@@ -25,6 +25,8 @@ dist/
 
 # JetBrains IDE
 .idea/
+*.iml
+*/*.iml
 
 # Unit test reports
 TEST*.xml
