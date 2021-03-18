@@ -22,6 +22,11 @@ dist/
 # Maven
 target/
 dist/
+.classpath
+.project
+
+# Eclipse
+.settings
 
 # JetBrains IDE
 .idea/
