@@ -6,8 +6,6 @@ import ar.edu.itba.paw.model.User;
 
 public interface UserService {
 
-  User findByUser(String id);
-
-  List<User> list();
-
+  User findById(long id);
+  User register(String username);
 }

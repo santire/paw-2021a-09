@@ -31,7 +31,7 @@
       <groupId>ar.edu.itba.paw</groupId>
       <artifactId>persistence</artifactId>
       <version>${parent.version}</version>
-        <scope>runtime</scope>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 
