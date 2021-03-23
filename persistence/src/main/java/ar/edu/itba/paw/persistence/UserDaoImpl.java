@@ -17,18 +17,19 @@ import java.util.Map;
 
 @Repository
 public class UserDaoImpl implements UserDao {
-    @Autowired
-    private DataSource ds;
+    //@Autowired
+    //private DataSource ds;
 
     private JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
 
+    @Autowired
     public UserDaoImpl(final DataSource ds){
         jdbcTemplate = new JdbcTemplate(ds);
         jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("userid");
-        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS users "
+        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS users( "
                 + "userid SERIAL PRIMARY KEY,"
                 + "username varchar(100)"
                 + ")");
