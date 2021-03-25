@@ -6,10 +6,6 @@ import ar.edu.itba.paw.model.User;
 
 public interface UserDao {
 
-  User get(String id);
-
-  List<User> list();
-
-  User save(User user);
-
+  User findById(long id);
+  User register(String username);
 }

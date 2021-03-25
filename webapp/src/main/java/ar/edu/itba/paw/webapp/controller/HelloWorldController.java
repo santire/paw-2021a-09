@@ -2,9 +2,13 @@ package ar.edu.itba.paw.webapp.controller;
 
 import java.util.Random;
 
+import ar.edu.itba.paw.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import ar.edu.itba.paw.service.UserService;
@@ -19,12 +23,21 @@ public class HelloWorldController {
     public ModelAndView helloWorld() {
         final ModelAndView mav = new ModelAndView("index");
 
-        final int usersCount = userService.list().size();
-        Random random = new Random();
-        final int randomUserId = random.nextInt(usersCount);
-
-        // randomizes user greeted on each response
-        mav.addObject("greeting", userService.list().get(randomUserId).getName());
         return mav;
     }
+
+    @RequestMapping("/register")
+    public ModelAndView register(@RequestParam(value = "username", required = true) final String username){
+        final User user = userService.register(username);
+        return new ModelAndView("redirect:/?userId=" + user.getId());
+    }
+
+    @RequestMapping("/user/{userId}")
+    public ModelAndView user(@PathVariable("userId") final long id){
+        final ModelAndView mav = new ModelAndView("index");
+        mav.addObject("user", userService.findById(id));
+        return mav;
+    }
+
+
 }

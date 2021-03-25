@@ -15,13 +15,12 @@ public class UserServiceImpl implements UserService {
   private UserDao userDao;
 
   @Override
-  public User findByUser(String id) {
-    return this.userDao.get(id);
+  public User findById(long id) {
+    return this.userDao.findById(id);
   }
 
   @Override
-  public List<User> list() {
-    return this.userDao.list();
+  public User register(final String username) {
+    return userDao.register(username);
   }
-
 }
