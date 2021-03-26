@@ -23,7 +23,6 @@
 </head>
 
 <body>
-
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
   <div class="container">
@@ -47,7 +46,7 @@
 
   <!-- Jumbotron Header -->
   <header class="jumbotron my-4">
-    <h1 class="display-3">Find a restaurant</h1>
+    <h1 class="display-3">Find a restaurant <strong>${user.getName()}</strong></h1>
     <p class="lead">Search for restaurants that suits your appetite. Like a Tinder with food.</p>
     <a href="#" class="btn btn-primary btn-lg">Call to action!</a>
   </header>
