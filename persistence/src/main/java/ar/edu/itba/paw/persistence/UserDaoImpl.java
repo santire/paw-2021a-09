@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -36,7 +37,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User register(final String username) {
-        final Number userId = jdbcInsert.executeAndReturnKey(Map.of("username", username));
+        final Number userId = jdbcInsert.executeAndReturnKey(Collections.singletonMap("username", username));
         return new User(userId.longValue(), username);
     }
 
