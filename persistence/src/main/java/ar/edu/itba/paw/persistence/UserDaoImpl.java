@@ -25,8 +25,8 @@ public class UserDaoImpl implements UserDao {
     public UserDaoImpl(final DataSource ds) {
         jdbcTemplate = new JdbcTemplate(ds);
         jdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("users").usingGeneratedKeyColumns("user_id");
-        jdbcTemplate.execute(
-                "CREATE TABLE IF NOT EXISTS users( " + "user_id SERIAL PRIMARY KEY," + "username varchar(100)" + ")");
+        // jdbcTemplate.execute(
+                // "CREATE TABLE IF NOT EXISTS users( " + "user_id SERIAL PRIMARY KEY," + "username varchar(100)" + ")");
     }
 
     @Override
