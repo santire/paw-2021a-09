@@ -1,0 +1,31 @@
+#burgundy {
+  color: rgb(153, 40, 59);
+}
+
+#orange,
+select,
+.btn {
+  color: orange;
+}
+
+.owl-prev,
+.owl-next {
+  width: 15px;
+  height: 100px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: block !important;
+  border: 0px solid black;
+}
+.owl-prev {
+  left: -22px;
+}
+.owl-next {
+  right: -22px;
+}
+.owl-prev i,
+.owl-next i {
+  transform: scale(2, 5);
+  color: #ccc;
+}
