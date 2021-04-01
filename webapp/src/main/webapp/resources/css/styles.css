@@ -8,6 +8,21 @@ select,
   color: orange;
 }
 
+form span {
+  background-color: white;
+  border-radius: 5px;
+}
+
+.search-bar {
+  width: 420px !important;
+}
+
+@media (max-width: 425px) {
+  .search-bar {
+    width: 200px !important;
+  }
+}
+
 /* carousel styling */
 .owl-prev,
 .owl-next {

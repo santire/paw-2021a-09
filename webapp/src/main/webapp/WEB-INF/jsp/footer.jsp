@@ -22,12 +22,13 @@
           </div>
         </div>
 
-        <div class="col item social">
+        <%--
+        <div class="col item social mx-auto justify-content-center">
           <a href="#"><i class="fa fa-facebook text-muted"></i></a
           ><a href="#"><i class="fa fa-instagram text-muted"></i></a
           ><a href="#"><i class="fa fa-twitter text-muted"></i></a
           ><a href="#"><i class="fa fa-snapchat text-muted"></i></a>
-        </div>
+        </div> --%>
       </div>
     </div>
   </footer>
