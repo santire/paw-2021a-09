@@ -8,11 +8,6 @@ select,
   color: orange;
 }
 
-form span {
-  background-color: white;
-  border-radius: 5px;
-}
-
 .search-bar {
   width: 420px !important;
 }

@@ -30,6 +30,13 @@ public class HelloWorldController {
         return mav;
     }
 
+    @RequestMapping("/restaurants")
+    public ModelAndView restaurants() {
+        final ModelAndView mav = new ModelAndView("restaurants");
+
+        return mav;
+    }
+
     @RequestMapping(path ={  "/register" }, method = RequestMethod.GET)
     public ModelAndView registerForm(@ModelAttribute("userForm") final UserForm form) {
         return new ModelAndView("register");

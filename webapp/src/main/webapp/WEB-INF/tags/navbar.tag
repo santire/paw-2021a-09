@@ -3,7 +3,7 @@
 
 <header>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand ml-2 font-weight-bold" href="#"
+    <a class="navbar-brand ml-2 font-weight-bold" href="/"
       ><span id="burgundy">Gourme</span><span id="orange">table</span></a
     >
     <button
@@ -39,11 +39,11 @@
           </div>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Ver todos</a>
+          <a class="nav-link" href="/restaurants">Ver todos</a>
         </li>
       </ul>
 
-      <form class="nav-item form-inline my-2 my-lg-0">
+      <form class="nav-item form-inline bg-light rounded my-2 my-lg-0">
         <span class="input-group">
           <input
             class="search-bar form-control mr-sm-2 input-lg"
