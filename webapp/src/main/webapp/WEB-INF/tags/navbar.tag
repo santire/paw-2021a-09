@@ -2,7 +2,7 @@
 <%@attribute name="user" required="true" type="ar.edu.itba.paw.model.User"%>
 
 <header>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
     <a class="navbar-brand ml-2 font-weight-bold" href="/"
       ><span id="burgundy">Gourme</span><span id="orange">table</span></a
     >

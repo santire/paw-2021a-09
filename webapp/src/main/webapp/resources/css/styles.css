@@ -47,6 +47,11 @@ select,
   background-color: #282d32;
 }
 
+.footer-light {
+  background-color: #f0f9ff;
+  color: #282d32;
+}
+
 /* footer styling */
 .footer-dark h3 {
   margin-top: 0;
