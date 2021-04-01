@@ -44,7 +44,7 @@ public class HelloWorldController {
             return registerForm(form);
         }
 
-        final User user = userService.register(form.getUsername());
+        final User user = userService.register(form.getUsername(),form.getPassword(),form.getFirst_name(),form.getLast_name(),form.getEmail(),form.getPhone());
         return new ModelAndView("redirect:/user/" + user.getId());
     }
 

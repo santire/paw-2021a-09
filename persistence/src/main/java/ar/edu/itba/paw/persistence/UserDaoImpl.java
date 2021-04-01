@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -15,12 +16,14 @@ import java.util.Optional;
 public class UserDaoImpl implements UserDao {
 
     private static final RowMapper<User> USER_ROW_MAPPER = (rs, rowNum) -> new User(
-            rs.getLong("user_id"),
-            rs.getString("username"),
-            rs.getString("password"),
-            rs.getString("full_name"),
-            rs.getString("email"),
-            rs.getString("phone") );
+        rs.getLong("user_id"),
+        rs.getString("username"),
+        rs.getString("password"),
+        rs.getString("first_name"),
+        rs.getString("last_name"),
+        rs.getString("email"),
+        rs.getString("phone")
+        );
 
     private JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
@@ -29,10 +32,8 @@ public class UserDaoImpl implements UserDao {
     public UserDaoImpl(final DataSource ds) {
         jdbcTemplate = new JdbcTemplate(ds);
         jdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("users").usingGeneratedKeyColumns("user_id");
-        jdbcTemplate.execute(
-        "CREATE TABLE IF NOT EXISTS users (user_id SERIAL PRIMARY KEY, username varchar(100), password varchar(100), full_name varchar(100), email varchar(100) UNIQUE, phone varchar(100))"
-        //"CREATE TABLE IF NOT EXISTS users( " + "user_id SERIAL PRIMARY KEY," + "username varchar(100)" + ")"       
-        );
+        // jdbcTemplate.execute(
+                // "CREATE TABLE IF NOT EXISTS users( " + "user_id SERIAL PRIMARY KEY," + "username varchar(100)" + ")");
     }
 
     @Override
@@ -42,11 +43,9 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public User register(final String username, final String password, final String fullname, final String email, final String phone) {
-        final Number userId = jdbcInsert.executeAndReturnKey(Map.of("username", username,"password",password,"fullname",fullname,"email", email,"phone",phone));
-        return new User(userId.longValue(), username,password,fullname, email, phone);
+    public User register(final String username,final String password,final String first_name,final String last_name,final String email,final String phone) {
+        final Number userId = jdbcInsert.executeAndReturnKey(Map.of("username", username,"password",password,"first_name",first_name,"last_name",last_name,"email", email,"phone",phone));
+        return new User(userId.longValue(), username,password, first_name,last_name,email,phone);
     }
-
-    
 
 }
