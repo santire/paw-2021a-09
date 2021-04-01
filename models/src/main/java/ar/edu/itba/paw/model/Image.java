@@ -1,10 +1,5 @@
 package ar.edu.itba.paw.model;
-
-import sun.nio.ch.IOUtil;
-
 import javax.imageio.ImageIO;
-// import javax.persistence.*;
-// import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
