@@ -1,9 +1,14 @@
 package ar.edu.itba.paw.webapp.forms;
 
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.NumberFormat;
+
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 public class UserForm {
+
+
 
   @Size(min = 6, max = 100)
   @Pattern(regexp = "[a-zA-Z0-9]+")
@@ -87,5 +92,4 @@ public class UserForm {
   public void setPhone(String phone) {
     this.phone = phone;
   }
-
 }

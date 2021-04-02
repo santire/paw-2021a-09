@@ -5,6 +5,8 @@ import ar.edu.itba.paw.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
@@ -14,6 +16,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 
+@EnableAsync
 @Service
 public class EmailServiceImpl implements EmailService{
 
@@ -21,7 +24,10 @@ public class EmailServiceImpl implements EmailService{
     @Autowired
     private JavaMailSender emailSender;
 
-    private void sendEmail(Email mail) {
+
+    @Async
+    @Override
+    public void sendEmail(Email mail) {
                 MimeMessage mimeMessage = emailSender.createMimeMessage();
                         try {
                             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
@@ -38,6 +44,7 @@ public class EmailServiceImpl implements EmailService{
                         }
             }
 
+    @Async
     @Override
     public void sendEmail(String to){
         Email email = new Email();
@@ -47,6 +54,7 @@ public class EmailServiceImpl implements EmailService{
                 sendEmail(email);
     }
 
+    @Async
     @Override
     public void sendReservationEmail(String to, User user, Date date, long quantity){
         Email email = new Email();
@@ -56,15 +64,17 @@ public class EmailServiceImpl implements EmailService{
         sendEmail(email);
     }
 
+    @Async
     @Override
     public void sendConfirmationEmail(String from, User user, Date date, long quantity) {
         Email email = new Email();
         email.setMailTo(user.getEmail());
-        email.setMailSubject("reserve confirmed!");
+        email.setMailSubject("confirmed reservation!");
         email.setMailContent("your reservation for:\n" + from + " has been confirmed \n"+ quantity + " persons, at " + date.toString() +"\n");
         sendEmail(email);
     }
 
+    @Async
     @Override
     public void sendRegistrationEmail(String to){
         Email email = new Email();

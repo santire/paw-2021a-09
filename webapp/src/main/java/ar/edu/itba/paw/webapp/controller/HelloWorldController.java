@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import ar.edu.itba.paw.service.EmailService;
 import ar.edu.itba.paw.service.ReservationService;
+import ar.edu.itba.paw.webapp.forms.ReservationForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -53,7 +54,6 @@ public class HelloWorldController {
         if (errors.hasErrors()) {
             return registerForm(form);
         }
-
         final User user = userService.register(form.getUsername(),form.getPassword(),form.getFirst_name(),form.getLast_name(),form.getEmail(),form.getPhone());
         return new ModelAndView("redirect:/user/" + user.getId());
     }
@@ -66,12 +66,24 @@ public class HelloWorldController {
     }
 
 
-    @RequestMapping("/send")
-    public ModelAndView sendR() {
-        final ModelAndView mav = new ModelAndView("index");
-        reservationService.addReservation(1, 1, new Date(), 5);
 
+    @RequestMapping(path ={  "/restaurant/{restaurantId}" }, method = RequestMethod.GET)
+    public ModelAndView restaurant( @ModelAttribute("reservationForm") final ReservationForm form, @PathVariable("restaurantId") final long restaurantId ) {
+
+        final ModelAndView mav = new ModelAndView("restaurant");
+        mav.addObject(restaurantId);
         return mav;
+    }
+
+    @RequestMapping(path ={  "/restaurant/{restaurantId}" }, method = RequestMethod.POST)
+    public ModelAndView register( @Valid @ModelAttribute("reservationForm") final ReservationForm form, final BindingResult errors, @PathVariable("restaurantId") final long restaurantId ) {
+
+        if (errors.hasErrors()) {
+            return restaurant(form, restaurantId);
+        }
+
+        reservationService.addReservation(1,restaurantId,new Date(),Long.parseLong(form.getQuantity()));
+        return new ModelAndView("redirect:/");
     }
 
 

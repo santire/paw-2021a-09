@@ -40,7 +40,8 @@ CREATE TABLE IF NOT EXISTS restaurants_tags(
 CREATE TABLE IF NOT EXISTS reservations(
     reservation_id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
-    restaurant_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
+    /*restaurant_id INTEGER REFERENCES restaurants(restaurant_id) ON DELETE CASCADE,*/
+    restaurant_id INTEGER,
     date TIMESTAMP,
     quantity INTEGER
     );
