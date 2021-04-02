@@ -1,9 +1,12 @@
 package ar.edu.itba.paw.webapp.controller;
 
+import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
 
 import javax.validation.Valid;
 
+import ar.edu.itba.paw.service.RestaurantService;
+import ar.edu.itba.paw.webapp.forms.SearchForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -18,11 +21,16 @@ import ar.edu.itba.paw.service.UserService;
 import ar.edu.itba.paw.webapp.exceptions.UserNotFoundException;
 import ar.edu.itba.paw.webapp.forms.UserForm;
 
+import java.util.Optional;
+
 @Controller
 public class HelloWorldController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RestaurantService restaurantService;
 
     @RequestMapping("/")
     public ModelAndView helloWorld() {
@@ -54,5 +62,37 @@ public class HelloWorldController {
         mav.addObject("user", userService.findById(id).orElseThrow(UserNotFoundException::new));
         return mav;
     }
+
+    @RequestMapping("/search")
+    public ModelAndView searchResults(@RequestParam(name = "find") String search){
+        final ModelAndView mav = new ModelAndView("search");
+        Optional<Restaurant> restaurant = restaurantService.findByName(search);
+        if(restaurant.isPresent()){
+            mav.addObject("restaurant", restaurant.get().getName());
+        }
+        else{
+            mav.addObject("restaurant", "Nothing found.");
+        }
+        return mav;
+    }
+
+   /* @RequestMapping("/search")
+    public ModelAndView searchResults(@Valid @ModelAttribute("SearchForm") final SearchForm form, final BindingResult errors){
+        if(errors.hasErrors()){
+            return helloWorld();
+        }
+
+        final ModelAndView mav = new ModelAndView("search");
+        mav.addObject("find", form.getSearch());
+        return mav;
+    }*/
+
+    @RequestMapping("/landing")
+    public ModelAndView landing(){
+        final ModelAndView mav = new ModelAndView("landing");
+        return mav;
+    }
+
+
 
 }
