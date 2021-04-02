@@ -6,18 +6,18 @@
     <title>Gourmetable</title>
 </head>
 <body>
-<%--<form action="${pageContext.request.contextPath}\search">
+<form action="${pageContext.request.contextPath}\search" method="get">
     <label>Search:
     <input type="text" name="find"/>
     </label>
     <input type="submit"/>
-</form>--%>
+</form>
 
-<c:url value="${pageContext.request.contextPath}\search" var="path"/>
+<%--<c:url value="${pageContext.request.contextPath}\search" var="path"/>
 <form:form modelAttribute="SearchForm" action="${path}">
     <form:label path="search">Search a restaurant</form:label>
     <form:input path="search" type="text"/>
     <form:errors path="search" cssClass="formError"/>
-</form:form>
+</form:form>--%>
 </body>
 </html>

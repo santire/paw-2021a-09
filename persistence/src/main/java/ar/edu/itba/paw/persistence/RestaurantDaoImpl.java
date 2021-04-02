@@ -42,9 +42,11 @@ public class RestaurantDaoImpl implements RestaurantDao {
 
     @Override
     public Optional<Restaurant> findByName(String name){
-        return jdbcTemplate.query("SELECT * FROM restaurants WHERE name = ?", RESTAURANT_ROW_MAPPER, name)
+        return jdbcTemplate.query("SELECT * FROM restaurants WHERE name LIKE ?", RESTAURANT_ROW_MAPPER, name + "%")
                 .stream().findFirst();
     }
+
+    //SELECT * FROM restaurants WHERE name ILIKE '%?%"
 
     @Override
     public Restaurant registerRestaurant(String name, String address, String phoneNumber,
