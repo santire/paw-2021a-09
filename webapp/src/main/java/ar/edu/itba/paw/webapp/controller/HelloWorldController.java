@@ -10,6 +10,7 @@ import ar.edu.itba.paw.webapp.forms.RestaurantForm;
 import ar.edu.itba.paw.webapp.forms.SearchForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -64,42 +65,6 @@ public class HelloWorldController {
         return mav;
     }
 
-    @RequestMapping("/search")
-    public ModelAndView searchResults(@RequestParam(name = "find") String search){
-        final ModelAndView mav = new ModelAndView("search");
-        Optional<Restaurant> restaurant = restaurantService.findByName(search);
-        if(restaurant.isPresent()){
-            mav.addObject("restaurant", restaurant.get().getName());
-        }
-        else{
-            mav.addObject("restaurant", "Nothing found.");
-        }
-        return mav;
-    }
-
-    @RequestMapping("/landing")
-    public ModelAndView landing(){
-        final ModelAndView mav = new ModelAndView("landing");
-        return mav;
-    }
-
-/*    @RequestMapping("/search")
-    public ModelAndView searchResults(@Valid @ModelAttribute("SearchForm") final SearchForm form, final BindingResult errors){
-        if(errors.hasErrors()){
-            return helloWorld();
-        }
-
-        final ModelAndView mav = new ModelAndView("search");
-        mav.addObject("restaurant", form.getSearch());
-        return mav;
-    }*/
-
-/*    @RequestMapping("/landing")
-    public ModelAndView landing(@ModelAttribute("SearchForm") final SearchForm form){
-        final ModelAndView mav = new ModelAndView("landing");
-        return mav;
-    }*/
-
     @RequestMapping(path ={"/registerRestaurant"}, method = RequestMethod.GET)
     public ModelAndView registerRestaurant(@ModelAttribute("RestaurantForm") final RestaurantForm form) {
         return new ModelAndView("registerRestaurant");
@@ -114,12 +79,4 @@ public class HelloWorldController {
         final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(), form.getPhoneNumber(), 0, 1);
         return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
     }
-
-    @RequestMapping("/restaurant/{id}")
-    public ModelAndView restaurant(@PathVariable("id") final long id){
-        final ModelAndView mav = new ModelAndView("restaurant");
-        mav.addObject("restaurant", restaurantService.findById(id).get());
-        return mav;
-    }
-
 }
