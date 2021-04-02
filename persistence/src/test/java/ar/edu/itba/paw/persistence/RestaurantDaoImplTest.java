@@ -88,4 +88,10 @@ public class RestaurantDaoImplTest {
         assertTrue(restaurant.isPresent());
         assertEquals(PREV_INSERTED_NAME, restaurant.get().getName());
     }
+
+    @Test
+    public void testRestaurantSearchByName(){
+        List<Restaurant> restaurants = restaurantDao.findByName(PATTERN);
+        assertEquals(2, restaurants.size());
+    }
 }

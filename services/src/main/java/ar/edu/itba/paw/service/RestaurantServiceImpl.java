@@ -19,7 +19,7 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     @Override
-    public Optional<Restaurant> findByName(String name){
+    public List<Restaurant> findByName(String name){
         return this.restaurantDao.findByName(name);
     }
 
