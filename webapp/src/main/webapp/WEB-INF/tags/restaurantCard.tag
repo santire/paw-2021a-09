@@ -7,7 +7,7 @@
 <div class="card">
   <img
     src="${imgUrl}"
-    class="card-img-top"
+    class="img-thumbnail rounded card-img-top"
     alt="..."
   />
   <div class="card-body">
