@@ -3,10 +3,12 @@ package ar.edu.itba.paw.persistence;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import javax.sql.DataSource;
+import javax.swing.text.html.Option;
 
 import ar.edu.itba.paw.model.Restaurant;
 import org.junit.Before;
@@ -27,6 +29,15 @@ import ar.edu.itba.paw.persistence.config.TestConfig;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestConfig.class)
 public class RestaurantDaoImplTest {
+    // General purpose
+    private static final int INSERTED_SIZE = 3;
+
+    // Restaurant to search
+    private static final long ID = 1;
+    private static final String PREV_INSERTED_NAME = "BurgerKing";
+    private static final String PATTERN = "Burg";
+
+    // Restaurant to insert
     private static final String NAME = "McDonalds";
     private static final String ADDRESS = "9 de Julio";
     private static final String PHONE_NUMBER = "46511234";
@@ -56,18 +67,25 @@ public class RestaurantDaoImplTest {
         assertEquals(ADDRESS, restaurant.getAddress());
         assertEquals(PHONE_NUMBER, restaurant.getPhoneNumber());
         assertEquals(USER_ID, restaurant.getUserId());
-        assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "restaurants"));
+        assertEquals(INSERTED_SIZE + 1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "restaurants"));
     }
 
     @Test
     public void testDeleteRestaurants(){
         boolean success = restaurantDao.deleteRestaurantById(1);
-        assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "restaurants"));
+        assertEquals(INSERTED_SIZE - 1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "restaurants"));
     }
 
     @Test
     public void testListAllRestaurants(){
         List<Restaurant> restaurantList = restaurantDao.getAllRestaurants();
-        assertEquals(2, restaurantList.size());
+        assertEquals(INSERTED_SIZE, restaurantList.size());
+    }
+
+    @Test
+    public void testRestaurantSearchById(){
+        Optional<Restaurant> restaurant = restaurantDao.findById(ID);
+        assertTrue(restaurant.isPresent());
+        assertEquals(PREV_INSERTED_NAME, restaurant.get().getName());
     }
 }
