@@ -5,6 +5,7 @@ import ar.edu.itba.paw.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
@@ -59,7 +60,15 @@ public class ReservationDaoImpl implements ReservationDao{
 
     @Override
     public Reservation addReservation( long userId, long restaurantId, Date date, long quantity) {
-        final Number reservationId = jdbcInsert.executeAndReturnKey(Map.of("user_id", userId,"restaurant_id",restaurantId,"date",date,"quantity",quantity));
+
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("user_id", userId);
+        params.addValue("restaurant_id", restaurantId);
+        params.addValue("date", date);
+        params.addValue("quantity", quantity);
+
+        final Number reservationId = jdbcInsert.executeAndReturnKey(params);
+
     return new Reservation(reservationId.longValue(),userId,restaurantId,date,quantity);
     }
 

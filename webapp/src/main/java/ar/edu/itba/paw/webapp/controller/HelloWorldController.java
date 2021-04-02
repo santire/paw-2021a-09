@@ -34,10 +34,10 @@ public class HelloWorldController {
     @Autowired
     private ReservationService reservationService;
 
+
     @RequestMapping("/")
     public ModelAndView helloWorld() {
         final ModelAndView mav = new ModelAndView("index");
-
         return mav;
     }
 
@@ -69,10 +69,7 @@ public class HelloWorldController {
     @RequestMapping("/send")
     public ModelAndView sendR() {
         final ModelAndView mav = new ModelAndView("index");
-
-        emailService.sendEmail("sburgos@itba.edu.ar");
-
-        //reservationService.addReservation(1, 1, new Date(), 5);
+        reservationService.addReservation(1, 1, new Date(), 5);
 
         return mav;
     }
