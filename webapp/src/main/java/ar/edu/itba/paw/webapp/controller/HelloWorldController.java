@@ -37,6 +37,14 @@ public class HelloWorldController {
         return mav;
     }
 
+    @RequestMapping("/restaurant/{restaurantId}")
+    public ModelAndView restaurant(@PathVariable("restaurantId") final long id) {
+        final ModelAndView mav = new ModelAndView("restaurant");
+        // mav.addObject("restaurant", restaurantService.findById(id).orElseThrow(RestaurantNotFoundException::new));
+        return mav;
+    }
+
+
     @RequestMapping(path ={  "/register" }, method = RequestMethod.GET)
     public ModelAndView registerForm(@ModelAttribute("userForm") final UserForm form) {
         return new ModelAndView("register");

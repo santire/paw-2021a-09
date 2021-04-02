@@ -10,6 +10,8 @@ select,
 
 .search-bar {
   width: 420px !important;
+  outline-color: white !important;
+  border-color: white !important;
 }
 
 @media (max-width: 425px) {

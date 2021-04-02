@@ -43,15 +43,15 @@
         </li>
       </ul>
 
-      <form class="nav-item form-inline bg-light rounded my-2 my-lg-0">
+      <form class="nav-item bg-light rounded my-2 my-lg-0">
         <span class="input-group">
           <input
-            class="search-bar form-control mr-sm-2 input-lg"
+            class="search-bar form-control mr-auto input-lg"
             type="search"
             placeholder="Search"
             aria-label="Search"
           />
-            <button class="btn my-2 my-sm-0" type="submit">
+            <button class="btn my-2 my-sm-0 ml-auto" type="submit">
             <span class="fa fa-search text-muted"></span>
           </button>
         </span>
