@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
   first_name VARCHAR(100),
   last_name VARCHAR(100),
   email VARCHAR(100) UNIQUE,
-  phone_number VARCHAR(100)
+  phone VARCHAR(100)
  );
 
 /*

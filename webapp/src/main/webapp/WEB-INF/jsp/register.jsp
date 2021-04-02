@@ -42,13 +42,6 @@
           </form:label>
       </div>
       <div>
-        <form:errors path="username" cssStyle="color: red;" element="p"/>
-          <form:label path="username">
-            Username:
-            <form:input type="text" path="username"/>
-          </form:label>
-      </div>
-      <div>
         <form:errors path="phone" cssStyle="color: red;" element="p"/>
           <form:label path="phone">
             Phone Number:
