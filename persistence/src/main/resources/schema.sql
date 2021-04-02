@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS users (
   phone VARCHAR(100)
  );
 
-/*
 CREATE TABLE IF NOT EXISTS restaurants(
   restaurant_id SERIAL PRIMARY KEY,
   name VARCHAR(100),
@@ -37,4 +36,11 @@ CREATE TABLE IF NOT EXISTS restaurants_tags(
   tag_id INTEGER REFERENCES tags(tag_id),
   CONSTRAINT restaurants_tags_pkey PRIMARY KEY (restaurant_id, tag_id)
 );
-*/
+
+CREATE TABLE IF NOT EXISTS reservations(
+    reservation_id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
+    restaurant_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
+    date TIMESTAMP,
+    quantity INTEGER
+    );

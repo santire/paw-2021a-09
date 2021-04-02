@@ -4,6 +4,8 @@ import ar.edu.itba.paw.model.User;
 
 import javax.validation.Valid;
 
+import ar.edu.itba.paw.service.EmailService;
+import ar.edu.itba.paw.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -18,11 +20,19 @@ import ar.edu.itba.paw.service.UserService;
 import ar.edu.itba.paw.webapp.exceptions.UserNotFoundException;
 import ar.edu.itba.paw.webapp.forms.UserForm;
 
+import java.util.Date;
+
 @Controller
 public class HelloWorldController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private ReservationService reservationService;
 
     @RequestMapping("/")
     public ModelAndView helloWorld() {
@@ -54,5 +64,18 @@ public class HelloWorldController {
         mav.addObject("user", userService.findById(id).orElseThrow(UserNotFoundException::new));
         return mav;
     }
+
+
+    @RequestMapping("/send")
+    public ModelAndView sendR() {
+        final ModelAndView mav = new ModelAndView("index");
+
+        emailService.sendEmail("sburgos@itba.edu.ar");
+
+        //reservationService.addReservation(1, 1, new Date(), 5);
+
+        return mav;
+    }
+
 
 }

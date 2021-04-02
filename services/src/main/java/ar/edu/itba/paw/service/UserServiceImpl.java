@@ -14,6 +14,9 @@ public class UserServiceImpl implements UserService {
   @Autowired
   private UserDao userDao;
 
+  //@Autowired
+  //private EmailService emailService;
+
   @Override
   public Optional<User> findById(long id) {
     return this.userDao.findById(id);
@@ -21,6 +24,8 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public User register(String username, String password, String first_name, String last_name, String email, String phone) {
+  //  emailService.sendRegistrationEmail(email);
+
     return userDao.register(username,password,first_name,last_name, email, phone);
   }
 
