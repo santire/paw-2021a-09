@@ -11,4 +11,6 @@ public interface RestaurantDao {
     public Restaurant registerRestaurant(String name, String address, String phoneNumber,
                                float rating, long userId);
     public List<Restaurant> getAllRestaurants();
+    public boolean deleteRestaurantById(long id);
+    public boolean deleteRestaurantByName(String name);
 }

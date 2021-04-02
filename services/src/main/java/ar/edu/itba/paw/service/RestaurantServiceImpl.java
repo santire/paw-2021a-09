@@ -34,4 +34,14 @@ public class RestaurantServiceImpl implements RestaurantService{
         return this.restaurantDao.getAllRestaurants();
     }
 
+    @Override
+    public boolean deleteRestaurantById(long id){
+        return this.restaurantDao.deleteRestaurantById(id);
+    }
+
+    @Override
+    public boolean deleteRestaurantByName(String name){
+        return this.restaurantDao.deleteRestaurantByName(name);
+    }
+
 }

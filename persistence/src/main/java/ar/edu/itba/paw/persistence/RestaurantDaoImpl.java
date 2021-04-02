@@ -46,8 +46,6 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 .stream().findFirst();
     }
 
-    //SELECT * FROM restaurants WHERE name ILIKE '%?%"
-
     @Override
     public Restaurant registerRestaurant(String name, String address, String phoneNumber,
                                          float rating, long userId){
@@ -64,5 +62,21 @@ public class RestaurantDaoImpl implements RestaurantDao {
     @Override
     public List<Restaurant> getAllRestaurants(){
         return jdbcTemplate.query("SELECT * FROM restaurants", RESTAURANT_ROW_MAPPER).stream().collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean deleteRestaurantById(long id) {
+        String sql = "DELETE FROM restaurants WHERE restaurant_id = ?";
+        Object[] args = new Object[] {id};
+
+        return jdbcTemplate.update(sql, args) == 1;
+    }
+
+    @Override
+    public boolean deleteRestaurantByName(String name) {
+        String sql = "DELETE FROM restaurants WHERE name = ?";
+        Object[] args = new Object[] {name};
+
+        return jdbcTemplate.update(sql, args) == 1;
     }
 }
