@@ -29,6 +29,9 @@ public class User {
     return this.username;
   }
 
+  public String getName() {
+    return this.username;
+  }
   public void setUsername(String username) {
     this.username = username;
   }
