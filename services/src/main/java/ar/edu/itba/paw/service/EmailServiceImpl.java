@@ -32,9 +32,9 @@ public class EmailServiceImpl implements EmailService{
                             emailSender.send(mimeMessageHelper.getMimeMessage());
 
                         } catch (MessagingException e) {
-                            e.printStackTrace();
+                            //e.printStackTrace();
                         } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
+                            //e.printStackTrace();
                         }
             }
 
