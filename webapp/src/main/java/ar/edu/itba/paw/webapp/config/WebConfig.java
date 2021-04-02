@@ -75,9 +75,9 @@ public class WebConfig {
       JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
       mailSender.setHost("smtp.gmail.com");
       mailSender.setPort(587);
-
-      mailSender.setUsername("recordpaw2020@gmail.com");
-      mailSender.setPassword("twytgaptuqsrpurs");
+      
+      mailSender.setUsername("gourmetablewebapp@gmail.com");
+      mailSender.setPassword("evjotkxuvnmjknuu");
 
       Properties props = mailSender.getJavaMailProperties();
       props.put("mail.transport.protocol", "smtp");
