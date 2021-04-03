@@ -16,9 +16,18 @@
         <h5 class="card-title">${name}</h5>
         <p class="card-text"><medium class="text-muted">${address}</medium></p>
         <p class="card-text"><medium class="text-muted">${phoneNumber}</medium></p>
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text"><i class="fa fa-clock-o"></i></span>
+          </div>
+          <input type="number" min="0" max="23" class="form-control" aria-label="Seleccione horario para su reserva">
+          <div class="input-group-append">
+            <span class="input-group-text">:00</span>
+          </div>
+        </div>
         <a 
         class="btn btn-outline-secondary btn-block">
-        Reservar 
+        Reservar Hoy 
         </a>
       </div>
     </div>
