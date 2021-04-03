@@ -42,8 +42,6 @@ public class RestaurantDaoImpl implements RestaurantDao {
 
     @Override
     public List<Restaurant> findByName(String name){
-      /*  return jdbcTemplate.query("SELECT * FROM restaurants WHERE name LIKE ?", RESTAURANT_ROW_MAPPER, name + "%")
-                .stream().findFirst();*/
         return jdbcTemplate.query("SELECT * FROM restaurants WHERE name LIKE ?", RESTAURANT_ROW_MAPPER, name + '%').stream().collect(Collectors.toList());
     }
 
