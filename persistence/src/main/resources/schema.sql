@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS users (
   phone VARCHAR(100)
  );
 
-/*
 CREATE TABLE IF NOT EXISTS restaurants(
   restaurant_id SERIAL PRIMARY KEY,
   name VARCHAR(100),
@@ -27,6 +26,7 @@ CREATE TABLE IF NOT EXISTS restaurants(
   user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE
 );
 
+/*
 CREATE TABLE IF NOT EXISTS tags(
   tag_id SERIAL PRIMARY KEY,
   category VARCHAR(100)
