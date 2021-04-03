@@ -21,6 +21,8 @@ public class ReservationServiceImpl implements ReservationService{
     private EmailService emailService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private RestaurantService restaurantService;
 
     @Override
     public List<Reservation> findByUser(int userId) {
@@ -41,13 +43,13 @@ public class ReservationServiceImpl implements ReservationService{
     public Reservation addReservation(long userId, long restaurantId, Date date, long quantity) {
         User user = userService.findById(userId).orElseThrow(() -> new IllegalStateException("Reservation: User doesnt exist"));
 
-        //get the restaurant email
-        String restaurantEmail = "sburgos@itba.edu.ar";
+        User restaurantOwner = restaurantService.findRestaurantOwner(restaurantId).orElseThrow(() -> new IllegalStateException("Reservation: Restaurant doesnt exist"));
+
 
         //send email to restaurant
-        emailService.sendReservationEmail(restaurantEmail, user, date, quantity);
+        emailService.sendReservationEmail(restaurantOwner, user, date, quantity);
         //for now its autoconfirmed
-        emailService.sendConfirmationEmail(restaurantEmail, user,date,quantity);
+        emailService.sendConfirmationEmail(restaurantOwner, user,date,quantity);
 
         return reservationDao.addReservation(user.getId(),restaurantId,date,quantity);
     }

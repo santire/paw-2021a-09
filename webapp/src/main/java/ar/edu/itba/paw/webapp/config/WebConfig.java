@@ -75,7 +75,7 @@ public class WebConfig {
       JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
       mailSender.setHost("smtp.gmail.com");
       mailSender.setPort(587);
-      
+
       mailSender.setUsername("gourmetablewebapp@gmail.com");
       mailSender.setPassword("evjotkxuvnmjknuu");
 

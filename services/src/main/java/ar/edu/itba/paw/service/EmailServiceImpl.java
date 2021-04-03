@@ -56,9 +56,9 @@ public class EmailServiceImpl implements EmailService{
 
     @Async
     @Override
-    public void sendReservationEmail(String to, User user, Date date, long quantity){
+    public void sendReservationEmail(User restaurantOwner, User user, Date date, long quantity){
         Email email = new Email();
-        email.setMailTo(to);
+        email.setMailTo(restaurantOwner.getEmail());
         email.setMailSubject("New reservation");
         email.setMailContent("New reservation from:\n" + user.getEmail() + "\nfor "+ quantity + " persons, at " + date.toString() +"\n");
         sendEmail(email);
@@ -66,11 +66,11 @@ public class EmailServiceImpl implements EmailService{
 
     @Async
     @Override
-    public void sendConfirmationEmail(String from, User user, Date date, long quantity) {
+    public void sendConfirmationEmail(User restaurantOwner, User user, Date date, long quantity) {
         Email email = new Email();
         email.setMailTo(user.getEmail());
         email.setMailSubject("confirmed reservation!");
-        email.setMailContent("your reservation for:\n" + from + " has been confirmed \n"+ quantity + " persons, at " + date.toString() +"\n");
+        email.setMailContent("your reservation for:\n" + restaurantOwner.getEmail() + " has been confirmed \n"+ quantity + " persons, at " + date.toString() +"\n");
         sendEmail(email);
     }
 

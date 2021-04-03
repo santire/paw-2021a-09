@@ -10,7 +10,7 @@ public interface EmailService {
     public void sendEmail(String to);
     public void sendEmail(Email mail);
 
-    public void sendReservationEmail(String to, User user, Date date, long quantity);
-    public void sendConfirmationEmail(String from, User user, Date date, long quantity);
+    public void sendReservationEmail(User restaurantOwner, User user, Date date, long quantity);
+    public void sendConfirmationEmail(User restaurantOwner, User user, Date date, long quantity);
     public void sendRegistrationEmail(String to);
 }

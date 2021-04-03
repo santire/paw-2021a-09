@@ -43,7 +43,7 @@ public class UserDaoImpl implements UserDao {
     @Override
     public User register(final String username,final String password,final String first_name,final String last_name,final String email,final String phone) {
 
-        //Map.of is not java 8
+
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("username", username);
         params.addValue("password", password);
