@@ -48,9 +48,9 @@ public class WebConfig {
 
     final SimpleDriverDataSource ds = new SimpleDriverDataSource();
     ds.setDriverClass(org.postgresql.Driver.class);
-    ds.setUrl("jdbc:postgresql://localhost/paw");
-    ds.setUsername("root");
-    ds.setPassword("root");
+      ds.setUrl("jdbc:postgresql://localhost/paw");
+      ds.setUsername("root");
+      ds.setPassword("root");
 
     // remote testing database (very slow)
 
@@ -82,8 +82,8 @@ public class WebConfig {
       mailSender.setHost("smtp.gmail.com");
       mailSender.setPort(587);
 
-      mailSender.setUsername("recordpaw2020@gmail.com");
-      mailSender.setPassword("twytgaptuqsrpurs");
+      mailSender.setUsername("gourmetablewebapp@gmail.com");
+      mailSender.setPassword("evjotkxuvnmjknuu");
 
       Properties props = mailSender.getJavaMailProperties();
       props.put("mail.transport.protocol", "smtp");

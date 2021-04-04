@@ -1,8 +1,17 @@
 package ar.edu.itba.paw.webapp.controller;
 
+import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
 
 import javax.validation.Valid;
+
+
+import ar.edu.itba.paw.service.ReservationService;
+import ar.edu.itba.paw.webapp.forms.ReservationForm;
+
+import ar.edu.itba.paw.service.RestaurantService;
+import ar.edu.itba.paw.webapp.forms.RestaurantForm;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,10 +21,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-
 import ar.edu.itba.paw.service.UserService;
 import ar.edu.itba.paw.webapp.exceptions.UserNotFoundException;
 import ar.edu.itba.paw.webapp.forms.UserForm;
+
+
+import java.util.Date;
+
 
 @Controller
 public class HelloWorldController {
@@ -23,10 +35,17 @@ public class HelloWorldController {
     @Autowired
     private UserService userService;
 
+
+    @Autowired
+    private ReservationService reservationService;
+
+    @Autowired
+    private RestaurantService restaurantService;
+
+
     @RequestMapping("/")
     public ModelAndView helloWorld() {
         final ModelAndView mav = new ModelAndView("home");
-
         return mav;
     }
 
@@ -57,8 +76,7 @@ public class HelloWorldController {
         if (errors.hasErrors()) {
             return registerForm(form);
         }
-
-        final User user = userService.register(form.getUsername());
+        final User user = userService.register(form.getUsername(),form.getPassword(),form.getFirst_name(),form.getLast_name(),form.getEmail(),form.getPhone());
         return new ModelAndView("redirect:/user/" + user.getId());
     }
 
@@ -67,6 +85,44 @@ public class HelloWorldController {
         final ModelAndView mav = new ModelAndView("home");
         mav.addObject("user", userService.findById(id).orElseThrow(UserNotFoundException::new));
         return mav;
+    }
+
+
+    @RequestMapping(path ={  "/restaurant/{restaurantId}" }, method = RequestMethod.GET)
+    public ModelAndView restaurant( @ModelAttribute("reservationForm") final ReservationForm form, @PathVariable("restaurantId") final long restaurantId ) {
+
+        final ModelAndView mav = new ModelAndView("restaurant");
+        mav.addObject(restaurantId);
+        return mav;
+    }
+
+    @RequestMapping(path ={  "/restaurant/{restaurantId}" }, method = RequestMethod.POST)
+    public ModelAndView register( @Valid @ModelAttribute("reservationForm") final ReservationForm form, final BindingResult errors, @PathVariable("restaurantId") final long restaurantId ) {
+
+        if (errors.hasErrors()) {
+            return restaurant(form, restaurantId);
+        }
+
+        reservationService.addReservation(1,restaurantId,new Date(),Long.parseLong(form.getQuantity()));
+        return new ModelAndView("redirect:/");
+    }
+
+
+    @RequestMapping(path ={"/registerRestaurant"}, method = RequestMethod.GET)
+    public ModelAndView registerRestaurant(@ModelAttribute("RestaurantForm") final RestaurantForm form) {
+        return new ModelAndView("registerRestaurant");
+    }
+
+    @RequestMapping(path ={"/registerRestaurant"}, method = RequestMethod.POST)
+    public ModelAndView registerRestaurant(@Valid @ModelAttribute("RestaurantForm") final RestaurantForm form, final BindingResult errors ) {
+        if (errors.hasErrors()) {
+            return registerRestaurant(form);
+        }
+
+        restaurantService.registerRestaurant(form.getName(), form.getAddress(), form.getPhoneNumber(), 0, 1);
+        final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(), form.getPhoneNumber(), 0, 1);
+
+        return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
     }
 
 }
