@@ -20,7 +20,10 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item dropdown">
+        <li class="nav-item">
+          <a class="nav-link" href="/restaurants">Ver todos</a>
+        </li>
+        <li class="nav-item dropdown" style="visibility: hidden;">
           <a
             class="nav-link dropdown-toggle"
             href="#"
@@ -38,25 +41,23 @@
             <a class="dropdown-item" href="#">Asiatica</a>
           </div>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/restaurants">Ver todos</a>
-        </li>
       </ul>
 
-      <form class="nav-item bg-light rounded my-2 my-lg-0">
+      <form class="nav-item bg-light rounded my-2 my-lg-0" action="/restaurants">
         <span class="input-group">
           <input
             class="search-bar form-control mr-auto input-lg"
             type="search"
             placeholder="Search"
             aria-label="Search"
+            name="search"
           />
             <button class="btn my-2 my-sm-0 ml-auto" type="submit">
             <span class="fa fa-search text-muted"></span>
           </button>
         </span>
       </form>
-      <ul class="navbar-nav ml-auto">
+      <ul class="navbar-nav ml-auto" style="visibility: hidden">
         <c:choose>
             <c:when test="${empty user}">
                 <ul class="navbar-nav mr-auto mt-2 mt-lg-0 pl-3">

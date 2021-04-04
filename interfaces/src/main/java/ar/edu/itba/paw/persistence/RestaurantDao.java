@@ -15,6 +15,8 @@ public interface RestaurantDao {
 
     public List<Restaurant> getAllRestaurants();
 
+    public List<Restaurant> getAllRestaurants(String searchTerm);
+
     public List<Restaurant> getPopularRestaurants();
 
     public boolean deleteRestaurantById(long id);

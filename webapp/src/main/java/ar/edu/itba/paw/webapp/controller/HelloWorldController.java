@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import ar.edu.itba.paw.service.UserService;
 import ar.edu.itba.paw.webapp.exceptions.UserNotFoundException;
@@ -52,9 +53,12 @@ public class HelloWorldController {
     }
 
     @RequestMapping("/restaurants")
-    public ModelAndView restaurants() {
+    public ModelAndView restaurants(@RequestParam(required=false) String search) {
         final ModelAndView mav = new ModelAndView("restaurants");
-        mav.addObject("restaurants", restaurantService.getAllRestaurants());
+        if (search == null) {
+            search="";
+        }
+        mav.addObject("restaurants", restaurantService.getAllRestaurants(search));
 
         return mav;
     }
