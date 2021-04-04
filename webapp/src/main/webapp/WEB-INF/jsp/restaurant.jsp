@@ -5,7 +5,7 @@
   <jsp:body>
     <main>
       <sc:restaurantBody 
-        imgUrl="/resources/images/resto1.jpg"
+        imgUrl="${pageContext.request.contextPath}/resources/images/resto1.jpg"
         restaurant="${restaurant}"
         />
     </main>

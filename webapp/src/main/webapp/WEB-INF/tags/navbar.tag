@@ -3,8 +3,8 @@
 
 <header>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
-    <a class="navbar-brand ml-2 font-weight-bold" href="/"
-      ><img src="/resources/images/logo.svg" height="40" width="40" class="pb-2 pr-1" \><span id="burgundy">Gourme</span><span id="orange">table</span></a
+    <a class="navbar-brand ml-2 font-weight-bold" href="${pageContext.request.contextPath}/"
+      ><img src="${pageContext.request.contextPath}/resources/images/logo.svg" height="40" width="40" class="pb-2 pr-1" \><span id="burgundy">Gourme</span><span id="orange">table</span></a
     >
     <button
       class="navbar-toggler"
@@ -21,7 +21,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <a class="nav-link" href="/restaurants">Ver todos</a>
+          <a class="nav-link" href="${pageContext.request.contextPath}/restaurants">Ver todos</a>
         </li>
         <li class="nav-item dropdown" style="visibility: hidden;">
           <a
@@ -43,7 +43,7 @@
         </li>
       </ul>
 
-      <form class="nav-item bg-light rounded my-2 my-lg-0" action="/restaurants">
+      <form class="nav-item bg-light rounded my-2 my-lg-0" action="${pageContext.request.contextPath}/restaurants">
         <span class="input-group">
           <input
             class="search-bar form-control mr-auto input-lg"
@@ -62,10 +62,10 @@
             <c:when test="${empty user}">
                 <ul class="navbar-nav mr-auto mt-2 mt-lg-0 pl-3">
                   <li class="nav-item">
-                    <a class="nav-link" href="/register">Registrarse</a>
+                    <a class="nav-link" href="${pageContext.request.contextPath}/register">Registrarse</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="/login">Log in</a>
+                    <a class="nav-link" href="${pageContext.request.contextPath}/login">Log in</a>
                   </li>
                 </ul>
             </c:when>

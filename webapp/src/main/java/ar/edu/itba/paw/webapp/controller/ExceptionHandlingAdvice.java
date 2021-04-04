@@ -13,7 +13,7 @@ public class ExceptionHandlingAdvice  {
 
     @ExceptionHandler(NoHandlerFoundException.class)
     public ModelAndView ex(NoHandlerFoundException exception) {
-        final ModelAndView mav = new ModelAndView("index");
+        final ModelAndView mav = new ModelAndView("home");
 
         return mav;
     }

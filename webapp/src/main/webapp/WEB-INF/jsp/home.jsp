@@ -15,7 +15,7 @@
               <div class="owl-carousel owl-theme">
                 <c:forEach var="restaurant" items="${popularRestaurants}" >
                   <sc:restaurantCard
-                    imgUrl="/resources/images/resto1.jpg"
+                    imgUrl="${pageContext.request.contextPath}/resources/images/resto1.jpg"
                     restaurant="${restaurant}"
                   />
                 </c:forEach>

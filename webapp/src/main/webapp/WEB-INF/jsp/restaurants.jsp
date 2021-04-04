@@ -10,7 +10,7 @@ prefix="sc" tagdir="/WEB-INF/tags" %>
             <c:forEach var="restaurant" items="${restaurants}" >
               <div class="p-3 col-lg-2 col-md-3 col-4 col-12 my-15">
                 <sc:restaurantCard
-                  imgUrl="/resources/images/resto1.jpg"
+                  imgUrl="${pageContext.request.contextPath}/resources/images/resto1.jpg"
                   restaurant="${restaurant}"
                 />
               </div>

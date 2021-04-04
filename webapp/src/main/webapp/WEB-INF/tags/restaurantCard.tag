@@ -11,7 +11,7 @@
   <div class="card-body">
     <h5 class="card-title">${restaurant.getName()}</h5>
     <%-- <p class="card-text">${restaurant.getDescription()}</p> --%>
-    <a href="/restaurant/${restaurant.getId()}" class="btn btn-outline-secondary btn-block">ver mas</a>
+    <a href="${pageContext.request.contextPath}/restaurant/${restaurant.getId()}" class="btn btn-outline-secondary btn-block">ver mas</a>
   </div>
 </div>
 
