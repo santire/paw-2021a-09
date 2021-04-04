@@ -6,10 +6,7 @@
     <main>
       <sc:restaurantBody 
         imgUrl="/resources/images/resto1.jpg"
-        name="Kith"
-        address="Calle Falsa 123"
-        phoneNumber="11 2345-6789"
-        rating="4.6"
+        restaurant="${restaurant}"
         />
     </main>
   </jsp:body>

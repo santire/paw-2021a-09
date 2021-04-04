@@ -3,7 +3,6 @@ package ar.edu.itba.paw.service;
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.persistence.RestaurantDao;
-import ar.edu.itba.paw.persistence.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +34,11 @@ public class RestaurantServiceImpl implements RestaurantService{
     @Override
     public List<Restaurant> getAllRestaurants(){
         return this.restaurantDao.getAllRestaurants();
+    }
+
+    @Override
+    public List<Restaurant> getPopularRestaurants(){
+        return this.restaurantDao.getPopularRestaurants();
     }
 
     @Override

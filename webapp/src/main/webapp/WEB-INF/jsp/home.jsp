@@ -6,20 +6,22 @@
     <main>
       <section>
         <div class="container my-2">
-          <h2 class="display-5">Restaurantes destacados</h2>
-          <div class="owl-carousel owl-theme">
-            <sc:restaurantCard restaurantId="1" name="Kith" imgUrl="/resources/images/resto1.jpg" description="Description"/>
-            <sc:restaurantCard restaurantId="1" name="Kith" imgUrl="/resources/images/resto1.jpg" description="Description"/>
-            <sc:restaurantCard restaurantId="1" name="Kith" imgUrl="/resources/images/resto1.jpg" description="Description"/>
-            <sc:restaurantCard restaurantId="1" name="Kith" imgUrl="/resources/images/resto1.jpg" description="Description"/>
-            <sc:restaurantCard restaurantId="1" name="Kith" imgUrl="/resources/images/resto1.jpg" description="Description"/>
-            <sc:restaurantCard restaurantId="1" name="Kith" imgUrl="/resources/images/resto1.jpg" description="Description"/>
-            <sc:restaurantCard restaurantId="1" name="Kith" imgUrl="/resources/images/resto1.jpg" description="Description"/>
-            <sc:restaurantCard restaurantId="1" name="Kith" imgUrl="/resources/images/resto1.jpg" description="Description"/>
-            <sc:restaurantCard restaurantId="1" name="Kith" imgUrl="/resources/images/resto1.jpg" description="Description"/>
-            <sc:restaurantCard restaurantId="1" name="Kith" imgUrl="/resources/images/resto1.jpg" description="Description"/>
-            <sc:restaurantCard restaurantId="1" name="Kith" imgUrl="/resources/images/resto1.jpg" description="Description"/>
-          </div>
+          <c:choose>
+            <c:when test="${empty popularRestaurants}">
+              <h2 class="display-5">No hay restaurantes destacados</h2>
+            </c:when>
+            <c:otherwise>
+              <h2 class="display-5">Restaurantes destacados</h2>
+              <div class="owl-carousel owl-theme">
+                <c:forEach var="restaurant" items="${popularRestaurants}" >
+                  <sc:restaurantCard
+                    imgUrl="/resources/images/resto1.jpg"
+                    restaurant="${restaurant}"
+                  />
+                </c:forEach>
+              </div>
+            </c:otherwise>
+          </c:choose>
         </div>
       </section>
     </main>

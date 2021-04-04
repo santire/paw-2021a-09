@@ -1,9 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
 <%@attribute name="imgUrl" required="true" type="java.lang.String"%>
-<%@attribute name="name" required="true" type="java.lang.String"%>
-<%@attribute name="address" required="true" type="java.lang.String"%>
-<%@attribute name="phoneNumber" required="true" type="java.lang.String"%>
-<%@attribute name="rating" required="true" type="java.lang.Double"%>
+<%@attribute name="restaurant" required="true" type="ar.edu.itba.paw.model.Restaurant"%>
 
 <div class="container">
 <div class="mb-3 my-2" style="max-height: 450px;">
@@ -13,9 +10,9 @@
     </div>
     <div class="card border-0 col-md-6 my-auto mx-auto" style="max-width: 300px;">
       <div class="card-body px-auto mb-auto">
-        <h5 class="card-title">${name}</h5>
-        <p class="card-text"><medium class="text-muted">${address}</medium></p>
-        <p class="card-text"><medium class="text-muted">${phoneNumber}</medium></p>
+        <h5 class="card-title">${restaurant.getName()}</h5>
+        <p class="card-text"><medium class="text-muted">${restaurant.getAddress()}</medium></p>
+        <p class="card-text"><medium class="text-muted">${restaurant.getPhoneNumber()}</medium></p>
         <div class="input-group mb-3">
           <div class="input-group-prepend">
             <span class="input-group-text"><i class="fa fa-clock-o"></i></span>

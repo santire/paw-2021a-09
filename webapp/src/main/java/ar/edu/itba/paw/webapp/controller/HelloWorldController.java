@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import ar.edu.itba.paw.service.UserService;
 import ar.edu.itba.paw.webapp.exceptions.UserNotFoundException;
+import ar.edu.itba.paw.webapp.exceptions.RestaurantNotFoundException;
 import ar.edu.itba.paw.webapp.forms.UserForm;
 
 
@@ -46,23 +47,17 @@ public class HelloWorldController {
     @RequestMapping("/")
     public ModelAndView helloWorld() {
         final ModelAndView mav = new ModelAndView("home");
+        mav.addObject("popularRestaurants", restaurantService.getPopularRestaurants());
         return mav;
     }
 
     @RequestMapping("/restaurants")
     public ModelAndView restaurants() {
         final ModelAndView mav = new ModelAndView("restaurants");
+        mav.addObject("restaurants", restaurantService.getAllRestaurants());
 
         return mav;
     }
-
-    @RequestMapping("/restaurant/{restaurantId}")
-    public ModelAndView restaurant(@PathVariable("restaurantId") final long id) {
-        final ModelAndView mav = new ModelAndView("restaurant");
-        // mav.addObject("restaurant", restaurantService.findById(id).orElseThrow(RestaurantNotFoundException::new));
-        return mav;
-    }
-
 
     @RequestMapping(path ={  "/register" }, method = RequestMethod.GET)
     public ModelAndView registerForm(@ModelAttribute("userForm") final UserForm form) {
@@ -92,7 +87,7 @@ public class HelloWorldController {
     public ModelAndView restaurant( @ModelAttribute("reservationForm") final ReservationForm form, @PathVariable("restaurantId") final long restaurantId ) {
 
         final ModelAndView mav = new ModelAndView("restaurant");
-        mav.addObject(restaurantId);
+        mav.addObject("restaurant", restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new));
         return mav;
     }
 

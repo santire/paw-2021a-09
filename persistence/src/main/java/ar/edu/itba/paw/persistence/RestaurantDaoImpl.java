@@ -67,6 +67,11 @@ public class RestaurantDaoImpl implements RestaurantDao {
     }
 
     @Override
+    public List<Restaurant> getPopularRestaurants(){
+        return jdbcTemplate.query("SELECT * FROM restaurants WHERE rating >= 4", RESTAURANT_ROW_MAPPER).stream().collect(Collectors.toList());
+    }
+
+    @Override
     public boolean deleteRestaurantById(long id) {
         String sql = "DELETE FROM restaurants WHERE restaurant_id = ?";
         Object[] args = new Object[] {id};
