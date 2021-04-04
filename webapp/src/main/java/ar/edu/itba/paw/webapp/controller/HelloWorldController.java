@@ -20,13 +20,16 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import ar.edu.itba.paw.service.UserService;
 import ar.edu.itba.paw.webapp.exceptions.UserNotFoundException;
+import ar.edu.itba.paw.webapp.exceptions.RestaurantNotFoundException;
 import ar.edu.itba.paw.webapp.forms.UserForm;
 
 
 import java.util.Date;
+import java.util.Optional;
 
 
 @Controller
@@ -45,7 +48,19 @@ public class HelloWorldController {
 
     @RequestMapping("/")
     public ModelAndView helloWorld() {
-        final ModelAndView mav = new ModelAndView("index");
+        final ModelAndView mav = new ModelAndView("home");
+        mav.addObject("popularRestaurants", restaurantService.getPopularRestaurants());
+        return mav;
+    }
+
+    @RequestMapping("/restaurants")
+    public ModelAndView restaurants(@RequestParam(required=false) String search) {
+        final ModelAndView mav = new ModelAndView("restaurants");
+        if (search == null) {
+            search="";
+        }
+        mav.addObject("restaurants", restaurantService.getAllRestaurants(search));
+
         return mav;
     }
 
@@ -67,7 +82,7 @@ public class HelloWorldController {
 
     @RequestMapping("/user/{userId}")
     public ModelAndView user(@PathVariable("userId") final long id) {
-        final ModelAndView mav = new ModelAndView("index");
+        final ModelAndView mav = new ModelAndView("home");
         mav.addObject("user", userService.findById(id).orElseThrow(UserNotFoundException::new));
         return mav;
     }
@@ -77,7 +92,7 @@ public class HelloWorldController {
     public ModelAndView restaurant( @ModelAttribute("reservationForm") final ReservationForm form, @PathVariable("restaurantId") final long restaurantId ) {
 
         final ModelAndView mav = new ModelAndView("restaurant");
-        mav.addObject(restaurantId);
+        mav.addObject("restaurant", restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new));
         return mav;
     }
 
@@ -87,8 +102,19 @@ public class HelloWorldController {
         if (errors.hasErrors()) {
             return restaurant(form, restaurantId);
         }
-
-        reservationService.addReservation(1,restaurantId,new Date(),Long.parseLong(form.getQuantity()));
+        // User user = userService.findByEmail(form.getEmail()).orElse(userService.register(form.getEmail()));
+        User user;
+        Optional<User> maybeUser = userService.findByEmail(form.getEmail());
+        if (maybeUser.isPresent()) {
+           user = maybeUser.get(); 
+        } else {
+            user = userService.register(form.getEmail());
+        }
+        Date date = new Date();
+        date.setHours(form.getDate());
+        date.setMinutes(0);
+        date.setSeconds(0);
+        reservationService.addReservation(user.getId(),restaurantId,date,Long.parseLong(form.getQuantity()));
         return new ModelAndView("redirect:/");
     }
 

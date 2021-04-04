@@ -52,6 +52,12 @@ public class WebConfig {
       ds.setUsername("root");
       ds.setPassword("root");
 
+    // remote testing database (very slow)
+
+    // ds.setUrl("jdbc:postgresql://santire.heliohost.us/santire_paw");
+    // ds.setUsername("santire_root");
+    // ds.setPassword("santire_root");
+
     return ds;
   }
 

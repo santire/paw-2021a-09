@@ -29,6 +29,9 @@ public class UserServiceImplTest {
   @Mock
   private UserDao mockDao;
 
+  @Mock
+  private EmailService mockEmailService;
+
   @Test
   public void testRegister() {
 
@@ -42,8 +45,7 @@ public class UserServiceImplTest {
     
     )).thenReturn(
       new User(1, USERNAME,PASSWORD,FIRST_NAME,LAST_NAME,EMAIL,PHONE));
-    
-    
+
     User user = userService.register(USERNAME,PASSWORD,FIRST_NAME,LAST_NAME,EMAIL,PHONE);
 
     assertEquals(USERNAME, user.getName());

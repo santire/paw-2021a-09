@@ -68,9 +68,17 @@ public class UserDaoImplTest {
   }
 
   @Test
-  public void findById() {
+  public void testFindById() {
 
     Optional<User> maybeUser = userDao.findById(1);
+
+    assertTrue(maybeUser.isPresent());
+  }
+
+  @Test
+  public void testFindByEmail() {
+
+    Optional<User> maybeUser = userDao.findByEmail("paw");
 
     assertTrue(maybeUser.isPresent());
   }

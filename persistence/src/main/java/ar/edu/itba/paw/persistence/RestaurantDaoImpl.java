@@ -65,6 +65,17 @@ public class RestaurantDaoImpl implements RestaurantDao {
     public List<Restaurant> getAllRestaurants(){
         return jdbcTemplate.query("SELECT * FROM restaurants", RESTAURANT_ROW_MAPPER).stream().collect(Collectors.toList());
     }
+        
+    @Override
+    public List<Restaurant> getAllRestaurants(String searchTerm){
+        return jdbcTemplate.query("SELECT * FROM restaurants WHERE name ILIKE ?", RESTAURANT_ROW_MAPPER, "%" + searchTerm + "%").stream().collect(Collectors.toList());
+    }
+
+
+    @Override
+    public List<Restaurant> getPopularRestaurants(){
+        return jdbcTemplate.query("SELECT * FROM restaurants WHERE rating >= 4", RESTAURANT_ROW_MAPPER).stream().collect(Collectors.toList());
+    }
 
     @Override
     public boolean deleteRestaurantById(long id) {
