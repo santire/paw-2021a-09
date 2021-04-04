@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@attribute name="imgUrl" required="true" type="java.lang.String"%>
 <%@attribute name="restaurant" required="true" type="ar.edu.itba.paw.model.Restaurant"%>
 
@@ -10,29 +11,63 @@
     </div>
     <div class="card border-0 col-md-6 my-auto mx-auto" style="max-width: 300px;">
       <div class="card-body px-auto mb-auto">
+      <c:url value="/restaurant/${restaurantId}" var="postFormUrl"/>
+      <form:form modelAttribute="reservationForm" action="${postFormUrl}" method="post">
         <h5 class="card-title">${restaurant.getName()}</h5>
         <p class="card-text"><medium class="text-muted">${restaurant.getAddress()}</medium></p>
         <p class="card-text"><medium class="text-muted">${restaurant.getPhoneNumber()}</medium></p>
-        <div class="input-group mb-3">
-          <div class="input-group-prepend">
-            <span class="input-group-text"><i class="fa fa-clock-o"></i></span>
+
+        <form:errors path="email" cssStyle="color: red;" element="p"/>
+        <form:label path="email">
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+            </div>
+            <form:input type="text" path="email" cssClass="form-control" aria-label="Ingrese su email" />
           </div>
-          <input type="number" min="0" max="23" class="form-control" aria-label="Seleccione horario para su reserva">
-          <div class="input-group-append">
-            <span class="input-group-text">:00</span>
+        </form:label>
+
+        <form:errors path="date" cssStyle="color: red;" element="p"/>
+        <form:label path="date">
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-clock-o"></i></span>
+            </div>
+            <form:input type="number" path="date" cssClass="form-control" aria-label="Seleccione horario para su reserva"/>
+            <div class="input-group-append">
+              <span class="input-group-text">:00</span>
+            </div>
           </div>
+        </form:label>
+
+        <form:errors path="quantity" cssStyle="color: red;" element="p"/>
+        <form:label path="quantity">
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-users"></i></span>
+            </div>
+            <form:input type="number" path="quantity" cssClass="form-control" aria-label="Cantidad de gente"/>
+            <div class="input-group-append">
+              <span class="input-group-text">personas</span>
+            </div>
+          </div>
+        </form:label>
+
         </div>
-        <a 
-        class="btn btn-outline-secondary btn-block">
-        Reservar Hoy 
-        </a>
+        <input
+        type="submit"
+        class="btn btn-outline-secondary btn-block"
+        value="Reservar Hoy" 
+        />
       </div>
+      </form:form>
     </div>
   </div>
 </div>
 </div>
-<div style="min-height: 15px; display: block;">
+<div class="restaurant-separator">
 </div>
+
 <div class="container border-top mt-1">
   <h3 class="pt-2">Menu</h3>
   <ul class="list-group list-group-flush">

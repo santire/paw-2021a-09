@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.webapp.forms;
 
+import org.hibernate.validator.constraints.Email;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.NumberFormat;
 
@@ -28,6 +29,7 @@ public class UserForm {
 
   @Size(min = 6, max = 100)
   //@Pattern(regexp = "/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/")
+  @Email
   private String email;
 
   @Size(min = 6, max = 15)

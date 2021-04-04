@@ -14,9 +14,18 @@ select,
   border-color: white !important;
 }
 
+.restaurant-separator {
+  min-height: 25px;
+  display: block;
+}
+
 @media (max-width: 425px) {
   .search-bar {
     width: 200px !important;
+  }
+  .restaurant-separator {
+    min-height: 345px;
+    display: block;
   }
 }
 

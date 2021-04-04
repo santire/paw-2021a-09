@@ -23,9 +23,21 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public User register(String username, String password, String first_name, String last_name, String email, String phone) {
+  public User register(String username, String password, String first_name, String last_name, String email,
+      String phone) {
     emailService.sendRegistrationEmail(email);
-    return userDao.register(username,password,first_name,last_name, email, phone);
+    return userDao.register(username, password, first_name, last_name, email, phone);
+  }
+
+  @Override
+  public User register(String email) {
+    emailService.sendRegistrationEmail(email);
+    return userDao.register("dummy","dummy","dummy","dummy", email,"dummy");
+  }
+
+  @Override
+  public Optional<User> findByEmail(String email) {
+    return userDao.findByEmail(email);
   }
 
 

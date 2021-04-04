@@ -8,5 +8,7 @@ public interface UserDao {
 
   public Optional<User> findById(long id);
 
+  public Optional<User> findByEmail(String email);
+
   public User register(final String username, final String password, final String first_name,final String last_name, final String email, final String phone);
 }

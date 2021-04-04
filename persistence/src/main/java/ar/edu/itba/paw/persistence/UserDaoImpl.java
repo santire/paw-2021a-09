@@ -41,6 +41,12 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    public Optional<User> findByEmail(String email) {
+        return jdbcTemplate.query("SELECT * FROM users WHERE email = ?", USER_ROW_MAPPER, email)
+            .stream().findFirst();
+    }
+
+    @Override
     public User register(final String username,final String password,final String first_name,final String last_name,final String email,final String phone) {
 
 

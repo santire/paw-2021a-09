@@ -29,6 +29,7 @@ import ar.edu.itba.paw.webapp.forms.UserForm;
 
 
 import java.util.Date;
+import java.util.Optional;
 
 
 @Controller
@@ -101,8 +102,19 @@ public class HelloWorldController {
         if (errors.hasErrors()) {
             return restaurant(form, restaurantId);
         }
-
-        reservationService.addReservation(1,restaurantId,new Date(),Long.parseLong(form.getQuantity()));
+        // User user = userService.findByEmail(form.getEmail()).orElse(userService.register(form.getEmail()));
+        User user;
+        Optional<User> maybeUser = userService.findByEmail(form.getEmail());
+        if (maybeUser.isPresent()) {
+           user = maybeUser.get(); 
+        } else {
+            user = userService.register(form.getEmail());
+        }
+        Date date = new Date();
+        date.setHours(form.getDate());
+        date.setMinutes(0);
+        date.setSeconds(0);
+        reservationService.addReservation(user.getId(),restaurantId,date,Long.parseLong(form.getQuantity()));
         return new ModelAndView("redirect:/");
     }
 
