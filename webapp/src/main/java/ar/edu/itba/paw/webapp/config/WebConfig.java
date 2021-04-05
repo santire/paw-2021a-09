@@ -1,7 +1,9 @@
 package ar.edu.itba.paw.webapp.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
@@ -15,6 +17,8 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
 import javax.sql.DataSource;
+
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 @EnableWebMvc
@@ -59,6 +63,17 @@ public class WebConfig {
     // ds.setPassword("santire_root");
 
     return ds;
+  }
+
+  @Bean
+  public MessageSource messageSource() {
+    final ReloadableResourceBundleMessageSource ms = new ReloadableResourceBundleMessageSource();
+
+    ms.setBasename("classpath:i18n/messages");
+    ms.setDefaultEncoding(StandardCharsets.UTF_8.displayName());
+    ms.setCacheSeconds(5);
+
+    return ms;
   }
 
   @Bean
