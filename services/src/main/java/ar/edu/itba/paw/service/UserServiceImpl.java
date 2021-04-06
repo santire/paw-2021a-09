@@ -35,8 +35,9 @@ public class UserServiceImpl implements UserService {
   @Override
   public User register(String email) {
 
+
       User user = userDao.register("dummy","dummy","dummy","dummy", email,"dummy");
-      emailService.sendRegistrationEmail(email);
+      //emailService.sendRegistrationEmail(email);
 
 
     return user;

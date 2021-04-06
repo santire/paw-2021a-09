@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.service;
 
 import ar.edu.itba.paw.model.Email;
+import ar.edu.itba.paw.model.Reservation;
 import ar.edu.itba.paw.model.User;
 
 import java.util.Date;
@@ -12,5 +13,6 @@ public interface EmailService {
 
     public void sendReservationEmail(User restaurantOwner, User user, Date date, long quantity);
     public void sendConfirmationEmail(User restaurantOwner, User user, Date date, long quantity);
+    public void sendConfirmationEmail(Reservation reservation);
     public void sendRegistrationEmail(String to);
 }
