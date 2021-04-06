@@ -4,8 +4,9 @@
 <sc:templateLayout>
   <jsp:body>
     <main>
+      <c:url value="/resources/images/resto1.jpg" var="restaurantImageUrl" />
       <sc:restaurantBody 
-        imgUrl="${pageContext.request.contextPath}/resources/images/resto1.jpg"
+        imgUrl="${restaurantImageUrl}"
         restaurant="${restaurant}"
         />
     </main>

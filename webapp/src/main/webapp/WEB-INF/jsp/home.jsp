@@ -14,8 +14,9 @@
               <h2 class="display-5">Restaurantes destacados</h2>
               <div class="owl-carousel owl-theme">
                 <c:forEach var="restaurant" items="${popularRestaurants}" >
+                  <c:url value="/resources/images/resto1.jpg" var="restaurantImageUrl" />
                   <sc:restaurantCard
-                    imgUrl="${pageContext.request.contextPath}/resources/images/resto1.jpg"
+                    imgUrl="${restaurantImageUrl}"
                     restaurant="${restaurant}"
                   />
                 </c:forEach>
