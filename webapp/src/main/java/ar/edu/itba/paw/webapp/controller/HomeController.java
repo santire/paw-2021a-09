@@ -28,7 +28,7 @@ import java.util.Date;
 import java.util.Optional;
 
 @Controller
-public class MainController {
+public class HomeController {
 
     @Autowired
     private UserService userService;
