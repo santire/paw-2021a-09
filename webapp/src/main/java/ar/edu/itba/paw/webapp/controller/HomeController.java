@@ -74,24 +74,4 @@ public class HomeController {
         return new ModelAndView("redirect:/user/" + user.getId());
     }
 
-
-    @RequestMapping(path ={"/registerRestaurant"}, method = RequestMethod.GET)
-    public ModelAndView registerRestaurant(@ModelAttribute("RestaurantForm") final RestaurantForm form) {
-        return new ModelAndView("registerRestaurant");
-    }
-
-    @RequestMapping(path = { "/registerRestaurant" }, method = RequestMethod.POST)
-    public ModelAndView registerRestaurant(@Valid @ModelAttribute("RestaurantForm") final RestaurantForm form,
-            final BindingResult errors) {
-        if (errors.hasErrors()) {
-            return registerRestaurant(form);
-        }
-
-        restaurantService.registerRestaurant(form.getName(), form.getAddress(), form.getPhoneNumber(), 0, 1);
-        final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
-                form.getPhoneNumber(), 0, 1);
-
-        return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
-    }
-
 }
