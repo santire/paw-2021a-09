@@ -1,3 +1,4 @@
+<%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
 <%@taglib prefix="sc" tagdir="/WEB-INF/tags" %>
 
@@ -5,6 +6,12 @@
   <jsp:body>
     <main>
       <section>
+        <c:if test="${madeReservation}">
+          <div class="alert alert-success" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>Hiciste una reserva!</strong> <c:out value="Te llegará por mail la confirmación"/>
+          </div>
+        </c:if>
         <div class="container my-2">
           <c:choose>
             <c:when test="${empty popularRestaurants}">

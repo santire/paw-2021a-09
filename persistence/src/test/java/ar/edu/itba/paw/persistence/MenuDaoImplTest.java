@@ -47,9 +47,6 @@ public class MenuDaoImplTest {
     @Test
     public void testFindByRestaurantId() {
         List<MenuItem> menu = menuDao.findMenuByRestaurantId(1);
-        for(MenuItem m: menu) {
-            System.out.println(m.getName());
-        }
         assertEquals(3, menu.size());
     }
 

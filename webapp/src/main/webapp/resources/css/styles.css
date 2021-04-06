@@ -24,8 +24,14 @@ select,
     width: 200px !important;
   }
   .restaurant-separator {
-    min-height: 345px;
+    min-height: 245px;
     display: block;
+  }
+}
+
+@media (max-width: 1050px) {
+  .search-bar {
+    width: 300px !important;
   }
 }
 
