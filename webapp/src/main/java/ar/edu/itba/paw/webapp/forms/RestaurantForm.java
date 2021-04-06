@@ -5,7 +5,7 @@ import javax.validation.constraints.Size;
 
 public class RestaurantForm {
     @Size(min = 6, max = 100)
-    @Pattern(regexp = "[a-zA-Z0-9]+")
+    @Pattern(regexp = "[a-zA-Z0-9 ]+")
     private String name;
 
     @Size(min = 8, max = 100)

@@ -91,7 +91,6 @@ public class RestaurantController {
             return registerRestaurant(form);
         }
 
-        restaurantService.registerRestaurant(form.getName(), form.getAddress(), form.getPhoneNumber(), 0, 1);
         final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
                 form.getPhoneNumber(), 0, 1);
 
