@@ -36,6 +36,7 @@
           </form:label>
       </div>
       <div>
+        <form:errors  name="emailError" cssStyle="color: red;" element="p"/>
         <form:errors path="email" cssStyle="color: red;" element="p"/>
           <form:label path="email">
             E-Mail:
