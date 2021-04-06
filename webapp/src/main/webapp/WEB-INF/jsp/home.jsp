@@ -12,14 +12,15 @@
             </c:when>
             <c:otherwise>
               <h2 class="display-5">Restaurantes destacados</h2>
-              <div class="owl-carousel owl-theme">
-                <c:forEach var="restaurant" items="${popularRestaurants}" >
-                  <c:url value="/resources/images/resto1.jpg" var="restaurantImageUrl" />
-                  <sc:restaurantCard
-                    imgUrl="${restaurantImageUrl}"
-                    restaurant="${restaurant}"
-                  />
-                </c:forEach>
+              <div class="row mb-5">
+                <div class="owl-carousel owl-theme">
+                  <c:forEach var="restaurant" items="${popularRestaurants}" >
+                    <c:url value="/resources/images/resto1.jpg" var="restaurantImageUrl" />
+                    <sc:restaurantCard
+                      restaurant="${restaurant}"
+                    />
+                  </c:forEach>
+                </div>
               </div>
             </c:otherwise>
           </c:choose>

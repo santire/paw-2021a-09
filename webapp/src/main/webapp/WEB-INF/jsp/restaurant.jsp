@@ -6,7 +6,6 @@
     <main>
       <c:url value="/resources/images/resto1.jpg" var="restaurantImageUrl" />
       <sc:restaurantBody 
-        imgUrl="${restaurantImageUrl}"
         restaurant="${restaurant}"
         />
     </main>
