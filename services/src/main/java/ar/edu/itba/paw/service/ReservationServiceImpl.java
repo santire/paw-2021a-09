@@ -43,15 +43,17 @@ public class ReservationServiceImpl implements ReservationService{
     public Reservation addReservation(long userId, long restaurantId, Date date, long quantity) {
         User user = userService.findById(userId).orElseThrow(() -> new IllegalStateException("Reservation: User doesnt exist"));
 
-        User restaurantOwner = restaurantService.findRestaurantOwner(restaurantId).orElseThrow(() -> new IllegalStateException("Reservation: Restaurant doesnt exist"));
+        // User restaurantOwner = restaurantService.findRestaurantOwner(restaurantId).orElseThrow(() -> new IllegalStateException("Reservation: Restaurant doesnt exist"));
 
 
         //send email to restaurant
-        emailService.sendReservationEmail(restaurantOwner, user, date, quantity);
-        //for now its autoconfirmed
-        emailService.sendConfirmationEmail(restaurantOwner, user,date,quantity);
+        // emailService.sendReservationEmail(restaurantOwner, user, date, quantity);
 
-        return reservationDao.addReservation(user.getId(),restaurantId,date,quantity);
+        //for now its autoconfirmed
+        Reservation reservation = reservationDao.addReservation(user.getId(),restaurantId,date,quantity);
+        emailService.sendConfirmationEmail(reservation);
+
+        return reservation;
     }
 
     @Override
