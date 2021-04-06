@@ -5,6 +5,7 @@ import ar.edu.itba.paw.model.User;
 
 import javax.validation.Valid;
 
+import ar.edu.itba.paw.service.MenuService;
 import ar.edu.itba.paw.service.ReservationService;
 import ar.edu.itba.paw.service.RestaurantService;
 import ar.edu.itba.paw.webapp.forms.RestaurantForm;
@@ -17,9 +18,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import ar.edu.itba.paw.service.UserService;
 
 import ar.edu.itba.paw.webapp.forms.UserForm;
+
+import java.util.Date;
+import java.util.Optional;
 
 @Controller
 public class MainController {
@@ -30,6 +36,8 @@ public class MainController {
     @Autowired
     private RestaurantService restaurantService;
 
+    @Autowired
+    private MenuService menuService;
 
     @RequestMapping("/")
     public ModelAndView helloWorld() {
@@ -39,10 +47,10 @@ public class MainController {
     }
 
     @RequestMapping("/restaurants")
-    public ModelAndView restaurants(@RequestParam(required=false) String search) {
+    public ModelAndView restaurants(@RequestParam(required = false) String search) {
         final ModelAndView mav = new ModelAndView("restaurants");
         if (search == null) {
-            search="";
+            search = "";
         }
         mav.addObject("restaurants", restaurantService.getAllRestaurants(search));
 
@@ -61,7 +69,8 @@ public class MainController {
         if (errors.hasErrors()) {
             return registerForm(form);
         }
-        final User user = userService.register(form.getUsername(),form.getPassword(),form.getFirst_name(),form.getLast_name(),form.getEmail(),form.getPhone());
+        final User user = userService.register(form.getUsername(), form.getPassword(), form.getFirst_name(),
+                form.getLast_name(), form.getEmail(), form.getPhone());
         return new ModelAndView("redirect:/user/" + user.getId());
     }
 
@@ -71,14 +80,16 @@ public class MainController {
         return new ModelAndView("registerRestaurant");
     }
 
-    @RequestMapping(path ={"/registerRestaurant"}, method = RequestMethod.POST)
-    public ModelAndView registerRestaurant(@Valid @ModelAttribute("RestaurantForm") final RestaurantForm form, final BindingResult errors ) {
+    @RequestMapping(path = { "/registerRestaurant" }, method = RequestMethod.POST)
+    public ModelAndView registerRestaurant(@Valid @ModelAttribute("RestaurantForm") final RestaurantForm form,
+            final BindingResult errors) {
         if (errors.hasErrors()) {
             return registerRestaurant(form);
         }
 
         restaurantService.registerRestaurant(form.getName(), form.getAddress(), form.getPhoneNumber(), 0, 1);
-        final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(), form.getPhoneNumber(), 0, 1);
+        final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
+                form.getPhoneNumber(), 0, 1);
 
         return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
     }

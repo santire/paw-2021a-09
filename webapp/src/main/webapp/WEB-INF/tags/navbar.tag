@@ -3,9 +3,9 @@
 
 <header>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
-    <a class="navbar-brand ml-2 font-weight-bold" href="${pageContext.request.contextPath}/"
-      ><img src="<c:url value="/resources/images/logo.svg"/>" height="40" width="40" class="pb-2 pr-1" \><span id="burgundy">Gourme</span><span id="orange">table</span></a
-    >
+    <a class="navbar-brand ml-2 font-weight-bold" href="<c:url value="/"/>">
+      <img src="<c:url value="/resources/images/logo.svg"/>" height="40" width="40" class="pb-2 pr-1" \><span id="burgundy">Gourme</span><span id="orange">table</span>
+    </a>
     <button
       class="navbar-toggler"
       type="button"

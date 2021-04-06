@@ -5,23 +5,21 @@
   <jsp:body>
     <main>
       <section>
-        <div class="container">
+        <div class="container mt-4">
           <c:choose>
             <c:when test="${empty restaurants}">
               <h2 class="display-5">No hay restaurantes</h2>
             </c:when>
             <c:otherwise>
-              <div class="row">
+            <div class="row row-cols-1 row-cols-md-4 row-cols-lg-6">
                 <c:forEach var="restaurant" items="${restaurants}" >
-                  <div class="p-3 col-lg-2 col-md-3 col-4 col-12 my-15">
-                    <c:url value="/resources/images/resto1.jpg" var="restaurantImageUrl" />
+                  <div class="col mb-4">
                     <sc:restaurantCard
-                      imgUrl="${restaurantImageUrl}"
                       restaurant="${restaurant}"
                     />
                   </div>
                 </c:forEach>
-              </div>
+            </div>
             </c:otherwise>
           </c:choose>
         </div>

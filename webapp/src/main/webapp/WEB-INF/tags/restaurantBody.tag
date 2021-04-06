@@ -1,12 +1,13 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<%@attribute name="imgUrl" required="true" type="java.lang.String"%>
 <%@attribute name="restaurant" required="true" type="ar.edu.itba.paw.model.Restaurant"%>
+<%@attribute name="menu" required="true" type="java.util.List"%>
 
 <div class="container">
 <div class="mb-3 my-2" style="max-height: 450px;">
   <div class="row no-gutters">
     <div class="col-md-6 mx-auto pb-3">
+      <c:url value="/resources/images/restaurants/${restaurant.getId()}.jpg" var="imgUrl"/>
       <img src="${imgUrl}" class="card-img img-fluid px-1 pr-md-5 border-right" alt="${name}">
     </div>
     <div class="card border-0 col-md-6 my-auto mx-auto" style="max-width: 300px;">
@@ -70,30 +71,19 @@
 
 <div class="container border-top mt-1">
   <h3 class="pt-2">Menu</h3>
-  <ul class="list-group list-group-flush">
-    <li class="list-group-item">
-    <span class="col-md-10 mr-auto pull-left">Cras justo odio</span>
-    <span class="col-md-2 pl-5 ml-auto pull-right">$250</span>
-    </li>
-    <li class="list-group-item">
-    <span class="col-md-10 mr-auto pull-left">Pizza con salame</span>
-    <span class="col-md-2 pl-5 ml-auto pull-right">$1250</span>
-    </li>
-    <li class="list-group-item">
-    <span class="col-md-10 mr-auto pull-left">Dapibus ac facilisis in</span>
-    <span class="col-md-2 pl-5 ml-auto pull-right">$250</span>
-    </li>
-    <li class="list-group-item">
-    <span class="col-md-10 mr-auto pull-left">Morbi leo risus</span>
-    <span class="col-md-2 pl-5 ml-auto pull-right">$250</span>
-    </li>
-    <li class="list-group-item">
-    <span class="col-md-10 mr-auto pull-left">Porta ac consectetur ac</span>
-    <span class="col-md-2 pl-5 ml-auto pull-right">$250</span>
-    </li>
-    <li class="list-group-item">
-    <span class="col-md-10 mr-auto pull-left">Vestibulum at eros</span>
-    <span class="col-md-2 pl-5 ml-auto pull-right">$250</span>
-    </li>
-  </ul>
+  <c:choose>
+    <c:when test="${ menu.size() == 0 }">
+      <h2 class="display-5">Menu no disponible</h2>
+    </c:when>
+    <c:otherwise>
+      <ul class="list-group list-group-flush">
+        <c:forEach var="item" items="${menu}" >
+          <li class="list-group-item">
+            <span class="col-md-10 mr-auto pull-left">${item.getName()}</span>
+            <span class="col-md-2 pl-5 ml-auto pull-right">${item.getPrice()}</span>
+          </li>
+        </c:forEach>
+      </ul>
+    </c:otherwise>
+  </c:choose>
 </div>
