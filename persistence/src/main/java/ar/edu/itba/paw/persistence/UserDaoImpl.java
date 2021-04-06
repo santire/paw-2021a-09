@@ -22,7 +22,7 @@ public class UserDaoImpl implements UserDao {
         rs.getString("first_name"),
         rs.getString("last_name"),
         rs.getString("email"),
-        rs.getString("phone_number")
+        rs.getString("phone")
         );
 
     private JdbcTemplate jdbcTemplate;
@@ -56,7 +56,7 @@ public class UserDaoImpl implements UserDao {
         params.addValue("first_name", first_name);
         params.addValue("last_name", last_name);
         params.addValue("email", email);
-        params.addValue("phone_number", phone);
+        params.addValue("phone", phone);
 
         final Number userId = jdbcInsert.executeAndReturnKey(params);
 
