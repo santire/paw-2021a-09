@@ -72,9 +72,11 @@ public class RestaurantDaoImpl implements RestaurantDao {
     }
 
 
+    // TODO: this would probably be better as getRestaurantsByMinRating and 
+    // pass the rating as an argument
     @Override
     public List<Restaurant> getPopularRestaurants(){
-        return jdbcTemplate.query("SELECT * FROM restaurants WHERE rating >= 4", RESTAURANT_ROW_MAPPER).stream().collect(Collectors.toList());
+        return jdbcTemplate.query("SELECT * FROM restaurants WHERE rating >= 9", RESTAURANT_ROW_MAPPER).stream().collect(Collectors.toList());
     }
 
     @Override

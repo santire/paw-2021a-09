@@ -25,6 +25,8 @@
       href="<c:url value="/resources/owlcarousel/owl.theme.default.min.css"/>"
     />
     <link rel="stylesheet" type="text/css" href="<c:url value="/resources/css/styles.css"/>" />
+    <link rel="icon" href="<c:url value="/favicon.ico"/>" type="image/x-icon">
+    <link rel="shortcut icon" href="<c:url value="/favicon.ico"/>" type="image/x-icon">
 
     <title>Gourmetable</title>
   </head>
