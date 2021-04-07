@@ -77,9 +77,9 @@ public class EmailServiceImpl implements EmailService {
     public void sendConfirmationEmail(User restaurantOwner, User user, Date date, long quantity) {
         Email email = new Email();
         email.setMailTo(user.getEmail());
-        email.setMailSubject("confirmed reservation!");
-        email.setMailContent("your reservation for:\n" + restaurantOwner.getEmail() + " has been confirmed \n"
-                + quantity + " persons, at " + date.toString() + "\n");
+        email.setMailSubject("Reserva confirmada!");
+        email.setMailContent("Su reserva para:\n" + restaurantOwner.getEmail() + " ha sido confirmada. \n"
+                + "Mesa para " + quantity + " personas, a las " + date.toString() + "\n");
         sendEmail(email);
     }
 
@@ -91,9 +91,9 @@ public class EmailServiceImpl implements EmailService {
         Restaurant restaurant = restaurantService.findById(reservation.getRestaurantId())
                 .orElseThrow(RestaurantNotFoundException::new);
         email.setMailTo(user.getEmail());
-        email.setMailSubject("confirmed reservation!");
-        email.setMailContent("your reservation for:\n" + restaurant.getName() + " has been confirmed \n"
-                + reservation.getQuantity() + " persons, at " + reservation.getDate().toString() + "\n");
+        email.setMailSubject("Reserva confirmada!");
+        email.setMailContent("Su reserva para:\n" + restaurant.getName() + " ha sido confirmada. \n"
+                + "Mesa para " + reservation.getQuantity() + " personas, a las " + reservation.getDate().toString() + "\n");
 
         sendEmail(email);
     }
