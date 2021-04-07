@@ -12,7 +12,7 @@
               <h2 class="display-5">No hay restaurantes</h2>
             </c:when>
             <c:otherwise>
-            <div class="row row-cols-1 row-cols-md-4 row-cols-lg-6">
+            <div class="row row-cols-1 row-cols-md-4 row-cols-lg-5">
                 <c:forEach var="restaurant" items="${restaurants}" >
                   <div class="col mb-4">
                     <sc:restaurantCard

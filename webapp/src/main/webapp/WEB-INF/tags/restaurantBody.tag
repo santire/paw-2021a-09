@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix ="fmt" uri ="http://java.sun.com/jsp/jstl/fmt" %>
 <%@attribute name="restaurant" required="true" type="ar.edu.itba.paw.model.Restaurant"%>
 <%@attribute name="menu" required="true" type="java.util.List"%>
 
@@ -80,7 +81,7 @@
         <c:forEach var="item" items="${menu}" >
           <li class="list-group-item">
             <span class="col-md-10 mr-auto pull-left">${item.getName()}</span>
-            <span class="col-md-2 pl-5 ml-auto pull-right">${item.getPrice()}</span>
+            <span class="col-md-2 pl-5 ml-auto pull-right"><fmt:formatNumber value="${item.getPrice()}" type="currency" maxFractionDigits="0" /></span>
           </li>
         </c:forEach>
       </ul>
