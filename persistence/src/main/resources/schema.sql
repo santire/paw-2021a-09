@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS reservations(
 CREATE TABLE IF NOT EXISTS menu_items(
   menu_item_id SERIAL PRIMARY KEY,
   name VARCHAR(100),
-  description VARCHAR(100),
+  description VARCHAR(300),
   price FLOAT,
   restaurant_id INTEGER NOT NULL REFERENCES restaurants(restaurant_id) ON DELETE CASCADE
 );
