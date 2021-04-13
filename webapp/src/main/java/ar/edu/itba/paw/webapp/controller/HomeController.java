@@ -1,11 +1,17 @@
 package ar.edu.itba.paw.webapp.controller;
 
+import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
+
+import java.util.List;
 
 import javax.validation.Valid;
 
 
 import ar.edu.itba.paw.service.RestaurantService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -28,6 +34,8 @@ import ar.edu.itba.paw.webapp.forms.UserForm;
 @Controller
 public class HomeController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(HomeController.class);
+
     @Autowired
     private UserService userService;
 
@@ -40,7 +48,9 @@ public class HomeController {
     @RequestMapping("/")
     public ModelAndView helloWorld() {
         final ModelAndView mav = new ModelAndView("home");
-        mav.addObject("popularRestaurants", restaurantService.getPopularRestaurants());
+        List<Restaurant> popularRestaurants = restaurantService.getPopularRestaurants();
+        mav.addObject("popularRestaurants", popularRestaurants);
+        LOGGER.debug("Amount of popular restaurants: {}", popularRestaurants.size());
         return mav;
     }
 
