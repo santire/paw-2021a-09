@@ -35,7 +35,7 @@
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="fa fa-clock-o"></i></span>
             </div>
-            <form:input type="number" path="date" cssClass="form-control" aria-label="Seleccione horario para su reserva"/>
+            <form:input type="number" min="0" max="23" path="date" cssClass="form-control" aria-label="Seleccione horario para su reserva"/>
             <div class="input-group-append">
               <span class="input-group-text">:00</span>
             </div>
@@ -48,7 +48,7 @@
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="fa fa-users"></i></span>
             </div>
-            <form:input type="number" path="quantity" cssClass="form-control" aria-label="Cantidad de gente"/>
+            <form:input type="number" min="1" max="12" path="quantity" cssClass="form-control" aria-label="Cantidad de gente"/>
             <div class="input-group-append">
               <span class="input-group-text">personas</span>
             </div>

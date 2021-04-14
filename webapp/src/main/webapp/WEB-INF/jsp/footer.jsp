@@ -16,7 +16,7 @@
             <div class="col-md-6">
               <div class="col-md-6 item text ml-auto">
                 <h3>Ponete en contacto</h3>
-                <p>gourmetable@gmail.com</p>
+                <p><a href="mailto:gourmetable@gmail.com" style="color:aliceblue">gourmetable@gmail.com</a></p>
               </div>
             </div>
           </div>
