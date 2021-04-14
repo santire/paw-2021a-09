@@ -1,6 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix ="fmt" uri ="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="sc" tagdir="/WEB-INF/tags" %>
 <%@attribute name="restaurant" required="true" type="ar.edu.itba.paw.model.Restaurant"%>
 <%@attribute name="menu" required="true" type="java.util.List"%>
 
@@ -13,78 +14,42 @@
     </div>
     <div class="card border-0 col-md-6 my-auto mx-auto" style="max-width: 300px;">
       <div class="card-body px-auto mb-auto">
-      <c:url value="/restaurant/${restaurantId}" var="postFormUrl"/>
-      <form:form modelAttribute="reservationForm" action="${postFormUrl}" method="post">
-        <h5 class="card-title">${restaurant.getName()}</h5>
-        <p class="card-text"><medium class="text-muted">${restaurant.getAddress()}</medium></p>
-        <p class="card-text"><medium class="text-muted">${restaurant.getPhoneNumber()}</medium></p>
-
-        <form:errors path="email" cssStyle="color: red;" element="p"/>
-        <form:label path="email">
-          <div class="input-group mb-3">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><i class="fa fa-envelope"></i></span>
-            </div>
-            <form:input type="text" path="email" cssClass="form-control" aria-label="Ingrese su email" />
-          </div>
-        </form:label>
-
-        <form:errors path="date" cssStyle="color: red;" element="p"/>
-        <form:label path="date">
-          <div class="input-group mb-3">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><i class="fa fa-clock-o"></i></span>
-            </div>
-            <form:input type="number" min="0" max="23" path="date" cssClass="form-control" aria-label="Seleccione horario para su reserva"/>
-            <div class="input-group-append">
-              <span class="input-group-text">:00</span>
-            </div>
-          </div>
-        </form:label>
-
-        <form:errors path="quantity" cssStyle="color: red;" element="p"/>
-        <form:label path="quantity">
-          <div class="input-group mb-3">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><i class="fa fa-users"></i></span>
-            </div>
-            <form:input type="number" min="1" max="12" path="quantity" cssClass="form-control" aria-label="Cantidad de gente"/>
-            <div class="input-group-append">
-              <span class="input-group-text">personas</span>
-            </div>
-          </div>
-        </form:label>
-
-        </div>
+      <h5 class="card-title">${restaurant.getName()}</h5>
+      <p class="card-text"><medium class="text-muted">${restaurant.getAddress()}</medium></p>
+      <p class="card-text"><medium class="text-muted">${restaurant.getPhoneNumber()}</medium></p>
+      </div>
         <input
-        type="submit"
+        onclick="$('#reservation-tab').tab('show')"
         class="btn btn-outline-secondary btn-block"
         value="Reservar Hoy" 
         />
       </div>
-      </form:form>
     </div>
   </div>
 </div>
 </div>
-<div class="restaurant-separator">
-</div>
 
-<div class="container border-top mt-1">
-  <h3 class="pt-2">Menu</h3>
-  <c:choose>
-    <c:when test="${ menu.size() == 0 }">
-      <h2 class="display-5">Menu no disponible</h2>
-    </c:when>
-    <c:otherwise>
-      <ul class="list-group list-group-flush">
-        <c:forEach var="item" items="${menu}" >
-          <li class="list-group-item">
-            <span class="col-md-10 mr-auto pull-left">${item.getName()}</span>
-            <span class="col-md-2 pl-5 ml-auto pull-right"><fmt:formatNumber value="${item.getPrice()}" type="currency" maxFractionDigits="0" /></span>
-          </li>
-        </c:forEach>
-      </ul>
-    </c:otherwise>
-  </c:choose>
+<ul class="nav nav-tabs pt-2" id="myTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active text-secondary" id="menu-tab" data-toggle="tab" href="#menu" role="tab" aria-controls="menu" aria-selected="true">Menu</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link text-secondary" id="reservation-tab" data-toggle="tab" href="#reservation" role="tab" aria-controls="reservation" aria-selected="false">Reservation</a>
+  </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+  <div class="tab-pane fade show active" id="menu" role="tabpanel" aria-labelledby="menu-tab">
+    <c:choose>
+      <c:when test="${ menu.size() == 0 }">
+        <h2 class="display-5">Menu no disponible</h2>
+      </c:when>
+      <c:otherwise>
+        <ul class="list-group list-group-flush">
+          <sc:menu menu="${menu}" />
+        </ul>
+      </c:otherwise>
+    </c:choose>
+  </div>
+  <div class="tab-pane fade" id="reservation" role="tabpanel" aria-labelledby="reservation-tab" data-spy="reservation2" data-target="#reservation2"></div>
+   <sc:reservationForm/> 
 </div>
