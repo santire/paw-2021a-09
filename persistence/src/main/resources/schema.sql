@@ -49,6 +49,12 @@ CREATE TABLE IF NOT EXISTS ratings(
   restaurant_id INTEGER REFERENCES restaurants(restaurant_id) ON DELETE CASCADE
 )
 
+CREATE TABLE IF NOT EXISTS likes(
+  like_id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
+  restaurant_id INTEGER REFERENCES restaurants(restaurant_id) ON DELETE CASCADE
+)
+
 /*
 CREATE TABLE IF NOT EXISTS tags(
   tag_id SERIAL PRIMARY KEY,

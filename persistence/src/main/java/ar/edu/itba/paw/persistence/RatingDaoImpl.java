@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
-public class RatingDaoImpl implements RatingDao{
+public class RatingDaoImpl implements RatingDao {
     private static final RowMapper<Rating> RATING_ROW_MAPPER = (rs, rowNum) -> new Rating(
             rs.getLong("user_id"),
             rs.getLong("restaurant_id"),
