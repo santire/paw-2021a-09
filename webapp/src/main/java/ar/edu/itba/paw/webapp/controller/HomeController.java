@@ -97,10 +97,22 @@ public class HomeController {
     }
 
     @RequestMapping("/login")
-    public ModelAndView login() {
-        return new ModelAndView("login");
+    public ModelAndView login(@RequestParam(value = "error", required = false) final String error) {
+        final ModelAndView mav = new ModelAndView("login");
 
+        if (error != null) {
+            mav.addObject("error", true);
+        }
+        else{
+            mav.addObject("error", false);
+        }
+
+        return mav;
     }
+
+
+
+
 
 
 
