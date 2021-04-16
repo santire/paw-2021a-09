@@ -6,7 +6,7 @@
     <title>Gourmetable</title>
 </head>
 <body>
-<c:url value="/registerRestaurant" var="path"/>
+<c:url value="/register-restaurant" var="path"/>
 <form:form modelAttribute="RestaurantForm" action="${path}" method="post">
     <div>
         <form:errors path="name" cssStyle="color: red;" element="p"/>

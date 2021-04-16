@@ -24,4 +24,6 @@ public interface RestaurantService {
     public boolean deleteRestaurantByName(String name);
 
     public Optional<User> findRestaurantOwner(long id);
+
+    public List<Restaurant> getRestaurantsFromOwner(long userId);
 }

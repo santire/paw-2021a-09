@@ -103,4 +103,10 @@ public class RestaurantDaoImpl implements RestaurantDao {
 
         return  userDao.findById(userId);
     }
+
+
+    @Override
+    public List<Restaurant> getRestaurantsFromOwner(long userId){
+        return jdbcTemplate.query("SELECT * FROM restaurants WHERE user_id = ?", RESTAURANT_ROW_MAPPER, userId).stream().collect(Collectors.toList());
+    }
 }

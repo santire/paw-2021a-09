@@ -79,12 +79,12 @@ public class RestaurantController {
         return new ModelAndView("redirect:/");
     }
 
-    @RequestMapping(path = { "/registerRestaurant" }, method = RequestMethod.GET)
+    @RequestMapping(path = { "/register-restaurant" }, method = RequestMethod.GET)
     public ModelAndView registerRestaurant(@ModelAttribute("RestaurantForm") final RestaurantForm form) {
         return new ModelAndView("registerRestaurant");
     }
 
-    @RequestMapping(path = { "/registerRestaurant" }, method = RequestMethod.POST)
+    @RequestMapping(path = { "/register-restaurant" }, method = RequestMethod.POST)
     public ModelAndView registerRestaurant(@Valid @ModelAttribute("RestaurantForm") final RestaurantForm form,
             final BindingResult errors) {
         if (errors.hasErrors()) {

@@ -62,4 +62,9 @@ public class RestaurantServiceImpl implements RestaurantService{
         return restaurantDao.findRestaurantOwner(id);
     }
 
+    @Override
+    public List<Restaurant> getRestaurantsFromOwner(long userId) {
+        return restaurantDao.getRestaurantsFromOwner(userId);
+    }
+
 }

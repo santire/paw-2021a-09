@@ -26,7 +26,7 @@ public class ExceptionHandlingAdvice  {
     @ExceptionHandler(value = {UserNotFoundException.class, RestaurantNotFoundException.class, NoHandlerFoundException.class, MethodArgumentTypeMismatchException.class})
     public ModelAndView handleException(Exception e)
     {
-        return new ModelAndView("home" );
+        return new ModelAndView("error" );
     }
 
 

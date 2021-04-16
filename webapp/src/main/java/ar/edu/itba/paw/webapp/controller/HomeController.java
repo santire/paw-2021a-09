@@ -93,5 +93,10 @@ public class HomeController {
         }
     }
 
+    @RequestMapping("/login")
+    public ModelAndView login() {
+        return new ModelAndView("login");
+
+    }
 
 }

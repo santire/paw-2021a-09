@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.persistence;
 
+import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -8,12 +9,14 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import javax.sql.DataSource;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class UserDaoImpl implements UserDao {
+
+    @Autowired
+    RestaurantDao restaurantDao;
 
     private static final RowMapper<User> USER_ROW_MAPPER = (rs, rowNum) -> new User(
         rs.getLong("user_id"),
@@ -33,6 +36,8 @@ public class UserDaoImpl implements UserDao {
         jdbcTemplate = new JdbcTemplate(ds);
         jdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("users").usingGeneratedKeyColumns("user_id");
     }
+
+
 
     @Override
     public Optional<User> findById(long id) {
@@ -62,5 +67,7 @@ public class UserDaoImpl implements UserDao {
 
         return new User(userId.longValue(),username,password, first_name,last_name,email,phone);
     }
+
+
 
 }
