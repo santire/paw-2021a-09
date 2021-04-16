@@ -4,6 +4,7 @@ import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -13,6 +14,8 @@ import ar.edu.itba.paw.service.RestaurantService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 
@@ -97,6 +100,16 @@ public class HomeController {
     public ModelAndView login() {
         return new ModelAndView("login");
 
+    }
+
+
+
+    @ModelAttribute
+    public Optional<User> loggedUser() {
+        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        final Optional<User> user = userService.findByEmail((String) auth.getName());
+        LOGGER.debug("Logged user is {}", user);
+        return user;
     }
 
 }

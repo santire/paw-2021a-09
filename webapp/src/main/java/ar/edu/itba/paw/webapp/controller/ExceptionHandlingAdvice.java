@@ -6,6 +6,7 @@ import ar.edu.itba.paw.webapp.exceptions.UserNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -21,6 +22,11 @@ public class ExceptionHandlingAdvice  {
         return mav;
     }
      */
+    @RequestMapping("/403")
+    public ModelAndView forbidden() {
+        return new ModelAndView("403");
+    }
+
 
     //
     @ExceptionHandler(value = {UserNotFoundException.class, RestaurantNotFoundException.class, NoHandlerFoundException.class, MethodArgumentTypeMismatchException.class})
