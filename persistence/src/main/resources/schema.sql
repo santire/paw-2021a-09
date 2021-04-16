@@ -1,13 +1,4 @@
-
-/*
 CREATE TABLE IF NOT EXISTS users (
-   user_id SERIAL PRIMARY KEY,
-   username VARCHAR(100),
-  password VARCHAR(100)
- );
- */
-
-CREATE TABLE IF NOT EXISTS users ( 
   user_id SERIAL PRIMARY KEY, 
   username VARCHAR(100),
   password VARCHAR(100), 
@@ -47,13 +38,19 @@ CREATE TABLE IF NOT EXISTS ratings(
   rating INTEGER,
   user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
   restaurant_id INTEGER REFERENCES restaurants(restaurant_id) ON DELETE CASCADE
-)
+);
 
 CREATE TABLE IF NOT EXISTS likes(
   like_id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
   restaurant_id INTEGER REFERENCES restaurants(restaurant_id) ON DELETE CASCADE
-)
+);
+
+-- CREATE TABLE IF NOT EXISTS restaurant_images(
+--   image_id SERIAL PRIMARY KEY,
+--   file BYTEA,
+--   restaurant_id INTEGER REFERENCES restaurant(restaurant_id) ON DELETE CASCADE
+-- );
 
 /*
 CREATE TABLE IF NOT EXISTS tags(

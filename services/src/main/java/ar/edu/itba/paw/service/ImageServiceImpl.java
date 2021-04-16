@@ -14,22 +14,11 @@ public class ImageServiceImpl implements ImageService {
     private ImageDao imageDao;
 
     @Override
-    public Optional<Image> getImageByUserId(long userId){ return imageDao.getImageByUserId(userId); }
-
-    @Override
     public Optional<Image> getImageByRestaurantId(long restaurantId){
         return imageDao.getImageByRestaurantId(restaurantId);
     }
 
-
-    @Override
-    public boolean saveUserImage(Image image){
-        if(imageDao.userHasImage(image.getOwnerId())) {
-            return imageDao.updateUserImage(image);
-        }
-        return imageDao.saveUserImage(image);
-    }
-
+    // For now, only 1 profile picture per restaurant
     @Override
     public boolean saveRestaurantImage(Image image){
         if(imageDao.restaurantHasImage(image.getOwnerId())) {
