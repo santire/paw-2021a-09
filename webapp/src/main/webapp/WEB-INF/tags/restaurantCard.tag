@@ -1,4 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+
 <%@attribute name="restaurant" required="true" type="ar.edu.itba.paw.model.Restaurant"%>
 
 <div class="card h-100">
@@ -12,7 +14,7 @@
     <div class="mt-auto">
       <h6 class="card-title text-break text-center">${restaurant.getName()}</h6>
       <%-- <p class="card-text">${restaurant.getDescription()}</p> --%>
-      <a href="<c:url value="/restaurant/${restaurant.getId()}"/>" class="btn btn-outline-secondary btn-block">Ver mas</a>
+      <a href="<c:url value="/restaurant/${restaurant.getId()}"/>" class="btn btn-outline-secondary btn-block"><spring:message code="restaurants.seeMore" /></a>
     </div>
   </div>
 </div>

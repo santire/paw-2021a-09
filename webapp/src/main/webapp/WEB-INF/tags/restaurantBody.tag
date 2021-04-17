@@ -1,6 +1,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix ="fmt" uri ="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+
 <%@attribute name="restaurant" required="true" type="ar.edu.itba.paw.model.Restaurant"%>
 <%@attribute name="menu" required="true" type="java.util.List"%>
 
@@ -50,7 +52,7 @@
             </div>
             <form:input type="number" min="1" max="12" path="quantity" cssClass="form-control" aria-label="Cantidad de gente"/>
             <div class="input-group-append">
-              <span class="input-group-text">personas</span>
+              <span class="input-group-text"><spring:message code="restaurants.partySize" /></span>
             </div>
           </div>
         </form:label>
@@ -59,7 +61,7 @@
         <input
         type="submit"
         class="btn btn-outline-secondary btn-block"
-        value="Reservar Hoy" 
+        value='<spring:message code="restaurants.bookNow" />' 
         />
       </div>
       </form:form>
@@ -74,7 +76,7 @@
   <h3 class="pt-2">Menu</h3>
   <c:choose>
     <c:when test="${ menu.size() == 0 }">
-      <h2 class="display-5">Menu no disponible</h2>
+      <h2 class="display-5"><spring:message code="restauants.menuNotAvailable" /></h2>
     </c:when>
     <c:otherwise>
       <ul class="list-group list-group-flush">
