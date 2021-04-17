@@ -110,7 +110,13 @@ public class HomeController {
         return mav;
     }
 
+    @RequestMapping("/403")
+    public ModelAndView forbidden() {
+        final ModelAndView mav = new ModelAndView("error");
+        mav.addObject("code", 403);
 
+        return mav;
+    }
 
 
 

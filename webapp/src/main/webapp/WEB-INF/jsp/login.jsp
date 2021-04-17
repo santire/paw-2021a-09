@@ -50,7 +50,7 @@
             <div class="col-md-3">
             </div>
             <div class="col-6">
-                <button type="submit" class="btn btn-primary"><spring:message code="hello.login.signin"></spring:message></button>
+                <button type="submit" class="btn btn-secondary"><spring:message code="hello.login.signin"></spring:message></button>
             </div>
             <div class="col-md-3">
             </div>

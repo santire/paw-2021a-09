@@ -22,18 +22,23 @@ public class ExceptionHandlingAdvice  {
         return mav;
     }
      */
-    @RequestMapping("/403")
-    public ModelAndView forbidden() {
-        return new ModelAndView("403");
+
+    @ExceptionHandler(value = { NoHandlerFoundException.class})
+    public ModelAndView notFound(Exception e)
+    {
+        final ModelAndView mav = new ModelAndView("error");
+        mav.addObject("code", 404);
+        return mav;
     }
 
 
     //
-    @ExceptionHandler(value = {UserNotFoundException.class, RestaurantNotFoundException.class, NoHandlerFoundException.class, MethodArgumentTypeMismatchException.class})
+    @ExceptionHandler(value = {UserNotFoundException.class, RestaurantNotFoundException.class, MethodArgumentTypeMismatchException.class})
     public ModelAndView handleException(Exception e)
     {
-        return new ModelAndView("error" );
+        final ModelAndView mav = new ModelAndView("error");
+        mav.addObject("code", 400);
+        return mav;
     }
-
 
 }
