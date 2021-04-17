@@ -11,21 +11,21 @@
     <div>
         <form:errors path="name" cssStyle="color: red;" element="p"/>
         <form:label path="name">
-            Restaurant Name:
+            <spring:message code="register.restaurant.RestaurantName" />:    
             <form:input type="text" path="name"/>
         </form:label>
     </div>
     <div>
         <form:errors path="address" cssStyle="color: red;" element="p"/>
         <form:label path="address">
-            Address:
+            <spring:message code="Address" />:
             <form:input type="text" path="address"/>
         </form:label>
     </div>
     <div>
         <form:errors path="phoneNumber" cssStyle="color: red;" element="p"/>
         <form:label path="phoneNumber">
-            Phone Number:
+            <spring:message code="PhoneNumber" />:
             <form:input type="text" path="phoneNumber"/>
         </form:label>
     </div>

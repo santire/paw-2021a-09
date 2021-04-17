@@ -9,7 +9,7 @@
         <div class="container mt-4">
           <c:choose>
             <c:when test="${empty restaurants}">
-              <h2 class="display-5">No hay restaurantes</h2>
+              <h2 class="display-5"><spring:message code="restaurants.noRestaurantsFound" /></h2>
             </c:when>
             <c:otherwise>
             <div class="row row-cols-1 row-cols-md-4 row-cols-lg-5">
