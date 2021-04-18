@@ -1,27 +1,26 @@
 package ar.edu.itba.paw.webapp.controller;
 
+import ar.edu.itba.paw.model.Rating;
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
 
 import javax.validation.Valid;
 
-import ar.edu.itba.paw.service.MenuService;
-import ar.edu.itba.paw.service.ReservationService;
+import ar.edu.itba.paw.service.*;
 import ar.edu.itba.paw.webapp.forms.ReservationForm;
 import ar.edu.itba.paw.webapp.forms.RestaurantForm;
-import ar.edu.itba.paw.service.RestaurantService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import ar.edu.itba.paw.service.UserService;
 import ar.edu.itba.paw.webapp.exceptions.RestaurantNotFoundException;
 
 import java.util.Date;
@@ -29,6 +28,8 @@ import java.util.Optional;
 
 @Controller
 public class RestaurantController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HomeController.class);
+
     @Autowired
     private UserService userService;
 
@@ -41,11 +42,29 @@ public class RestaurantController {
     @Autowired
     private MenuService menuService;
 
+    @Autowired
+    private RatingService ratingService;
+
     @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.GET)
     public ModelAndView restaurant(@ModelAttribute("reservationForm") final ReservationForm form,
             @PathVariable("restaurantId") final long restaurantId) {
-
         final ModelAndView mav = new ModelAndView("restaurant");
+
+        Optional<User> user = loggedUser();
+        if(user.isPresent()){
+            long userId = user.get().getId();
+            mav.addObject("loggedUser", true);
+            Optional<Rating> userRating = ratingService.getRating(userId, restaurantId);
+            if(userRating.isPresent()){
+                mav.addObject("rated", true);
+                mav.addObject("userRatingToRestaurant", userRating.get().getRating());
+            }
+            else{ mav.addObject("rated", false); }
+        }
+        else{
+            mav.addObject("loggedUser", false);
+            mav.addObject("rated", false);
+        }
         mav.addObject("restaurant",
                 restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new));
         mav.addObject("menu",
@@ -79,9 +98,33 @@ public class RestaurantController {
         return new ModelAndView("redirect:/");
     }
 
+    @RequestMapping(path = {"/restaurant/rate/set/{restaurantId}"}, method = RequestMethod.POST)
+    public ModelAndView setRating(@PathVariable("restaurantId") final long restaurantId, @RequestParam("rating") float rating){
+        Optional<User> user = loggedUser();
+        if(user.isPresent()){
+            long userId = user.get().getId();
+            ratingService.rateRestaurant(userId, restaurantId, rating);
+        }
+        return new ModelAndView("redirect:/restaurant/" + restaurantId);
+    }
+
+    @RequestMapping(path = {"/restaurant/rate/update/{restaurantId}"}, method = RequestMethod.POST)
+    public ModelAndView updateRating(@PathVariable("restaurantId") final long restaurantId, @RequestParam("rating") float rating){
+        Optional<User> user = loggedUser();
+        if(user.isPresent()){
+            long userId = user.get().getId();
+            ratingService.modifyRestaurantRating(userId, restaurantId, rating);
+        }
+        return new ModelAndView("redirect:/restaurant/" + restaurantId);
+    }
+
     @RequestMapping(path = { "/register-restaurant" }, method = RequestMethod.GET)
     public ModelAndView registerRestaurant(@ModelAttribute("RestaurantForm") final RestaurantForm form) {
-        return new ModelAndView("registerRestaurant");
+        Optional<User> user = loggedUser();
+        if(user.isPresent()){
+            return new ModelAndView("registerRestaurant");
+        }
+        return new ModelAndView("redirect:/login");
     }
 
     @RequestMapping(path = { "/register-restaurant" }, method = RequestMethod.POST)
@@ -91,10 +134,21 @@ public class RestaurantController {
             return registerRestaurant(form);
         }
 
-        final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
-                form.getPhoneNumber(), 0, 1);
+        Optional<User> user = loggedUser();
+        if(user.isPresent()){
+            final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
+                    form.getPhoneNumber(), user.get().getId());
+            return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
+        }
+        return new ModelAndView("redirect:/login");
+    }
 
-        return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
+    @ModelAttribute
+    public Optional<User> loggedUser() {
+        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        final Optional<User> user = userService.findByEmail((String) auth.getName());
+        LOGGER.debug("Logged user is {}", user);
+        return user;
     }
 
 }
