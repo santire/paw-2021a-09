@@ -3,7 +3,11 @@
 
 <%@attribute name="restaurant" required="true" type="ar.edu.itba.paw.model.Restaurant"%>
 
-<div class="card h-100">
+<div class="card h-100" 
+     <%-- hack to make whole class clickable without breaking style --%>
+     onclick="window.location='<c:url value="/restaurant/${restaurant.getId()}"/>'"
+     style="cursor: pointer;"
+>
 <c:url value="/resources/images/restaurants/${restaurant.getId()}.jpg" var="imgUrl"/>
   <img
     src="${imgUrl}"
