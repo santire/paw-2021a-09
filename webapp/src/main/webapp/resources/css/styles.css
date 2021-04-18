@@ -35,6 +35,23 @@ select,
   }
 }
 
+/* magic fix for firefox */
+.owl-carousel .owl-stage {
+  display: flex;
+}
+.article-items {
+  display: flex;
+  flex: 1 0 auto;
+  height: 100%;
+}
+.aticle-box {
+  position: relative;
+  overflow: hidden;
+  /* margin-bottom: 80px; */ /*This is optional*/
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
 /* carousel styling */
 .owl-prev,
 .owl-next {
