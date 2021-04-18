@@ -40,7 +40,9 @@
     </c:choose>
   </div>
   <div class="order-1 order-lg-2">
-    <h3 class="pb-1 text-center border-bottom">Reservation</h3>
+    <h3 class="pb-1 text-center border-bottom">
+      <spring:message code="restaurants.reservation"/>
+    </h3>
       <sc:reservationForm/> 
     </div>
   </div>
