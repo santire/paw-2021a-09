@@ -99,7 +99,7 @@ public class RestaurantController {
     }
 
     @RequestMapping(path = {"/restaurant/rate/set/{restaurantId}"}, method = RequestMethod.POST)
-    public ModelAndView setRating(@PathVariable("restaurantId") final long restaurantId, @RequestParam("rating") float rating){
+    public ModelAndView setRating(@PathVariable("restaurantId") final long restaurantId, @RequestParam("rating") int rating){
         Optional<User> user = loggedUser();
         if(user.isPresent()){
             long userId = user.get().getId();
@@ -109,7 +109,7 @@ public class RestaurantController {
     }
 
     @RequestMapping(path = {"/restaurant/rate/update/{restaurantId}"}, method = RequestMethod.POST)
-    public ModelAndView updateRating(@PathVariable("restaurantId") final long restaurantId, @RequestParam("rating") float rating){
+    public ModelAndView updateRating(@PathVariable("restaurantId") final long restaurantId, @RequestParam("rating") int rating){
         Optional<User> user = loggedUser();
         if(user.isPresent()){
             long userId = user.get().getId();
@@ -137,7 +137,7 @@ public class RestaurantController {
         Optional<User> user = loggedUser();
         if(user.isPresent()){
             final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
-                    form.getPhoneNumber(), user.get().getId());
+                    form.getPhoneNumber(), 0, user.get().getId());
             return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
         }
         return new ModelAndView("redirect:/login");
