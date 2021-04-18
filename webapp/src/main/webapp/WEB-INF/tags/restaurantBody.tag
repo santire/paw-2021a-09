@@ -18,27 +18,14 @@
       <p class="card-text"><medium class="text-muted">${restaurant.getAddress()}</medium></p>
       <p class="card-text"><medium class="text-muted">${restaurant.getPhoneNumber()}</medium></p>
       </div>
-        <input
-        onclick="$('#reservation-tab').tab('show')"
-        class="btn btn-outline-secondary btn-block"
-        value="Reservar Hoy" 
-        />
       </div>
     </div>
   </div>
 </div>
 </div>
-
-<ul class="nav nav-tabs pt-2" id="myTab" role="tablist">
-  <li class="nav-item">
-    <a class="nav-link active text-secondary" id="menu-tab" data-toggle="tab" href="#menu" role="tab" aria-controls="menu" aria-selected="true">Menu</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link text-secondary" id="reservation-tab" data-toggle="tab" href="#reservation" role="tab" aria-controls="reservation" aria-selected="false">Reservation</a>
-  </li>
-</ul>
-<div class="tab-content" id="myTabContent">
-  <div class="tab-pane fade show active" id="menu" role="tabpanel" aria-labelledby="menu-tab">
+<div class="row row-cols-1 row-cols-lg-2 w-75 mx-auto">
+  <div class="order-2 order-lg-1">
+    <h3 class="pb-1 text-center border-bottom">Menu</h3>
     <c:choose>
       <c:when test="${ menu.size() == 0 }">
         <h2 class="display-5">Menu no disponible</h2>
@@ -50,6 +37,10 @@
       </c:otherwise>
     </c:choose>
   </div>
-  <div class="tab-pane fade" id="reservation" role="tabpanel" aria-labelledby="reservation-tab" data-spy="reservation2" data-target="#reservation2"></div>
-   <sc:reservationForm/> 
+  <div class="order-1 order-lg-2">
+    <h3 class="pb-1 text-center border-bottom">Reservation</h3>
+      <sc:reservationForm/> 
+    </div>
+  </div>
 </div>
+

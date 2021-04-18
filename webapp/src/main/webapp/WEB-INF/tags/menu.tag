@@ -4,7 +4,7 @@
 <%@attribute name="menu" required="true" type="java.util.List"%>
 
 
-<div class="row row-cols-1 row-cols-lg-2">
+<div class="row row-cols-1 row-cols-lg-1 mx-auto">
   <c:forEach var="item" items="${menu}" >
     <li class="list-group-item border-0">
       <span class="col-md-10 mr-auto pull-left">${item.getName()}</span>
