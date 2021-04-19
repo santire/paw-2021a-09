@@ -14,21 +14,21 @@
         <div class="col-md-6">
             <div class="error-template">
                 <c:if test= "${code == '404'}">
-                    <h2>404 Not Found</h2>
+                    <h2><spring:message code="error.404.title" /></h2>
                     <div class="error-details">
-                        Sorry, an error has occured, Requested page not found!
+                        <spring:message code="error.404.details" />
                     </div>
                 </c:if>
                 <c:if test= "${code == '403'}">
-                    <h2>403 Forbidden</h2>
+                    <h2><spring:message code="error.403.title" /></h2>
                     <div class="error-details">
-                        Sorry, you have not access for requested page!
+                        <spring:message code="error.403.details" />
                     </div>
                 </c:if>
                 <c:if test= "${code == '400'}">
-                    <h2>400 Bad request</h2>
+                    <h2><spring:message code="error.400.title" /></h2>
                     <div class="error-details">
-                        Sorry, an error has occured!
+                        <spring:message code="error.400.details" />
                     </div>
                 </c:if>
                 <c:if test= "${code == '498'}">
@@ -43,7 +43,7 @@
                 </c:if>
 
                 <div class="error-actions">
-                    <a href="<c:url value="/"/>" class="btn btn-secondary btn-lg"><span class="glyphicon glyphicon-home"></span>Take Me Home </a>
+                    <a href="<c:url value="/"/>" class="btn btn-secondary btn-lg"><span class="glyphicon glyphicon-home"></span><spring:message code="error.home" /> </a>
                 </div>
             </div>
         </div>

@@ -1,4 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+
 <html lang="en">
 
 <head>
@@ -46,8 +48,8 @@
 
   <!-- Jumbotron Header -->
   <header class="jumbotron my-4">
-    <h1 class="display-3">Find a restaurant <strong>${user.getName()}</strong></h1>
-    <p class="lead">Search for restaurants that suits your appetite. Like a Tinder with food.</p>
+    <h1 class="display-3"><spring:message code="index.FindARestaurant" /> <strong>${user.getName()}</strong></h1>
+    <p class="lead"><spring:message code="index.description" /></p>
     <a href="#" class="btn btn-primary btn-lg">Call to action!</a>
   </header>
 

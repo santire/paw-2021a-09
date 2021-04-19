@@ -1,3 +1,6 @@
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+
+
 <div class="footer-dark bg-dark border-top">
   <footer class="footer">
     <div class="container">
@@ -5,7 +8,7 @@
         <div class="container">
           <div class="row">
             <div class="item text col-md-6 mr-auto">
-              <h3>Nosotros</h3>
+              <h3><spring:message code="footer.weAre" /></h3>
               <ul class="list">
                 <li><p>Gianfranco Marchetti</p></li>
                 <li><p>Manuel Luque</p></li>
@@ -15,8 +18,8 @@
             </div>
             <div class="col-md-6">
               <div class="col-md-6 item text ml-auto">
-                <h3>Ponete en contacto</h3>
-                <p><a href="mailto:gourmetable@gmail.com" style="color:aliceblue">gourmetable@gmail.com</a></p>
+                <h3><spring:message code="footer.ContactUs" /></h3>
+                <p><a href="mailto:gourmetablewebapp@gmail.com" style="color:aliceblue">gourmetablewebapp@gmail.com</a></p>
               </div>
             </div>
           </div>

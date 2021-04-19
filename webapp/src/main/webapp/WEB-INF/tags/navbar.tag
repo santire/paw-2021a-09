@@ -1,5 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
 <%@attribute name="user" required="true" type="ar.edu.itba.paw.model.User"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+
 
 <header>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
@@ -21,7 +23,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <a class="nav-link" href="<c:url value="/restaurants"/>">Ver todos</a>
+          <a class="nav-link" href="<c:url value="/restaurants"/>"><spring:message code="navbar.browse" /></a>
         </li>
         <li class="nav-item dropdown" style="visibility: hidden;">
           <a
@@ -48,7 +50,7 @@
           <input
             class="search-bar form-control mr-auto input-lg"
             type="search"
-            placeholder="Search"
+            placeholder='<spring:message code="navbar.search" />'
             aria-label="Search"
             name="search"
           />
