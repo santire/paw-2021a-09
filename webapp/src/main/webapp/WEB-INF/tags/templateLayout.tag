@@ -33,7 +33,7 @@
     <title>Gourmetable</title>
   </head>
   <body>
-    <sc:navbar user="${user}" />
+    <sc:navbar />
 
     <div id="body" class="page-content">
       <jsp:doBody />

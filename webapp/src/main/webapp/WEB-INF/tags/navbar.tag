@@ -1,5 +1,4 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
-<%@attribute name="user" required="true" type="ar.edu.itba.paw.model.User"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 

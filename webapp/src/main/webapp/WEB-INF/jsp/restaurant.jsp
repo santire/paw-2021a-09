@@ -8,7 +8,6 @@
       <c:url value="/resources/images/resto1.jpg" var="restaurantImageUrl" />
       <sc:restaurantBody 
         restaurant="${restaurant}"
-        menu="${menu}"
         />
     </main>
   </jsp:body>

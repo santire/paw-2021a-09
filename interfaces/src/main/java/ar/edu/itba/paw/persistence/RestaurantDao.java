@@ -26,4 +26,6 @@ public interface RestaurantDao {
     public Optional<User> findRestaurantOwner(long id);
 
     public List<Restaurant> getRestaurantsFromOwner(long userId);
+
+    public List<Restaurant> findAll();
 }

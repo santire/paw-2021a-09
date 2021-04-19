@@ -5,7 +5,6 @@
 <%@ taglib prefix="sc" tagdir="/WEB-INF/tags" %>
 
 <%@attribute name="restaurant" required="true" type="ar.edu.itba.paw.model.Restaurant"%>
-<%@attribute name="menu" required="true" type="java.util.List"%>
 
 <div class="container">
 <div class="mb-3 my-2" style="max-height: 450px;">
@@ -34,7 +33,7 @@
       </c:when>
       <c:otherwise>
         <ul class="list-group list-group-flush">
-          <sc:menu menu="${menu}" />
+          <sc:menu menu="${restaurant.getMenu()}" />
         </ul>
       </c:otherwise>
     </c:choose>

@@ -32,8 +32,7 @@ public class ExceptionHandlingAdvice  {
     }
 
 
-    //
-    // @ExceptionHandler(value = {UserNotFoundException.class, RestaurantNotFoundException.class, MethodArgumentTypeMismatchException.class})
+    @ExceptionHandler(value = {UserNotFoundException.class, RestaurantNotFoundException.class, MethodArgumentTypeMismatchException.class})
     public ModelAndView handleException(Exception e)
     {
         final ModelAndView mav = new ModelAndView("error");
