@@ -16,8 +16,12 @@ import ar.edu.itba.paw.webapp.forms.UserForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -30,9 +34,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ar.edu.itba.paw.service.UserService;
 import ar.edu.itba.paw.webapp.exceptions.RestaurantNotFoundException;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 public class RestaurantController {
@@ -107,6 +109,9 @@ public class RestaurantController {
         final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
                 form.getPhoneNumber(), 0, user.getId());
 
+        if(restaurantService.getRestaurantsFromOwner(user.getId()).size() == 1)
+        updateAuthorities();
+
         return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
     }
 
@@ -122,6 +127,10 @@ public class RestaurantController {
 
             if(userService.isTheRestaurantOwner(user.getId(), restaurantId)){
                 restaurantService.deleteRestaurantById(restaurantId);
+
+                if(restaurantService.getRestaurantsFromOwner(user.getId()).isEmpty())
+                    updateAuthorities();
+
                 return new ModelAndView("redirect:/user/edit");
             }
         return new ModelAndView("redirect:/403");
@@ -185,4 +194,25 @@ public class RestaurantController {
         LOGGER.debug("Logged user is {}", user);
         return user;
     }
+
+
+
+
+
+
+    @ModelAttribute
+    public void updateAuthorities() {
+        User user = loggedUser().orElseThrow(UserNotFoundException::new);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Collection<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        if(!restaurantService.getRestaurantsFromOwner(user.getId()).isEmpty()){
+            authorities.add(new SimpleGrantedAuthority("ROLE_RESTAURANTOWNER"));
+        }
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
+    }
+
+
+
 }

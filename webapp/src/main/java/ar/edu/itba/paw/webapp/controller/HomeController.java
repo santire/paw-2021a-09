@@ -70,8 +70,14 @@ public class HomeController {
 
 
     @RequestMapping(path ={"/register"}, method = RequestMethod.GET)
-    public ModelAndView registerForm(@ModelAttribute("userForm") final UserForm form) {
-        return new ModelAndView("register");
+    public ModelAndView registerForm(@ModelAttribute("userForm") final UserForm form,@RequestParam(value = "error", required = false) final String error) {
+       ModelAndView mav = new ModelAndView("register");
+       if(error != null){
+           System.out.println("error q llego" + error);
+           mav.addObject("error", error);
+       }
+       System.out.println(error);
+        return mav;
     }
 
 
@@ -80,8 +86,11 @@ public class HomeController {
     public ModelAndView register(@Valid @ModelAttribute("userForm") final UserForm form, final BindingResult errors ) {
         // if there are errors it goes back to the register form without losing data
         // but letting the user know it has errors
+        if(!form.getPassword().equals(form.getRepeatPassword())){
+            return registerForm(form, "password");
+        }
         if (errors.hasErrors()) {
-            return registerForm(form);
+            return registerForm(form,null);
         }
 
         try{
@@ -91,8 +100,7 @@ public class HomeController {
             return new ModelAndView("redirect:/user/" + user.getId());
         } catch (Exception e) {
 
-            errors.addError(new ObjectError("emailError", "email already in use"));
-            return registerForm(form);
+            return registerForm(form, "email");
         }
     }
 
@@ -129,5 +137,10 @@ public class HomeController {
         LOGGER.debug("Logged user is {}", user);
         return user;
     }
+
+
+
+
+
 
 }

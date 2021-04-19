@@ -19,10 +19,23 @@
         </form:label>
       </div>
       <div>
+
         <form:errors path="password" cssStyle="color: red;" element="p"/>
         <form:label path="password">
           Password:
-          <form:input type="text" path="password"/>
+          <form:input type="password" path="password"/>
+        </form:label>
+      </div >
+      <c:if test= "${error == 'password'}">
+        <div style="color:red;">
+          passwords doesnt match
+        </div>
+      </c:if>
+      <div>
+        <form:errors path="repeatPassword" cssStyle="color: red;" element="p"/>
+        <form:label path="password">
+          Repeat Password:
+          <form:input type="password" path="repeatPassword"/>
         </form:label>
       </div>
       <div>
@@ -39,8 +52,12 @@
           <form:input type="text" path="last_name"/>
         </form:label>
       </div>
+      <c:if test= "${error == 'email'}">
+        <div style="color:red;">
+          email already registered
+        </div>
+      </c:if>
       <div>
-        <form:errors  name="emailError" cssStyle="color: red;" element="p"/>
         <form:errors path="email" cssStyle="color: red;" element="p"/>
         <form:label path="email">
           E-Mail:

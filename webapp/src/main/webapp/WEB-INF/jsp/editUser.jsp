@@ -30,6 +30,18 @@
                     <form:input type="password" path="password" placeholder="********"/>
                 </form:label>
             </div>
+            <c:if test= "${error == 'password'}">
+                <div style="color:red;">
+                    passwords doesnt match
+                </div>
+            </c:if>
+            <div>
+                <form:errors path="repeatPassword" cssStyle="color: red;" element="p"/>
+                <form:label path="password">
+                    Repeat Password:
+                    <form:input type="password" path="repeatPassword" placeholder="********"/>
+                </form:label>
+            </div>
             <div>
                 <input type="submit" value="Save"/>
             </div>
