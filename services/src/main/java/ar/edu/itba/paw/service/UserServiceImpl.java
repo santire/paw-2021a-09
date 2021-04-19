@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
   public User register(String username, String password, String firstName, String lastName, String email,
       String phone) {
 
-    User user =userDao.register(username,encoder.encode(password), firstName, lastName, email, phone);
+    User user = userDao.register(username,encoder.encode(password), firstName, lastName, email, phone);
     emailService.sendRegistrationEmail(email);
 
     return  user;

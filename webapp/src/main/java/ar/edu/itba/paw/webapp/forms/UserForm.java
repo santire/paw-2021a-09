@@ -22,10 +22,10 @@ public class UserForm {
   private String repeatPassword;
 
   @Size(min = 2, max = 100)
-  private String first_name;
+  private String firstName;
 
   @Size(min = 2, max = 100)
-  private String last_name;
+  private String lastName;
 
   @Size(min = 6, max = 100)
   //@Pattern(regexp = "/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/")
@@ -63,20 +63,20 @@ public class UserForm {
     this.repeatPassword = repeatPassword;
   }
 
-  public String getFirst_name() {
-    return this.first_name;
+  public String getFirstName() {
+    return this.firstName;
   }
 
-  public void setFirst_name(String first_name) {
-    this.first_name = first_name;
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
   }
 
-  public String getLast_name() {
-    return this.last_name;
+  public String getLastName() {
+    return this.lastName;
   }
 
-  public void setLast_name(String last_name) {
-    this.last_name = last_name;
+  public void setLast_name(String lastName) {
+    this.lastName = lastName;
   }
 
   public String getEmail() {

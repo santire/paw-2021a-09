@@ -89,7 +89,7 @@
                       <c:out value="${loggedUser.getName()}"/>
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                      <a class="dropdown-item" href="/logout"><spring:message code="navbar.logout" /></a>
+                      <a class="dropdown-item" href="<c:url value="/logout"/>"><spring:message code="navbar.logout" /></a>
                     </div>
                 </ul>
             </c:otherwise>
