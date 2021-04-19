@@ -49,18 +49,18 @@ public class RestaurantController {
     private LikesService likesService;
 
     @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.GET)
-    public ModelAndView restaurant(@ModelAttribute("reservationForm") final ReservationForm form,
+    public ModelAndView restaurant(@ModelAttribute("loggedUser") final User loggedUser, @ModelAttribute("reservationForm") final ReservationForm form,
             @PathVariable("restaurantId") final long restaurantId) {
         final ModelAndView mav = new ModelAndView("restaurant");
 
-        // if(loggedUser != null){
-            // Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
-            // if(userRating.isPresent()){
-                // mav.addObject("rated", true);
-                // mav.addObject("userRatingToRestaurant", userRating.get().getRating());
-                // mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
-            // }
-        // }
+        if(loggedUser != null){
+            Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
+            if(userRating.isPresent()){
+                mav.addObject("rated", true);
+                mav.addObject("userRatingToRestaurant", userRating.get().getRating());
+                mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
+            }
+        }
 
         mav.addObject("restaurant",
                 restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new));
@@ -68,12 +68,12 @@ public class RestaurantController {
     }
 
     @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.POST)
-    public ModelAndView register(@Valid @ModelAttribute("reservationForm") final ReservationForm form,
+    public ModelAndView register(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("reservationForm") final ReservationForm form,
             final BindingResult errors, @PathVariable("restaurantId") final long restaurantId,
             RedirectAttributes redirectAttributes) {
 
         if (errors.hasErrors()) {
-            return restaurant(form, restaurantId);
+            return restaurant(loggedUser, form, restaurantId);
         }
 
         User user;
@@ -92,71 +92,65 @@ public class RestaurantController {
         return new ModelAndView("redirect:/");
     }
 
-    // @RequestMapping(path = { "/register-restaurant" }, method = RequestMethod.GET)
-    // public ModelAndView registerRestaurant(@ModelAttribute("RestaurantForm") final RestaurantForm form) {
-    //     Optional<User> user = loggedUser();
-    //     if(user.isPresent()){
-    //         return new ModelAndView("registerRestaurant");
-    //     }
-    //     return new ModelAndView("redirect:/login");
-    // }
+    @RequestMapping(path = { "/register/restaurant" }, method = RequestMethod.GET)
+    public ModelAndView registerRestaurant(@ModelAttribute("loggedUser") final User loggedUser, @ModelAttribute("RestaurantForm") final RestaurantForm form) {
+        if(loggedUser != null){
+            return new ModelAndView("registerRestaurant");
+        }
+        return new ModelAndView("redirect:/login");
+    }
 
-    // @RequestMapping(path = { "/register-restaurant" }, method = RequestMethod.POST)
-    // public ModelAndView registerRestaurant(@Valid @ModelAttribute("RestaurantForm") final RestaurantForm form,
-    //                                        final BindingResult errors) {
-    //     if (errors.hasErrors()) {
-    //         return registerRestaurant(form);
-    //     }
+    @RequestMapping(path = { "/register/restaurant" }, method = RequestMethod.POST)
+    public ModelAndView registerRestaurant(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("RestaurantForm") final RestaurantForm form,
+                                           final BindingResult errors) {
+        if (errors.hasErrors()) {
+            return registerRestaurant(loggedUser, form);
+        }
 
-    //     Optional<User> user = loggedUser();
-    //     if(user.isPresent()){
-    //         final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
-    //                 form.getPhoneNumber(), 0, user.get().getId());
-    //         return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
-    //     }
-    //     return new ModelAndView("redirect:/login");
-    // }
+        if(loggedUser != null){
+            final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
+                    form.getPhoneNumber(), 0, loggedUser.getId());
+            return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
+        }
+        return new ModelAndView("redirect:/login");
+    }
 
-    // @RequestMapping(path = {"/restaurant/rate/set/{restaurantId}"}, method = RequestMethod.POST)
-    // public ModelAndView setRating(@PathVariable("restaurantId") final long restaurantId, @RequestParam("rating") int rating){
-    //     Optional<User> user = loggedUser();
-    //     if(user.isPresent()){
-    //         long userId = user.get().getId();
-    //         ratingService.rateRestaurant(userId, restaurantId, rating);
-    //     }
-    //     return new ModelAndView("redirect:/restaurant/" + restaurantId);
-    // }
+    @RequestMapping(path = {"/restaurant/{restaurantId}/rate"}, method = RequestMethod.POST)
+    public ModelAndView setRating(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId, @RequestParam("rating") int rating){
+        if(loggedUser != null){
+            long userId = loggedUser.getId();
+            ratingService.rateRestaurant(userId, restaurantId, rating);
+        }
+        return new ModelAndView("redirect:/restaurant/" + restaurantId);
+    }
 
-    // @RequestMapping(path = {"/restaurant/rate/update/{restaurantId}"}, method = RequestMethod.POST)
-    // public ModelAndView updateRating(@PathVariable("restaurantId") final long restaurantId, @RequestParam("rating") int rating){
-    //     Optional<User> user = loggedUser();
-    //     if(user.isPresent()){
-    //         long userId = user.get().getId();
-    //         ratingService.modifyRestaurantRating(userId, restaurantId, rating);
-    //     }
-    //     return new ModelAndView("redirect:/restaurant/" + restaurantId);
-    // }
+    @RequestMapping(path = {"/restaurant/{restaurantId}/rate"}, method = RequestMethod.PUT)
+    public ModelAndView updateRating(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId, @RequestParam("rating") int rating){
+        if(loggedUser != null){
+            long userId = loggedUser.getId();
+            ratingService.modifyRestaurantRating(userId, restaurantId, rating);
+        }
+        return new ModelAndView("redirect:/restaurant/" + restaurantId);
+    }
 
-    // @RequestMapping(path = {"restaurant/like/{restaurantId}"}, method = RequestMethod.POST)
-    // public ModelAndView like(@PathVariable("restaurantId") final long restaurantId){
-    //     Optional<User> user = loggedUser();
-    //     if(user.isPresent()){
-    //         long userId = user.get().getId();
-    //         likesService.like(userId, restaurantId);
-    //         return new ModelAndView("redirect:/restaurant/" + restaurantId);
-    //     }
-    //     return new ModelAndView("redirect:/login");
-    // }
+    @RequestMapping(path = {"restaurant/{restaurantId}/like"}, method = RequestMethod.POST)
+    public ModelAndView like(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId){
+        if(loggedUser != null){
+            long userId = loggedUser.getId();
+            likesService.like(userId, restaurantId);
+            return new ModelAndView("redirect:/restaurant/" + restaurantId);
+        }
+        return new ModelAndView("redirect:/login");
+    }
 
-    // @RequestMapping(path = {"restaurant/dislike/{restaurantId}"}, method = RequestMethod.POST)
-    // public ModelAndView dislike(@PathVariable("restaurantId") final long restaurantId){
-    //     Optional<User> user = loggedUser();
-    //     if(user.isPresent()){
-    //         long userId = user.get().getId();
-    //         likesService.dislike(userId, restaurantId);
-    //         return new ModelAndView("redirect:/restaurant/" + restaurantId);
-    //     }
-    //     return new ModelAndView("redirect:/login");
-    // }
+    @RequestMapping(path = {"restaurant/{restaurantId}/dislike"}, method = RequestMethod.POST)
+    public ModelAndView dislike(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId){
+        if(loggedUser != null){
+            long userId = loggedUser.getId();
+            likesService.dislike(userId, restaurantId);
+            return new ModelAndView("redirect:/restaurant/" + restaurantId);
+        }
+        return new ModelAndView("redirect:/login");
+    }
 
 }

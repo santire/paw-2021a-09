@@ -41,17 +41,18 @@ public class RestaurantDaoImpl implements RestaurantDao {
             String phoneNumber = rs.getString("phone_number");
             Float rating = rs.getFloat("rating");
             Long userId = rs.getLong("user_id");
-            Long menuItemId = rs.getLong("menu_item_id");
-            String menuItemName = rs.getString("menu_item_name");
-            String menuItemDescrip = rs.getString("description");
-            Float menuItemPrice = rs.getFloat("price");
-            MenuItem menuItem = new MenuItem(menuItemId, menuItemName, menuItemDescrip, menuItemPrice);
             Restaurant restaurant = restaurantsById.get(id);
             if (restaurant == null) {
                 restaurant = new Restaurant(id, name, address, phoneNumber, rating, userId);
                 restaurantsById.put(restaurant.getId(), restaurant);
             }
-            restaurant.addMenuItem(menuItem);
+            Long menuItemId = rs.getLong("menu_item_id");
+            String menuItemName = rs.getString("menu_item_name");
+            String menuItemDescrip = rs.getString("description");
+            Float menuItemPrice = rs.getFloat("price");
+            MenuItem menuItem = new MenuItem(menuItemId, menuItemName, menuItemDescrip, menuItemPrice);
+            if (menuItemId != 0 && !menuItemName.isBlank())
+                restaurant.addMenuItem(menuItem);
         }
         return restaurantsById.values();
     };

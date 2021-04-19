@@ -28,8 +28,8 @@
   <div class="order-2 order-lg-1">
     <h3 class="pb-1 text-center border-bottom">Menu</h3>
     <c:choose>
-      <c:when test="${ menu.size() == 0 }">
-      <h2 class="display-5"><spring:message code="restaurants.menuNotAvailable" /></h2>
+      <c:when test="${ restaurant.getMenu().size() == 0 }">
+      <h2 class="display-5 text-center"><spring:message code="restaurants.menuNotAvailable" /></h2>
       </c:when>
       <c:otherwise>
         <ul class="list-group list-group-flush">
