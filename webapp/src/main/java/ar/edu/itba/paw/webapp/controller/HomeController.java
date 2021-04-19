@@ -85,10 +85,10 @@ public class HomeController {
         }
 
         try{
-           final User user = userService.register(form.getUsername(), form.getPassword(), form.getFirst_name(),
-                    form.getLast_name(), form.getEmail(), form.getPhone());
+           final User user = userService.register(form.getUsername(), form.getPassword(), form.getFirstName(),
+                    form.getLastName(), form.getEmail(), form.getPhone());
 
-            return new ModelAndView("redirect:/user/" + user.getId());
+            return new ModelAndView("redirect:/");
         } catch (Exception e) {
 
             errors.addError(new ObjectError("emailError", "email already in use"));
@@ -117,17 +117,4 @@ public class HomeController {
 
         return mav;
     }
-
-
-
-
-
-    @ModelAttribute
-    public Optional<User> loggedUser() {
-        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        final Optional<User> user = userService.findByEmail((String) auth.getName());
-        LOGGER.debug("Logged user is {}", user);
-        return user;
-    }
-
 }

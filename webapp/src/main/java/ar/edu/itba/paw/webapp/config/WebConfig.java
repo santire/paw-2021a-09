@@ -5,12 +5,15 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.io.Resource;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.DatabasePopulator;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
@@ -21,15 +24,13 @@ import javax.sql.DataSource;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
+@EnableTransactionManagement
 @EnableWebMvc
 @ComponentScan({
         "ar.edu.itba.paw.webapp.controller",
         "ar.edu.itba.paw.service",
         "ar.edu.itba.paw.persistence",
 })
-
-
-
 @Configuration
 public class WebConfig {
 
@@ -95,6 +96,11 @@ public class WebConfig {
     final ResourceDatabasePopulator dbp = new ResourceDatabasePopulator();
     dbp.addScript(schemaSql);
     return dbp;
+  }
+
+  @Bean
+  public PlatformTransactionManager transactionManager(final DataSource ds) {
+    return new DataSourceTransactionManager(ds);
   }
 
   @Bean

@@ -10,5 +10,5 @@ public interface UserDao {
 
   public Optional<User> findByEmail(String email);
 
-  public User register(final String username, final String password, final String first_name,final String last_name, final String email, final String phone);
+  public User register(final String username, final String password, final String firstName,final String lastName, final String email, final String phone);
 }

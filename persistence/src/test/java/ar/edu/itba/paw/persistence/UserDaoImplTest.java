@@ -55,8 +55,8 @@ public class UserDaoImplTest {
     assertEquals(USERNAME, user.getName());
     assertEquals(USERNAME, user.getUsername());
     assertEquals(PASSWORD, user.getPassword());
-    assertEquals(FIRST_NAME, user.getFirst_name());
-    assertEquals(LAST_NAME, user.getLast_name());
+    assertEquals(FIRST_NAME, user.getFirstName());
+    assertEquals(LAST_NAME, user.getLastName());
     assertEquals(EMAIL, user.getEmail());
     assertEquals(PHONE, user.getPhone());
 

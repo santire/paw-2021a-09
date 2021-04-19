@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.persistence.UserDao;
@@ -26,11 +27,12 @@ public class UserServiceImpl implements UserService {
     return this.userDao.findById(id);
   }
 
+  @Transactional
   @Override
-  public User register(String username, String password, String first_name, String last_name, String email,
+  public User register(String username, String password, String firstName, String lastName, String email,
       String phone) {
 
-    User user =userDao.register(username,encoder.encode(password), first_name, last_name, email, phone);
+    User user = userDao.register(username,encoder.encode(password), firstName, lastName, email, phone);
     emailService.sendRegistrationEmail(email);
 
     return  user;
@@ -38,12 +40,8 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public User register(String email) {
-
-
-      User user = userDao.register("dummy","dummy","dummy","dummy", email,"dummy");
-      //emailService.sendRegistrationEmail(email);
-
-
+    User user = userDao.register("dummy","dummy","dummy","dummy", email,"dummy");
+    //emailService.sendRegistrationEmail(email);
     return user;
   }
 
