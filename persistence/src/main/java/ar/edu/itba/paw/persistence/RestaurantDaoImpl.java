@@ -109,4 +109,21 @@ public class RestaurantDaoImpl implements RestaurantDao {
     public List<Restaurant> getRestaurantsFromOwner(long userId){
         return jdbcTemplate.query("SELECT * FROM restaurants WHERE user_id = ?", RESTAURANT_ROW_MAPPER, userId).stream().collect(Collectors.toList());
     }
+
+    @Override
+    public void updateName(long id, String name) {
+        jdbcTemplate.update("UPDATE restaurants SET name = ? WHERE restaurant_id = ?", name, id);
+    }
+    @Override
+    public void updateAddress(long id, String address) {
+        jdbcTemplate.update("UPDATE restaurants SET address = ? WHERE restaurant_id = ?", address, id);
+    }
+    @Override
+    public void updatePhoneNumber(long id, String phoneNumber) {
+        jdbcTemplate.update("UPDATE restaurants SET phone_number = ? WHERE restaurant_id = ?", phoneNumber, id);
+    }
+    @Override
+    public void updateRestaurant(long id, String name, String address, String phoneNumber) {
+        jdbcTemplate.update("UPDATE restaurants SET name = ?, address = ?, phoneNumber = ? WHERE restaurant_id = ?", name, address, phoneNumber);
+    }
 }

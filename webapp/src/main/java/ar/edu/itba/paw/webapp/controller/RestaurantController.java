@@ -7,11 +7,17 @@ import javax.validation.Valid;
 
 import ar.edu.itba.paw.service.MenuService;
 import ar.edu.itba.paw.service.ReservationService;
+import ar.edu.itba.paw.webapp.exceptions.UserNotFoundException;
 import ar.edu.itba.paw.webapp.forms.ReservationForm;
 import ar.edu.itba.paw.webapp.forms.RestaurantForm;
 import ar.edu.itba.paw.service.RestaurantService;
 
+import ar.edu.itba.paw.webapp.forms.UserForm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -25,10 +31,15 @@ import ar.edu.itba.paw.service.UserService;
 import ar.edu.itba.paw.webapp.exceptions.RestaurantNotFoundException;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
 public class RestaurantController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
+
+
     @Autowired
     private UserService userService;
 
@@ -91,10 +102,87 @@ public class RestaurantController {
             return registerRestaurant(form);
         }
 
+        User user = loggedUser().orElseThrow(UserNotFoundException::new);
+
         final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
-                form.getPhoneNumber(), 0, 1);
+                form.getPhoneNumber(), 0, user.getId());
 
         return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
     }
 
+
+
+
+    @RequestMapping(path = { "/restaurant/{restaurantId}/delete" })
+    public ModelAndView deleteRestaurant(@PathVariable("restaurantId") final long restaurantId) {
+
+        User user = loggedUser().orElseThrow(UserNotFoundException::new);
+        List<Restaurant> restaurants = restaurantService.getRestaurantsFromOwner(user.getId());
+
+
+            if(userService.isTheRestaurantOwner(user.getId(), restaurantId)){
+                restaurantService.deleteRestaurantById(restaurantId);
+                return new ModelAndView("redirect:/user/edit");
+            }
+        return new ModelAndView("redirect:/403");
+
+    }
+
+
+
+    @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.GET)
+    public ModelAndView editRestaurant(@PathVariable("restaurantId") final long restaurantId, @ModelAttribute("updateRestaurantForm") final RestaurantForm form) {
+
+        User user = loggedUser().orElseThrow(UserNotFoundException::new);
+        Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
+
+
+        if(userService.isTheRestaurantOwner(user.getId(), restaurantId)){
+            final ModelAndView mav = new ModelAndView("editRestaurant");
+            mav.addObject("restaurant", restaurant);
+
+            return mav;
+            }
+        return new ModelAndView("redirect:/403");
+    }
+
+
+    @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-name")
+    public ModelAndView editRestaurantName(@Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors, @PathVariable("restaurantId") final long restaurantId ) {
+        if (errors.hasErrors()) {
+            return editRestaurant(restaurantId, form);
+        }
+        restaurantService.updateName(restaurantId, form.getName());
+        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/edit");
+    }
+
+    @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-address")
+    public ModelAndView editRestaurantAddress(@Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors,  @PathVariable("restaurantId") final long restaurantId ) {
+        if (errors.hasErrors()) {
+            return editRestaurant(restaurantId, form);
+        }
+        restaurantService.updateAddress(restaurantId, form.getAddress());
+        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/edit");
+    }
+
+    @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-phone")
+    public ModelAndView editRestaurantPhone(@Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors,  @PathVariable("restaurantId") final long restaurantId ) {
+        if (errors.hasErrors()) {
+            return editRestaurant(restaurantId, form);
+        }
+        restaurantService.updatePhoneNumber(restaurantId, form.getPhoneNumber());
+        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/edit");
+    }
+
+
+
+
+
+    @ModelAttribute
+    public Optional<User> loggedUser() {
+        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        final Optional<User> user = userService.findByEmail((String) auth.getName());
+        LOGGER.debug("Logged user is {}", user);
+        return user;
+    }
 }

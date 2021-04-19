@@ -33,11 +33,29 @@ public class ExceptionHandlingAdvice  {
 
 
     //
-    @ExceptionHandler(value = {UserNotFoundException.class, RestaurantNotFoundException.class, MethodArgumentTypeMismatchException.class})
-    public ModelAndView handleException(Exception e)
+    @ExceptionHandler(value = {MethodArgumentTypeMismatchException.class})
+    public ModelAndView methodArgumentTypeMismatch(Exception e)
     {
         final ModelAndView mav = new ModelAndView("error");
         mav.addObject("code", 400);
+        return mav;
+    }
+
+    //
+    @ExceptionHandler(value = {UserNotFoundException.class})
+    public ModelAndView userNotFound(Exception e)
+    {
+        final ModelAndView mav = new ModelAndView("error");
+        mav.addObject("code", 499);
+        return mav;
+    }
+
+    //
+    @ExceptionHandler(value = {RestaurantNotFoundException.class})
+    public ModelAndView restaurantNotFound(Exception e)
+    {
+        final ModelAndView mav = new ModelAndView("error");
+        mav.addObject("code", 498);
         return mav;
     }
 

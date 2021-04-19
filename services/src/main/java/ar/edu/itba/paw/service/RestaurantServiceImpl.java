@@ -67,4 +67,24 @@ public class RestaurantServiceImpl implements RestaurantService{
         return restaurantDao.getRestaurantsFromOwner(userId);
     }
 
+    @Override
+    public void updateName(long id, String name) {
+        restaurantDao.updateName(id, name);
+    }
+
+    @Override
+    public void updateAddress(long id, String address) {
+        restaurantDao.updateAddress(id, address);
+    }
+
+    @Override
+    public void updatePhoneNumber(long id, String phoneNumber) {
+        restaurantDao.updatePhoneNumber(id, phoneNumber);
+    }
+
+    @Override
+    public void updateRestaurant(long id, String name, String address, String phoneNumber) {
+        restaurantDao.updateRestaurant(id, name, address ,phoneNumber);
+    }
+
 }

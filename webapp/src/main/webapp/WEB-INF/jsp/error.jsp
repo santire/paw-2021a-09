@@ -31,6 +31,16 @@
                         Sorry, an error has occured!
                     </div>
                 </c:if>
+                <c:if test= "${code == '498'}">
+                    <div class="error-details">
+                        The user you are looking for doesnt exits
+                    </div>
+                </c:if>
+                <c:if test= "${code == '499'}">
+                    <div class="error-details">
+                        The restaurant you are looking for doesnt exits
+                    </div>
+                </c:if>
 
                 <div class="error-actions">
                     <a href="<c:url value="/"/>" class="btn btn-secondary btn-lg"><span class="glyphicon glyphicon-home"></span>Take Me Home </a>

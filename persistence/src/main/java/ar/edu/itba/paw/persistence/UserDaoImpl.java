@@ -68,6 +68,36 @@ public class UserDaoImpl implements UserDao {
         return new User(userId.longValue(),username,password, first_name,last_name,email,phone);
     }
 
+    @Override
+    public void updatePassword(long id, String password) {
+        jdbcTemplate.update("UPDATE users SET password = ? WHERE user_id = ?", password, id);
+    }
+    @Override
+    public void updateUsername(long id, String username) {
+        jdbcTemplate.update("UPDATE users SET username = ? WHERE user_id = ?", username, id);
+    }
+    @Override
+    public void updateFistName(long id, String first_name) {
+        jdbcTemplate.update("UPDATE users SET first_name = ? WHERE user_id = ?", first_name, id);
+    }
+    @Override
+    public void updateLastName(long id, String last_name) {
+        jdbcTemplate.update("UPDATE users SET last_name = ? WHERE user_id = ?", last_name, id);
+    }
+    @Override
+    public void updatePhone(long id, String phone) {
+        jdbcTemplate.update("UPDATE users SET phone = ? WHERE user_id = ?", phone, id);
+    }
+
+    @Override
+    public void updateEmail(long id, String email) {
+        jdbcTemplate.update("UPDATE users SET email = ? WHERE user_id = ?", email, id);
+    }
+
+    @Override
+    public void updateUser(long id, String username, String password, String first_name, String last_name, String email, String phone) {
+        jdbcTemplate.update("UPDATE users SET username = ?, password = ?, first_name = ?, last_name = ?, email = ?, phone = ? WHERE userid = ?", username, password, first_name, last_name, email, phone);
+    }
 
 
 }
