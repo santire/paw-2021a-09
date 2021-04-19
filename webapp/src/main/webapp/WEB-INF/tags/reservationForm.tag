@@ -42,7 +42,7 @@
                 max="23"
                 path="date"
                 value="18"
-                cssClass="form-control"
+                cssClass="form-control text-right"
                 aria-label="Seleccione horario para su reserva"
               />
               <div class="input-group-append">
@@ -64,7 +64,7 @@
                 max="12"
                 value="2"
                 path="quantity"
-                cssClass="form-control"
+                cssClass="form-control text-right"
                 aria-label="Cantidad de gente"
               />
             </div>
