@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.service;
 
+import ar.edu.itba.paw.model.Image;
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.persistence.RestaurantDao;
@@ -24,12 +25,21 @@ public class RestaurantServiceImpl implements RestaurantService{
         return this.restaurantDao.findByName(name);
     }
 
+    // CREATE
+
     @Override
     public Restaurant registerRestaurant(String name, String address, String phoneNumber,
                                          float rating, long userId){
 
         return restaurantDao.registerRestaurant(name, address, phoneNumber, rating, userId);
     }
+
+    @Override
+    public boolean setImageByRestaurantId(Image image, long restaurantId) {
+        return restaurantDao.setImageByRestaurantId(image, restaurantId);
+    }
+
+    // READ
 
     @Override
     public List<Restaurant> getAllRestaurants(){
@@ -47,6 +57,11 @@ public class RestaurantServiceImpl implements RestaurantService{
         return this.restaurantDao.getPopularRestaurants();
     }
 
+    // UPDATE
+
+
+    // DESTROY
+
     @Override
     public boolean deleteRestaurantById(long id){
         return this.restaurantDao.deleteRestaurantById(id);
@@ -57,6 +72,8 @@ public class RestaurantServiceImpl implements RestaurantService{
         return this.restaurantDao.deleteRestaurantByName(name);
     }
 
+    // ??
+
     @Override
     public Optional<User> findRestaurantOwner(long id) {
         return restaurantDao.findRestaurantOwner(id);
@@ -66,5 +83,7 @@ public class RestaurantServiceImpl implements RestaurantService{
     public List<Restaurant> getRestaurantsFromOwner(long userId) {
         return restaurantDao.getRestaurantsFromOwner(userId);
     }
+
+
 
 }

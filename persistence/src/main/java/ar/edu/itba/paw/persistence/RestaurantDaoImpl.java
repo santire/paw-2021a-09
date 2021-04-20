@@ -15,8 +15,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 
-import java.nio.charset.StandardCharsets;
-import java.sql.ResultSetMetaData;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +29,6 @@ public class RestaurantDaoImpl implements RestaurantDao {
     private UserDao userDao;
     private JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
-    private final SimpleJdbcInsert jdbcInsertImage;
 
     private static final RowMapper<Restaurant> RESTAURANT_ROW_MAPPER = (rs, rowNum) -> {
                 Restaurant restaurant = new Restaurant(
@@ -84,12 +81,35 @@ public class RestaurantDaoImpl implements RestaurantDao {
         jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
             .withTableName("restaurants")
             .usingGeneratedKeyColumns("restaurant_id");
-
-        jdbcInsertImage = new SimpleJdbcInsert(ds)
-            .withTableName("restaurant_images")
-            .usingGeneratedKeyColumns("image_id")
-            .usingColumns("image_data");
     }
+
+    // CREATE
+
+    @Override
+    public Restaurant registerRestaurant(String name, String address, String phoneNumber, float rating, long userId) {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("name", name);
+        params.addValue("address", address);
+        params.addValue("phone_number", phoneNumber);
+        params.addValue("rating", rating);
+        params.addValue("user_id", userId);
+        final Number restaurantId = jdbcInsert.executeAndReturnKey(params);
+        return new Restaurant(restaurantId.longValue(), name, address, phoneNumber, rating, userId);
+    }
+
+    @Override
+    public boolean setImageByRestaurantId(Image image, long restaurantId) {
+        byte[] imageData = image.getData();
+        int response = jdbcTemplate.update(
+                "INSERT INTO restaurant_images(image_data, restaurant_id)"
+                +
+                " VALUES(?, ?) ON CONFLICT(restaurant_id) DO UPDATE"
+                +
+                " SET image_data=?", imageData, restaurantId, imageData);
+       return response == 1; 
+    }
+
+    // READ
 
     @Override
     public Optional<Restaurant> findById(long id) {
@@ -119,30 +139,6 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 + 
                 " WHERE name LIKE ?",
                 RESTAURANT_NESTED_MAPPER, name + '%').stream().collect(Collectors.toList());
-    }
-
-    @Override
-    public Restaurant registerRestaurant(String name, String address, String phoneNumber, float rating, long userId) {
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("name", name);
-        params.addValue("address", address);
-        params.addValue("phone_number", phoneNumber);
-        params.addValue("rating", rating);
-        params.addValue("user_id", userId);
-        final Number restaurantId = jdbcInsert.executeAndReturnKey(params);
-        return new Restaurant(restaurantId.longValue(), name, address, phoneNumber, rating, userId);
-    }
-
-    @Override
-    public boolean setImageByRestaurantId(Image image, long restaurantId) {
-        byte[] imageData = image.getData();
-        int response = jdbcTemplate.update(
-                "INSERT INTO restaurant_images(image_data, restaurant_id)"
-                +
-                " VALUES(?, ?) ON CONFLICT(restaurant_id) DO UPDATE"
-                +
-                " SET image_data=?", imageData, restaurantId, imageData);
-       return response == 1; 
     }
 
     @Override
@@ -178,6 +174,10 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 .collect(Collectors.toList());
     }
 
+    // UPDATE
+
+    // DESTROY
+
     @Override
     public boolean deleteRestaurantById(long id) {
         String sql = "DELETE FROM restaurants WHERE restaurant_id = ?";
@@ -193,6 +193,8 @@ public class RestaurantDaoImpl implements RestaurantDao {
 
         return jdbcTemplate.update(sql, args) == 1;
     }
+
+    // ??
 
     @Override
     public Optional<User> findRestaurantOwner(long id) {

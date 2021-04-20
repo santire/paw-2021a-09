@@ -50,9 +50,6 @@ public class RestaurantController {
     @Autowired
     private LikesService likesService;
 
-    @Autowired
-    private ImageService imageService;
-
     @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.GET)
     public ModelAndView restaurant(@ModelAttribute("loggedUser") final User loggedUser, @ModelAttribute("reservationForm") final ReservationForm form,
             @PathVariable("restaurantId") final long restaurantId) {
@@ -118,7 +115,7 @@ public class RestaurantController {
             if (form.getProfileImage() != null && !form.getProfileImage().isEmpty()) {
                 try {
                 Image image = new Image(form.getProfileImage().getBytes());
-                imageService.setImageByRestaurantId(image, restaurant.getId());
+                restaurantService.setImageByRestaurantId(image, restaurant.getId());
                 } catch (IOException e) {
                     LOGGER.error("error while setting restaurant profile image");
                 }
