@@ -2,6 +2,7 @@ package ar.edu.itba.paw.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Restaurant {
     private final long id;
@@ -12,6 +13,7 @@ public class Restaurant {
     private long userId;
 
     private List<MenuItem> menu;
+    private Optional<Image> profileImage;
 
     public Restaurant(long id, String name, String address, String phoneNumber, float rating, long userId){
         this.id = id;
@@ -39,6 +41,7 @@ public class Restaurant {
     public float getRating() { return rating; }
     public long getUserId() { return userId; }
     public List<MenuItem> getMenu() { return this.menu; }
+    public Optional<Image> getMaybeProfileImage() { return this.profileImage; }
 
     public void setName(String name) { this.name = name; }
     public void setAddress(String address) { this.address = address; }
@@ -46,4 +49,5 @@ public class Restaurant {
     public void setRating(float rating) { this.rating = rating; }
     public void setUserId(long userId) { this.userId = userId; }
     public void addMenuItem(MenuItem menuItem) { this.menu.add(menuItem); }
+    public void setProfileImage(Image profileImage) { this.profileImage = Optional.ofNullable(profileImage); }
 }

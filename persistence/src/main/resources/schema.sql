@@ -50,11 +50,11 @@ CREATE TABLE IF NOT EXISTS likes(
   FOREIGN KEY(restaurant_id) REFERENCES restaurants(restaurant_id) ON DELETE CASCADE
 );
 
--- CREATE TABLE IF NOT EXISTS restaurant_images(
---   image_id SERIAL PRIMARY KEY,
---   file BYTEA,
---   restaurant_id INTEGER REFERENCES restaurant(restaurant_id) ON DELETE CASCADE
--- );
+CREATE TABLE IF NOT EXISTS restaurant_images(
+ image_id SERIAL PRIMARY KEY,
+ image_data BYTEA,
+ restaurant_id INTEGER UNIQUE REFERENCES restaurants(restaurant_id) ON DELETE CASCADE
+);
 
 /*
 CREATE TABLE IF NOT EXISTS tags(

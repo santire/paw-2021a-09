@@ -21,8 +21,8 @@ public class ImageDaoImpl implements ImageDao {
     private SimpleJdbcInsert jdbcInsertUserImage;
     private SimpleJdbcInsert jdbcInsertRestaurantImage;
 
-    private static final RowMapper<Image> RESTAURANT_IMAGE_ROW_MAPPER_ROW_MAPPER = (rs, rowNum) ->
-            new Image(rs.getLong("image_id"), rs.getBytes("file"), rs.getLong("restaurant_id"));
+    // private static final RowMapper<Image> RESTAURANT_IMAGE_ROW_MAPPER_ROW_MAPPER = (rs, rowNum) ->
+    //         new Image(rs.getLong("image_id"), rs.getBytes("file"), rs.getLong("restaurant_id"));
 
     @Autowired
     public ImageDaoImpl(final DataSource ds){
@@ -30,21 +30,22 @@ public class ImageDaoImpl implements ImageDao {
         jdbcInsertRestaurantImage = new SimpleJdbcInsert(ds)
                 .withTableName("restaurant_images")
                 .usingGeneratedKeyColumns("image_id")
-                .usingColumns("file", "restaurant_id");
+                .usingColumns("image_data");
     }
 
 
     @Override
     public Optional<Image> getImageByRestaurantId(long restaurantId) {
-        return jdbcTemplate.query("SELECT * FROM restaurant_images WHERE restaurant_id = ?", new Object[]{restaurantId}, RESTAURANT_IMAGE_ROW_MAPPER_ROW_MAPPER).stream().findFirst();
+        // return jdbcTemplate.query("SELECT * FROM restaurant_images WHERE restaurant_id = ?", new Object[]{restaurantId}, RESTAURANT_IMAGE_ROW_MAPPER_ROW_MAPPER).stream().findFirst();
+        return Optional.ofNullable(null);
     }
 
 
     @Override
     public boolean saveRestaurantImage(Image image){
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("file", image.getData());
-        params.addValue("restaurant_id", image.getOwnerId());
+        params.addValue("image_data", image.getData());
+        // params.addValue("restaurant_id", image.getOwnerId());
 
         jdbcInsertRestaurantImage.execute(params);
         return true;
@@ -52,16 +53,16 @@ public class ImageDaoImpl implements ImageDao {
 
     @Override
     public boolean restaurantHasImage(long restaurantId) {
-        Integer count = jdbcTemplate.queryForObject("SELECT count(*) FROM restaurant_images WHERE restaurant_id = ?", new Object[]{restaurantId}, Integer.class);
-        if(count == 0) {
-            return false;
-        }
+        // Integer count = jdbcTemplate.queryForObject("SELECT count(*) FROM restaurant_images WHERE restaurant_id = ?", new Object[]{restaurantId}, Integer.class);
+        // if(count == 0) {
+            // return false;
+        // }
         return true;
     }
 
     @Override
     public boolean updateRestaurantImage(Image image){
-        jdbcTemplate.update("UPDATE restaurant_images SET file = ? WHERE restaurant_id = ?", image.getData(), image.getOwnerId());
+        // jdbcTemplate.update("UPDATE restaurant_images SET file = ? WHERE restaurant_id = ?", image.getData(), image.getOwnerId());
         return true;
     }
 }

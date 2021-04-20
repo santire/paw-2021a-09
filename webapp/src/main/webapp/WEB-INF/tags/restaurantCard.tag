@@ -8,7 +8,14 @@
      onclick="window.location='<c:url value="/restaurant/${restaurant.getId()}"/>'"
      style="cursor: pointer;"
 >
-<c:url value="/resources/images/restaurants/${restaurant.getId()}.jpg" var="imgUrl"/>
+  <c:choose>
+    <c:when test="${restaurant.getMaybeProfileImage().isPresent()}" >
+      <c:url value="data:image/jpg;base64,${restaurant.getMaybeProfileImage().get().getImageEnconded()}" var="imgUrl"/>
+    </c:when>
+    <c:otherwise>
+      <c:url value="/resources/images/noimage.jpg" var="imgUrl"/>
+    </c:otherwise>
+  </c:choose>
   <img
     src="${imgUrl}"
     class="img-thumbnail rounded card-img-top"

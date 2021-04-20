@@ -10,8 +10,15 @@
 <div class="mb-3 my-2" style="max-height: 450px;">
   <div class="row no-gutters">
     <div class="col-md-6 mx-auto pb-3">
-      <c:url value="/resources/images/restaurants/${restaurant.getId()}.jpg" var="imgUrl"/>
-      <img src="${imgUrl}" class="card-img img-fluid px-1 pr-md-5 border-right" alt="${name}">
+      <c:choose>
+        <c:when test="${restaurant.getMaybeProfileImage().isPresent()}" >
+          <c:url value="data:image/jpg;base64,${restaurant.getMaybeProfileImage().get().getImageEnconded()}" var="imgUrl"/>
+        </c:when>
+        <c:otherwise>
+          <c:url value="/resources/images/noimage.jpg" var="imgUrl"/>
+        </c:otherwise>
+      </c:choose>
+      <img src="${imgUrl}" class="card-img img-fluid px-1 pr-md-5 border-right" alt="${name}" >
     </div>
     <div class="card border-0 col-md-6 my-auto mx-auto" style="max-width: 300px;">
       <div class="card-body px-auto mb-auto">

@@ -21,9 +21,9 @@ public class ImageServiceImpl implements ImageService {
     // For now, only 1 profile picture per restaurant
     @Override
     public boolean saveRestaurantImage(Image image){
-        if(imageDao.restaurantHasImage(image.getOwnerId())) {
-            return imageDao.updateRestaurantImage(image);
-        }
+        // if(imageDao.restaurantHasImage(image.getOwnerId())) {
+            // return imageDao.updateRestaurantImage(image);
+        // }
         return imageDao.saveRestaurantImage(image);
     }
 }

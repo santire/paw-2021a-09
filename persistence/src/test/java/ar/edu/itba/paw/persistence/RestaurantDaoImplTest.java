@@ -3,13 +3,11 @@ package ar.edu.itba.paw.persistence;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import javax.sql.DataSource;
-import javax.swing.text.html.Option;
 
 import ar.edu.itba.paw.model.MenuItem;
 import ar.edu.itba.paw.model.Restaurant;
@@ -83,20 +81,6 @@ public class RestaurantDaoImplTest {
         List<Restaurant> restaurantList = restaurantDao.getAllRestaurants();
         assertEquals(INSERTED_SIZE, restaurantList.size());
     }
-
-    @Test
-    public void testFindAll() {
-        List<Restaurant> restaurants = restaurantDao.findAll();
-        assertEquals(INSERTED_SIZE, restaurants.size());
-    }
-
-    @Test
-    public void testFindAllKFCMenu() {
-        List<Restaurant> restaurants = restaurantDao.findAll();
-        Restaurant kfc = restaurants.get(2);
-        assertEquals(INSERTED_SIZE, kfc.getMenu().size());
-    }
-
 
     @Test
     public void testRestaurantSearchById(){

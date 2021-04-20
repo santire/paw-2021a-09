@@ -27,5 +27,4 @@ public interface RestaurantDao {
 
     public List<Restaurant> getRestaurantsFromOwner(long userId);
 
-    public List<Restaurant> findAll();
 }
