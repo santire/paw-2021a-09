@@ -177,4 +177,8 @@ public class RestaurantDaoImpl implements RestaurantDao {
     public void updateRestaurant(long id, String name, String address, String phoneNumber) {
         jdbcTemplate.update("UPDATE restaurants SET name = ?, address = ?, phoneNumber = ? WHERE restaurant_id = ?", name, address, phoneNumber);
     }
+    @Override
+    public void updateRating(long id, int rating){
+        jdbcTemplate.update("UPDATE restaurants SET rating = ? WHERE restaurant_id = ?", rating, id);
+    }
 }

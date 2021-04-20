@@ -33,6 +33,7 @@ import ar.edu.itba.paw.persistence.config.TestConfig;
 public class RestaurantDaoImplTest {
     // General purpose
     private static final int INSERTED_SIZE = 3;
+    private static final int NEW_RATING = 3;
 
     // Restaurant to search
     private static final long ID = 1;
@@ -127,6 +128,14 @@ public class RestaurantDaoImplTest {
         assertEquals(menuExpected.get(0).getName(), menuActual.get(0).getName());
         assertEquals(menuExpected.get(0).getDescription(), menuActual.get(0).getDescription());
         assertEquals(menuExpected.get(0).getPrice(), menuActual.get(0).getPrice(), 0.01);
+    }
 
+    @Test
+    public void testUpdateRating(){
+        restaurantDao.updateRating(ID, NEW_RATING);
+        Optional<Restaurant> restaurant = restaurantDao.findById(ID);
+
+        assertTrue(restaurant.isPresent());
+        assertEquals(NEW_RATING, Math.round(restaurant.get().getRating()));
     }
 }

@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestConfig.class)
 public class RatingDaoImplTest {
-    private static final int RATINGS_INSERTED_SIZE = 2;
+    private static final int RATINGS_INSERTED_SIZE = 3;
 
     private static final long USER_ID = 1;
     private static final long RESTAURANT_ID = 1;
@@ -78,6 +78,13 @@ public class RatingDaoImplTest {
     public void getRatedRestaurantByUserId(){
         List<Rating> ratings = ratingDao.getRatedRestaurantsByUserId(USER_ID);
 
-        assertEquals(RATINGS_INSERTED_SIZE, ratings.size());
+        assertEquals(RATINGS_INSERTED_SIZE-1, ratings.size());
+    }
+
+    @Test
+    public void getNumberOfRates(){
+        int number = ratingDao.getNumberOfRates(RESTAURANT_ID);
+
+        assertEquals(2, number);
     }
 }

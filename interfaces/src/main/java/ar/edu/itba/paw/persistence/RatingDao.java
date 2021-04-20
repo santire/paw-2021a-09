@@ -11,4 +11,5 @@ public interface RatingDao {
     public List<Rating> getRatedRestaurantsByUserId(long userId);
     public Rating rateRestaurant(long userId, long restaurantId, int rating);
     public boolean modifyRestaurantRating(long userId, long restaurantId, int rating);
+    public int getNumberOfRates(long restaurantId);
 }
