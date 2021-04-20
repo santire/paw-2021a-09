@@ -7,29 +7,28 @@
 <%@attribute name="restaurant" required="true" type="ar.edu.itba.paw.model.Restaurant"%>
 
 <div class="container">
-<div class="mb-3 my-2" style="max-height: 450px;">
-  <div class="row no-gutters">
-    <div class="col-md-6 mx-auto pb-3">
-      <c:choose>
-        <c:when test="${restaurant.getMaybeProfileImage().isPresent()}" >
-          <c:url value="data:image/jpg;base64,${restaurant.getMaybeProfileImage().get().getImageEnconded()}" var="imgUrl"/>
-        </c:when>
-        <c:otherwise>
-          <c:url value="/resources/images/noimage.jpg" var="imgUrl"/>
-        </c:otherwise>
-      </c:choose>
-      <img src="${imgUrl}" class="card-img img-fluid px-1 pr-md-5 border-right" alt="${name}" >
-    </div>
-    <div class="card border-0 col-md-6 my-auto mx-auto" style="max-width: 300px;">
-      <div class="card-body px-auto mb-auto">
-      <h5 class="card-title">${restaurant.getName()}</h5>
-      <p class="card-text"><medium class="text-muted">${restaurant.getAddress()}</medium></p>
-      <p class="card-text"><medium class="text-muted">${restaurant.getPhoneNumber()}</medium></p>
+  <div class="mb-3 my-2" style="max-height: 450px;">
+    <div class="row no-gutters">
+      <div class="col-md-6 mx-auto pb-3">
+        <c:choose>
+          <c:when test="${restaurant.getMaybeProfileImage().isPresent()}" >
+            <c:url value="data:image/jpg;base64,${restaurant.getMaybeProfileImage().get().getImageEnconded()}" var="imgUrl"/>
+          </c:when>
+          <c:otherwise>
+            <c:url value="/resources/images/noimage.jpg" var="imgUrl"/>
+          </c:otherwise>
+        </c:choose>
+        <img src="${imgUrl}" class="card-img img-fluid px-1 pr-md-5 border-right" alt="${name}" >
       </div>
+      <div class="card border-0 col-md-6 my-auto mx-auto" style="max-width: 300px;">
+        <div class="card-body px-auto mb-auto">
+          <h5 class="card-title">${restaurant.getName()}</h5>
+          <p class="card-text"><medium class="text-muted">${restaurant.getAddress()}</medium></p>
+          <p class="card-text"><medium class="text-muted">${restaurant.getPhoneNumber()}</medium></p>
+        </div>
       </div>
     </div>
   </div>
-</div>
 </div>
 <div class="row row-cols-1 row-cols-lg-2 w-75 mx-auto">
   <div class="order-2 order-lg-1">

@@ -1,7 +1,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 
-<div class="footer-dark bg-dark border-top">
+<div id="footer" class="footer-dark bg-dark border-top" >
   <footer class="footer">
     <div class="container">
       <div class="row">

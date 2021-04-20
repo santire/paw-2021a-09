@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@attribute name="hidden" required="true" type="java.lang.Boolean"%>
 
 
 <header>
@@ -7,18 +8,27 @@
     <a class="navbar-brand ml-2 font-weight-bold" href="<c:url value="/"/>">
       <img src="<c:url value="/resources/images/logo.svg"/>" height="40" width="40" class="pb-2 pr-1" \><span id="burgundy">Gourme</span><span id="orange">table</span>
     </a>
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-toggle="collapse"
-      data-target="#navbarSupportedContent"
-      aria-controls="navbarSupportedContent"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
+    <c:choose>
+      <c:when test="${hidden eq true}">
+        <div style="visibility: hidden;">
+      </c:when>
+      <c:otherwise>
+        <div>
+      </c:otherwise>
+    </c:choose>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
+    </div>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
@@ -44,7 +54,7 @@
         </li>
       </ul>
 
-      <form class="nav-item bg-light rounded my-2 my-lg-0" action="<c:url value="/restaurants"/>">
+      <form class="nav-item bg-light rounded mx-auto my-2 my-lg-0" action="<c:url value="/restaurants"/>">
         <span class="input-group">
           <input
             class="search-bar form-control mr-auto input-lg"
@@ -58,10 +68,10 @@
           </button>
         </span>
       </form>
-      <ul class="navbar-nav ml-auto">
+      <div class="navbar-nav ml-auto">
         <c:choose>
             <c:when test="${empty loggedUser}">
-                <ul class="navbar-nav mr-auto mt-2 mt-lg-0 pl-3">
+                <ul class="navbar-nav mt-2 mt-lg-0 pl-3">
                   <li class="nav-item">
                     <a class="nav-link" href="<c:url value="/register"/>"><spring:message code="navbar.register" /></a>
                   </li>
@@ -71,7 +81,7 @@
                 </ul>
             </c:when>
             <c:otherwise>
-                <ul class="navbar-nav mr-auto mt-2 mt-lg-0 pl-3">
+                <ul class="navbar-nav mt-2 mt-lg-0 pl-3">
                   <li class="nav-item">
                     <span class="navbar-text"></span>
                   </li>
@@ -93,7 +103,7 @@
                 </ul>
             </c:otherwise>
         </c:choose>
-      </ul>
+      </div>
     </div>
   </nav>
 </header>
