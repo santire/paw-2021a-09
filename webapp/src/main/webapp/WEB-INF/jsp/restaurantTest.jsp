@@ -3,7 +3,7 @@
 
 <html>
 <body>
-<h2>Reservation</h2>
+<h2><spring:message code="restaurants.reservation"/></h2>
 <c:url value="/restaurant/${restaurantId}" var="postFormUrl"/>
 <form:form modelAttribute="reservationForm" action="${postFormUrl}" method="post">
     <div>
