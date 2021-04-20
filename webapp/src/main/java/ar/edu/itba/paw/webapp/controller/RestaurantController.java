@@ -241,17 +241,17 @@ public class RestaurantController {
 
 
 
-    @ModelAttribute
     public void updateAuthorities(@ModelAttribute("loggedUser") final User loggedUser) {
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Collection<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-        if(!restaurantService.getRestaurantsFromOwner(loggedUser.getId()).isEmpty()){
-            authorities.add(new SimpleGrantedAuthority("ROLE_RESTAURANTOWNER"));
+        if(loggedUser!=null){
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            Collection<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
+            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+            if(!restaurantService.getRestaurantsFromOwner(loggedUser.getId()).isEmpty()){
+                authorities.add(new SimpleGrantedAuthority("ROLE_RESTAURANTOWNER"));
+            }
+            Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
+            SecurityContextHolder.getContext().setAuthentication(newAuth);
         }
-        Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
-        SecurityContextHolder.getContext().setAuthentication(newAuth);
     }
 
 }
