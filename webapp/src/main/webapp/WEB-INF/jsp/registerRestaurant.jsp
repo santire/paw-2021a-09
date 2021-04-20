@@ -8,7 +8,7 @@
 </head>
 <body>
 <c:url value="/register/restaurant" var="path"/>
-<form:form modelAttribute="RestaurantForm" action="${path}" method="post">
+<form:form modelAttribute="RestaurantForm" action="${path}" method="post" enctype="multipart/form-data">
     <div>
         <form:errors path="name" cssStyle="color: red;" element="p"/>
         <form:label path="name">
@@ -29,6 +29,10 @@
             <spring:message code="PhoneNumber" />:
             <form:input type="text" path="phoneNumber"/>
         </form:label>
+    </div>
+    <div>
+        <form:label path="profileImage">Select an image to upload</form:label>
+        <form:input type="file" path="profileImage"/>
     </div>
     <div>
         <input type="submit" value="Register your restaurant!"/>

@@ -2,6 +2,8 @@ package ar.edu.itba.paw.service;
 
 import ar.edu.itba.paw.model.Image;
 import ar.edu.itba.paw.persistence.ImageDao;
+import ar.edu.itba.paw.persistence.RestaurantDao;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,9 @@ public class ImageServiceImpl implements ImageService {
 
     @Autowired
     private ImageDao imageDao;
+
+    @Autowired
+    private RestaurantDao restaurantDao;
 
     @Override
     public Optional<Image> getImageByRestaurantId(long restaurantId){
@@ -25,5 +30,10 @@ public class ImageServiceImpl implements ImageService {
             // return imageDao.updateRestaurantImage(image);
         // }
         return imageDao.saveRestaurantImage(image);
+    }
+
+    @Override
+    public boolean setImageByRestaurantId(Image image, long restaurantId) {
+        return restaurantDao.setImageByRestaurantId(image, restaurantId);
     }
 }

@@ -81,10 +81,14 @@ public class RestaurantDaoImpl implements RestaurantDao {
     @Autowired
     public RestaurantDaoImpl(final DataSource ds) {
         jdbcTemplate = new JdbcTemplate(ds);
-        jdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("restaurants")
-                .usingGeneratedKeyColumns("restaurant_id");
-        jdbcInsertImage = new SimpleJdbcInsert(ds).withTableName("restaurant_images")
-                .usingGeneratedKeyColumns("image_id").usingColumns("image_data");
+        jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+            .withTableName("restaurants")
+            .usingGeneratedKeyColumns("restaurant_id");
+
+        jdbcInsertImage = new SimpleJdbcInsert(ds)
+            .withTableName("restaurant_images")
+            .usingGeneratedKeyColumns("image_id")
+            .usingColumns("image_data");
     }
 
     @Override
@@ -127,6 +131,18 @@ public class RestaurantDaoImpl implements RestaurantDao {
         params.addValue("user_id", userId);
         final Number restaurantId = jdbcInsert.executeAndReturnKey(params);
         return new Restaurant(restaurantId.longValue(), name, address, phoneNumber, rating, userId);
+    }
+
+    @Override
+    public boolean setImageByRestaurantId(Image image, long restaurantId) {
+        byte[] imageData = image.getData();
+        int response = jdbcTemplate.update(
+                "INSERT INTO restaurant_images(image_data, restaurant_id)"
+                +
+                " VALUES(?, ?) ON CONFLICT(restaurant_id) DO UPDATE"
+                +
+                " SET image_data=?", imageData, restaurantId, imageData);
+       return response == 1; 
     }
 
     @Override

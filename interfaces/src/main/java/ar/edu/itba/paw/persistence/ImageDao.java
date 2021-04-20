@@ -2,8 +2,6 @@ package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.model.Image;
 
-import java.awt.*;
-import java.io.FileInputStream;
 import java.util.Optional;
 
 public interface ImageDao {

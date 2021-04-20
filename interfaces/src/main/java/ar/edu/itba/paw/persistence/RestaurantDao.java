@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.persistence;
 
+import ar.edu.itba.paw.model.Image;
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
 
@@ -26,5 +27,7 @@ public interface RestaurantDao {
     public Optional<User> findRestaurantOwner(long id);
 
     public List<Restaurant> getRestaurantsFromOwner(long userId);
+    
+    public boolean setImageByRestaurantId(Image image, long restaurantId);
 
 }

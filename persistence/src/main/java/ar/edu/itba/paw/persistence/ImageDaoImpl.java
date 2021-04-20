@@ -21,8 +21,8 @@ public class ImageDaoImpl implements ImageDao {
     private SimpleJdbcInsert jdbcInsertUserImage;
     private SimpleJdbcInsert jdbcInsertRestaurantImage;
 
-    // private static final RowMapper<Image> RESTAURANT_IMAGE_ROW_MAPPER_ROW_MAPPER = (rs, rowNum) ->
-    //         new Image(rs.getLong("image_id"), rs.getBytes("file"), rs.getLong("restaurant_id"));
+    private static final RowMapper<Image> RESTAURANT_IMAGE_ROW_MAPPER_ROW_MAPPER = (rs, rowNum) ->
+            new Image(rs.getLong("image_id"), rs.getBytes("image_data"));
 
     @Autowired
     public ImageDaoImpl(final DataSource ds){
@@ -36,8 +36,11 @@ public class ImageDaoImpl implements ImageDao {
 
     @Override
     public Optional<Image> getImageByRestaurantId(long restaurantId) {
-        // return jdbcTemplate.query("SELECT * FROM restaurant_images WHERE restaurant_id = ?", new Object[]{restaurantId}, RESTAURANT_IMAGE_ROW_MAPPER_ROW_MAPPER).stream().findFirst();
-        return Optional.ofNullable(null);
+        return jdbcTemplate.query(
+                "SELECT * FROM restaurant_images"
+                +
+                " WHERE restaurant_id = ?", new Object[]{restaurantId}
+                , RESTAURANT_IMAGE_ROW_MAPPER_ROW_MAPPER).stream().findFirst();
     }
 
 

@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.webapp.controller;
 
+import ar.edu.itba.paw.model.Image;
 import ar.edu.itba.paw.model.Rating;
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
@@ -23,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import ar.edu.itba.paw.webapp.exceptions.RestaurantNotFoundException;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
 
@@ -47,6 +49,9 @@ public class RestaurantController {
 
     @Autowired
     private LikesService likesService;
+
+    @Autowired
+    private ImageService imageService;
 
     @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.GET)
     public ModelAndView restaurant(@ModelAttribute("loggedUser") final User loggedUser, @ModelAttribute("reservationForm") final ReservationForm form,
@@ -110,6 +115,14 @@ public class RestaurantController {
         if(loggedUser != null){
             final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
                     form.getPhoneNumber(), 0, loggedUser.getId());
+            if (form.getProfileImage() != null && !form.getProfileImage().isEmpty()) {
+                try {
+                Image image = new Image(form.getProfileImage().getBytes());
+                imageService.setImageByRestaurantId(image, restaurant.getId());
+                } catch (IOException e) {
+                    LOGGER.error("error while setting restaurant profile image");
+                }
+            }
             return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
         }
         return new ModelAndView("redirect:/login");
