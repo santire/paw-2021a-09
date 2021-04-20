@@ -38,6 +38,3 @@
 
     </jsp:body>
 </sc:templateLayout>
-
-
-

@@ -42,63 +42,58 @@ public class UserController {
 
 
     @RequestMapping(path ={"/user/edit"}, method = RequestMethod.GET)
-    public ModelAndView editUser(@ModelAttribute("updateUserForm") final UserForm form, @RequestParam(value = "error", required = false) final String error) {
+    public ModelAndView editUser(@ModelAttribute("loggedUser") final User loggedUser, @ModelAttribute("updateUserForm") final UserForm form, @RequestParam(value = "error", required = false) final String error) {
 
         final ModelAndView mav = new ModelAndView("editUser");
-        User user = loggedUser().orElseThrow(UserNotFoundException::new);
 
         if(error != null){
             mav.addObject("error", error);
         }
-        mav.addObject("user", user);
-        List<Restaurant> restaurants = restaurantService.getRestaurantsFromOwner(user.getId());
+        mav.addObject("user", loggedUser);
+        List<Restaurant> restaurants = restaurantService.getRestaurantsFromOwner(loggedUser.getId());
         mav.addObject("restaurants", restaurants);
 
         return mav;
     }
 
     @RequestMapping(path ={"/user/edit"}, method = RequestMethod.POST, params = "edit-username")
-    public ModelAndView editUserUsername(@Valid @ModelAttribute("updateUserForm") final UserForm form, final BindingResult errors ) {
+    public ModelAndView editUserUsername(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateUserForm") final UserForm form, final BindingResult errors ) {
         if (errors.hasErrors()) {
-            return editUser(form, "");
+            return editUser(loggedUser, form, "");
         }
-            User user = loggedUser().orElseThrow(UserNotFoundException::new);
-            userService.updateUsername(user.getId(), form.getUsername());
+            userService.updateUsername(loggedUser.getId(), form.getUsername());
             return new ModelAndView("redirect:/user/edit");
     }
 
     @RequestMapping(path ={"/user/edit"}, method = RequestMethod.POST, params = "edit-password")
-    public ModelAndView editUserPassword(@Valid @ModelAttribute("updateUserForm") final UserForm form, final BindingResult errors ) {
+    public ModelAndView editUserPassword(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateUserForm") final UserForm form, final BindingResult errors ) {
         if(!form.getPassword().equals(form.getRepeatPassword())){
-            return editUser(form, "password");
+            return editUser(loggedUser, form, "password");
         }
         if (errors.hasErrors()) {
-            return editUser(form,null);
+            return editUser(loggedUser, form,null);
         }
-        User user = loggedUser().orElseThrow(UserNotFoundException::new);
-        userService.updatePassword(user.getId(), form.getPassword());
+        userService.updatePassword(loggedUser.getId(), form.getPassword());
         return new ModelAndView("redirect:/user/edit");
     }
 
     @RequestMapping(path ={"/user/edit"}, method = RequestMethod.POST, params = "edit-first-name")
-    public ModelAndView editUserFirstName(@Valid @ModelAttribute("updateUserForm") final UserForm form, final BindingResult errors ) {
+    public ModelAndView editUserFirstName(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateUserForm") final UserForm form, final BindingResult errors ) {
         if (errors.hasErrors()) {
-            return editUser(form, "");
+            return editUser(loggedUser, form, "");
         }
-        User user = loggedUser().orElseThrow(UserNotFoundException::new);
-        userService.updateFistName(user.getId(), form.getFirst_name());
+        userService.updateFistName(loggedUser.getId(), form.getFirstName());
         return new ModelAndView("redirect:/user/edit");
     }
 
 
     @RequestMapping(path ={"/user/edit"}, method = RequestMethod.POST, params = "edit-last-name")
-    public ModelAndView editUserLastName(@Valid @ModelAttribute("updateUserForm") final UserForm form, final BindingResult errors ) {
+    public ModelAndView editUserLastName(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateUserForm") final UserForm form, final BindingResult errors ) {
 
         if (errors.hasErrors()) {
-            return editUser(form, "");
+            return editUser(loggedUser, form, "");
         }
-        User user = loggedUser().orElseThrow(UserNotFoundException::new);
-        userService.updateLastName(user.getId(), form.getLast_name());
+        userService.updateLastName(loggedUser.getId(), form.getLastName());
         return new ModelAndView("redirect:/user/edit");
     }
 
@@ -121,20 +116,19 @@ public class UserController {
      */
 
     @RequestMapping(path ={"/user/edit"}, method = RequestMethod.POST, params = "edit-phone")
-    public ModelAndView editUserPhone(@Valid @ModelAttribute("updateUserForm") final UserForm form, final BindingResult errors ) {
+    public ModelAndView editUserPhone(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateUserForm") final UserForm form, final BindingResult errors ) {
 
         if (errors.hasErrors()) {
-            return editUser(form, "");
+            return editUser(loggedUser, form, "");
         }
-        User user = loggedUser().orElseThrow(UserNotFoundException::new);
-        userService.updatePhone(user.getId(), form.getPhone());
+        userService.updatePhone(loggedUser.getId(), form.getPhone());
         return new ModelAndView("redirect:/user/edit");
     }
 
 
 
 
-
+    /*
     @ModelAttribute
     public Optional<User> loggedUser() {
         final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -142,4 +136,6 @@ public class UserController {
         LOGGER.debug("Logged user is {}", user);
         return user;
     }
+
+     */
 }

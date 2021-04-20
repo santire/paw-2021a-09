@@ -40,6 +40,7 @@ import java.util.*;
 @Controller
 public class RestaurantController {
 
+
     private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
 
 
@@ -63,43 +64,33 @@ public class RestaurantController {
     private LikesService likesService;
 
     @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.GET)
-    public ModelAndView restaurant(@ModelAttribute("reservationForm") final ReservationForm form,
+    public ModelAndView restaurant(@ModelAttribute("loggedUser") final User loggedUser, @ModelAttribute("reservationForm") final ReservationForm form,
             @PathVariable("restaurantId") final long restaurantId) {
         final ModelAndView mav = new ModelAndView("restaurant");
 
-        Optional<User> user = loggedUser();
-        if(user.isPresent()){
-            long userId = user.get().getId();
-            mav.addObject("loggedUser", true);
-            Optional<Rating> userRating = ratingService.getRating(userId, restaurantId);
+        if(loggedUser != null){
+            Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
             if(userRating.isPresent()){
                 mav.addObject("rated", true);
                 mav.addObject("userRatingToRestaurant", userRating.get().getRating());
-                mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(userId, restaurantId));
+                mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
             }
-            else{ mav.addObject("rated", false); }
         }
-        else{
-            mav.addObject("loggedUser", false);
-            mav.addObject("rated", false);
-        }
+
         mav.addObject("restaurant",
                 restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new));
-        mav.addObject("menu",
-                menuService.findMenuByRestaurantId(restaurantId));
         return mav;
     }
 
     @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.POST)
-    public ModelAndView register(@Valid @ModelAttribute("reservationForm") final ReservationForm form,
+    public ModelAndView register(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("reservationForm") final ReservationForm form,
             final BindingResult errors, @PathVariable("restaurantId") final long restaurantId,
             RedirectAttributes redirectAttributes) {
 
         if (errors.hasErrors()) {
-            return restaurant(form, restaurantId);
+            return restaurant(loggedUser, form, restaurantId);
         }
-        // User user =
-        // userService.findByEmail(form.getEmail()).orElse(userService.register(form.getEmail()));
+
         User user;
         Optional<User> maybeUser = userService.findByEmail(form.getEmail());
         if (maybeUser.isPresent()) {
@@ -116,84 +107,66 @@ public class RestaurantController {
         return new ModelAndView("redirect:/");
     }
 
-    @RequestMapping(path = { "/register-restaurant" }, method = RequestMethod.GET)
-    public ModelAndView registerRestaurant(@ModelAttribute("RestaurantForm") final RestaurantForm form) {
 
-        //TODO handled in webauthconfig
-        //
-        // Optional<User> user = loggedUser();
-       // if(user.isPresent()){
+    @RequestMapping(path = { "/register-restaurant" }, method = RequestMethod.GET)
+    public ModelAndView registerRestaurant( @ModelAttribute("loggedUser") final User loggedUser, @ModelAttribute("RestaurantForm") final RestaurantForm form) {
+
             return new ModelAndView("registerRestaurant");
-       // }
-       // return new ModelAndView("redirect:/login");
     }
 
 
 
     @RequestMapping(path = { "/register-restaurant" }, method = RequestMethod.POST)
-    public ModelAndView registerRestaurant(@Valid @ModelAttribute("RestaurantForm") final RestaurantForm form,
-                                           final BindingResult errors) {
+    public ModelAndView registerRestaurant( @ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("RestaurantForm") final RestaurantForm form, final BindingResult errors) {
         if (errors.hasErrors()) {
-            return registerRestaurant(form);
+            return registerRestaurant(loggedUser, form);
         }
 
-        User user = loggedUser().orElseThrow(UserNotFoundException::new);
 
         final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
-                form.getPhoneNumber(), 0, user.getId());
+                form.getPhoneNumber(), 0, loggedUser.getId());
 
-        if(restaurantService.getRestaurantsFromOwner(user.getId()).size() == 1)
-        updateAuthorities();
+        if(restaurantService.getRestaurantsFromOwner(loggedUser.getId()).size() == 1)
+        updateAuthorities(loggedUser);
 
         return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
 
-        //Optional<User> user = loggedUser();
-        //if(user.isPresent()){
-         //   final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
-         //           form.getPhoneNumber(), 0, user.get().getId());
-         //   return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
-        //}
-        //return new ModelAndView("redirect:/login");
     }
 
 
 
-    @RequestMapping(path = {"/restaurant/rate/set/{restaurantId}"}, method = RequestMethod.POST)
-    public ModelAndView setRating(@PathVariable("restaurantId") final long restaurantId, @RequestParam("rating") int rating){
-        Optional<User> user = loggedUser();
-        if(user.isPresent()){
-            long userId = user.get().getId();
+    @RequestMapping(path = {"/restaurant/{restaurantId}/rate"}, method = RequestMethod.POST)
+    public ModelAndView setRating(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId, @RequestParam("rating") int rating){
+        if(loggedUser != null){
+            long userId = loggedUser.getId();
             ratingService.rateRestaurant(userId, restaurantId, rating);
         }
         return new ModelAndView("redirect:/restaurant/" + restaurantId);
     }
 
-    @RequestMapping(path = {"/restaurant/rate/update/{restaurantId}"}, method = RequestMethod.POST)
-    public ModelAndView updateRating(@PathVariable("restaurantId") final long restaurantId, @RequestParam("rating") int rating){
-        Optional<User> user = loggedUser();
-        if(user.isPresent()){
-            long userId = user.get().getId();
+    @RequestMapping(path = {"/restaurant/{restaurantId}/rate"}, method = RequestMethod.PUT)
+    public ModelAndView updateRating(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId, @RequestParam("rating") int rating){
+        if(loggedUser != null){
+            long userId = loggedUser.getId();
             ratingService.modifyRestaurantRating(userId, restaurantId, rating);
         }
         return new ModelAndView("redirect:/restaurant/" + restaurantId);
     }
 
-    @RequestMapping(path = {"restaurant/like/{restaurantId}"}, method = RequestMethod.POST)
-    public ModelAndView like(@PathVariable("restaurantId") final long restaurantId){
-        Optional<User> user = loggedUser();
-        if(user.isPresent()){
-            long userId = user.get().getId();
+    @RequestMapping(path = {"restaurant/{restaurantId}/like"}, method = RequestMethod.POST)
+    public ModelAndView like(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId){
+        if(loggedUser != null){
+            long userId = loggedUser.getId();
             likesService.like(userId, restaurantId);
             return new ModelAndView("redirect:/restaurant/" + restaurantId);
         }
         return new ModelAndView("redirect:/login");
     }
 
-    @RequestMapping(path = {"restaurant/dislike/{restaurantId}"}, method = RequestMethod.POST)
-    public ModelAndView dislike(@PathVariable("restaurantId") final long restaurantId){
-        Optional<User> user = loggedUser();
-        if(user.isPresent()){
-            long userId = user.get().getId();
+    @RequestMapping(path = {"restaurant/{restaurantId}/dislike"}, method = RequestMethod.POST)
+    public ModelAndView dislike(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId){
+        if(loggedUser != null){
+            long userId = loggedUser.getId();
             likesService.dislike(userId, restaurantId);
             return new ModelAndView("redirect:/restaurant/" + restaurantId);
         }
@@ -202,19 +175,16 @@ public class RestaurantController {
 
 
 
-
     @RequestMapping(path = { "/restaurant/{restaurantId}/delete" })
-    public ModelAndView deleteRestaurant(@PathVariable("restaurantId") final long restaurantId) {
+    public ModelAndView deleteRestaurant(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId) {
 
-        User user = loggedUser().orElseThrow(UserNotFoundException::new);
-        List<Restaurant> restaurants = restaurantService.getRestaurantsFromOwner(user.getId());
+        List<Restaurant> restaurants = restaurantService.getRestaurantsFromOwner(loggedUser.getId());
 
-
-            if(userService.isTheRestaurantOwner(user.getId(), restaurantId)){
+            if(userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId)){
                 restaurantService.deleteRestaurantById(restaurantId);
 
-                if(restaurantService.getRestaurantsFromOwner(user.getId()).isEmpty())
-                    updateAuthorities();
+                if(restaurantService.getRestaurantsFromOwner(loggedUser.getId()).isEmpty())
+                    updateAuthorities(loggedUser);
 
                 return new ModelAndView("redirect:/user/edit");
             }
@@ -225,13 +195,12 @@ public class RestaurantController {
 
 
     @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.GET)
-    public ModelAndView editRestaurant(@PathVariable("restaurantId") final long restaurantId, @ModelAttribute("updateRestaurantForm") final RestaurantForm form) {
+    public ModelAndView editRestaurant(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId, @ModelAttribute("updateRestaurantForm") final RestaurantForm form) {
 
-        User user = loggedUser().orElseThrow(UserNotFoundException::new);
+
         Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
 
-
-        if(userService.isTheRestaurantOwner(user.getId(), restaurantId)){
+        if(userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId)){
             final ModelAndView mav = new ModelAndView("editRestaurant");
             mav.addObject("restaurant", restaurant);
 
@@ -242,27 +211,27 @@ public class RestaurantController {
 
 
     @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-name")
-    public ModelAndView editRestaurantName(@Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors, @PathVariable("restaurantId") final long restaurantId ) {
+    public ModelAndView editRestaurantName(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors, @PathVariable("restaurantId") final long restaurantId ) {
         if (errors.hasErrors()) {
-            return editRestaurant(restaurantId, form);
+            return editRestaurant(loggedUser, restaurantId, form);
         }
         restaurantService.updateName(restaurantId, form.getName());
         return new ModelAndView("redirect:/restaurant/" + restaurantId + "/edit");
     }
 
     @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-address")
-    public ModelAndView editRestaurantAddress(@Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors,  @PathVariable("restaurantId") final long restaurantId ) {
+    public ModelAndView editRestaurantAddress(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors,  @PathVariable("restaurantId") final long restaurantId ) {
         if (errors.hasErrors()) {
-            return editRestaurant(restaurantId, form);
+            return editRestaurant(loggedUser, restaurantId, form);
         }
         restaurantService.updateAddress(restaurantId, form.getAddress());
         return new ModelAndView("redirect:/restaurant/" + restaurantId + "/edit");
     }
 
     @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-phone")
-    public ModelAndView editRestaurantPhone(@Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors,  @PathVariable("restaurantId") final long restaurantId ) {
+    public ModelAndView editRestaurantPhone(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors,  @PathVariable("restaurantId") final long restaurantId ) {
         if (errors.hasErrors()) {
-            return editRestaurant(restaurantId, form);
+            return editRestaurant(loggedUser, restaurantId, form);
         }
         restaurantService.updatePhoneNumber(restaurantId, form.getPhoneNumber());
         return new ModelAndView("redirect:/restaurant/" + restaurantId + "/edit");
@@ -273,30 +242,16 @@ public class RestaurantController {
 
 
     @ModelAttribute
-    public Optional<User> loggedUser() {
-        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        final Optional<User> user = userService.findByEmail((String) auth.getName());
-        LOGGER.debug("Logged user is {}", user);
-        return user;
-    }
+    public void updateAuthorities(@ModelAttribute("loggedUser") final User loggedUser) {
 
-
-
-
-
-    @ModelAttribute
-    public void updateAuthorities() {
-        User user = loggedUser().orElseThrow(UserNotFoundException::new);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Collection<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-        if(!restaurantService.getRestaurantsFromOwner(user.getId()).isEmpty()){
+        if(!restaurantService.getRestaurantsFromOwner(loggedUser.getId()).isEmpty()){
             authorities.add(new SimpleGrantedAuthority("ROLE_RESTAURANTOWNER"));
         }
         Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
         SecurityContextHolder.getContext().setAuthentication(newAuth);
     }
-
-
 
 }

@@ -19,7 +19,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 
-import org.springframework.validation.ObjectError;
 
 import org.springframework.web.servlet.ModelAndView;
 
@@ -73,10 +72,8 @@ public class HomeController {
     public ModelAndView registerForm(@ModelAttribute("userForm") final UserForm form,@RequestParam(value = "error", required = false) final String error) {
        ModelAndView mav = new ModelAndView("register");
        if(error != null){
-           System.out.println("error q llego" + error);
            mav.addObject("error", error);
        }
-       System.out.println(error);
         return mav;
     }
 
@@ -94,10 +91,10 @@ public class HomeController {
         }
 
         try{
-           final User user = userService.register(form.getUsername(), form.getPassword(), form.getFirst_name(),
-                    form.getLast_name(), form.getEmail(), form.getPhone());
+           final User user = userService.register(form.getUsername(), form.getPassword(), form.getFirstName(),
+                    form.getLastName(), form.getEmail(), form.getPhone());
 
-            return new ModelAndView("redirect:/user/" + user.getId());
+            return new ModelAndView("redirect:/login");
         } catch (Exception e) {
 
             return registerForm(form, "email");
@@ -127,9 +124,7 @@ public class HomeController {
     }
 
 
-
-
-
+/*
     @ModelAttribute
     public Optional<User> loggedUser() {
         final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -138,8 +133,7 @@ public class HomeController {
         return user;
     }
 
-
-
+ */
 
 
 

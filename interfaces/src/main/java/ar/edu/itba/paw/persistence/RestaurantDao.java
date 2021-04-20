@@ -27,8 +27,12 @@ public interface RestaurantDao {
 
     public List<Restaurant> getRestaurantsFromOwner(long userId);
 
+
     public void updateName(long id, String name);
     public void updateAddress(long id, String address);
     public void updatePhoneNumber(long id, String phoneNumber);
     public void updateRestaurant(long id, String name, String address, String phoneNumber);
+
+    public List<Restaurant> findAll();
+
 }

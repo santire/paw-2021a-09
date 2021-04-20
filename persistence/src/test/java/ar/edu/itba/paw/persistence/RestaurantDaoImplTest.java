@@ -4,12 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import javax.sql.DataSource;
 import javax.swing.text.html.Option;
 
+import ar.edu.itba.paw.model.MenuItem;
 import ar.edu.itba.paw.model.Restaurant;
 import org.junit.Before;
 import org.junit.Test;
@@ -83,6 +85,20 @@ public class RestaurantDaoImplTest {
     }
 
     @Test
+    public void testFindAll() {
+        List<Restaurant> restaurants = restaurantDao.findAll();
+        assertEquals(INSERTED_SIZE, restaurants.size());
+    }
+
+    @Test
+    public void testFindAllKFCMenu() {
+        List<Restaurant> restaurants = restaurantDao.findAll();
+        Restaurant kfc = restaurants.get(2);
+        assertEquals(INSERTED_SIZE, kfc.getMenu().size());
+    }
+
+
+    @Test
     public void testRestaurantSearchById(){
         Optional<Restaurant> restaurant = restaurantDao.findById(ID);
         assertTrue(restaurant.isPresent());
@@ -93,5 +109,24 @@ public class RestaurantDaoImplTest {
     public void testRestaurantSearchByName(){
         List<Restaurant> restaurants = restaurantDao.findByName(PATTERN);
         assertEquals(2, restaurants.size());
+    }
+
+    @Test
+    public void testRestaurantByIdWithMenu() {
+        Optional<Restaurant> maybeRestaurant = restaurantDao.findById(3);
+
+        assertTrue(maybeRestaurant.isPresent());
+        Restaurant kfc = maybeRestaurant.get();
+        List<MenuItem> menuActual = kfc.getMenu();
+        List<MenuItem> menuExpected = Arrays.asList(
+            new MenuItem(1, "Fried Chicken Original", "Delicious fried chicken", 3.99f),
+            new MenuItem(2, "Fried Chicken Crispy", "Delicious fried chicken but crispy", 4.99f),
+            new MenuItem(3, "Vegan Friendly Option", "It's literally just water", 10.99f)
+            );
+
+        assertEquals(menuExpected.get(0).getName(), menuActual.get(0).getName());
+        assertEquals(menuExpected.get(0).getDescription(), menuActual.get(0).getDescription());
+        assertEquals(menuExpected.get(0).getPrice(), menuActual.get(0).getPrice(), 0.01);
+
     }
 }

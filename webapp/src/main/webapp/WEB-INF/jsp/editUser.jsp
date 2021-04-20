@@ -12,7 +12,7 @@
         <form:form modelAttribute="updateUserForm" action="${path}?edit-username" method="post" >
             <div>
                 <form:errors path="username" cssStyle="color: red;" element="p"/>
-                <form:label path="first_name">
+                <form:label path="username">
                     Username:
                     <form:input type="text" path="username" placeholder="${user.username}"/>
                 </form:label>
@@ -49,10 +49,10 @@
 
         <form:form modelAttribute="updateUserForm" action="${path}?edit-first-name" method="post" >
             <div>
-                <form:errors path="first_name" cssStyle="color: red;" element="p"/>
-                <form:label path="first_name">
+                <form:errors path="firstName" cssStyle="color: red;" element="p"/>
+                <form:label path="firstName">
                     First Name:
-                    <form:input type="text" path="first_name" placeholder="${user.first_name}"/>
+                    <form:input type="text" path="firstName" placeholder="${user.firstName}"/>
                 </form:label>
             </div>
             <div>
@@ -62,10 +62,10 @@
 
         <form:form modelAttribute="updateUserForm" action="${path}?edit-last-name" method="post" >
             <div>
-                <form:errors path="last_name" cssStyle="color: red;" element="p"/>
-                <form:label path="last_name">
+                <form:errors path="lastName" cssStyle="color: red;" element="p"/>
+                <form:label path="lastName">
                     Family Name:
-                    <form:input type="text" path="last_name" placeholder="${user.last_name}"/>
+                    <form:input type="text" path="lastName" placeholder="${user.lastName}"/>
                 </form:label>
             </div>
             <div>

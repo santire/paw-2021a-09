@@ -1,6 +1,9 @@
 package ar.edu.itba.paw.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doNothing;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.persistence.UserDao;
@@ -32,10 +36,13 @@ public class UserServiceImplTest {
   @Mock
   private EmailService mockEmailService;
 
+  @Mock
+  private PasswordEncoder encoder;
+
   @Test
   public void testRegister() {
 
-    /*Mockito.when(mockDao.register(
+    Mockito.when(mockDao.register(
     Mockito.eq(USERNAME),
     Mockito.eq(PASSWORD),
     Mockito.eq(FIRST_NAME),
@@ -45,16 +52,17 @@ public class UserServiceImplTest {
     
     )).thenReturn(
       new User(1, USERNAME,PASSWORD,FIRST_NAME,LAST_NAME,EMAIL,PHONE));
+    Mockito.when(encoder.encode(PASSWORD)).thenReturn(PASSWORD);
 
     User user = userService.register(USERNAME,PASSWORD,FIRST_NAME,LAST_NAME,EMAIL,PHONE);
 
     assertEquals(USERNAME, user.getName());
     assertEquals(USERNAME, user.getUsername());
     assertEquals(PASSWORD, user.getPassword());
-    assertEquals(FIRST_NAME, user.getFirst_name());
-    assertEquals(LAST_NAME, user.getLast_name());
+    assertEquals(FIRST_NAME, user.getFirstName());
+    assertEquals(LAST_NAME, user.getLastName());
     assertEquals(EMAIL, user.getEmail());
-    assertEquals(PHONE, user.getPhone());*/
+    assertEquals(PHONE, user.getPhone());
     assertEquals(1, 1);
   }
 

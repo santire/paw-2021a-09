@@ -1,5 +1,4 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
-<%@attribute name="user" required="true" type="ar.edu.itba.paw.model.User"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 
@@ -59,15 +58,15 @@
           </button>
         </span>
       </form>
-      <ul class="navbar-nav ml-auto" style="visibility: hidden">
+      <ul class="navbar-nav ml-auto">
         <c:choose>
-            <c:when test="${empty user}">
+            <c:when test="${empty loggedUser}">
                 <ul class="navbar-nav mr-auto mt-2 mt-lg-0 pl-3">
                   <li class="nav-item">
-                    <a class="nav-link" href="<c:url value="/register"/>">Registrarse</a>
+                    <a class="nav-link" href="<c:url value="/register"/>"><spring:message code="navbar.register" /></a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="<c:url value="/login"/>">Log in</a>
+                    <a class="nav-link" href="<c:url value="/login"/>"><spring:message code="navbar.login" /></a>
                   </li>
                 </ul>
             </c:when>
@@ -86,10 +85,10 @@
                       aria-haspopup="true"
                       aria-expanded="false"
                     >
-                      <c:out value="${user.getName()}"/>
+                      <c:out value="${loggedUser.getName()}"/>
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                      <a class="dropdown-item" href="/">Log Out</a>
+                      <a class="dropdown-item" href="<c:url value="/logout"/>"><spring:message code="navbar.logout" /></a>
                     </div>
                 </ul>
             </c:otherwise>

@@ -38,18 +38,18 @@
         </form:label>
       </div>
       <div>
-        <form:errors path="first_name" cssStyle="color: red;" element="p"/>
-        <form:label path="first_name">
+        <form:errors path="firstName" cssStyle="color: red;" element="p"/>
+          <form:label path="firstName">
             <spring:message code="FirstName" />:
-          <form:input type="text" path="first_name"/>
-        </form:label>
+            <form:input type="text" path="firstName"/>
+          </form:label>
       </div>
       <div>
-        <form:errors path="last_name" cssStyle="color: red;" element="p"/>
-        <form:label path="last_name">
+        <form:errors path="lastName" cssStyle="color: red;" element="p"/>
+          <form:label path="lastName">
             <spring:message code="FamilyName" />:
-          <form:input type="text" path="last_name"/>
-        </form:label>
+            <form:input type="text" path="lastName"/>
+          </form:label>
       </div>
       <c:if test= "${error == 'email'}">
         <div style="color:red;">

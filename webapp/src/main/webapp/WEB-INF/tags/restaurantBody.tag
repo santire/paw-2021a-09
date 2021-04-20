@@ -5,7 +5,6 @@
 <%@ taglib prefix="sc" tagdir="/WEB-INF/tags" %>
 
 <%@attribute name="restaurant" required="true" type="ar.edu.itba.paw.model.Restaurant"%>
-<%@attribute name="menu" required="true" type="java.util.List"%>
 
 <div class="container">
 <div class="mb-3 my-2" style="max-height: 450px;">
@@ -29,12 +28,12 @@
   <div class="order-2 order-lg-1">
     <h3 class="pb-1 text-center border-bottom">Menu</h3>
     <c:choose>
-      <c:when test="${ menu.size() == 0 }">
-      <h2 class="display-5"><spring:message code="restaurants.menuNotAvailable" /></h2>
+      <c:when test="${ restaurant.getMenu().size() == 0 }">
+      <h2 class="display-5 text-center"><spring:message code="restaurants.menuNotAvailable" /></h2>
       </c:when>
       <c:otherwise>
         <ul class="list-group list-group-flush">
-          <sc:menu menu="${menu}" />
+          <sc:menu menu="${restaurant.getMenu()}" />
         </ul>
       </c:otherwise>
     </c:choose>
