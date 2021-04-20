@@ -9,7 +9,7 @@
 <div class="container">
   <div class="mb-3 my-2" style="max-height: 450px;">
     <div class="row no-gutters">
-      <div class="col-md-6 mx-auto pb-3">
+      <div class="col-md-7 mx-auto pb-3">
         <c:choose>
           <c:when test="${restaurant.getMaybeProfileImage().isPresent()}" >
             <c:url value="data:image/jpg;base64,${restaurant.getMaybeProfileImage().get().getImageEnconded()}" var="imgUrl"/>
@@ -20,11 +20,13 @@
         </c:choose>
         <img src="${imgUrl}" class="card-img img-fluid px-1 pr-md-5 border-right" alt="${name}" >
       </div>
-      <div class="card border-0 col-md-6 my-auto mx-auto" style="max-width: 300px;">
+      <div class="card border-0 col-md-5 my-auto mx-auto" style="">
         <div class="card-body px-auto mb-auto">
           <h5 class="card-title">${restaurant.getName()}</h5>
           <p class="card-text"><medium class="text-muted">${restaurant.getAddress()}</medium></p>
           <p class="card-text"><medium class="text-muted">${restaurant.getPhoneNumber()}</medium></p>
+      <p class="text-secondary">${restaurant.getRating()}/10 <i class="fa fa-cutlery" aria-hidden="true"></i></p>
+
         </div>
       </div>
     </div>

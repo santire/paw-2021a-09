@@ -2,20 +2,16 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@attribute name="hidden" required="true" type="java.lang.Boolean"%>
 
+<c:set value="" var="hide"/>
+<c:if test="${hidden eq true}">
+  <c:set value="d-none" var="hide"/>
+</c:if>
 
 <header>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
     <a class="navbar-brand ml-2 font-weight-bold" href="<c:url value="/"/>">
       <img src="<c:url value="/resources/images/logo.svg"/>" height="40" width="40" class="pb-2 pr-1" \><span id="burgundy">Gourme</span><span id="orange">table</span>
     </a>
-    <c:choose>
-      <c:when test="${hidden eq true}">
-        <div style="visibility: hidden;">
-      </c:when>
-      <c:otherwise>
-        <div>
-      </c:otherwise>
-    </c:choose>
       <button
         class="navbar-toggler"
         type="button"
@@ -28,13 +24,12 @@
         <span class="navbar-toggler-icon"></span>
       </button>
 
-    </div>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item">
+        <li class="nav-item ${hide}">
           <a class="nav-link" href="<c:url value="/restaurants"/>"><spring:message code="navbar.browse" /></a>
         </li>
-        <li class="nav-item dropdown" style="visibility: hidden;">
+        <li class="nav-item ${hide} dropdown" style="visibility: hidden;">
           <a
             class="nav-link dropdown-toggle"
             href="#"
@@ -54,7 +49,7 @@
         </li>
       </ul>
 
-      <form class="nav-item bg-light rounded mx-auto my-2 my-lg-0" action="<c:url value="/restaurants"/>">
+      <form class="nav-item ${hide} bg-light rounded mx-auto my-2 my-lg-0" action="<c:url value="/restaurants"/>">
         <span class="input-group">
           <input
             class="search-bar form-control mr-auto input-lg"
@@ -72,20 +67,20 @@
         <c:choose>
             <c:when test="${empty loggedUser}">
                 <ul class="navbar-nav mt-2 mt-lg-0 pl-3">
-                  <li class="nav-item">
+                  <li class="nav-item ${hide}">
                     <a class="nav-link" href="<c:url value="/register"/>"><spring:message code="navbar.register" /></a>
                   </li>
-                  <li class="nav-item">
+                  <li class="nav-item ${hide}">
                     <a class="nav-link" href="<c:url value="/login"/>"><spring:message code="navbar.login" /></a>
                   </li>
                 </ul>
             </c:when>
             <c:otherwise>
                 <ul class="navbar-nav mt-2 mt-lg-0 pl-3">
-                  <li class="nav-item">
+                  <li class="nav-item ${hide}">
                     <span class="navbar-text"></span>
                   </li>
-                  <li class="nav-item dropdown">
+                  <li class="nav-item ${hide} dropdown">
                     <a
                       class="nav-link dropdown-toggle"
                       href="#"
@@ -97,9 +92,9 @@
                     >
                       <c:out value="${loggedUser.getName()}"/>
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                      <a class="dropdown-item" href="<c:url value="/register/restaurant"/>"><spring:message code="navbar.registerRestaurant" /></a>
                       <a class="dropdown-item" href="<c:url value="/logout"/>"><spring:message code="navbar.logout" /></a>
-                    </div>
                 </ul>
             </c:otherwise>
         </c:choose>
