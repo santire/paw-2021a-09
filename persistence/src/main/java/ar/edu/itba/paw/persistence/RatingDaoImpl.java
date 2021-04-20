@@ -59,4 +59,11 @@ public class RatingDaoImpl implements RatingDao {
         return true;
     }
 
+    @Override
+    public int getNumberOfRates(long restaurantId){
+        Optional<Integer> number = jdbcTemplate.query("SELECT COUNT(*) FROM ratings WHERE restaurant_id = ?", new Object[]{restaurantId}, (rs, rowNum) ->
+                rs.getInt(1)).stream().findFirst();
+        return number.map(Integer::intValue).orElse(0);
+    }
+
 }

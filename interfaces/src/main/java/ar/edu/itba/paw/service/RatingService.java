@@ -11,4 +11,5 @@ public interface RatingService {
     public List<Rating> getRatedRestaurantsByUserId(long userId);
     public Rating rateRestaurant(long userId, long restaurantId, int rating);
     public boolean modifyRestaurantRating(long userId, long restaurantId, int rating);
+    public boolean updateAvgRating(long restaurantId, int rating);
 }
