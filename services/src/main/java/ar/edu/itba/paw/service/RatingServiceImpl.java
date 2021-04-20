@@ -33,6 +33,7 @@ public class RatingServiceImpl implements RatingService {
 
     @Override
     public Rating rateRestaurant(long userId, long restaurantId, int rating){
+        updateAvgRating(restaurantId, rating);
         return ratingDao.rateRestaurant(userId, restaurantId, rating);
     }
 
