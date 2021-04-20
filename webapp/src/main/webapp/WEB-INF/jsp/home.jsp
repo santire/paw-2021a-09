@@ -8,10 +8,11 @@
   <jsp:body>
     <main>
       <section>
+        <spring:message code="home.reservations.confirmationMessage" var="confirmationMessage"/>
         <c:if test="${madeReservation}">
           <div class="alert alert-success" role="alert">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <strong><spring:message code="home.reservation.noRestaurantsFound" /></strong> <c:out value='<spring:message code="home.reservations.confirmationMessage" />'/>
+            <strong><c:out value="${confirmationMessage}"/></strong> 
           </div>
         </c:if>
         <div class="container my-2">
