@@ -24,7 +24,7 @@ public interface RestaurantService {
     public void updateName(long id, String name);
     public void updateAddress(long id, String address);
     public void updatePhoneNumber(long id, String phoneNumber);
-    public void updateRestaurant(long id, String name, String address, String phoneNumber);
+    public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber);
 
     // DESTROY
     public boolean deleteRestaurantById(long id);

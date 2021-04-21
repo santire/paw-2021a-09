@@ -5,53 +5,63 @@
 <%@ taglib prefix="sc" tagdir="/WEB-INF/tags" %>
 
 
-<sc:templateLayout>
-    <jsp:body>
+<c:url value="/restaurant/${restaurant.getId()}/edit" var="postFormUrl"/>
+<sc:templateLayout >
+  <jsp:body>
+    <h2 class="text-center mt-4"><spring:message code="hello.restaurant.edit.title" /></h2>
+    <div class="card border-0 mx-auto w-75">
+      <div class="card body border-0">
+        <form:form
+           modelAttribute="RestaurantForm"
+           action="${postFormUrl}"
+           method="post"
+           enctype="multipart/form-data"
+        >
+           <div class="row row-cols-1 row-cols-lg-2 justify-content-center">
+              <div>
+                  <form:label class="px-3 mx-auto w-100" path="name">
+                    <spring:message code="register.restaurant.RestaurantName" />:
+                    <form:input
+                        class=" form-control mx-auto w-100 px-1 mx-auto w-100 input-group-text text-left" 
+                        value="${restaurant.getName()}"
+                        type="text"
+                        path="name"/>
+                  </form:label>
+                  <form:errors path="name" class="px-3 text-danger" element="p"/>
 
-        Meter el edit de la foto
+                  <form:label class="px-3 mx-auto w-100" path="address">
+                    <spring:message code="Address" />:
+                    <form:input
+                        class="px-1 mx-auto w-100 input-group-text text-left"
+                        value="${restaurant.getAddress()}"
+                        type="text"
+                        path="address"/>
+                  </form:label>
+                  <form:errors path="address" class="px-3 text-danger" element="p"/>
 
-        <c:url value="/restaurant/${restaurant.getId()}/edit" var="path"/>
-        <form:form modelAttribute="updateRestaurantForm" action="${path}?edit-restaurant-name" method="post" >
-            <div>
-                <form:errors path="name" cssStyle="color: red;" element="p"/>
-                <form:label path="name">
-                    Restaurant Name:
-                    <form:input type="text" path="name" placeholder="${restaurant.name}"/>
+                <form:label class="px-3 mx-auto w-100" path="phoneNumber">
+                  <spring:message code="PhoneNumber" />:
+                  <form:input
+                      class="px-1 mx-auto w-100 input-group-text text-left"
+                      value="${restaurant.getPhoneNumber()}"
+                      type="text"
+                      path="phoneNumber"/>
                 </form:label>
-            </div>
-            <div>
-                <input type="submit" value="Save"/>
-            </div>
-        </form:form>
+                <form:errors path="phoneNumber" class="px-3 text-danger" element="p"/>
 
-        <form:form modelAttribute="updateRestaurantForm" action="${path}?edit-restaurant-address" method="post" >
-            <div>
-                <form:errors path="address" cssStyle="color: red;" element="p"/>
-                <form:label path="address">
-                    Address:
-                    <form:input type="text" path="address" placeholder="${restaurant.address}"/>
+                <form:label class="px-3 mx-auto w-100" path="profileImage">
+                    <spring:message code="restaurant.edit.profileImage"/>
                 </form:label>
-            </div>
-            <div>
-                <input type="submit" value="Save"/>
-            </div>
+                <form:input class="px-3 mx-auto w-100" type="file" path="profileImage"/>
+                <form:errors path="profileImage" class="px-3 text-danger" element="p"/>
+              </div>
+          </div>
+          <div>
+            <input type="submit" class="btn btn-outline-secondary btn-block w-50 mt-3 px-0 mx-auto" value='<spring:message code="hello.register.restaurant.submit" />'>
+          </div>
         </form:form>
+      </div>
+    </div>
 
-
-        <form:form modelAttribute="updateRestaurantForm" action="${path}?edit-restaurant-phone" method="post" >
-            <div>
-                <form:errors path="phoneNumber" cssStyle="color: red;" element="p"/>
-                <form:label path="phoneNumber">
-                    Phone Number:
-                    <form:input type="text" path="phoneNumber" placeholder="${restaurant.phoneNumber}"/>
-                </form:label>
-            </div>
-            <div>
-                <input type="submit" value="Save"/>
-            </div>
-        </form:form>
-
-
-
-    </jsp:body>
+  </jsp:body>
 </sc:templateLayout>

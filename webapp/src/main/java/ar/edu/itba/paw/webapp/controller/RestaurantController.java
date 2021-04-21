@@ -202,19 +202,60 @@ public class RestaurantController {
 
 
     @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.GET)
-    public ModelAndView editRestaurant(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId, @ModelAttribute("updateRestaurantForm") final RestaurantForm form) {
-
+    public ModelAndView editRestaurant(@ModelAttribute("loggedUser") final User loggedUser, 
+            @PathVariable("restaurantId") final long restaurantId, @ModelAttribute("RestaurantForm") final RestaurantForm form) {
 
         Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
-
         if(userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId)){
             final ModelAndView mav = new ModelAndView("editRestaurant");
+            if(form.getName() != null && !form.getName().isBlank()) {
+                restaurant.setName(form.getName());
+            }
+            if(form.getAddress() != null && !form.getAddress().isBlank()) {
+                restaurant.setAddress(form.getAddress());
+            }
+            if(form.getPhoneNumber() != null && !form.getPhoneNumber().isBlank()) {
+                restaurant.setName(form.getPhoneNumber());
+            }
             mav.addObject("restaurant", restaurant);
-
             return mav;
             }
+
         return new ModelAndView("redirect:/403");
     }
+
+    @RequestMapping(path={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST)
+    public ModelAndView editRestaurant(@ModelAttribute("loggedUser") final User loggedUser, 
+            @PathVariable("restaurantId") final long restaurantId, 
+            @Valid @ModelAttribute("RestaurantForm") final RestaurantForm form,
+            final BindingResult errors) {
+
+        if (errors.hasErrors()) {
+            LOGGER.debug("Form has errors at /restaurant/{}/edit", restaurantId);
+            return editRestaurant(loggedUser, restaurantId, form);
+        }
+        // Should be if it got here, 
+        // but it doesn't hurt to escape a potential null pointer exception
+        if (loggedUser != null) {
+            LOGGER.debug("Updating restaurant for user {}", loggedUser.getName());
+            final Restaurant restaurant = restaurantService
+                .updateRestaurant(restaurantId, form.getName(), form.getAddress(), form.getPhoneNumber())
+                .orElseThrow(RestaurantNotFoundException::new);
+
+            if (form.getProfileImage() != null && !form.getProfileImage().isEmpty()) {
+                try {
+                Image image = new Image(form.getProfileImage().getBytes());
+                restaurantService.setImageByRestaurantId(image, restaurant.getId());
+                } catch (IOException e) {
+                    LOGGER.error("error while setting restaurant profile image");
+                }
+            }
+
+            return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
+        }
+        return new ModelAndView("redirect:/403");
+    }
+
 
 
     @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-name")

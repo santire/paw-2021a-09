@@ -189,8 +189,9 @@ public class RestaurantDaoImpl implements RestaurantDao {
         jdbcTemplate.update("UPDATE restaurants SET phone_number = ? WHERE restaurant_id = ?", phoneNumber, id);
     }
     @Override
-    public void updateRestaurant(long id, String name, String address, String phoneNumber) {
-        jdbcTemplate.update("UPDATE restaurants SET name = ?, address = ?, phoneNumber = ? WHERE restaurant_id = ?", name, address, phoneNumber);
+    public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber) {
+        jdbcTemplate.update("UPDATE restaurants SET name = ?, address = ?, phone_number = ? WHERE restaurant_id = ?", name, address, phoneNumber, id);
+        return findById(id);
     }
     @Override
     public void updateRating(long id, int rating){
