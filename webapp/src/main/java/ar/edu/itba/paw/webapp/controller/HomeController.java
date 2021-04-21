@@ -60,9 +60,12 @@ public class HomeController {
     public ModelAndView restaurants(@RequestParam(required = false) String search) {
         final ModelAndView mav = new ModelAndView("restaurants");
         if (search == null) {
+            mav.addObject("userIsSearching", false);
             mav.addObject("restaurants", restaurantService.getAllRestaurants());
             return mav;
         }
+        mav.addObject("userIsSearching", true);
+        mav.addObject("searchString", search);
         mav.addObject("restaurants", restaurantService.getAllRestaurants(search));
         return mav;
     }
