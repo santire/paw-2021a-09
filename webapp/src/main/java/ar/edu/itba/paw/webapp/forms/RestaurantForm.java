@@ -5,6 +5,9 @@ import javax.validation.constraints.Size;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import ar.edu.itba.paw.webapp.validators.MultipartFileSizeValid;
+import ar.edu.itba.paw.webapp.validators.ValidImage;
+
 public class RestaurantForm {
     @Size(min = 6, max = 100)
     @Pattern(regexp = "[a-zA-Z0-9 '´¨!]+")
@@ -17,6 +20,8 @@ public class RestaurantForm {
     @Pattern(regexp = "[0-9]+")
     private String phoneNumber;
 
+    @ValidImage
+    @MultipartFileSizeValid
     private MultipartFile profileImage;
 
     public void setName(String name) { this.name = name; }

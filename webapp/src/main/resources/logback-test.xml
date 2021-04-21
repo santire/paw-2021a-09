@@ -12,7 +12,7 @@
         <appender-ref ref="STDOUT" />
     </logger>
 
-    <logger name="org.springframework.security" level="DEBUG" additivity="false">
+    <logger name="org.springframework.security" level="WARN" additivity="false">
         <appender-ref ref="STDOUT" />
     </logger>
 

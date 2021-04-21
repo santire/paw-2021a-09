@@ -106,10 +106,12 @@ public class RestaurantController {
     public ModelAndView registerRestaurant(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("RestaurantForm") final RestaurantForm form,
                                            final BindingResult errors) {
         if (errors.hasErrors()) {
+            LOGGER.debug("Form has errors at /register/restaurant");
             return registerRestaurant(loggedUser, form);
         }
 
         if(loggedUser != null){
+            LOGGER.debug("Creating restaurant for user {}", loggedUser.getName());
             final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
                     form.getPhoneNumber(), 0, loggedUser.getId());
             if (form.getProfileImage() != null && !form.getProfileImage().isEmpty()) {

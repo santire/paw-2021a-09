@@ -37,6 +37,12 @@ select,
   display: block;
 }
 
+#upload-photo {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+}
+
 @media (max-width: 425px) {
   .search-bar {
     width: 200px !important;
