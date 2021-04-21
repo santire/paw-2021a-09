@@ -57,7 +57,7 @@
               </div>
           </div>
           <div>
-            <input type="submit" class="btn btn-outline-secondary btn-block w-50 mt-3 px-0 mx-auto" value='<spring:message code="hello.register.restaurant.submit" />'>
+            <input type="submit" class="btn btn-outline-secondary btn-block w-50 mt-3 px-0 mx-auto" value='<spring:message code="restaurant.editButton" />'>
           </div>
         </form:form>
 
