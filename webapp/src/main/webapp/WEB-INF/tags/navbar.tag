@@ -59,7 +59,7 @@
               placeholder='<spring:message code="navbar.search" />'
               aria-label="Search"
               name="search"
-              value=${searchString}
+              value="${searchString}"
             />
           </c:when>
           <c:otherwise>
