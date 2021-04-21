@@ -76,8 +76,8 @@ public class RestaurantController {
             if(userRating.isPresent()){
                 mav.addObject("rated", true);
                 mav.addObject("userRatingToRestaurant", userRating.get().getRating());
-                mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
             }
+            mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
         }
 
         mav.addObject("restaurant",

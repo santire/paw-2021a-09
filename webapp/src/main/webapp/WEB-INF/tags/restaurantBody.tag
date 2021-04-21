@@ -22,7 +22,10 @@
       </div>
       <div class="card border-0 col-md-5 my-auto mx-auto" style="">
         <div class="card-body px-auto mb-auto">
-          <h5 class="card-title">${restaurant.getName()}</h5>
+          <div class="d-inline">
+          <h5 class="d-inline card-title">${restaurant.getName()}</h5>
+          <h5 class="float-right"><sc:like/></h5>
+          </div>
           <p class="card-text"><medium class="text-muted">${restaurant.getAddress()}</medium></p>
           <p class="card-text"><medium class="text-muted">${restaurant.getPhoneNumber()}</medium></p>
           <div class="row row-cols-2 m-0 p-0">

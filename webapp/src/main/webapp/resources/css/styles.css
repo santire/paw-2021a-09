@@ -5,6 +5,7 @@ body {
 
 .restaurant-img {
   max-width: 600px;
+  max-height: 337px;
   aspect-ratio: 16/9;
   width: 100%;
   object-fit: contain;
