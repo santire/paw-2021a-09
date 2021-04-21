@@ -35,8 +35,8 @@
                   </form:label>
                   <form:errors path="password" class="px-3 text-danger" element="p"/>
                   <c:if test= "${error == 'password'}">
-                    <div>
-                      <spring:message class="px-3 text-danger" code="hello.register.userForm.repeatPasswordError"/>
+                    <div class="px-3 text-danger">
+                      <spring:message code="hello.register.userForm.repeatPasswordError"/>
                     </div>
                   </c:if>
               </div>

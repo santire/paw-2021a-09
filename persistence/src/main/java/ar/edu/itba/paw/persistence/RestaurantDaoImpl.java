@@ -62,7 +62,7 @@ public class RestaurantDaoImpl implements RestaurantDao {
             String menuItemDescrip = rs.getString("description");
             Float menuItemPrice = rs.getFloat("price");
             MenuItem menuItem = new MenuItem(menuItemId, menuItemName, menuItemDescrip, menuItemPrice);
-            if (menuItemId != 0 && !menuItemName.trim().isEmpty())
+            if (menuItemId != 0 && !menuItemName.trim().isEmpty()){
                 restaurant.addMenuItem(menuItem);
             }
             byte[] imageData = rs.getBytes("image_data");
