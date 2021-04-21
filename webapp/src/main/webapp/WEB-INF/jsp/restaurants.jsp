@@ -21,7 +21,7 @@
             </c:when>
             <c:otherwise>
               <c:if test="${userIsSearching}">
-                <h2 class="display-5"><spring:message code="restaurants.search.restaurantsFound"/>${searchString}</h2>
+                <h5 class="display-5"><spring:message code="restaurants.search.restaurantsFound"/>${searchString}</h5>
               </c:if>
               <div class="row row-cols-1 row-cols-md-4 row-cols-lg-5">
                 <c:forEach var="restaurant" items="${restaurants}" >

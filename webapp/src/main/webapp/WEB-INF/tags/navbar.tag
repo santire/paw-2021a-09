@@ -49,15 +49,29 @@
         </li>
       </ul>
 
-      <form class="nav-item ${hide} bg-light rounded mx-auto my-2 my-lg-0" action="<c:url value="/restaurants"/>">
+      <form id="search-bar" class="nav-item ${hide} bg-light rounded mx-auto my-2 my-lg-0" action="<c:url value="/restaurants"/>">
         <span class="input-group">
-          <input
-            class="search-bar form-control mr-auto input-lg"
-            type="search"
-            placeholder='<spring:message code="navbar.search" />'
-            aria-label="Search"
-            name="search"
-          />
+        <c:choose>
+          <c:when test="${userIsSearching}">
+            <input
+              class="search-bar form-control mr-auto input-lg"
+              type="search"
+              placeholder='<spring:message code="navbar.search" />'
+              aria-label="Search"
+              name="search"
+              value=${searchString}
+            />
+          </c:when>
+          <c:otherwise>
+            <input
+              class="search-bar form-control mr-auto input-lg"
+              type="search"
+              placeholder='<spring:message code="navbar.search" />'
+              aria-label="Search"
+              name="search"
+            />
+          </c:otherwise>
+        </c:choose>
             <button class="btn my-2 my-sm-0 ml-auto" type="submit">
             <span class="fa fa-search text-muted"></span>
           </button>

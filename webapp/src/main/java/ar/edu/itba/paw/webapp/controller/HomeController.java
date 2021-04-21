@@ -4,7 +4,6 @@ import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -14,14 +13,11 @@ import ar.edu.itba.paw.service.RestaurantService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 
 
 import org.springframework.web.servlet.ModelAndView;
-
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -59,7 +55,7 @@ public class HomeController {
     @RequestMapping("/restaurants")
     public ModelAndView restaurants(@RequestParam(required = false) String search) {
         final ModelAndView mav = new ModelAndView("restaurants");
-        if (search == null) {
+        if (search == null || search.isBlank()) {
             mav.addObject("userIsSearching", false);
             mav.addObject("restaurants", restaurantService.getAllRestaurants());
             return mav;
@@ -137,7 +133,5 @@ public class HomeController {
     }
 
  */
-
-
 
 }
