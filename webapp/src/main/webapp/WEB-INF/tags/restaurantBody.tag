@@ -8,7 +8,7 @@
 
 <div class="container">
   <div class="mb-5 my-2" style="max-height: 450px;">
-    <div class="row no-gutters">
+    <div class="row no-gutters mt-5">
       <div class="col-md-7 mx-auto pb-3">
         <c:choose>
           <c:when test="${restaurant.getMaybeProfileImage().isPresent()}" >
