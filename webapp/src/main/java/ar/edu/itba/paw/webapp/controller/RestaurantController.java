@@ -263,6 +263,20 @@ public class RestaurantController {
     }
 
 
+    @RequestMapping("/restaurants/user/{userId}")
+    public ModelAndView userRestaurants(@ModelAttribute("loggedUser") final User loggedUser,
+                                        @PathVariable("userId") final long userId) {
+        if(loggedUser != null){
+            final ModelAndView mav = new ModelAndView("myRestaurants");
+            List<Restaurant> restaurants = restaurantService.getRestaurantsFromOwner(userId);
+            mav.addObject("userHasRestaurants", !restaurants.isEmpty());
+            mav.addObject("restaurants", restaurants);
+            return mav;
+        }
+        return new ModelAndView("redirect:/403");
+    }
+
+
 
     // @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-name")
     // public ModelAndView editRestaurantName(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors, @PathVariable("restaurantId") final long restaurantId ) {

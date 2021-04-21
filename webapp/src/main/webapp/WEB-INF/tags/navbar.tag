@@ -29,6 +29,11 @@
         <li class="nav-item ${hide}">
           <a class="nav-link" href="<c:url value="/restaurants"/>"><spring:message code="navbar.browse" /></a>
         </li>
+        <c:if test="${!empty loggedUser}">
+          <li class="nav-item ${hide}">
+            <a class="nav-link" href="<c:url value="/restaurants/user/${loggedUser.getId()}"/>"><spring:message code="navbar.myRestaurants" /></a>
+          </li>
+        </c:if>
         <li class="nav-item ${hide} dropdown" style="visibility: hidden;">
           <a
             class="nav-link dropdown-toggle"
