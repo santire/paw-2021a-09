@@ -8,6 +8,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 
+import ar.edu.itba.paw.service.LikesService;
 import ar.edu.itba.paw.service.RestaurantService;
 
 import org.slf4j.Logger;
@@ -37,18 +38,25 @@ public class HomeController {
     @Autowired
     private UserService userService;
 
-
+    @Autowired
+    private LikesService likesService;
 
     @Autowired
     private RestaurantService restaurantService;
 
 
     @RequestMapping("/")
-    public ModelAndView helloWorld() {
+    public ModelAndView helloWorld(@ModelAttribute("loggedUser") final User loggedUser) {
         final ModelAndView mav = new ModelAndView("home");
         List<Restaurant> popularRestaurants = restaurantService.getPopularRestaurants();
         mav.addObject("popularRestaurants", popularRestaurants);
         LOGGER.debug("Amount of popular restaurants: {}", popularRestaurants.size());
+
+        if(loggedUser != null){
+            List<Restaurant> likedRestaurants = likesService.getLikedRestaurants(loggedUser.getId());
+            mav.addObject("likedRestaurants", likedRestaurants);
+            //LOGGER.debug("Amount of liked restaurants: {}", likedRestaurants.size());
+        }
         return mav;
     }
 
