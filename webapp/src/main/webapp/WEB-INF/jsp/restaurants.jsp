@@ -12,7 +12,7 @@
             <c:when test="${empty restaurants}">
               <c:choose>
                 <c:when test="${userIsSearching}">
-                  <h2 class="display-5"><spring:message code="restaurants.search.noRestaurantsFound"/>'${searchString}'</h2>
+                <h2 class="display-5"><spring:message code="restaurants.search.noRestaurantsFound"/>'<c:out value="${searchString}"/>'</h2>
                 </c:when>
                 <c:otherwise>
                   <h2 class="display-5"><spring:message code="restaurants.noRestaurantsFound" /></h2>
