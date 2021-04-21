@@ -28,6 +28,7 @@ public class RatingDaoImplTest {
     private static final int RATINGS_INSERTED_SIZE = 3;
 
     private static final long USER_ID = 1;
+    private static final long ANOTHER_USER_ID = 2;
     private static final long RESTAURANT_ID = 1;
     private static final long ANOTHER_RESTAURANT_ID = 2;
 
@@ -60,7 +61,7 @@ public class RatingDaoImplTest {
 
     @Test
     public void rateRestaurant(){
-        Rating rating = ratingDao.rateRestaurant(USER_ID, ANOTHER_RESTAURANT_ID, ANOTHER_RATING);
+        Rating rating = ratingDao.rateRestaurant(ANOTHER_USER_ID, ANOTHER_RESTAURANT_ID, ANOTHER_RATING);
 
         assertEquals(RATINGS_INSERTED_SIZE + 1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "ratings"));
         assertEquals(ANOTHER_RATING, rating.getRating());

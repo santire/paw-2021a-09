@@ -14,6 +14,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
@@ -26,11 +27,7 @@ import java.util.Properties;
 
 @EnableTransactionManagement
 @EnableWebMvc
-@ComponentScan({
-        "ar.edu.itba.paw.webapp.controller",
-        "ar.edu.itba.paw.service",
-        "ar.edu.itba.paw.persistence",
-})
+@ComponentScan({ "ar.edu.itba.paw.webapp.controller", "ar.edu.itba.paw.service", "ar.edu.itba.paw.persistence", })
 @Configuration
 public class WebConfig {
 
@@ -49,19 +46,18 @@ public class WebConfig {
   }
 
   @Bean
-  public DataSource dataSource(){
+  public DataSource dataSource() {
 
     final SimpleDriverDataSource ds = new SimpleDriverDataSource();
     ds.setDriverClass(org.postgresql.Driver.class);
-      ds.setUrl("jdbc:postgresql://localhost/paw");
-      ds.setUsername("root");
-      ds.setPassword("root");
-
+    ds.setUrl("jdbc:postgresql://localhost/paw");
+    ds.setUsername("root");
+    ds.setPassword("root");
 
     // paw server
-      // ds.setUrl("jdbc:postgresql://10.16.1.110/paw-2021a-09");
-      // ds.setUsername("paw-2021a-09");
-      // ds.setPassword("6jnqLFj1g");
+    // ds.setUrl("jdbc:postgresql://10.16.1.110/paw-2021a-09");
+    // ds.setUsername("paw-2021a-09");
+    // ds.setPassword("6jnqLFj1g");
 
     // remote testing database (very slow)
 
@@ -105,21 +101,27 @@ public class WebConfig {
 
   @Bean
   public JavaMailSender getJavaMailSender() {
-      JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-      mailSender.setHost("smtp.gmail.com");
-      mailSender.setPort(587);
+    JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+    mailSender.setHost("smtp.gmail.com");
+    mailSender.setPort(587);
 
-      mailSender.setUsername("gourmetablewebapp@gmail.com");
-      mailSender.setPassword("evjotkxuvnmjknuu");
+    mailSender.setUsername("gourmetablewebapp@gmail.com");
+    mailSender.setPassword("evjotkxuvnmjknuu");
 
-      Properties props = mailSender.getJavaMailProperties();
-      props.put("mail.transport.protocol", "smtp");
-      props.put("mail.smtp.auth", "true");
-      props.put("mail.smtp.starttls.enable", "true");
-      props.put("mail.debug", "true");
+    Properties props = mailSender.getJavaMailProperties();
+    props.put("mail.transport.protocol", "smtp");
+    props.put("mail.smtp.auth", "true");
+    props.put("mail.smtp.starttls.enable", "true");
+    props.put("mail.debug", "true");
 
-         return mailSender;
-        }
+    return mailSender;
+  }
 
+  @Bean(name = "multipartResolver")
+  public CommonsMultipartResolver multipartResolver() {
+    CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
+    multipartResolver.setMaxUploadSize(-1);
+    return multipartResolver;
+  }
 
 }

@@ -1,8 +1,6 @@
 package ar.edu.itba.paw.webapp.forms;
 
 import org.hibernate.validator.constraints.Email;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.NumberFormat;
 
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;

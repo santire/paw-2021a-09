@@ -19,9 +19,15 @@
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="fa fa-envelope"></i></span>
             </div>
+
+            <c:set value="" var="emailPlaceholder"/>
+            <c:if test="${not empty loggedUser}">
+              <c:set value="${loggedUser.getEmail()}" var="emailPlaceholder"/>
+            </c:if>
             <form:input
               type="text"
               path="email"
+              value="${emailPlaceholder}"
               cssClass="form-control"
               aria-label="Ingrese su email"
             />
