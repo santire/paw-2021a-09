@@ -20,7 +20,7 @@
             <h2 style="vertical-align : middle;text-align:left;margin-top: 150px;margin-left:80px;font-size: 50px;"><spring:message code="home.phrase"></spring:message></h2>
           </div>
           <div class="column" style="background-color:#bbb; opacity: 0.7; max-height: 420px;">
-            <img class="card-img-top img-fluid pull-right mr-5 pr-5" style="max-height: 380px; width: auto;" src="/../../resources/images/home_image.png" alt="">
+            <img class="card-img-top img-fluid pull-right mr-5 pr-5" style="max-height: 380px; width: auto;" src="<c:url value="/resources/images/home_image.png"/>" alt="">
           </div>
         </div>
         <div class="container my-2 mt-5">
