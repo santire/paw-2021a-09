@@ -55,7 +55,6 @@ public class HomeController {
         if(loggedUser != null){
             List<Restaurant> likedRestaurants = likesService.getLikedRestaurants(loggedUser.getId());
             mav.addObject("likedRestaurants", likedRestaurants);
-            //LOGGER.debug("Amount of liked restaurants: {}", likedRestaurants.size());
         }
         return mav;
     }
