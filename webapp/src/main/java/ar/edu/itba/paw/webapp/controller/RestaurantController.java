@@ -250,13 +250,13 @@ public class RestaurantController {
                 Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
                 if(userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId)){
                     final ModelAndView mav = new ModelAndView("editRestaurant");
-                    if(form.getName() != null && !form.getName().isBlank()) {
+                    if(form.getName() != null && !form.getName().isEmpty()) {
                         restaurant.setName(form.getName());
                     }
-                    if(form.getAddress() != null && !form.getAddress().isBlank()) {
+                    if(form.getAddress() != null && !form.getAddress().isEmpty()) {
                         restaurant.setAddress(form.getAddress());
                     }
-                    if(form.getPhoneNumber() != null && !form.getPhoneNumber().isBlank()) {
+                    if(form.getPhoneNumber() != null && !form.getPhoneNumber().isEmpty()) {
                         restaurant.setName(form.getPhoneNumber());
                     }
                     mav.addObject("restaurant", restaurant);

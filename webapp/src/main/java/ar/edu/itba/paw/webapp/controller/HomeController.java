@@ -63,7 +63,7 @@ public class HomeController {
     @RequestMapping("/restaurants")
     public ModelAndView restaurants(@RequestParam(required = false) String search) {
         final ModelAndView mav = new ModelAndView("restaurants");
-        if (search == null || search.isBlank()) {
+        if (search == null || search.isEmpty()) {
             mav.addObject("userIsSearching", false);
             mav.addObject("restaurants", restaurantService.getAllRestaurants());
             return mav;
