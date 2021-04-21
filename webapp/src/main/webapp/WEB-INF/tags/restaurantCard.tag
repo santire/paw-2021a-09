@@ -18,7 +18,7 @@
   </c:choose>
   <img
     src="${imgUrl}"
-    class="img-thumbnail rounded card-img-top"
+    class="restaurant-img card-img img-fluid img-thumbnail rounded card-img-top"
     alt="..."
   />
   <div class="card-body d-flex flex-column">

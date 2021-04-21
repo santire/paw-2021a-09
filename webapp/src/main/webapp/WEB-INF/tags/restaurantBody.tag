@@ -18,15 +18,25 @@
             <c:url value="/resources/images/noimage.jpg" var="imgUrl"/>
           </c:otherwise>
         </c:choose>
-        <img src="${imgUrl}" class="card-img img-fluid px-1 pr-md-5 border-right" alt="${name}" >
+        <img src="${imgUrl}" class=" restaurant-img card-img img-fluid px-1 pr-md-5 border-right" alt="${name}" >
       </div>
       <div class="card border-0 col-md-5 my-auto mx-auto" style="">
         <div class="card-body px-auto mb-auto">
           <h5 class="card-title">${restaurant.getName()}</h5>
           <p class="card-text"><medium class="text-muted">${restaurant.getAddress()}</medium></p>
           <p class="card-text"><medium class="text-muted">${restaurant.getPhoneNumber()}</medium></p>
-      <p class="text-secondary">${restaurant.getRating()}/10 <i class="fa fa-cutlery" aria-hidden="true"></i></p>
-
+          <div class="row row-cols-2 m-0 p-0">
+            <p class="col-3 m-0 p-0 text-secondary">${restaurant.getRating()}/10 <i class="fa fa-cutlery" aria-hidden="true"></i></p>
+            <c:if test="${not empty isTheOwner}">
+              <div>
+                <a href="<c:url value="/restaurant/${restaurantId}/edit"/>">
+                  <p class="col-9 m-0 p-0 text-secondary">
+                    <spring:message code="restaurant.editButton"/><i class="col-9 m-0 p-1 text-muted fa fa-edit" aria-hidden="true"></i>
+                  </p>
+                </a>
+              </div>
+            </c:if>
+          </div>
         </div>
       </div>
     </div>

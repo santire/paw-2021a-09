@@ -69,6 +69,10 @@ public class RestaurantController {
 
         if(loggedUser != null){
             Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
+            boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
+            if (isTheRestaurantOwner) {
+                mav.addObject("isTheOwner", true);
+            }
             if(userRating.isPresent()){
                 mav.addObject("rated", true);
                 mav.addObject("userRatingToRestaurant", userRating.get().getRating());
@@ -205,20 +209,22 @@ public class RestaurantController {
     public ModelAndView editRestaurant(@ModelAttribute("loggedUser") final User loggedUser, 
             @PathVariable("restaurantId") final long restaurantId, @ModelAttribute("RestaurantForm") final RestaurantForm form) {
 
-        Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
-        if(userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId)){
-            final ModelAndView mav = new ModelAndView("editRestaurant");
-            if(form.getName() != null && !form.getName().isBlank()) {
-                restaurant.setName(form.getName());
-            }
-            if(form.getAddress() != null && !form.getAddress().isBlank()) {
-                restaurant.setAddress(form.getAddress());
-            }
-            if(form.getPhoneNumber() != null && !form.getPhoneNumber().isBlank()) {
-                restaurant.setName(form.getPhoneNumber());
-            }
-            mav.addObject("restaurant", restaurant);
-            return mav;
+            if (loggedUser != null) {
+                Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
+                if(userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId)){
+                    final ModelAndView mav = new ModelAndView("editRestaurant");
+                    if(form.getName() != null && !form.getName().isBlank()) {
+                        restaurant.setName(form.getName());
+                    }
+                    if(form.getAddress() != null && !form.getAddress().isBlank()) {
+                        restaurant.setAddress(form.getAddress());
+                    }
+                    if(form.getPhoneNumber() != null && !form.getPhoneNumber().isBlank()) {
+                        restaurant.setName(form.getPhoneNumber());
+                    }
+                    mav.addObject("restaurant", restaurant);
+                    return mav;
+                }
             }
 
         return new ModelAndView("redirect:/403");
@@ -258,32 +264,32 @@ public class RestaurantController {
 
 
 
-    @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-name")
-    public ModelAndView editRestaurantName(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors, @PathVariable("restaurantId") final long restaurantId ) {
-        if (errors.hasErrors()) {
-            return editRestaurant(loggedUser, restaurantId, form);
-        }
-        restaurantService.updateName(restaurantId, form.getName());
-        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/edit");
-    }
+    // @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-name")
+    // public ModelAndView editRestaurantName(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors, @PathVariable("restaurantId") final long restaurantId ) {
+        // if (errors.hasErrors()) {
+            // return editRestaurant(loggedUser, restaurantId, form);
+        // }
+        // restaurantService.updateName(restaurantId, form.getName());
+        // return new ModelAndView("redirect:/restaurant/" + restaurantId + "/edit");
+    // }
 
-    @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-address")
-    public ModelAndView editRestaurantAddress(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors,  @PathVariable("restaurantId") final long restaurantId ) {
-        if (errors.hasErrors()) {
-            return editRestaurant(loggedUser, restaurantId, form);
-        }
-        restaurantService.updateAddress(restaurantId, form.getAddress());
-        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/edit");
-    }
+    // @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-address")
+    // public ModelAndView editRestaurantAddress(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors,  @PathVariable("restaurantId") final long restaurantId ) {
+        // if (errors.hasErrors()) {
+            // return editRestaurant(loggedUser, restaurantId, form);
+        // }
+        // restaurantService.updateAddress(restaurantId, form.getAddress());
+        // return new ModelAndView("redirect:/restaurant/" + restaurantId + "/edit");
+    // }
 
-    @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-phone")
-    public ModelAndView editRestaurantPhone(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors,  @PathVariable("restaurantId") final long restaurantId ) {
-        if (errors.hasErrors()) {
-            return editRestaurant(loggedUser, restaurantId, form);
-        }
-        restaurantService.updatePhoneNumber(restaurantId, form.getPhoneNumber());
-        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/edit");
-    }
+    // @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-phone")
+    // public ModelAndView editRestaurantPhone(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors,  @PathVariable("restaurantId") final long restaurantId ) {
+        // if (errors.hasErrors()) {
+            // return editRestaurant(loggedUser, restaurantId, form);
+        // }
+        // restaurantService.updatePhoneNumber(restaurantId, form.getPhoneNumber());
+        // return new ModelAndView("redirect:/restaurant/" + restaurantId + "/edit");
+    // }
 
 
 
