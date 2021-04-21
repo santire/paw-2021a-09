@@ -17,7 +17,7 @@
         </c:if>
           <div class="row">
           <div class="column" style="background-color:#bbb; opacity: 0.7;">
-            <h2 style="vertical-align : middle;text-align:left;margin-top: 150px;margin-left:80px;font-size: 50px;">Descubrí y reservá el mejor restaurante</h2>
+            <h2 style="vertical-align : middle;text-align:left;margin-top: 150px;margin-left:80px;font-size: 50px;"><spring:message code="home.phrase"></spring:message></h2>
           </div>
           <div class="column" style="background-color:#bbb; opacity: 0.7;">
             <img class="card-img-top" src="/../../resources/images/home_image.png" alt="">
