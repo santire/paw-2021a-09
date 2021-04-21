@@ -3,6 +3,7 @@ package ar.edu.itba.paw.webapp.controller;
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -69,6 +70,11 @@ public class HomeController {
         }
         mav.addObject("userIsSearching", true);
         mav.addObject("searchString", search);
+        // To delete after sprint
+        if(search.startsWith("%")){
+            mav.addObject("restaurants", new ArrayList<Restaurant>());
+            return mav;
+        }
         mav.addObject("restaurants", restaurantService.getAllRestaurants(search));
         return mav;
     }

@@ -233,7 +233,7 @@ public class RestaurantController {
                 if(restaurantService.getRestaurantsFromOwner(loggedUser.getId()).isEmpty())
                     updateAuthorities(loggedUser);
 
-                return new ModelAndView("redirect:/user/edit");
+                return new ModelAndView("redirect:/restaurants/user/" + loggedUser.getId());
             }
         }
         return new ModelAndView("redirect:/403");
@@ -299,6 +299,19 @@ public class RestaurantController {
         return new ModelAndView("redirect:/403");
     }
 
+
+    @RequestMapping("/restaurants/user/{userId}")
+    public ModelAndView userRestaurants(@ModelAttribute("loggedUser") final User loggedUser,
+                                        @PathVariable("userId") final long userId) {
+        if(loggedUser != null){
+            final ModelAndView mav = new ModelAndView("myRestaurants");
+            List<Restaurant> restaurants = restaurantService.getRestaurantsFromOwner(userId);
+            mav.addObject("userHasRestaurants", !restaurants.isEmpty());
+            mav.addObject("restaurants", restaurants);
+            return mav;
+        }
+        return new ModelAndView("redirect:/403");
+    }
 
 
     // @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-name")

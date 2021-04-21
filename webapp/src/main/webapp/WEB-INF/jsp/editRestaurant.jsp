@@ -22,7 +22,7 @@
                   <form:label class="px-3 mx-auto w-100" path="name">
                     <spring:message code="register.restaurant.RestaurantName" />:
                     <form:input
-                        class=" form-control mx-auto w-100 px-1 mx-auto w-100 input-group-text text-left" 
+                        class=" form-control mx-auto w-100 px-1 mx-auto w-100 input-group-text text-left"
                         value="${restaurant.getName()}"
                         type="text"
                         path="name"/>
@@ -60,7 +60,42 @@
             <input type="submit" class="btn btn-outline-secondary btn-block w-50 mt-3 px-0 mx-auto" value='<spring:message code="hello.register.restaurant.submit" />'>
           </div>
         </form:form>
+
+          <c:url value="/restaurant/${restaurant.getId()}/delete" var="deletePath"/>
+          <div class="row row-cols-1 row-cols-lg-2 justify-content-center px-3">
+              <button type="button" class="btn btn-danger w-50 mt-3 px-5 mx-auto text-white" data-toggle="modal" data-target="#confirmationModalCenter">
+                  <spring:message code="restaurant.edit.delete" />
+              </button>
+          </div>
+          <div class="row row-cols-1 row-cols-lg-2 justify-content-center">
+            <p class="text-danger"><spring:message code="restaurant.edit.deleteWarning" /></p>
+          </div>
+
       </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="confirmationModalCenter" tabindex="-1" role="dialog" aria-labelledby="confirmationModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmationModalLongTitle"><spring:message code="restaurant.edit.ModalTitle" /></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <spring:message code="restaurant.edit.confirmationModalMesagge" />
+                    </div>
+                    <form action="${deletePath}" method="post">
+                        <div class="modal-footer">
+                            <input type="submit" class="btn btn-danger text-white" value=<spring:message code="restaurant.edit.deleteConfirmation" />>
+                            <button type="button" class="btn btn-secondary text-white" data-dismiss="modal"><spring:message code="restaurant.edit.cancel" /></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
     </div>
 
   </jsp:body>
