@@ -4,82 +4,91 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="sc" tagdir="/WEB-INF/tags" %>
 
+<c:url value="/register" var="postFormUrl"/>
 
-<sc:templateLayout>
+<sc:templateLayout simpleTopBar="true">
   <jsp:body>
 
-    <h2><spring:message code="hello.register.title" /></h2>
-    <c:url value="/register" var="postFormUrl"/>
-    <form:form modelAttribute="userForm" action="${postFormUrl}" method="post">
-      <div>
-        <form:errors path="username" cssStyle="color: red;" element="p"/>
-          <form:label path="username">
-            <spring:message code="Username" />:
-            <form:input type="text" path="username"/>
-          </form:label>
-      </div>
-      <div>
-        <form:errors path="password" cssStyle="color: red;" element="p"/>
-        <form:label path="password">
-            <spring:message code="Password" />:
-          <form:input type="password" path="password"/>
-        </form:label>
-      </div >
-      <c:if test= "${error == 'password'}">
-        <div style="color:red;">
-          passwords doesnt match
-        </div>
-      </c:if>
-      <div>
-        <form:errors path="repeatPassword" cssStyle="color: red;" element="p"/>
-        <form:label path="password">
-          Repeat Password:
-          <form:input type="password" path="repeatPassword"/>
-        </form:label>
-      </div>
-      <div>
-        <form:errors path="firstName" cssStyle="color: red;" element="p"/>
-          <form:label path="firstName">
-            <spring:message code="FirstName" />:
-            <form:input type="text" path="firstName"/>
-          </form:label>
-      </div>
-      <div>
-        <form:errors path="lastName" cssStyle="color: red;" element="p"/>
-          <form:label path="lastName">
-            <spring:message code="FamilyName" />:
-            <form:input type="text" path="lastName"/>
-          </form:label>
-      </div>
-      <c:if test= "${error == 'email'}">
-        <div style="color:red;">
-          email already registered
-        </div>
-      </c:if>
-      <div>
-        <form:errors path="email" cssStyle="color: red;" element="p"/>
-        <form:label path="email">
-            <spring:message code="email" />:
-          <form:input type="text" path="email"/>
-        </form:label>
-      </div>
-      <div>
-        <form:errors path="phone" cssStyle="color: red;" element="p"/>
-        <form:label path="phone">
-            <spring:message code="PhoneNumber" />:
-          <form:input type="text" path="phone"/>
-        </form:label>
-      </div>
-      <div>
-        <input type="submit" value='<spring:message code="SignUp" />'/>
-      </div>
-    </form:form>
+    <h2 class="text-center mt-4"><spring:message code="hello.register.title" /></h2>
+    <div class="card border-0 mx-auto w-75">
+      <div class="card body border-0">
+        <form:form
+           modelAttribute="userForm"
+           action="${postFormUrl}"
+           method="post"
+        >
+           <div class="row row-cols-1 row-cols-lg-2 justify-content-center">
+              <div>
+                  <form:label class="px-3 mx-auto w-100" path="username">
+                    <spring:message code="Username" />:
+                    <form:input class=" form-control mx-auto w-100 px-1 mx-auto w-100 input-group-text text-left" type="text" path="username"/>
+                  </form:label>
+                  <form:errors path="username" class="px-3 text-danger" element="p"/>
+              </div>
+          </div>
 
+          <div class="row row-cols-1 row-cols-lg-2 justify-content-center">
+              <div>
+                  <form:label class="px-3 mx-auto w-100" path="password">
+                    <spring:message code="Password" />:
+                    <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="password" path="password"/>
+                  </form:label>
+                  <form:errors path="password" class="px-3 text-danger" element="p"/>
+                  <c:if test= "${error == 'password'}">
+                    <div>
+                      <spring:message class="px-3 text-danger" code="hello.register.userForm.repeatPasswordError"/>
+                    </div>
+                  </c:if>
+              </div>
+              <div>
+                  <form:label class="px-3 mx-auto w-100" path="password">
+                    <spring:message code="Password" />:
+                    <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="password" path="repeatPassword"/>
+                  </form:label>
+                  <form:errors path="repeatPassword" class="px-3 text-danger" element="p"/>
+              </div>
+          </div>
 
+          <div class="row row-cols-1 row-cols-lg-2">
+            <div class="mx-auto">
+                <form:label class="px-3 mx-auto w-100" path="firstName">
+                  <spring:message code="FirstName" />:
+                  <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="text" path="firstName"/>
+                </form:label>
+                <form:errors path="firstName" class="px-3 text-danger" element="p"/>
+            </div>
+            <div class="mx-auto">
+                <form:label class="px-3 mx-auto w-100" path="lastName">
+                  <spring:message code="FamilyName" />:
+                  <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="text" path="lastName"/>
+                </form:label>
+                <form:errors path="lastName" class="px-3 text-danger" element="p"/>
+            </div>
+          </div>
+
+          <div class="row row-cols-1 row-cols-lg-2">
+            <div>
+                <form:label class="px-3 mx-auto w-100" path="email">
+                  <spring:message code="email" />:
+                  <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="text" path="email"/>
+                </form:label>
+                <form:errors path="email" class="px-3 text-danger" element="p"/>
+            </div>
+            <div>
+                <form:label class="px-3 mx-auto w-100" path="phone">
+                  <spring:message code="PhoneNumber" />:
+                  <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="text" path="phone"/>
+                </form:label>
+                <form:errors path="phone" class="px-3 text-danger" element="p"/>
+            </div>
+          </div>
+
+          <div>
+            <input type="submit" class="btn btn-outline-secondary btn-block w-100 mt-3 px-0 mx-auto" value='<spring:message code="SignUp" />'/>
+          </div>
+        </form:form>
+      </div>
+    </div>
 
   </jsp:body>
 </sc:templateLayout>
-
-
-
-

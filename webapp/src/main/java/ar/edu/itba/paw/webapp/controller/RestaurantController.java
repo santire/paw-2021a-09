@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.webapp.controller;
 
+import ar.edu.itba.paw.model.Image;
 import ar.edu.itba.paw.model.Rating;
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
@@ -36,6 +37,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ar.edu.itba.paw.webapp.exceptions.RestaurantNotFoundException;
 
 import java.util.*;
+import java.io.IOException;
 
 @Controller
 public class RestaurantController {
@@ -53,9 +55,6 @@ public class RestaurantController {
 
     @Autowired
     private RestaurantService restaurantService;
-
-    @Autowired
-    private MenuService menuService;
 
     @Autowired
     private RatingService ratingService;
@@ -108,7 +107,7 @@ public class RestaurantController {
     }
 
 
-    @RequestMapping(path = { "/register-restaurant" }, method = RequestMethod.GET)
+    @RequestMapping(path = { "/register/restaurant" }, method = RequestMethod.GET)
     public ModelAndView registerRestaurant( @ModelAttribute("loggedUser") final User loggedUser, @ModelAttribute("RestaurantForm") final RestaurantForm form) {
 
             return new ModelAndView("registerRestaurant");
@@ -116,21 +115,28 @@ public class RestaurantController {
 
 
 
-    @RequestMapping(path = { "/register-restaurant" }, method = RequestMethod.POST)
+    @RequestMapping(path = { "/register/restaurant" }, method = RequestMethod.POST)
     public ModelAndView registerRestaurant( @ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("RestaurantForm") final RestaurantForm form, final BindingResult errors) {
         if (errors.hasErrors()) {
+            LOGGER.debug("Form has errors at /register/restaurant");
             return registerRestaurant(loggedUser, form);
         }
-
-
-        final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
-                form.getPhoneNumber(), 0, loggedUser.getId());
-
-        if(restaurantService.getRestaurantsFromOwner(loggedUser.getId()).size() == 1)
-        updateAuthorities(loggedUser);
-
-        return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
-
+        if(loggedUser != null){
+            LOGGER.debug("Creating restaurant for user {}", loggedUser.getName());
+            final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
+                    form.getPhoneNumber(), 0, loggedUser.getId());
+            updateAuthorities(loggedUser);
+            if (form.getProfileImage() != null && !form.getProfileImage().isEmpty()) {
+                try {
+                Image image = new Image(form.getProfileImage().getBytes());
+                restaurantService.setImageByRestaurantId(image, restaurant.getId());
+                } catch (IOException e) {
+                    LOGGER.error("error while setting restaurant profile image");
+                }
+            }
+            return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
+        }
+        return new ModelAndView("redirect:/login");
     }
 
 
@@ -178,16 +184,17 @@ public class RestaurantController {
     @RequestMapping(path = { "/restaurant/{restaurantId}/delete" })
     public ModelAndView deleteRestaurant(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId) {
 
+        if (loggedUser != null) {
         List<Restaurant> restaurants = restaurantService.getRestaurantsFromOwner(loggedUser.getId());
 
             if(userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId)){
                 restaurantService.deleteRestaurantById(restaurantId);
-
                 if(restaurantService.getRestaurantsFromOwner(loggedUser.getId()).isEmpty())
                     updateAuthorities(loggedUser);
 
                 return new ModelAndView("redirect:/user/edit");
             }
+        }
         return new ModelAndView("redirect:/403");
 
     }

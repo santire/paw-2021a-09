@@ -2,7 +2,7 @@
 
 <div>
     <c:choose>
-        <c:when test="${loggedUser}">
+        <c:when test="${not empty loggedUser}">
             <c:if test="${rated}">
                 User rating to this restaurant is: ${userRatingToRestaurant}
                 <c:set var="path" value="${pageContext.request.contextPath}/restaurant/rate/update/${restaurant.getId()}"/>

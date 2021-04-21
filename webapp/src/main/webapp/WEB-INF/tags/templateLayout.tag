@@ -1,6 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%> 
 <%@ taglib prefix="sc" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@attribute name="simpleTopBar" required="false" type="java.lang.Boolean"%>
 
 
 <html>
@@ -33,10 +34,12 @@
     <title>Gourmetable</title>
   </head>
   <body>
-    <sc:navbar />
+    <sc:navbar hidden="${simpleTopBar}"/>
 
-    <div id="body" class="page-content">
-      <jsp:doBody />
+    <div id="wrap">
+      <div id="body" class="page-content">
+        <jsp:doBody />
+      </div>
     </div>
 
     <jsp:include page="/WEB-INF/jsp/footer.jsp" />

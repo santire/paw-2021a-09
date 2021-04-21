@@ -36,8 +36,10 @@ CREATE TABLE IF NOT EXISTS menu_items(
 CREATE TABLE IF NOT EXISTS ratings(
   rating_id SERIAL PRIMARY KEY,
   rating INTEGER,
+  user_comment TEXT,
   user_id INTEGER,
   restaurant_id INTEGER,
+  UNIQUE(user_id, restaurant_id),
   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE,
   FOREIGN KEY(restaurant_id) REFERENCES restaurants(restaurant_id) ON DELETE CASCADE
 );
@@ -46,15 +48,27 @@ CREATE TABLE IF NOT EXISTS likes(
   like_id SERIAL PRIMARY KEY,
   user_id INTEGER,
   restaurant_id INTEGER,
+  UNIQUE(user_id, restaurant_id),
   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE,
   FOREIGN KEY(restaurant_id) REFERENCES restaurants(restaurant_id) ON DELETE CASCADE
 );
 
--- CREATE TABLE IF NOT EXISTS restaurant_images(
---   image_id SERIAL PRIMARY KEY,
---   file BYTEA,
---   restaurant_id INTEGER REFERENCES restaurant(restaurant_id) ON DELETE CASCADE
--- );
+CREATE TABLE IF NOT EXISTS restaurant_images(
+ image_id SERIAL PRIMARY KEY,
+ image_data BYTEA,
+ restaurant_id INTEGER UNIQUE REFERENCES restaurants(restaurant_id) ON DELETE CASCADE
+);
+
+/* CREATE TABLE IF NOT EXISTS reviews( */
+  /* review_id SERIAL PRIMARY KEY, */
+  /* user_rating INTEGER, */
+  /* user_comment TEXT, */
+  /* user_id INTEGER, */
+  /* restaurant_id INTEGER, */
+  /* UNIQUE(user_id, restaurant_id), */
+  /* FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE, */
+  /* FOREIGN KEY(restaurant_id) REFERENCES restaurants(restaurant_id) ON DELETE CASCADE */
+/* ); */
 
 /*
 CREATE TABLE IF NOT EXISTS tags(
