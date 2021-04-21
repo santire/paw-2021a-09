@@ -60,10 +60,20 @@
     </c:choose>
   </div>
   <div class="order-1 order-lg-2">
-    <h3 class="pb-1 text-center border-bottom">
-      <spring:message code="restaurants.reservation"/>
-    </h3>
-      <sc:reservationForm/> 
+    <c:choose>
+      <c:when test="${isTheOwner}">
+        <h3 class="pb-1 text-center border-bottom">
+          <spring:message code="restaurants.menuAdd"/>
+        </h3>
+        <sc:menuItemForm/> 
+      </c:when>
+      <c:otherwise>
+        <h3 class="pb-1 text-center border-bottom">
+          <spring:message code="restaurants.reservation"/>
+        </h3>
+        <sc:reservationForm/> 
+      </c:otherwise>
+    </c:choose>
     </div>
   </div>
 </div>

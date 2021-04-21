@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
@@ -33,6 +34,17 @@ public class MenuDaoImpl implements MenuDao {
     public List<MenuItem> findMenuByRestaurantId(long id) {
         return jdbcTemplate.query("SELECT * FROM menu_items WHERE restaurant_id = ?", MENU_ITEM_ROW_MAPPER, id).stream()
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void addItemToRestaurant(long restaurant_id, MenuItem item) {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("name", item.getName().trim());
+        params.addValue("description", item.getDescription().trim());
+        params.addValue("price", item.getPrice());
+        params.addValue("restaurant_id", restaurant_id);
+
+        jdbcInsert.execute(params);
     }
 
 }

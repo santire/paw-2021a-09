@@ -22,6 +22,12 @@ public class MenuItem {
         this.description = description;
         this.price = price;
     }
+    public MenuItem(String name, String description, float price) {
+        this.id = 0;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+    }
 
     public long getId() {
         return id;

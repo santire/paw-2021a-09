@@ -20,5 +20,10 @@ public class MenuServiceImpl implements MenuService {
 	public List<MenuItem> findMenuByRestaurantId(long id) {
 		return menuDao.findMenuByRestaurantId(id);
 	}
+
+	@Override
+	public void addItemToRestaurant(long restaurantId, MenuItem item) {
+		menuDao.addItemToRestaurant(restaurantId, item);
+	}
     
 }

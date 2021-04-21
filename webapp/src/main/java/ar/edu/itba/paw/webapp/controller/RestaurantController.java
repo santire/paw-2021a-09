@@ -4,6 +4,7 @@ import ar.edu.itba.paw.model.Image;
 import ar.edu.itba.paw.model.Rating;
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.MenuItem;
 
 import javax.validation.Valid;
 
@@ -13,7 +14,7 @@ import ar.edu.itba.paw.service.ReservationService;
 import ar.edu.itba.paw.webapp.exceptions.UserNotFoundException;
 
 import ar.edu.itba.paw.service.*;
-
+import ar.edu.itba.paw.webapp.forms.MenuItemForm;
 import ar.edu.itba.paw.webapp.forms.ReservationForm;
 import ar.edu.itba.paw.webapp.forms.RestaurantForm;
 
@@ -47,6 +48,10 @@ public class RestaurantController {
 
 
 
+	private static final String MenuItem = null;
+
+
+
     @Autowired
     private UserService userService;
 
@@ -62,8 +67,13 @@ public class RestaurantController {
     @Autowired
     private LikesService likesService;
 
+    @Autowired
+    private MenuService menuService;
+
     @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.GET)
-    public ModelAndView restaurant(@ModelAttribute("loggedUser") final User loggedUser, @ModelAttribute("reservationForm") final ReservationForm form,
+    public ModelAndView restaurant(@ModelAttribute("loggedUser") final User loggedUser,
+            @ModelAttribute("reservationForm") final ReservationForm form,
+            @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
             @PathVariable("restaurantId") final long restaurantId) {
         final ModelAndView mav = new ModelAndView("restaurant");
 
@@ -86,12 +96,14 @@ public class RestaurantController {
     }
 
     @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.POST)
-    public ModelAndView register(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("reservationForm") final ReservationForm form,
+    public ModelAndView register(@ModelAttribute("loggedUser") final User loggedUser,
+            @Valid @ModelAttribute("reservationForm") final ReservationForm form,
+             @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
             final BindingResult errors, @PathVariable("restaurantId") final long restaurantId,
             RedirectAttributes redirectAttributes) {
 
         if (errors.hasErrors()) {
-            return restaurant(loggedUser, form, restaurantId);
+            return restaurant(loggedUser, form, menuForm, restaurantId);
         }
 
         User user;
@@ -110,6 +122,31 @@ public class RestaurantController {
         return new ModelAndView("redirect:/");
     }
 
+    @RequestMapping(path = { "/restaurant/{restaurantId}/menu" }, method = RequestMethod.POST)
+    public ModelAndView addMenu(@ModelAttribute("loggedUser") final User loggedUser,
+             @ModelAttribute("reservationForm") final ReservationForm form,
+             @Valid @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
+            final BindingResult errors, @PathVariable("restaurantId") final long restaurantId,
+            RedirectAttributes redirectAttributes) {
+        if(errors.hasErrors()) {
+            return restaurant(loggedUser, form, menuForm, restaurantId);
+        }
+        if (loggedUser != null) {
+            boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
+            if (isTheRestaurantOwner) {
+                LOGGER.debug("{} is the owner at /restaurant/{}", loggedUser.getName(), restaurantId );
+                MenuItem item = new MenuItem(
+                        menuForm.getName(),
+                        menuForm.getDescription(),
+                        menuForm.getPrice());
+                menuService.addItemToRestaurant(restaurantId, item);
+                LOGGER.debug("Owner added restaurant");
+            return new ModelAndView("redirect:/restaurant/" + restaurantId);
+            }
+        }
+        return new ModelAndView("redirect:/login");
+    }
+    
 
     @RequestMapping(path = { "/register/restaurant" }, method = RequestMethod.GET)
     public ModelAndView registerRestaurant( @ModelAttribute("loggedUser") final User loggedUser, @ModelAttribute("RestaurantForm") final RestaurantForm form) {
