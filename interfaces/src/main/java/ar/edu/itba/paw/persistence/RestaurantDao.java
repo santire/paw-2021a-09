@@ -24,7 +24,7 @@ public interface RestaurantDao {
     public void updateName(long id, String name);
     public void updateAddress(long id, String address);
     public void updatePhoneNumber(long id, String phoneNumber);
-    public void updateRestaurant(long id, String name, String address, String phoneNumber);
+    public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber);
     public void updateRating(long id, int rating);
 
 

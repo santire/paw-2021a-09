@@ -37,7 +37,7 @@
                 <form:errors path="phoneNumber" class="px-3 text-danger" element="p"/>
 
                 <form:label class="px-3 mx-auto w-100" path="profileImage">
-                    Select an image to upload 
+                    <spring:message code="restaurant.register.profileImage"/>
                 </form:label>
                 <form:input class="px-3 mx-auto w-100" type="file" path="profileImage"/>
                 <form:errors path="profileImage" class="px-3 text-danger" element="p"/>

@@ -74,8 +74,8 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     @Override
-    public void updateRestaurant(long id, String name, String address, String phoneNumber) {
-        restaurantDao.updateRestaurant(id, name, address ,phoneNumber);
+    public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber) {
+       return restaurantDao.updateRestaurant(id, name, address ,phoneNumber);
     }
 
 
