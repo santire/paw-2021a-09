@@ -1,3 +1,5 @@
+/*CREATE EXTENSION pg_trgm;*/
+
 CREATE TABLE IF NOT EXISTS users (
   user_id SERIAL PRIMARY KEY, 
   username VARCHAR(100),
@@ -16,6 +18,9 @@ CREATE TABLE IF NOT EXISTS restaurants(
   rating FLOAT,
   user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE
 );
+
+/*CREATE extension IF NOT EXISTS pg_trgm with schema pg_catalog;
+CREATE INDEX IF NOT EXISTS trgm_idx ON restaurants USING gin (name gin_trgm_ops);*/
 
 CREATE TABLE IF NOT EXISTS reservations(
   reservation_id SERIAL PRIMARY KEY,

@@ -115,10 +115,17 @@ public class RestaurantDaoImpl implements RestaurantDao {
             .stream().collect(Collectors.toList());
     }
 
-    @Override
+/*    @Override
     public List<Restaurant> getAllRestaurants(String searchTerm) {
         return jdbcTemplate
                 .query("SELECT * FROM restaurants WHERE name ILIKE ?", RESTAURANT_ROW_MAPPER, "%" + searchTerm + "%")
+                .stream().collect(Collectors.toList());
+    }*/
+
+    @Override
+    public List<Restaurant> getAllRestaurants(String searchTerm) {
+        return jdbcTemplate
+                .query("SELECT *, similarity(name, ?) AS sml FROM restaurants WHERE similarity(name, ?)>0 ORDER BY sml DESC, name", RESTAURANT_ROW_MAPPER, searchTerm, searchTerm)
                 .stream().collect(Collectors.toList());
     }
 
