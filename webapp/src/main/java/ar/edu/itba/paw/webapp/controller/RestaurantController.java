@@ -196,7 +196,7 @@ public class RestaurantController {
                 if(restaurantService.getRestaurantsFromOwner(loggedUser.getId()).isEmpty())
                     updateAuthorities(loggedUser);
 
-                return new ModelAndView("redirect:/user/edit");
+                return new ModelAndView("redirect:/restaurants/user/" + loggedUser.getId());
             }
         }
         return new ModelAndView("redirect:/403");
@@ -275,7 +275,6 @@ public class RestaurantController {
         }
         return new ModelAndView("redirect:/403");
     }
-
 
 
     // @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-name")
