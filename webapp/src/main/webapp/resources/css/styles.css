@@ -198,3 +198,10 @@ select,
 .error-actions .btn {
   margin-right: 10px;
 }
+.row {
+  display: flex;
+}
+.column {
+  flex: 50%;
+  padding: 10px;
+}
