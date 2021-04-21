@@ -9,7 +9,7 @@
   <c:forEach var="item" items="${menu}" >
     <li class="list-group-item border-0">
       <span class="col-md-10 mr-auto pull-left">${item.getName()}</span>
-      <span class="col-md-2 pl-5 ml-auto pull-right"><fmt:formatNumber value="${item.getPrice()}" type="currency" maxFractionDigits="0" /></span>
+      <span class="col-md-2 pl-5 ml-auto pull-right">$<fmt:formatNumber value="${item.getPrice()}" maxFractionDigits="0" /></span>
       <c:if test="${ item.getDescription().length() > 3 }">
         <p class="col-md-10 pull-left text-muted">${item.getDescription()}</p>
       </c:if>
