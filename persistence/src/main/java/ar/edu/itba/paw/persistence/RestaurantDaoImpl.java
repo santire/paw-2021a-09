@@ -164,10 +164,15 @@ public class RestaurantDaoImpl implements RestaurantDao {
 
     @Override
     public List<Restaurant> getAllRestaurants(String searchTerm) {
-        return jdbcTemplate
+/*        return jdbcTemplate
                 .query("SELECT *, similarity(name, ?) AS sml FROM restaurants r"
                         +
                         " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE similarity(name, ?)>0 ORDER BY sml DESC, name ", RESTAURANT_ROW_MAPPER, searchTerm, searchTerm)
+                .stream().collect(Collectors.toList());*/
+        return jdbcTemplate
+                .query("SELECT * FROM restaurants r"
+                        +
+                        " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE name ILIKE ?", RESTAURANT_ROW_MAPPER, '%' + searchTerm + '%')
                 .stream().collect(Collectors.toList());
     }
 
