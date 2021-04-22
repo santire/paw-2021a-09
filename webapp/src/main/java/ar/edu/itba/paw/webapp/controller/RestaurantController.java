@@ -98,8 +98,9 @@ public class RestaurantController {
     @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.POST)
     public ModelAndView register(@ModelAttribute("loggedUser") final User loggedUser,
             @Valid @ModelAttribute("reservationForm") final ReservationForm form,
+            final BindingResult errors,
              @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
-            final BindingResult errors, @PathVariable("restaurantId") final long restaurantId,
+            final BindingResult menuErrors, @PathVariable("restaurantId") final long restaurantId,
             RedirectAttributes redirectAttributes) {
 
         if (errors.hasErrors()) {

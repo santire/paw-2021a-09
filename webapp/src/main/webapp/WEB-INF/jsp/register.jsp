@@ -73,6 +73,11 @@
                   <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="text" path="email"/>
                 </form:label>
                 <form:errors path="email" class="px-3 text-danger" element="p"/>
+                <c:if test= "${error == 'email'}">
+                  <div class="px-3 text-danger">
+                    <spring:message code="hello.register.userForm.emailAlreadyInUse"/>
+                  </div>
+                </c:if>
             </div>
             <div>
                 <form:label class="px-3 mx-auto w-100" path="phone">
