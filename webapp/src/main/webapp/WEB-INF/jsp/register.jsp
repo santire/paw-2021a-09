@@ -34,14 +34,9 @@
                     <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="password" path="password"/>
                   </form:label>
                   <form:errors path="password" class="px-3 text-danger" element="p"/>
-                  <c:if test= "${error == 'password'}">
-                    <div class="px-3 text-danger">
-                      <spring:message code="hello.register.userForm.repeatPasswordError"/>
-                    </div>
-                  </c:if>
               </div>
               <div>
-                  <form:label class="px-3 mx-auto w-100" path="password">
+                  <form:label class="px-3 mx-auto w-100" path="repeatPassword">
                     <spring:message code="Password" />:
                     <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="password" path="repeatPassword"/>
                   </form:label>
@@ -73,11 +68,7 @@
                   <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="text" path="email"/>
                 </form:label>
                 <form:errors path="email" class="px-3 text-danger" element="p"/>
-                <c:if test= "${error == 'email'}">
-                  <div class="px-3 text-danger">
-                    <spring:message code="hello.register.userForm.emailAlreadyInUse"/>
-                  </div>
-                </c:if>
+                <form:errors path="emailInUse" class="px-3 text-danger" element="p"/>
             </div>
             <div>
                 <form:label class="px-3 mx-auto w-100" path="phone">
@@ -92,6 +83,9 @@
             <input type="submit" class="btn btn-outline-secondary btn-block w-100 mt-3 px-0 mx-auto" value='<spring:message code="SignUp" />'/>
           </div>
         </form:form>
+        <div>
+          <spring:message code="register.alreadyHaveAnAccountQuestion"/><a href="<c:url value="/login"/>"><spring:message code="register.clickHere"/></a>
+        </div>
       </div>
     </div>
 

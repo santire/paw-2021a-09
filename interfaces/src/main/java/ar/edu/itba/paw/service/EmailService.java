@@ -14,5 +14,5 @@ public interface EmailService {
     public void sendReservationEmail(User restaurantOwner, User user, Date date, long quantity);
     public void sendConfirmationEmail(User restaurantOwner, User user, Date date, long quantity);
     public void sendConfirmationEmail(Reservation reservation);
-    public void sendRegistrationEmail(String to);
+    public void sendRegistrationEmail(String to, String url);
 }

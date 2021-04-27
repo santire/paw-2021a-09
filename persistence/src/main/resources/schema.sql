@@ -64,6 +64,15 @@ CREATE TABLE IF NOT EXISTS restaurant_images(
  restaurant_id INTEGER UNIQUE REFERENCES restaurants(restaurant_id) ON DELETE CASCADE
 );
 
+/* ALTER TABLE IF EXISTS users ADD COLUMN is_active boolean; */
+
+CREATE TABLE IF NOT EXISTS verification_tokens(
+  token_id SERIAL PRIMARY KEY,
+  token VARCHAR(36) UNIQUE,
+  created_at TIMESTAMP,
+  user_id INTEGER UNIQUE REFERENCES users(user_id) ON DELETE CASCADE
+);
+
 /* CREATE TABLE IF NOT EXISTS reviews( */
   /* review_id SERIAL PRIMARY KEY, */
   /* user_rating INTEGER, */

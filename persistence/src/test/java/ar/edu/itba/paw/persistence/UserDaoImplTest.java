@@ -50,7 +50,7 @@ public class UserDaoImplTest {
 
   @Test
   public void testRegister() {
-    final User user = userDao.register(USERNAME,PASSWORD,FIRST_NAME,LAST_NAME,EMAIL,PHONE);
+    final User user = userDao.register(USERNAME,PASSWORD,FIRST_NAME,LAST_NAME,EMAIL,PHONE).get();
 
     assertEquals(USERNAME, user.getName());
     assertEquals(USERNAME, user.getUsername());

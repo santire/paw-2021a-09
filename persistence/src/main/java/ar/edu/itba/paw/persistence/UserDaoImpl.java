@@ -1,19 +1,27 @@
 package ar.edu.itba.paw.persistence;
 
-import ar.edu.itba.paw.model.Restaurant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.VerificationToken;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import javax.sql.DataSource;
+
+import java.sql.Timestamp;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
 public class UserDaoImpl implements UserDao {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserDaoImpl.class);
 
     @Autowired
     RestaurantDao restaurantDao;
@@ -28,13 +36,21 @@ public class UserDaoImpl implements UserDao {
         rs.getString("phone")
         );
 
+    private static final RowMapper<VerificationToken> TOKEN_ROW_MAPPER = (rs, rowNum) -> new VerificationToken(
+        rs.getString("token"),
+        rs.getTimestamp("created_at"),
+        rs.getLong("user_id")
+        );
+
     private JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
+    private final SimpleJdbcInsert jdbcInsertToken;
 
     @Autowired
     public UserDaoImpl(final DataSource ds) {
         jdbcTemplate = new JdbcTemplate(ds);
         jdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("users").usingGeneratedKeyColumns("user_id");
+        jdbcInsertToken = new SimpleJdbcInsert(jdbcTemplate).withTableName("verification_tokens").usingGeneratedKeyColumns("token_id");
     }
 
 
@@ -52,7 +68,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public User register(final String username,final String password,final String firstName,final String lastName,final String email,final String phone) {
+    public Optional<User> register(final String username,final String password,final String firstName,final String lastName,final String email,final String phone) {
 
 
         MapSqlParameterSource params = new MapSqlParameterSource();
@@ -62,10 +78,39 @@ public class UserDaoImpl implements UserDao {
         params.addValue("last_name", lastName);
         params.addValue("email", email);
         params.addValue("phone", phone);
+        params.addValue("is_active", false);
+        Number userId;
+        try {
+            userId = jdbcInsert.executeAndReturnKey(params);
+        } catch(DuplicateKeyException e) {
+            LOGGER.warn("Can't register, email: {} already in use", email);
+            return Optional.empty();
+        }
 
-        final Number userId = jdbcInsert.executeAndReturnKey(params);
+        return Optional.of(new User(userId.longValue(),username,password, firstName,lastName,email,phone));
+    }
 
-        return new User(userId.longValue(),username,password, firstName,lastName,email,phone);
+    @Override
+    public void assignTokenToUser(String token, Timestamp createdAt, long userId) {
+
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("token", token);
+        params.addValue("created_at", createdAt);
+        params.addValue("user_id", userId);
+
+        jdbcInsertToken.execute(params);
+    }
+
+    @Override
+    public Optional<VerificationToken> getToken(String token) {
+        return jdbcTemplate.query("SELECT * FROM verification_tokens WHERE token = ?", TOKEN_ROW_MAPPER, token)
+            .stream().findFirst();
+    }
+
+    @Override
+    public Optional<User> activateUserById(long userId) {
+        jdbcTemplate.update("UPDATE users SET is_active = true WHERE user_id = ?", userId);
+        return findById(userId);
     }
 
     @Override

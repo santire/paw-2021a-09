@@ -9,8 +9,10 @@ public class User {
   private String lastName;
   private String email;
   private String phone;
+  private boolean active;
 
-  public User(long id, String username, String password, String firstName, String lastName, String email, String phone) {
+  public User(long id, String username, String password, String firstName, String lastName, String email,
+      String phone) {
     this.id = id;
     this.username = username;
     this.password = password;
@@ -20,10 +22,17 @@ public class User {
     this.phone = phone;
   }
 
+  public boolean isActive() {
+    return active;
+  }
+
+  public void setActive(boolean active) {
+    this.active = active;
+  }
+
   public long getId() {
     return this.id;
   }
-
 
   public String getUsername() {
     return this.username;
@@ -32,6 +41,7 @@ public class User {
   public String getName() {
     return this.username;
   }
+
   public void setUsername(String username) {
     this.username = username;
   }
@@ -75,7 +85,5 @@ public class User {
   public void setPhone(String phone) {
     this.phone = phone;
   }
-
-
 
 }

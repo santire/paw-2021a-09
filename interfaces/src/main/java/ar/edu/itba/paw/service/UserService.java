@@ -16,6 +16,8 @@ public interface UserService {
 
   public boolean isTheRestaurantOwner(long userId,long restaurantId);
 
+  public User activateUserByToken(String token);
+
   public void updatePassword(long id, String password);
   public void updateUsername(long id, String username);
   public void updateFistName(long id, String first_name);

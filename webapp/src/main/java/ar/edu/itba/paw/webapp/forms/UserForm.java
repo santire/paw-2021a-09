@@ -7,8 +7,6 @@ import javax.validation.constraints.Size;
 
 public class UserForm {
 
-
-
   @Size(min = 6, max = 100)
   @Pattern(regexp = "[a-zA-Z0-9]+")
   private String username;
@@ -26,9 +24,12 @@ public class UserForm {
   private String lastName;
 
   @Size(min = 6, max = 100)
-  //@Pattern(regexp = "/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/")
+  // @Pattern(regexp =
+  // "/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/")
   @Email
   private String email;
+
+  private boolean emailInUse;
 
   @Size(min = 6, max = 15)
   private String phone;
@@ -36,6 +37,13 @@ public class UserForm {
   public UserForm() {
   }
 
+  public boolean isEmailInUse() {
+    return emailInUse;
+  }
+
+  public void setEmailInUse(boolean emailInUse) {
+    this.emailInUse = emailInUse;
+  }
 
   public String getUsername() {
     return this.username;
@@ -92,4 +100,5 @@ public class UserForm {
   public void setPhone(String phone) {
     this.phone = phone;
   }
+
 }

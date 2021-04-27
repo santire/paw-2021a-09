@@ -5,6 +5,8 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
 
+import java.util.Optional;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -51,7 +53,8 @@ public class UserServiceImplTest {
     Mockito.eq(PHONE)
     
     )).thenReturn(
-      new User(1, USERNAME,PASSWORD,FIRST_NAME,LAST_NAME,EMAIL,PHONE));
+      Optional.of(new User(1, USERNAME,PASSWORD,FIRST_NAME,LAST_NAME,EMAIL,PHONE)));
+
     Mockito.when(encoder.encode(PASSWORD)).thenReturn(PASSWORD);
 
     User user = userService.register(USERNAME,PASSWORD,FIRST_NAME,LAST_NAME,EMAIL,PHONE);
