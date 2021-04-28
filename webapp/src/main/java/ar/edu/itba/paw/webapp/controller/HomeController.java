@@ -68,7 +68,10 @@ public class HomeController {
         final ModelAndView mav = new ModelAndView("restaurants");
         if (search != null) {
             search = search.trim().replaceAll("[^a-zA-Z0-9 ()'´¨!]", "");
+        }else {
+            search = "";
         }
+
         mav.addObject("userIsSearching", !search.isEmpty());
         mav.addObject("searchString", search);
         mav.addObject("restaurants", restaurantService.getAllRestaurants(search));
@@ -152,13 +155,7 @@ public class HomeController {
     @RequestMapping("/login")
     public ModelAndView login(@RequestParam(value = "error", required = false) final String error) {
         final ModelAndView mav = new ModelAndView("login");
-
-        if (error != null) {
-            mav.addObject("error", true);
-        }
-        else{
-            mav.addObject("error", false);
-        }
+        mav.addObject("error", error!=null);
 
         return mav;
     }

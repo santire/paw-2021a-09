@@ -7,8 +7,10 @@ CREATE TABLE IF NOT EXISTS users (
   first_name VARCHAR(100),
   last_name VARCHAR(100),
   email VARCHAR(100) UNIQUE,
-  phone VARCHAR(100)
+  phone VARCHAR(100),
+  is_active BOOLEAN
  );
+/* ALTER TABLE IF EXISTS users ADD COLUMN is_active boolean; */
 
 CREATE TABLE IF NOT EXISTS restaurants(
   restaurant_id SERIAL PRIMARY KEY,
@@ -64,7 +66,6 @@ CREATE TABLE IF NOT EXISTS restaurant_images(
  restaurant_id INTEGER UNIQUE REFERENCES restaurants(restaurant_id) ON DELETE CASCADE
 );
 
-/* ALTER TABLE IF EXISTS users ADD COLUMN is_active boolean; */
 
 CREATE TABLE IF NOT EXISTS verification_tokens(
   token_id SERIAL PRIMARY KEY,

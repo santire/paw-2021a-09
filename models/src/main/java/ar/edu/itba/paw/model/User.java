@@ -12,6 +12,18 @@ public class User {
   private boolean active;
 
   public User(long id, String username, String password, String firstName, String lastName, String email,
+      String phone, boolean active) {
+    this.id = id;
+    this.username = username;
+    this.password = password;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.phone = phone;
+    this.active = active;
+  }
+
+  public User(long id, String username, String password, String firstName, String lastName, String email,
       String phone) {
     this.id = id;
     this.username = username;
@@ -20,6 +32,7 @@ public class User {
     this.lastName = lastName;
     this.email = email;
     this.phone = phone;
+    this.active = false;
   }
 
   public boolean isActive() {

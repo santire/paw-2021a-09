@@ -33,7 +33,8 @@ public class UserDaoImpl implements UserDao {
         rs.getString("first_name"),
         rs.getString("last_name"),
         rs.getString("email"),
-        rs.getString("phone")
+        rs.getString("phone"),
+        rs.getBoolean("is_active")
         );
 
     private static final RowMapper<VerificationToken> TOKEN_ROW_MAPPER = (rs, rowNum) -> new VerificationToken(
@@ -111,6 +112,15 @@ public class UserDaoImpl implements UserDao {
     public Optional<User> activateUserById(long userId) {
         jdbcTemplate.update("UPDATE users SET is_active = true WHERE user_id = ?", userId);
         return findById(userId);
+    }
+
+    @Override
+    public void deleteToken(String token) {
+        try {
+            jdbcTemplate.update("DELETE FROM verification_tokens WHERE token = ?", token);
+        } catch (Exception e) {
+            LOGGER.error("Something went wrong deleting token {}", token);
+        }
     }
 
     @Override

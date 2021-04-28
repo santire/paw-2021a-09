@@ -29,6 +29,9 @@ public class PawUserDetailsService implements UserDetailsService {
 
         final User user = userService.findByEmail(email)
                 .orElseThrow(()-> new UsernameNotFoundException(email + " not found"));
+        if(!user.isActive()) {
+            throw new UsernameNotFoundException(email + " not activated");
+        }
 
         Collection<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));

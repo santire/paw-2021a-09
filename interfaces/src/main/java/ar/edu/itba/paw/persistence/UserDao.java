@@ -30,5 +30,6 @@ public interface UserDao {
 
 
   // DESTROY
+  public void deleteToken(String token);
 
 }

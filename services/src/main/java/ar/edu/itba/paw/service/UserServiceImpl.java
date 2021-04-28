@@ -89,8 +89,8 @@ public class UserServiceImpl implements UserService {
     });
     
     user = userDao.activateUserById(user.getId()).orElseThrow(() -> new RuntimeException("Couldn't activate user"));
+    userDao.deleteToken(token);
     return user;
-    // TODO: delete codes -> @Scheduled, after each or both?
   }
 
   @Override
