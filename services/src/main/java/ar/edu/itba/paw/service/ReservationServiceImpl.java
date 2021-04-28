@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.service;
 
 import ar.edu.itba.paw.model.Reservation;
+import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.persistence.ReservationDao;
 import ar.edu.itba.paw.persistence.UserDao;
@@ -25,12 +26,20 @@ public class ReservationServiceImpl implements ReservationService{
     private RestaurantService restaurantService;
 
     @Override
-    public List<Reservation> findByUser(int userId) {
-        return reservationDao.findByUser(userId);
+    public List<Reservation> findByUser(long userId) {
+        List<Reservation> reservations = reservationDao.findByUser(userId);
+        Optional<Restaurant> restaurant;
+        for(Reservation reservation : reservations){
+            restaurant = restaurantService.findById(reservation.getRestaurantId());
+            if(restaurant.isPresent()){
+                reservation.setRestaurant(restaurant.get());
+            }
+        }
+        return reservations;
     }
 
     @Override
-    public List<Reservation> findByRestaurant(int restaurantId) {
+    public List<Reservation> findByRestaurant(long restaurantId) {
         return reservationDao.findByRestaurant(restaurantId);
     }
 

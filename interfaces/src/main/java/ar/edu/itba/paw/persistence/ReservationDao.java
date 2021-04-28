@@ -10,8 +10,8 @@ import java.util.Optional;
 
 public interface ReservationDao {
 
-    public List<Reservation> findByUser(int userId);
-    public List<Reservation> findByRestaurant(int restaurantId);
+    public List<Reservation> findByUser(long userId);
+    public List<Reservation> findByRestaurant(long restaurantId);
     public Optional<Reservation> findById(int id);
 
     public Reservation addReservation(long userId, long restaurantId, Date date, long quantity);

@@ -43,12 +43,12 @@ public class ReservationDaoImpl implements ReservationDao{
 
 
     @Override
-    public List<Reservation> findByUser(int userId) {
+    public List<Reservation> findByUser(long userId) {
         return jdbcTemplate.query("SELECT * FROM reservations WHERE user_id = ?", RESERVATION_ROW_MAPPER, userId).stream().collect(Collectors.toList());
     }
 
     @Override
-    public List<Reservation> findByRestaurant(int restaurantId) {
+    public List<Reservation> findByRestaurant(long restaurantId) {
         return jdbcTemplate.query("SELECT * FROM reservations WHERE reservation_id = ?", RESERVATION_ROW_MAPPER, restaurantId).stream().collect(Collectors.toList());
     }
 
@@ -59,7 +59,7 @@ public class ReservationDaoImpl implements ReservationDao{
     }
 
     @Override
-    public Reservation addReservation( long userId, long restaurantId, Date date, long quantity) {
+    public Reservation addReservation(long userId, long restaurantId, Date date, long quantity) {
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("user_id", userId);
