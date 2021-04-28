@@ -79,4 +79,10 @@ public class ReservationDaoImpl implements ReservationDao{
 
         return jdbcTemplate.update(sql, args) == 1;
     }
+
+    @Override
+    public Optional<Reservation> modifyReservation(int reservationId, Date date, long quantity){
+        jdbcTemplate.update("UPDATE reservations SET date = ?, quantity = ? WHERE reservation_id = ?", date, quantity, reservationId);
+        return findById(reservationId);
+    }
 }

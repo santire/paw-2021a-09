@@ -17,4 +17,6 @@ public interface ReservationService {
     public Reservation addReservation(long userId, long restaurantId, Date date, long quantity);
 
     public boolean cancelReservation(int id);
+
+    public Optional<Reservation> modifyReservation(int reservationId, Date date, long quantity);
 }

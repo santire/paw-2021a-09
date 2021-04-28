@@ -60,4 +60,9 @@ public class ReservationServiceImpl implements ReservationService{
     public boolean cancelReservation(int id) {
         return reservationDao.cancelReservation(id);
     }
+
+    @Override
+    public Optional<Reservation> modifyReservation(int reservationId, Date date, long quantity){
+        return reservationDao.modifyReservation(reservationId, date, quantity);
+    }
 }
