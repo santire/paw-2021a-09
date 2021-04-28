@@ -39,6 +39,10 @@ import ar.edu.itba.paw.webapp.exceptions.RestaurantNotFoundException;
 
 import java.util.*;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 
 @Controller
 public class RestaurantController {
@@ -103,6 +107,14 @@ public class RestaurantController {
             final BindingResult menuErrors, @PathVariable("restaurantId") final long restaurantId,
             RedirectAttributes redirectAttributes) {
 
+        if (form != null && errors != null) {
+            int currentHours = LocalTime.now().getHour();
+            if (form.getDate() <= currentHours) {
+                errors.rejectValue("date",
+                                    "reservationForm.date",
+                                    "Date is before current time");
+            }
+        }
         if (errors.hasErrors()) {
             return restaurant(loggedUser, form, menuForm, restaurantId);
         }
@@ -112,12 +124,10 @@ public class RestaurantController {
         if (maybeUser.isPresent()) {
             user = maybeUser.get();
         } else {
-            user = userService.register(form.getEmail());
+            return new ModelAndView("redirect:/register");
         }
-        Date date = new Date();
-        date.setHours(form.getDate());
-        date.setMinutes(0);
-        date.setSeconds(0);
+        LocalDateTime todayAtDate = LocalDate.now().atTime(form.getDate(), 0);
+        Date date = Date.from(todayAtDate.atZone(ZoneId.systemDefault()).toInstant());
         reservationService.addReservation(user.getId(), restaurantId, date, Long.parseLong(form.getQuantity()));
         redirectAttributes.addFlashAttribute("madeReservation", true);
         return new ModelAndView("redirect:/");
