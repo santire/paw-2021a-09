@@ -9,12 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -56,5 +56,23 @@ public class ReservationController {
             return new ModelAndView("redirect:/reservations");
         }
         else return new ModelAndView("redirect:/login");
+    }
+
+    @RequestMapping(path = "/reservations/{reservationId}/modify", method = RequestMethod.POST)
+    public ModelAndView modifyReservation(@ModelAttribute("loggedUser") final User loggedUser,
+                                          @PathVariable("reservationId") final int reservationId,
+                                          @RequestParam("quantity") final int quantity){
+        SimpleDateFormat dateformat2 = new SimpleDateFormat("yyyy-M-dd hh:mm:ss");
+        String date = "2021-05-20 11:35:42";
+        if(loggedUser != null){
+            try{
+                Date newDate = dateformat2.parse(date);
+                reservationService.modifyReservation(reservationId, newDate, quantity);
+                return new ModelAndView("redirect:/reservations");
+            } catch (ParseException e){
+                e.printStackTrace();
+            }
+        }
+        return new ModelAndView("redirect:/login");
     }
 }
