@@ -2,6 +2,7 @@ package ar.edu.itba.paw.webapp.forms;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Email;
@@ -17,6 +18,7 @@ public class ReservationForm {
 
     @Size(min=1, max=15)
     @NumberFormat
+    @Pattern(regexp = "[0-9]+")
     private String quantity;
 
     @Email

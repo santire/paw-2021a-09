@@ -313,6 +313,9 @@ public class RestaurantController {
             final ModelAndView mav =  new ModelAndView("manageRestaurant");
             Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
             if(restaurant.isPresent()){
+                if(restaurant.get().getUserId() != loggedUser.getId()){
+                    return new ModelAndView("redirect:/403");
+                }
                 mav.addObject("restaurant", restaurant.get());
                 List<Reservation> reservations = reservationService.findByRestaurant(restaurantId);
                 if(reservations.isEmpty()){
