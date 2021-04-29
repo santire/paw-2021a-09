@@ -29,6 +29,7 @@
               value="${emailPlaceholder}"
               cssClass="form-control"
               aria-label="Ingrese su email"
+              readonly="true"
             />
           </div>
         </form:label>

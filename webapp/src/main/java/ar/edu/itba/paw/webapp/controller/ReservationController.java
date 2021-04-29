@@ -22,13 +22,8 @@ public class ReservationController {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private ReservationService reservationService;
 
-    @Autowired
-    private RestaurantService restaurantService;
 
     @RequestMapping("/reservations")
     public ModelAndView userReservations(@ModelAttribute("loggedUser") final User loggedUser){
@@ -43,6 +38,7 @@ public class ReservationController {
                 mav.addObject("userHasReservations", true);
             }
             mav.addObject("reservations", reservations);
+            mav.addObject("isOwner", false);
             return mav;
         }
         else return new ModelAndView("redirect:/login");
@@ -72,6 +68,18 @@ public class ReservationController {
             } catch (ParseException e){
                 e.printStackTrace();
             }
+        }
+        return new ModelAndView("redirect:/login");
+    }
+
+    @RequestMapping(path = "/reservations/{restaurantId}/{reservationId}/cancel", method = RequestMethod.POST)
+    public ModelAndView cancelReservationFromOwner(@ModelAttribute("loggedUser") final User loggedUser,
+                                                   @PathVariable("restaurantId") final long restaurantId,
+                                                   @PathVariable("reservationId") final int reservationId,
+                                                   @RequestParam("cancellationMessage") final String cancellationMessage){
+        if(loggedUser != null){
+            reservationService.cancelReservation(reservationId);
+            return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage");
         }
         return new ModelAndView("redirect:/login");
     }

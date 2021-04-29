@@ -25,10 +25,10 @@
                   <h2 class="display-5"><spring:message code="restaurants.search.restaurantsFound"/>${searchString}</h2>
                 </c:when>
                 <c:otherwise>
-                  <h2 class="display-5"><spring:message code="restaurants.allRestaurants"/></h2>
+                  <h2 class="display-5 mt-5"><spring:message code="restaurants.allRestaurants"/></h2>
                 </c:otherwise>
               </c:choose>
-              <div class="row row-cols-1 row-cols-md-4 row-cols-lg-5">
+              <div class="row row-cols-1 row-cols-md-4 row-cols-lg-5 mt-5">
                 <c:forEach var="restaurant" items="${restaurants}" >
                   <div class="col mb-4">
                     <sc:restaurantCard

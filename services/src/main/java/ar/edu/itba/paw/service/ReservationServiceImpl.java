@@ -40,7 +40,15 @@ public class ReservationServiceImpl implements ReservationService{
 
     @Override
     public List<Reservation> findByRestaurant(long restaurantId) {
-        return reservationDao.findByRestaurant(restaurantId);
+        List<Reservation> reservations =  reservationDao.findByRestaurant(restaurantId);
+        Optional<Restaurant> restaurant;
+        for(Reservation reservation : reservations){
+            restaurant = restaurantService.findById(reservation.getRestaurantId());
+            if(restaurant.isPresent()){
+                reservation.setRestaurant(restaurant.get());
+            }
+        }
+        return reservations;
     }
 
     @Override

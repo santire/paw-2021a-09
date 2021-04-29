@@ -16,6 +16,7 @@
                                     <div class="row mt-5">
                                         <sc:reservationCard
                                                 reservation="${reservation}"
+                                                isOwner="${isOwner}"
                                         />
                                     </div>
                                 </c:forEach>
