@@ -67,7 +67,7 @@ public class EmailServiceImpl implements EmailService {
         Email email = new Email();
         email.setMailTo(to);
         email.setMailSubject("Your reservation has been cancelled");
-        email.setMailContent("Your reservation for " + restaurant.getName() + "has been cancelled. " +
+        email.setMailContent("Your reservation for " + restaurant.getName() + " has been cancelled. " +
                 "The restaurant also sent you this message:\n" + message);
         sendEmail(email);
     }

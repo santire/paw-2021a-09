@@ -90,18 +90,19 @@ public class ReservationController {
                                                    @PathVariable("reservationId") final int reservationId,
                                                    @RequestParam("cancellationMessage") final String cancellationMessage){
         if(loggedUser != null){
-            reservationService.cancelReservation(reservationId);
             Optional<Reservation> reservation = reservationService.findById(reservationId);
             if(reservation.isPresent()){
                 Optional<User> userToCancel = userService.findById(reservation.get().getUserId());
                 if(userToCancel.isPresent()){
                     Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
                     if(restaurant.isPresent()){
+                        reservationService.cancelReservation(reservationId);
                         emailService.sendCancellationEmail(userToCancel.get().getEmail(), restaurant.get(), cancellationMessage);
+                        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage");
                     }
                 }
             }
-            return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage");
+            return new ModelAndView("redirect:/400");
         }
         return new ModelAndView("redirect:/login");
     }
