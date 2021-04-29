@@ -313,7 +313,7 @@ public class RestaurantController {
             final ModelAndView mav =  new ModelAndView("manageRestaurant");
             Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
             if(restaurant.isPresent()){
-                mav.addObject(restaurant.get());
+                mav.addObject("restaurant", restaurant.get());
                 List<Reservation> reservations = reservationService.findByRestaurant(restaurantId);
                 if(reservations.isEmpty()){
                     mav.addObject("restaurantHasReservations", false);

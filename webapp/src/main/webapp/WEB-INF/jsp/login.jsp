@@ -44,7 +44,7 @@
                         </label>
                   </div>
                   <div>
-                    <input type="submit" class="btn btn-outline-secondary btn-block w-100 mt-3 px-0 mx-auto" value='<spring:message code="hello.login.signin" />'>
+                    <input type="submit" class="btn btn-outline-secondary btn-block w-100 mt-3 px-0 mx-auto" value='<spring:message code="hello.register.userForm.submit" />'>
                   </div>
               </div>
             </form>

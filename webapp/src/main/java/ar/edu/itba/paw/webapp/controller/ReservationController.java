@@ -1,7 +1,9 @@
 package ar.edu.itba.paw.webapp.controller;
 
 import ar.edu.itba.paw.model.Reservation;
+import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.service.EmailService;
 import ar.edu.itba.paw.service.ReservationService;
 import ar.edu.itba.paw.service.RestaurantService;
 import ar.edu.itba.paw.service.UserService;
@@ -16,13 +18,23 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class ReservationController {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
+    private RestaurantService restaurantService;
+
+    @Autowired
     private ReservationService reservationService;
+
+    @Autowired
+    private EmailService emailService;
 
 
     @RequestMapping("/reservations")
@@ -79,6 +91,16 @@ public class ReservationController {
                                                    @RequestParam("cancellationMessage") final String cancellationMessage){
         if(loggedUser != null){
             reservationService.cancelReservation(reservationId);
+            Optional<Reservation> reservation = reservationService.findById(reservationId);
+            if(reservation.isPresent()){
+                Optional<User> userToCancel = userService.findById(reservation.get().getUserId());
+                if(userToCancel.isPresent()){
+                    Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
+                    if(restaurant.isPresent()){
+                        emailService.sendCancellationEmail(userToCancel.get().getEmail(), restaurant.get(), cancellationMessage);
+                    }
+                }
+            }
             return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage");
         }
         return new ModelAndView("redirect:/login");

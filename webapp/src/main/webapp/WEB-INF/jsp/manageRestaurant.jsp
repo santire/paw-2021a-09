@@ -11,17 +11,17 @@
                     <h2 class="display-5 mt-5"><spring:message code="restaurant.manage.title"/> ${restaurant.getName()}</h2>
                     <ul class="nav nav-pills nav-fill navtop mt-5">
                         <li class="nav-item">
-                            <a class="nav-link active"  href="#reservations" data-toggle="pill" role="tab">Reservations</a>
+                            <a class="nav-link active"  href="#reservations" data-toggle="pill" role="tab"><spring:message code="restaurant.manage.reservationTab"/></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#reviews" data-toggle="pill" role="tab">Reviews</a>
+                            <a class="nav-link" href="#reviews" data-toggle="pill" role="tab"><spring:message code="restaurant.manage.reviewsTab"/></a>
                         </li>
                     </ul>
                     <div class="tab-content mt-5">
                         <div class="tab-pane fade show active" role="tabpanel" id="reservations">
                             <c:choose>
                                 <c:when test="${restaurantHasReservations}">
-                                    <h2 class="display-5 text-center mt-5"><spring:message code="myReservations.title" /></h2>
+                                    <h2 class="display-5 text-center mt-5"><spring:message code="restaurant.manage.reservationsTitle" /></h2>
                                     <c:forEach var="reservation" items="${reservations}">
                                         <div class="row mt-5">
                                             <sc:reservationCard

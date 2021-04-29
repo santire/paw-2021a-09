@@ -49,7 +49,7 @@ public class ReservationDaoImpl implements ReservationDao{
 
     @Override
     public List<Reservation> findByRestaurant(long restaurantId) {
-        return jdbcTemplate.query("SELECT * FROM reservations WHERE reservation_id = ?", RESERVATION_ROW_MAPPER, restaurantId).stream().collect(Collectors.toList());
+        return jdbcTemplate.query("SELECT * FROM reservations WHERE restaurant_id = ?", RESERVATION_ROW_MAPPER, restaurantId).stream().collect(Collectors.toList());
     }
 
     @Override
