@@ -34,6 +34,9 @@ import ar.edu.itba.paw.webapp.forms.UserForm;
 public class HomeController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HomeController.class);
+    private static final int AMOUNT_OF_RESTAURANTS = 6;
+    private static final int AMOUNT_OF_POPULAR_RESTAURANTS = 10;
+    private static final int POPULAR_MIN_RATING = 8;
 
     @Autowired
     private UserService userService;
@@ -57,7 +60,7 @@ public class HomeController {
             page=1;
         }
 
-        List<Restaurant> popularRestaurants = restaurantService.getPopularRestaurants(10, 8);
+        List<Restaurant> popularRestaurants = restaurantService.getPopularRestaurants(AMOUNT_OF_POPULAR_RESTAURANTS, POPULAR_MIN_RATING);
         mav.addObject("popularRestaurants", popularRestaurants);
         LOGGER.debug("Amount of popular restaurants: {}", popularRestaurants.size());
 
@@ -81,7 +84,7 @@ public class HomeController {
 
         // Catching invalid page value and setting it at max or min 
         // depending on the overflow direction
-        int maxPages = restaurantService.getAllRestaurantPagesCount(6, search);
+        int maxPages = restaurantService.getAllRestaurantPagesCount(AMOUNT_OF_RESTAURANTS, search);
         if(page == null || page <1) {
             page=1;
         }else if (page > maxPages) {
@@ -91,7 +94,7 @@ public class HomeController {
         mav.addObject("userIsSearching", !search.isEmpty());
         mav.addObject("searchString", search);
         mav.addObject("maxPages", maxPages);
-        mav.addObject("restaurants", restaurantService.getAllRestaurants(page, 6, search));
+        mav.addObject("restaurants", restaurantService.getAllRestaurants(page, AMOUNT_OF_RESTAURANTS, search));
         mav.addObject("page", page);
         return mav;
     }

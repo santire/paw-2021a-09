@@ -112,7 +112,7 @@ public class RestaurantDaoImpl implements RestaurantDao {
     // READ
 
     @Override
-    public Optional<Restaurant> findById(long id) {
+    public Optional<Restaurant> findById(long id, int menuPage, int amountOnMenuPage) {
         return jdbcTemplate.query(
                 " SELECT r.*, m.menu_item_id, m.name as menu_item_name, m.description, m.price, m.restaurant_id, i.image_data"
                 + 
@@ -122,8 +122,26 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 +
                 " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id"
                 +
-                "  WHERE r.restaurant_id = ?",
-                RESTAURANT_NESTED_MAPPER, id).stream().findFirst();
+                "  WHERE r.restaurant_id = ?"
+                +
+                " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"
+                ,RESTAURANT_NESTED_MAPPER, id, (menuPage-1)*amountOnMenuPage, amountOnMenuPage).stream().findFirst();
+    }
+
+    @Override
+    public int findByIdMenuPagesCount(int amountOnMenuPage, long id) {
+
+        return jdbcTemplate.query(
+                " SELECT CEILING(COUNT(m.menu_item_id)/?)+1 as c"
+                + 
+                " FROM restaurants r"
+                +
+                " LEFT JOIN menu_items m ON r.restaurant_id = m.restaurant_id"
+                +
+                "  WHERE r.restaurant_id = ?"
+                ,(r, n) -> r.getInt("c"), amountOnMenuPage, id)
+                .stream().findFirst().orElse(0);
+
     }
 
     @Override
@@ -155,12 +173,12 @@ public class RestaurantDaoImpl implements RestaurantDao {
 
     @Override
     public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm) {
-        Optional<Integer> maybeCount = jdbcTemplate.query(
+        return jdbcTemplate.query(
                 "SELECT CEILING(COUNT(*)/?)+1 as c FROM restaurants"
                 + 
                 " WHERE name ILIKE ?"
-                ,(r, n) -> r.getInt("c"), amountOnPage, '%' + searchTerm + '%').stream().findFirst();
-        return maybeCount.orElse(0);
+                ,(r, n) -> r.getInt("c"), amountOnPage, '%' + searchTerm + '%')
+                .stream().findFirst().orElse(0);
     }
 
     @Override
