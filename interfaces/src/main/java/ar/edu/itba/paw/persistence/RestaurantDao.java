@@ -14,8 +14,10 @@ public interface RestaurantDao {
     public boolean setImageByRestaurantId(Image image, long restaurantId);
 
     // READ
-    public Optional<Restaurant> findById(long id, int menuPage, int amountOnMenuPage);
-    public int findByIdMenuPagesCount(int amountOnMenuPage, long id);
+    public Optional<Restaurant> findById(long id);
+
+    public Optional<Restaurant> findByIdWithMenu(long id, int menuPage, int amountOnMenuPage);
+    public int findByIdWithMenuPagesCount(int amountOnMenuPage, long id);
 
     public List<Restaurant> getAllRestaurants(int page, int amountOnPage, String searchTerm);
     public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm);

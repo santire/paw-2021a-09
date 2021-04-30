@@ -112,7 +112,22 @@ public class RestaurantDaoImpl implements RestaurantDao {
     // READ
 
     @Override
-    public Optional<Restaurant> findById(long id, int menuPage, int amountOnMenuPage) {
+    public Optional<Restaurant> findById(long id) {
+        return jdbcTemplate.query(
+                "SELECT r.*, i.image_data"
+                +
+                " FROM restaurants r"
+                +
+                " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id"
+                +
+                " WHERE restaurant_id=?"
+                , RESTAURANT_ROW_MAPPER, id)
+                .stream().findFirst();
+
+    }
+
+    @Override
+    public Optional<Restaurant> findByIdWithMenu(long id, int menuPage, int amountOnMenuPage) {
         return jdbcTemplate.query(
                 " SELECT r.*, m.menu_item_id, m.name as menu_item_name, m.description, m.price, m.restaurant_id, i.image_data"
                 + 
@@ -125,11 +140,12 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 "  WHERE r.restaurant_id = ?"
                 +
                 " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"
-                ,RESTAURANT_NESTED_MAPPER, id, (menuPage-1)*amountOnMenuPage, amountOnMenuPage).stream().findFirst();
+                ,RESTAURANT_NESTED_MAPPER, id, (menuPage-1)*amountOnMenuPage, amountOnMenuPage)
+                .stream().findFirst();
     }
 
     @Override
-    public int findByIdMenuPagesCount(int amountOnMenuPage, long id) {
+    public int findByIdWithMenuPagesCount(int amountOnMenuPage, long id) {
 
         return jdbcTemplate.query(
                 " SELECT CEILING(COUNT(m.menu_item_id)/?)+1 as c"

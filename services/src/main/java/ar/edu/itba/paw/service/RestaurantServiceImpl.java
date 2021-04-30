@@ -16,13 +16,18 @@ public class RestaurantServiceImpl implements RestaurantService{
     private RestaurantDao restaurantDao;
 
     @Override
-    public Optional<Restaurant> findById(long id, int menuPage, int amountOnMenuPage){
-        return this.restaurantDao.findById(id, menuPage, amountOnMenuPage);
+    public Optional<Restaurant> findById(long id) {
+        return this.restaurantDao.findById(id);
+    }
+
+    @Override
+    public Optional<Restaurant> findByIdWithMenu(long id, int menuPage, int amountOnMenuPage){
+        return this.restaurantDao.findByIdWithMenu(id, menuPage, amountOnMenuPage);
     }
     
     @Override
-    public int findByIdMenuPagesCount(int amountOnMenuPage, long id) {
-        return restaurantDao.findByIdMenuPagesCount(amountOnMenuPage, id);
+    public int findByIdWithMenuPagesCount(int amountOnMenuPage, long id) {
+        return restaurantDao.findByIdWithMenuPagesCount(amountOnMenuPage, id);
     }
 
     @Override
