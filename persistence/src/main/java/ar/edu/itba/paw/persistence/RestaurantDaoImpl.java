@@ -120,7 +120,7 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 +
                 " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id"
                 +
-                " WHERE restaurant_id=?"
+                " WHERE r.restaurant_id=?"
                 , RESTAURANT_ROW_MAPPER, id)
                 .stream().findFirst();
 

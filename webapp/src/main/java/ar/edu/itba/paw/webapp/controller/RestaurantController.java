@@ -73,7 +73,7 @@ public class RestaurantController {
             @PathVariable("restaurantId") final long restaurantId) {
         final ModelAndView mav = new ModelAndView("restaurant");
 
-        int maxPages = restaurantService.findByIdMenuPagesCount(AMOUNT_OF_MENU_ITEMS, restaurantId);
+        int maxPages = restaurantService.findByIdWithMenuPagesCount(AMOUNT_OF_MENU_ITEMS, restaurantId);
 
         if(page == null || page <1) {
             page=1;
@@ -96,7 +96,7 @@ public class RestaurantController {
         }
 
         mav.addObject("restaurant",
-                restaurantService.findById(restaurantId, page, AMOUNT_OF_MENU_ITEMS).orElseThrow(RestaurantNotFoundException::new));
+                restaurantService.findByIdWithMenu(restaurantId, page, AMOUNT_OF_MENU_ITEMS).orElseThrow(RestaurantNotFoundException::new));
         return mav;
     }
 
@@ -105,7 +105,9 @@ public class RestaurantController {
             @Valid @ModelAttribute("reservationForm") final ReservationForm form,
             final BindingResult errors,
              @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
-            final BindingResult menuErrors, @PathVariable("restaurantId") final long restaurantId,
+            final BindingResult menuErrors, 
+            @RequestParam(defaultValue="1") Integer page,
+            @PathVariable("restaurantId") final long restaurantId,
             RedirectAttributes redirectAttributes) {
 
         if (form != null && errors != null) {
@@ -117,7 +119,7 @@ public class RestaurantController {
             }
         }
         if (errors.hasErrors()) {
-            return restaurant(loggedUser, form, menuForm, restaurantId);
+            return restaurant(loggedUser, form, menuForm,page, restaurantId);
         }
 
         User user;
@@ -138,10 +140,13 @@ public class RestaurantController {
     public ModelAndView addMenu(@ModelAttribute("loggedUser") final User loggedUser,
              @ModelAttribute("reservationForm") final ReservationForm form,
              @Valid @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
-            final BindingResult errors, @PathVariable("restaurantId") final long restaurantId,
-            RedirectAttributes redirectAttributes) {
+             final BindingResult errors, 
+             @RequestParam(defaultValue="1") Integer page,
+             @PathVariable("restaurantId") final long restaurantId,
+             RedirectAttributes redirectAttributes) {
+
         if(errors.hasErrors()) {
-            return restaurant(loggedUser, form, menuForm, restaurantId);
+            return restaurant(loggedUser, form, menuForm, page, restaurantId);
         }
         if (loggedUser != null) {
             boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
