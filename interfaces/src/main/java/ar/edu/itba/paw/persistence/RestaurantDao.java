@@ -16,9 +16,10 @@ public interface RestaurantDao {
     // READ
     public Optional<Restaurant> findById(long id);
     public List<Restaurant> findByName(String name);
-    public List<Restaurant> getAllRestaurants();
-    public List<Restaurant> getAllRestaurants(String searchTerm);
-    public List<Restaurant> getPopularRestaurants();
+    public List<Restaurant> getAllRestaurants(int page, int amountOnPage);
+    public List<Restaurant> getAllRestaurants(int page, int amountOnPage, String searchTerm);
+    public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm);
+    public List<Restaurant> getPopularRestaurants(int limit, int minValue);
 
     // UPDATE
     public void updateName(long id, String name);

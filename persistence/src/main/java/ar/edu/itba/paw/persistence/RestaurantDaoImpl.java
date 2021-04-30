@@ -142,49 +142,69 @@ public class RestaurantDaoImpl implements RestaurantDao {
     }
 
     @Override
-    public List<Restaurant> getAllRestaurants() {
+    public List<Restaurant> getAllRestaurants(int page, int amountOnPage) {
         return jdbcTemplate.query(
                 "SELECT * FROM restaurants r"
                 +
                 " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id"
-                , RESTAURANT_ROW_MAPPER).stream()
+                +
+                " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"
+                ,RESTAURANT_ROW_MAPPER, (page-1)*amountOnPage, amountOnPage).stream()
                 .collect(Collectors.toList());
     }
 
-/*    @Override
-    public List<Restaurant> getAllRestaurants(String searchTerm) {
+    @Override
+    public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm) {
+        Optional<Integer> maybeCount = jdbcTemplate.query(
+                "SELECT CEILING(COUNT(*)/?)+1 as c FROM restaurants"
+                + 
+                " WHERE name ILIKE ?"
+                ,(r, n) -> r.getInt("c"), amountOnPage, '%' + searchTerm + '%').stream().findFirst();
+        return maybeCount.orElse(0);
+    }
+
+    @Override
+    public List<Restaurant> getAllRestaurants(int page, int amountOnPage, String searchTerm) {
         return jdbcTemplate
             .query(
                 "SELECT * FROM restaurants r"
                 +
-                " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE name ILIKE ?"
-                , RESTAURANT_ROW_MAPPER, "%" + searchTerm.trim() + "%")
-                .stream().collect(Collectors.toList());
-    }*/
-
-    @Override
-    public List<Restaurant> getAllRestaurants(String searchTerm) {
-/*        return jdbcTemplate
-                .query("SELECT *, similarity(name, ?) AS sml FROM restaurants r"
-                        +
-                        " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE similarity(name, ?)>0 ORDER BY sml DESC, name ", RESTAURANT_ROW_MAPPER, searchTerm, searchTerm)
-                .stream().collect(Collectors.toList());*/
-        return jdbcTemplate
-                .query("SELECT * FROM restaurants r"
-                        +
-                        " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE name ILIKE ?", RESTAURANT_ROW_MAPPER, '%' + searchTerm + '%')
+                " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id"
+                +
+                " WHERE name ILIKE ?"
+                +
+                " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"
+                , RESTAURANT_ROW_MAPPER, "%" + searchTerm.trim() + "%", (page-1)*amountOnPage, amountOnPage)
                 .stream().collect(Collectors.toList());
     }
+
+    // @Override
+    // public List<Restaurant> getAllRestaurants(String searchTerm) {
+       // return jdbcTemplate
+                // .query("SELECT *, similarity(name, ?) AS sml FROM restaurants r"
+                        // +
+                        // " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE similarity(name, ?)>0 ORDER BY sml DESC, name ", RESTAURANT_ROW_MAPPER, searchTerm, searchTerm)
+                // .stream().collect(Collectors.toList());
+        // return jdbcTemplate
+                // .query("SELECT * FROM restaurants r"
+                        // +
+                        // " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE name ILIKE ?", RESTAURANT_ROW_MAPPER, '%' + searchTerm + '%')
+                // .stream().collect(Collectors.toList());
+    // }
 
     // TODO: this would probably be better as getRestaurantsByMinRating and
     // pass the rating as an argument
     @Override
-    public List<Restaurant> getPopularRestaurants() {
+    public List<Restaurant> getPopularRestaurants(int limit, int minValue) {
         return jdbcTemplate.query(
                 "SELECT * FROM restaurants r"
                 +
-                " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE rating >= 9"
-                , RESTAURANT_ROW_MAPPER).stream()
+                " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE rating >= ?"
+                +
+                " ORDER BY rating DESC"
+                +
+                " FETCH NEXT ? ROWS ONLY"
+                , RESTAURANT_ROW_MAPPER, minValue, limit).stream()
                 .collect(Collectors.toList());
     }
 

@@ -34,24 +34,6 @@
             <a class="nav-link" href="<c:url value="/restaurants/user/${loggedUser.getId()}"/>"><spring:message code="navbar.myRestaurants" /></a>
           </li>
         </c:if>
-        <li class="nav-item ${hide} dropdown" style="visibility: hidden;">
-          <a
-            class="nav-link dropdown-toggle"
-            href="#"
-            id="navbarDropdown"
-            role="button"
-            data-toggle="dropdown"
-            aria-haspopup="true"
-            aria-expanded="false"
-          >
-            Categorias
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="#">Italiana</a>
-            <a class="dropdown-item" href="#">Parrilla</a>
-            <a class="dropdown-item" href="#">Asiatica</a>
-          </div>
-        </li>
       </ul>
 
       <form id="search-bar" class="nav-item ${hide} bg-light rounded mx-auto my-2 my-lg-0" action="<c:url value="/restaurants"/>">

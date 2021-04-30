@@ -42,19 +42,25 @@ public class RestaurantServiceImpl implements RestaurantService{
     // READ
 
     @Override
-    public List<Restaurant> getAllRestaurants(){
-        return this.restaurantDao.getAllRestaurants();
+    public List<Restaurant> getAllRestaurants(int page, int amountOnPage){
+        return this.restaurantDao.getAllRestaurants(page, amountOnPage);
     }
 
     @Override
-    public List<Restaurant> getAllRestaurants(String searchTerm){
-        return this.restaurantDao.getAllRestaurants(searchTerm);
+    public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm) {
+        return this.restaurantDao.getAllRestaurantPagesCount(amountOnPage, searchTerm);
     }
 
 
     @Override
-    public List<Restaurant> getPopularRestaurants(){
-        return this.restaurantDao.getPopularRestaurants();
+    public List<Restaurant> getAllRestaurants(int page, int amountOnPage, String searchTerm){
+        return this.restaurantDao.getAllRestaurants(page, amountOnPage, searchTerm);
+    }
+
+
+    @Override
+    public List<Restaurant> getPopularRestaurants(int limit, int minValue){
+        return this.restaurantDao.getPopularRestaurants(limit,  minValue);
     }
 
     // UPDATE
