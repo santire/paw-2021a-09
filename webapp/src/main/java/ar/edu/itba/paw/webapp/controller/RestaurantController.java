@@ -45,12 +45,7 @@ public class RestaurantController {
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
-
-
-
-	private static final String MenuItem = null;
-
-
+    private static final int AMOUNT_OF_MENU_ITEMS = 5;
 
     @Autowired
     private UserService userService;
@@ -74,8 +69,18 @@ public class RestaurantController {
     public ModelAndView restaurant(@ModelAttribute("loggedUser") final User loggedUser,
             @ModelAttribute("reservationForm") final ReservationForm form,
             @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
+            @RequestParam(defaultValue="1") Integer page,
             @PathVariable("restaurantId") final long restaurantId) {
         final ModelAndView mav = new ModelAndView("restaurant");
+
+        int maxPages = restaurantService.findByIdMenuPagesCount(AMOUNT_OF_MENU_ITEMS, restaurantId);
+
+        if(page == null || page <1) {
+            page=1;
+        }else if (page > maxPages) {
+            page = maxPages;
+        }
+        mav.addObject("maxPages", maxPages);
 
         if(loggedUser != null){
             Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
@@ -91,7 +96,7 @@ public class RestaurantController {
         }
 
         mav.addObject("restaurant",
-                restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new));
+                restaurantService.findById(restaurantId, page, AMOUNT_OF_MENU_ITEMS).orElseThrow(RestaurantNotFoundException::new));
         return mav;
     }
 

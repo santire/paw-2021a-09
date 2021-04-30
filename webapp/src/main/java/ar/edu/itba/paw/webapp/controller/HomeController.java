@@ -34,6 +34,9 @@ import ar.edu.itba.paw.webapp.forms.UserForm;
 public class HomeController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HomeController.class);
+    private static final int AMOUNT_OF_RESTAURANTS = 6;
+    private static final int AMOUNT_OF_POPULAR_RESTAURANTS = 10;
+    private static final int POPULAR_MIN_RATING = 8;
 
     @Autowired
     private UserService userService;
@@ -49,9 +52,15 @@ public class HomeController {
 
 
     @RequestMapping("/")
-    public ModelAndView helloWorld(@ModelAttribute("loggedUser") final User loggedUser) {
+    public ModelAndView helloWorld(@ModelAttribute("loggedUser") final User loggedUser, 
+            @RequestParam(defaultValue = "1") Integer page) {
         final ModelAndView mav = new ModelAndView("home");
-        List<Restaurant> popularRestaurants = restaurantService.getPopularRestaurants();
+
+        if(page == null || page <1) {
+            page=1;
+        }
+
+        List<Restaurant> popularRestaurants = restaurantService.getPopularRestaurants(AMOUNT_OF_POPULAR_RESTAURANTS, POPULAR_MIN_RATING);
         mav.addObject("popularRestaurants", popularRestaurants);
         LOGGER.debug("Amount of popular restaurants: {}", popularRestaurants.size());
 
@@ -63,7 +72,8 @@ public class HomeController {
     }
 
     @RequestMapping("/restaurants")
-    public ModelAndView restaurants(@RequestParam(required = false) String search) {
+    public ModelAndView restaurants(@RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(required = false) String search) {
 
         final ModelAndView mav = new ModelAndView("restaurants");
         if (search != null) {
@@ -72,9 +82,20 @@ public class HomeController {
             search = "";
         }
 
+        // Catching invalid page value and setting it at max or min 
+        // depending on the overflow direction
+        int maxPages = restaurantService.getAllRestaurantPagesCount(AMOUNT_OF_RESTAURANTS, search);
+        if(page == null || page <1) {
+            page=1;
+        }else if (page > maxPages) {
+            page = maxPages;
+        }
+
         mav.addObject("userIsSearching", !search.isEmpty());
         mav.addObject("searchString", search);
-        mav.addObject("restaurants", restaurantService.getAllRestaurants(search));
+        mav.addObject("maxPages", maxPages);
+        mav.addObject("restaurants", restaurantService.getAllRestaurants(page, AMOUNT_OF_RESTAURANTS, search));
+        mav.addObject("page", page);
         return mav;
     }
 
@@ -106,12 +127,13 @@ public class HomeController {
         // if there are errors it goes back to the register form without losing data
         // but letting the user know it has errors
         if(form != null && errors != null){
-            if(!form.getPassword().equals(form.getRepeatPassword())) {
+            if(form.getPassword() == null || !form.getPassword().equals(form.getRepeatPassword())) {
                 errors.rejectValue("repeatPassword", 
                                     "userForm.repeatPassword",
                                     "Passwords do not match");
             }
-            if (!form.getEmail().trim().isEmpty() && userService.findByEmail(form.getEmail()).isPresent()){
+            if (form.getEmail() == null || !form.getEmail().trim().isEmpty() 
+                    && userService.findByEmail(form.getEmail()).isPresent()){
                 errors.rejectValue("emailInUse", 
                                     "userForm.emailInUse",
                                     "Email is already in use");

@@ -16,8 +16,13 @@ public class RestaurantServiceImpl implements RestaurantService{
     private RestaurantDao restaurantDao;
 
     @Override
-    public Optional<Restaurant> findById(long id){
-        return this.restaurantDao.findById(id);
+    public Optional<Restaurant> findById(long id, int menuPage, int amountOnMenuPage){
+        return this.restaurantDao.findById(id, menuPage, amountOnMenuPage);
+    }
+    
+    @Override
+    public int findByIdMenuPagesCount(int amountOnMenuPage, long id) {
+        return restaurantDao.findByIdMenuPagesCount(amountOnMenuPage, id);
     }
 
     @Override
@@ -42,19 +47,25 @@ public class RestaurantServiceImpl implements RestaurantService{
     // READ
 
     @Override
-    public List<Restaurant> getAllRestaurants(){
-        return this.restaurantDao.getAllRestaurants();
+    public List<Restaurant> getAllRestaurants(int page, int amountOnPage){
+        return this.restaurantDao.getAllRestaurants(page, amountOnPage);
     }
 
     @Override
-    public List<Restaurant> getAllRestaurants(String searchTerm){
-        return this.restaurantDao.getAllRestaurants(searchTerm);
+    public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm) {
+        return this.restaurantDao.getAllRestaurantPagesCount(amountOnPage, searchTerm);
     }
 
 
     @Override
-    public List<Restaurant> getPopularRestaurants(){
-        return this.restaurantDao.getPopularRestaurants();
+    public List<Restaurant> getAllRestaurants(int page, int amountOnPage, String searchTerm){
+        return this.restaurantDao.getAllRestaurants(page, amountOnPage, searchTerm);
+    }
+
+
+    @Override
+    public List<Restaurant> getPopularRestaurants(int limit, int minValue){
+        return this.restaurantDao.getPopularRestaurants(limit,  minValue);
     }
 
     // UPDATE

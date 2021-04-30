@@ -32,6 +32,7 @@ public class RestaurantDaoImplTest {
     // General purpose
     private static final int INSERTED_SIZE = 3;
     private static final int NEW_RATING = 3;
+    private static final int AMOUNT_ON_PAGE = 6;
 
     // Restaurant to search
     private static final long ID = 1;
@@ -79,7 +80,7 @@ public class RestaurantDaoImplTest {
 
     @Test
     public void testListAllRestaurants(){
-        List<Restaurant> restaurantList = restaurantDao.getAllRestaurants();
+        List<Restaurant> restaurantList = restaurantDao.getAllRestaurants(1, AMOUNT_ON_PAGE);
         assertEquals(INSERTED_SIZE, restaurantList.size());
     }
 

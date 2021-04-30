@@ -56,6 +56,10 @@
         <ul class="list-group list-group-flush">
           <sc:menu menu="${restaurant.getMenu()}" />
         </ul>
+      <c:url value="/restaurant/${restaurant.getId()}" var="url"/>
+      <div class="mx-auto">
+        <sc:pagination baseUrl="${url}" page="${param.page}" pages="${maxPages}"/>
+      </div>
       </c:otherwise>
     </c:choose>
   </div>
