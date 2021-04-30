@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.model;
 
 import java.util.Date;
+import java.util.Optional;
 
 public class Reservation {
 
@@ -10,6 +11,8 @@ public class Reservation {
     private Date date;
     private long quantity;
 
+    private Restaurant restaurant;
+
     public Reservation(long id, long userId, long restaurantId, Date date, long quantity) {
         this.id = id;
         this.userId = userId;
@@ -17,6 +20,15 @@ public class Reservation {
         this.date = date;
         this.quantity = quantity;
     }
+    public Reservation(long id, long userId, long restaurantId, Date date, long quantity, Restaurant restaurant) {
+        this.id = id;
+        this.userId = userId;
+        this.restaurantId = restaurantId;
+        this.date = date;
+        this.quantity = quantity;
+        this.restaurant = restaurant;
+    }
+
 
     public Reservation(long userId, long restaurantId, Date date, long quantity) {
         this.userId = userId;
@@ -65,4 +77,7 @@ public class Reservation {
         this.quantity = quantity;
     }
 
+    public void setRestaurant(Restaurant restaurant) { this.restaurant = restaurant; }
+
+    public Restaurant getRestaurant() { return restaurant; }
 }

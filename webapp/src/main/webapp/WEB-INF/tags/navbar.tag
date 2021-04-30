@@ -33,6 +33,9 @@
           <li class="nav-item ${hide}">
             <a class="nav-link" href="<c:url value="/restaurants/user/${loggedUser.getId()}"/>"><spring:message code="navbar.myRestaurants" /></a>
           </li>
+          <li class="nav-item ${hide}">
+            <a class="nav-link" href="<c:url value="/reservations"/>"><spring:message code="navbar.myReservations" /></a>
+          </li>
         </c:if>
         <li class="nav-item ${hide} dropdown" style="visibility: hidden;">
           <a
@@ -113,6 +116,7 @@
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                       <a class="dropdown-item" href="<c:url value="/register/restaurant"/>"><spring:message code="navbar.registerRestaurant" /></a>
+                      <div class="dropdown-divider"></div>
                       <a class="dropdown-item" href="<c:url value="/logout"/>"><spring:message code="navbar.logout" /></a>
                 </ul>
             </c:otherwise>

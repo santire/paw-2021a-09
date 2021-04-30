@@ -1,10 +1,6 @@
 package ar.edu.itba.paw.webapp.controller;
 
-import ar.edu.itba.paw.model.Image;
-import ar.edu.itba.paw.model.Rating;
-import ar.edu.itba.paw.model.Restaurant;
-import ar.edu.itba.paw.model.User;
-import ar.edu.itba.paw.model.MenuItem;
+import ar.edu.itba.paw.model.*;
 
 import javax.validation.Valid;
 
@@ -306,6 +302,35 @@ public class RestaurantController {
             }
 
             return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
+        }
+        return new ModelAndView("redirect:/403");
+    }
+
+    @RequestMapping(path={"/restaurant/{restaurantId}/manage"})
+    public ModelAndView manageRestaurant(@ModelAttribute("loggedUser") final User loggedUser,
+                                       @PathVariable("restaurantId") final long restaurantId) {
+        if (loggedUser != null) {
+            final ModelAndView mav =  new ModelAndView("manageRestaurant");
+            Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
+            if(restaurant.isPresent()){
+                if(restaurant.get().getUserId() != loggedUser.getId()){
+                    return new ModelAndView("redirect:/403");
+                }
+                mav.addObject("restaurant", restaurant.get());
+                List<Reservation> reservations = reservationService.findByRestaurant(restaurantId);
+                if(reservations.isEmpty()){
+                    mav.addObject("restaurantHasReservations", false);
+                }
+                else{
+                    mav.addObject("restaurantHasReservations", true);
+                    mav.addObject("reservations", reservations);
+                    mav.addObject("isOwner", true);
+                }
+                return mav;
+            }
+            else{
+                return new ModelAndView("redirect:/404");
+            }
         }
         return new ModelAndView("redirect:/403");
     }

@@ -43,13 +43,13 @@ public class ReservationDaoImpl implements ReservationDao{
 
 
     @Override
-    public List<Reservation> findByUser(int userId) {
+    public List<Reservation> findByUser(long userId) {
         return jdbcTemplate.query("SELECT * FROM reservations WHERE user_id = ?", RESERVATION_ROW_MAPPER, userId).stream().collect(Collectors.toList());
     }
 
     @Override
-    public List<Reservation> findByRestaurant(int restaurantId) {
-        return jdbcTemplate.query("SELECT * FROM reservations WHERE reservation_id = ?", RESERVATION_ROW_MAPPER, restaurantId).stream().collect(Collectors.toList());
+    public List<Reservation> findByRestaurant(long restaurantId) {
+        return jdbcTemplate.query("SELECT * FROM reservations WHERE restaurant_id = ?", RESERVATION_ROW_MAPPER, restaurantId).stream().collect(Collectors.toList());
     }
 
     @Override
@@ -59,7 +59,7 @@ public class ReservationDaoImpl implements ReservationDao{
     }
 
     @Override
-    public Reservation addReservation( long userId, long restaurantId, Date date, long quantity) {
+    public Reservation addReservation(long userId, long restaurantId, Date date, long quantity) {
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("user_id", userId);
@@ -78,5 +78,11 @@ public class ReservationDaoImpl implements ReservationDao{
         Object[] args = new Object[] {id};
 
         return jdbcTemplate.update(sql, args) == 1;
+    }
+
+    @Override
+    public Optional<Reservation> modifyReservation(int reservationId, Date date, long quantity){
+        jdbcTemplate.update("UPDATE reservations SET date = ?, quantity = ? WHERE reservation_id = ?", date, quantity, reservationId);
+        return findById(reservationId);
     }
 }
