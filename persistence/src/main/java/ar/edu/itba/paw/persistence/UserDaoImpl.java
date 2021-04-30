@@ -57,6 +57,32 @@ public class UserDaoImpl implements UserDao {
 
 
     @Override
+    public boolean isTheRestaurantOwner(long userId, long restaurantId) {
+
+        return jdbcTemplate.query(
+                "SELECT COUNT(*) as c"
+                +
+                " FROM restaurants"
+                +
+                " WHERE user_id = ? AND restaurant_id = ?"
+                ,(r,n) -> r.getInt("c"), userId, restaurantId)
+                .stream().findFirst().orElse(0) > 0;
+    }
+
+    @Override
+    public boolean isRestaurantOwner(long userId) {
+
+        return jdbcTemplate.query(
+                "SELECT COUNT(*) as c"
+                +
+                " FROM restaurants"
+                +
+                " WHERE user_id = ?"
+                ,(r,n) -> r.getInt("c"), userId)
+                .stream().findFirst().orElse(0) > 0;
+    }
+
+    @Override
     public Optional<User> findById(long id) {
         return jdbcTemplate.query("SELECT * FROM users WHERE user_id = ?", USER_ROW_MAPPER, id)
             .stream().findFirst();

@@ -108,13 +108,12 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public boolean isTheRestaurantOwner(long userId, long restaurantId) {
-    List<Restaurant> restaurants = restaurantService.getRestaurantsFromOwner(userId);
-    for (Restaurant r: restaurants) {
-      if(r.getId() == restaurantId){
-        return true;
-      }
-    }
-    return false;
+    return userDao.isTheRestaurantOwner(userId, restaurantId);
+  }
+
+  @Override
+  public boolean isRestaurantOwner(long userId) {
+     return userDao.isRestaurantOwner(userId);
   }
 
   @Override

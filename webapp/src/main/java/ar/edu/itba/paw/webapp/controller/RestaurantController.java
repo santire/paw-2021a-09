@@ -46,6 +46,7 @@ public class RestaurantController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
     private static final int AMOUNT_OF_MENU_ITEMS = 5;
+    private static final int AMOUNT_OF_RESTAURANTS = 10;
 
     @Autowired
     private UserService userService;
@@ -122,17 +123,15 @@ public class RestaurantController {
             return restaurant(loggedUser, form, menuForm,page, restaurantId);
         }
 
-        User user;
-        Optional<User> maybeUser = userService.findByEmail(form.getEmail());
-        if (maybeUser.isPresent()) {
-            user = maybeUser.get();
+        if (loggedUser != null) {
+            LocalDateTime todayAtDate = LocalDate.now().atTime(form.getDate(), 0);
+            Date date = Date.from(todayAtDate.atZone(ZoneId.systemDefault()).toInstant());
+            reservationService.addReservation(loggedUser.getId(), restaurantId, date, Long.parseLong(form.getQuantity()));
+            redirectAttributes.addFlashAttribute("madeReservation", true);
         } else {
             return new ModelAndView("redirect:/register");
         }
-        LocalDateTime todayAtDate = LocalDate.now().atTime(form.getDate(), 0);
-        Date date = Date.from(todayAtDate.atZone(ZoneId.systemDefault()).toInstant());
-        reservationService.addReservation(user.getId(), restaurantId, date, Long.parseLong(form.getQuantity()));
-        redirectAttributes.addFlashAttribute("madeReservation", true);
+
         return new ModelAndView("redirect:/");
     }
 
@@ -240,16 +239,15 @@ public class RestaurantController {
 
 
     @RequestMapping(path = { "/restaurant/{restaurantId}/delete" })
-    public ModelAndView deleteRestaurant(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId) {
+    public ModelAndView deleteRestaurant(@ModelAttribute("loggedUser") final User loggedUser, 
+            @PathVariable("restaurantId") final long restaurantId) {
 
         if (loggedUser != null) {
-        List<Restaurant> restaurants = restaurantService.getRestaurantsFromOwner(loggedUser.getId());
-
             if(userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId)){
                 restaurantService.deleteRestaurantById(restaurantId);
-                if(restaurantService.getRestaurantsFromOwner(loggedUser.getId()).isEmpty())
+                if(userService.isRestaurantOwner(loggedUser.getId())){
                     updateAuthorities(loggedUser);
-
+                }
                 return new ModelAndView("redirect:/restaurants/user/" + loggedUser.getId());
             }
         }
@@ -347,11 +345,23 @@ public class RestaurantController {
 
 
     @RequestMapping("/restaurants/user/{userId}")
-    public ModelAndView userRestaurants(@ModelAttribute("loggedUser") final User loggedUser,
-                                        @PathVariable("userId") final long userId) {
+    public ModelAndView userRestaurants(
+            @ModelAttribute("loggedUser") final User loggedUser,
+            @PathVariable("userId") final long userId,
+            @RequestParam(defaultValue = "1") Integer page) {
+
+        // Shouldn't be able to get here unless logged it but just in case
         if(loggedUser != null){
             final ModelAndView mav = new ModelAndView("myRestaurants");
-            List<Restaurant> restaurants = restaurantService.getRestaurantsFromOwner(userId);
+            int maxPages = restaurantService.getRestaurantsFromOwnerPagesCount(AMOUNT_OF_RESTAURANTS, userId);
+
+            if(page == null || page <1) {
+                page=1;
+            }else if (page > maxPages) {
+                page = maxPages;
+            }
+            mav.addObject("maxPages", maxPages);
+            List<Restaurant> restaurants = restaurantService.getRestaurantsFromOwner(page, AMOUNT_OF_RESTAURANTS, userId);
             mav.addObject("userHasRestaurants", !restaurants.isEmpty());
             mav.addObject("restaurants", restaurants);
             return mav;
@@ -396,7 +406,7 @@ public class RestaurantController {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             Collection<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-            if(!restaurantService.getRestaurantsFromOwner(loggedUser.getId()).isEmpty()){
+            if(userService.isRestaurantOwner(loggedUser.getId())){
                 authorities.add(new SimpleGrantedAuthority("ROLE_RESTAURANTOWNER"));
             }
             Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);

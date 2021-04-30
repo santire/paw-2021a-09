@@ -17,6 +17,9 @@ public interface UserDao {
   public Optional<User> findByEmail(String email);
   public Optional<VerificationToken> getToken(String token);
 
+  public boolean isTheRestaurantOwner(long userId, long restaurantId);
+  public boolean isRestaurantOwner(long userId);
+
   // UPDATE
   public Optional<User> activateUserById(long userId);
   public void updateUser(long id, String username, String password, String first_name, String last_name, String email, String phone);

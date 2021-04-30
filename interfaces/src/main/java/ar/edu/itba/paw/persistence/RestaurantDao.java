@@ -22,6 +22,9 @@ public interface RestaurantDao {
     public List<Restaurant> getAllRestaurants(int page, int amountOnPage, String searchTerm);
     public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm);
 
+    public List<Restaurant> getRestaurantsFromOwner(int page, int amountOnPage, long userId);
+    public int getRestaurantsFromOwnerPagesCount(int amountOnPage, long userId);
+
     public List<Restaurant> getPopularRestaurants(int limit, int minValue);
 
     public List<Restaurant> getAllRestaurants(int page, int amountOnPage);
@@ -40,6 +43,5 @@ public interface RestaurantDao {
     public boolean deleteRestaurantByName(String name);
 
     public Optional<User> findRestaurantOwner(long id);
-    public List<Restaurant> getRestaurantsFromOwner(long userId);
     
 }

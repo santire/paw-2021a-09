@@ -58,7 +58,7 @@
         </ul>
       <c:url value="/restaurant/${restaurant.getId()}" var="url"/>
       <div class="mx-auto">
-        <sc:pagination baseUrl="${url}" page="${param.page}" pages="${maxPages}"/>
+        <sc:pagination baseUrl="${url}" pages="${maxPages}"/>
       </div>
       </c:otherwise>
     </c:choose>

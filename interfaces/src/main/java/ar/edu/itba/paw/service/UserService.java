@@ -14,6 +14,8 @@ public interface UserService {
 
   public Optional<User> findByEmail(String email);
 
+  public boolean isRestaurantOwner(long userId);
+
   public boolean isTheRestaurantOwner(long userId,long restaurantId);
 
   public User activateUserByToken(String token);

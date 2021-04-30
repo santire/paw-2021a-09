@@ -139,6 +139,8 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 +
                 "  WHERE r.restaurant_id = ?"
                 +
+                " ORDER BY menu_item_id DESC"
+                +
                 " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"
                 ,RESTAURANT_NESTED_MAPPER, id, (menuPage-1)*amountOnMenuPage, amountOnMenuPage)
                 .stream().findFirst();
@@ -186,6 +188,30 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 ,RESTAURANT_ROW_MAPPER, (page-1)*amountOnPage, amountOnPage).stream()
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<Restaurant> getRestaurantsFromOwner(int page, int amountOnPage, long userId) {
+        return jdbcTemplate.query(
+                "SELECT * FROM restaurants r"
+                +
+                " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id"
+                +
+                " WHERE user_id = ?"
+                +
+                " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"
+                , RESTAURANT_ROW_MAPPER, userId, (page-1)*amountOnPage, amountOnPage).stream()
+                .collect(Collectors.toList());
+    }
+
+   @Override
+   public int getRestaurantsFromOwnerPagesCount(int amountOnPage, long userId) {
+        return jdbcTemplate.query(
+                "SELECT CEILING(COUNT(*)/?)+1 as c FROM restaurants"
+                +
+                " WHERE user_id = ?"
+                , (r,s) -> r.getInt("c"), amountOnPage, userId)
+                .stream().findFirst().orElse(0);
+   }
 
     @Override
     public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm) {
@@ -295,14 +321,5 @@ public class RestaurantDaoImpl implements RestaurantDao {
         return userDao.findById(userId);
     }
 
-    @Override
-    public List<Restaurant> getRestaurantsFromOwner(long userId) {
-        return jdbcTemplate.query(
-                "SELECT * FROM restaurants r"
-                +
-                " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE user_id = ?"
-                , RESTAURANT_ROW_MAPPER, userId).stream()
-                .collect(Collectors.toList());
-    }
 
 }

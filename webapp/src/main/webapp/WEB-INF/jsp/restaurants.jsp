@@ -85,7 +85,7 @@
                 </div>
                   <c:url value="/restaurants" var="url"/>
                   <div class="mx-auto">
-                    <sc:pagination baseUrl="${url}" page="${page}" pages="${maxPages}"/>
+                    <sc:pagination baseUrl="${url}" pages="${maxPages}"/>
                   </div>
               </div>
             </c:otherwise>

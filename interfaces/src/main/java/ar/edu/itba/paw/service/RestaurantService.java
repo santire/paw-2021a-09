@@ -19,6 +19,9 @@ public interface RestaurantService {
     public Optional<Restaurant> findByIdWithMenu(long id, int menuPage, int amountOnMenuPage);
     public int findByIdWithMenuPagesCount(int amountOnMenuPage, long id);
 
+    public List<Restaurant> getRestaurantsFromOwner(int page, int amountOnPage, long userId);
+    public int getRestaurantsFromOwnerPagesCount(int amountOnPage, long userId);
+
     public List<Restaurant> getAllRestaurants(int page, int amountOnPage, String searchTerm);
     public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm);
     public List<Restaurant> getPopularRestaurants(int limit, int minValue);
@@ -37,5 +40,4 @@ public interface RestaurantService {
     public boolean deleteRestaurantByName(String name);
 
     public Optional<User> findRestaurantOwner(long id);
-    public List<Restaurant> getRestaurantsFromOwner(long userId);
 }
