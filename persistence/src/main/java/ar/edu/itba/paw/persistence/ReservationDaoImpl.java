@@ -66,7 +66,7 @@ public class ReservationDaoImpl implements ReservationDao{
                 " FROM reservations"
                 +
                 " WHERE user_id = ?"
-                ,(r,n) -> r.getInt("c"), userId, amountOnPage)
+                ,(r,n) -> r.getInt("c"), amountOnPage, userId)
                 .stream().findFirst().orElse(0);
 
     }
@@ -96,7 +96,7 @@ public class ReservationDaoImpl implements ReservationDao{
                 " FROM reservations"
                 +
                 " WHERE restaurant_id = ?"
-                ,(r,n) -> r.getInt("c"), restaurantId, amountOnPage)
+                ,(r,n) -> r.getInt("c"), amountOnPage, restaurantId)
                 .stream().findFirst().orElse(0);
     }
 

@@ -30,6 +30,10 @@
                                             />
                                         </div>
                                     </c:forEach>
+                                    <c:url value="/restaurant/${restaurantId}/manage" var="url"/>
+                                    <div class="mx-auto">
+                                        <sc:pagination baseUrl="${url}" pages="${maxPages}"/>
+                                    </div>
                                 </c:when>
                                 <c:otherwise>
                                     <h2 class="display-5 text-center mt-5"><spring:message code="restaurant.manage.noReservations" /></h2>

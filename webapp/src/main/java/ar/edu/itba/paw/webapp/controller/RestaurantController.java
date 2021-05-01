@@ -47,6 +47,7 @@ public class RestaurantController {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
     private static final int AMOUNT_OF_MENU_ITEMS = 5;
     private static final int AMOUNT_OF_RESTAURANTS = 10;
+    private static final int AMOUNT_OF_RESERVATIONS = 2;
 
     @Autowired
     private UserService userService;
@@ -315,8 +316,11 @@ public class RestaurantController {
     }
 
     @RequestMapping(path={"/restaurant/{restaurantId}/manage"})
-    public ModelAndView manageRestaurant(@ModelAttribute("loggedUser") final User loggedUser,
-                                       @PathVariable("restaurantId") final long restaurantId) {
+    public ModelAndView manageRestaurant(
+            @ModelAttribute("loggedUser") final User loggedUser,
+            @PathVariable("restaurantId") final long restaurantId,
+            @RequestParam(defaultValue = "1") Integer page) {
+
         if (loggedUser != null) {
             final ModelAndView mav =  new ModelAndView("manageRestaurant");
             Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
@@ -324,12 +328,19 @@ public class RestaurantController {
                 if(restaurant.get().getUserId() != loggedUser.getId()){
                     return new ModelAndView("redirect:/403");
                 }
+                int maxPages = reservationService.findByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
+                if(page == null || page <1) {
+                    page=1;
+                }else if (page > maxPages) {
+                    page = maxPages;
+                }
                 mav.addObject("restaurant", restaurant.get());
-                List<Reservation> reservations = reservationService.findByRestaurant(restaurantId);
+                List<Reservation> reservations = reservationService.findByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
                 if(reservations.isEmpty()){
                     mav.addObject("restaurantHasReservations", false);
                 }
                 else{
+                    mav.addObject("maxPages", maxPages);
                     mav.addObject("restaurantHasReservations", true);
                     mav.addObject("reservations", reservations);
                     mav.addObject("isOwner", true);

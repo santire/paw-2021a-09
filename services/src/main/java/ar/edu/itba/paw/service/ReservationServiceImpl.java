@@ -93,7 +93,7 @@ public class ReservationServiceImpl implements ReservationService{
     }
 	  @Override
 	  public List<Reservation> findByRestaurant(int page, int amountOnPage, long restaurantId) {
-        List<Reservation> reservations =  reservationDao.findByRestaurant(restaurantId);
+        List<Reservation> reservations =  reservationDao.findByRestaurant(page, amountOnPage, restaurantId);
         reservations.stream().forEach(r -> {
             Optional<Restaurant> restaurant = restaurantService.findById(r.getRestaurantId());
             if(restaurant.isPresent()) {
