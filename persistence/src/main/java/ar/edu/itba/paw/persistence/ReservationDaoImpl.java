@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -48,8 +47,57 @@ public class ReservationDaoImpl implements ReservationDao{
     }
 
     @Override
+    public List<Reservation> findByUser(int page, int amountOnPage, long userId) {
+        return jdbcTemplate.query(
+                "SELECT * FROM reservations"
+                +
+                " WHERE user_id = ?"
+                +
+                " OFFSET ? FETCH NEXT ? ROWS ONLY"
+                , RESERVATION_ROW_MAPPER, userId, (page-1)*amountOnPage, amountOnPage)
+                .stream().collect(Collectors.toList());
+    }
+
+    @Override
+    public int findByUserPageCount(int amountOnPage, long userId) {
+        return jdbcTemplate.query(
+                "SELECT CEILING(COUNT(*)::numeric/?) as c"
+                +
+                " FROM reservations"
+                +
+                " WHERE user_id = ?"
+                ,(r,n) -> r.getInt("c"), userId, amountOnPage)
+                .stream().findFirst().orElse(0);
+
+    }
+
+    @Override
     public List<Reservation> findByRestaurant(long restaurantId) {
         return jdbcTemplate.query("SELECT * FROM reservations WHERE restaurant_id = ?", RESERVATION_ROW_MAPPER, restaurantId).stream().collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Reservation> findByRestaurant(int page, int amountOnPage, long restaurantId) {
+        return jdbcTemplate.query(
+                "SELECT * FROM reservations"
+                +
+                " WHERE restaurant_id = ?"
+                +
+                " OFFSET ? FETCH NEXT ? ROWS ONLY"
+                , RESERVATION_ROW_MAPPER, restaurantId, (page-1)*amountOnPage, amountOnPage)
+                .stream().collect(Collectors.toList());
+    }
+
+    @Override
+    public int findByRestaurantPageCount(int amountOnPage, long restaurantId) {
+        return jdbcTemplate.query(
+                "SELECT CEILING(COUNT(*)::numeric/?) as c"
+                +
+                " FROM reservations"
+                +
+                " WHERE restaurant_id = ?"
+                ,(r,n) -> r.getInt("c"), restaurantId, amountOnPage)
+                .stream().findFirst().orElse(0);
     }
 
     @Override

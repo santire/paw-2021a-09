@@ -150,7 +150,7 @@ public class RestaurantDaoImpl implements RestaurantDao {
     public int findByIdWithMenuPagesCount(int amountOnMenuPage, long id) {
 
         return jdbcTemplate.query(
-                " SELECT CEILING(COUNT(m.menu_item_id)/?)+1 as c"
+                " SELECT CEILING(COUNT(m.menu_item_id)::numeric/?) as c"
                 + 
                 " FROM restaurants r"
                 +
@@ -206,7 +206,7 @@ public class RestaurantDaoImpl implements RestaurantDao {
    @Override
    public int getRestaurantsFromOwnerPagesCount(int amountOnPage, long userId) {
         return jdbcTemplate.query(
-                "SELECT CEILING(COUNT(*)/?)+1 as c FROM restaurants"
+                "SELECT CEILING(COUNT(*)::numeric/?) as c FROM restaurants"
                 +
                 " WHERE user_id = ?"
                 , (r,s) -> r.getInt("c"), amountOnPage, userId)
@@ -216,7 +216,7 @@ public class RestaurantDaoImpl implements RestaurantDao {
     @Override
     public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm) {
         return jdbcTemplate.query(
-                "SELECT CEILING(COUNT(*)/?)+1 as c FROM restaurants"
+                "SELECT CEILING(COUNT(*)::numeric/?) as c FROM restaurants"
                 + 
                 " WHERE name ILIKE ?"
                 ,(r, n) -> r.getInt("c"), amountOnPage, '%' + searchTerm + '%')

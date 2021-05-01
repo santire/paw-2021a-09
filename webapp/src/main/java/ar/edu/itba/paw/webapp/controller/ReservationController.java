@@ -22,7 +22,8 @@ import java.util.Optional;
 
 @Controller
 public class ReservationController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReservationController.class);
+    private static final int AMOUNT_OF_RESERVATIONS = 2;
 
     @Autowired
     private UserService userService;
@@ -38,17 +39,25 @@ public class ReservationController {
 
 
     @RequestMapping("/reservations")
-    public ModelAndView userReservations(@ModelAttribute("loggedUser") final User loggedUser){
+    public ModelAndView userReservations(
+            @ModelAttribute("loggedUser") final User loggedUser,
+            @RequestParam(defaultValue="1") Integer page){
+
         final ModelAndView mav = new ModelAndView("myReservations");
+
+        // Shouldn't get here unless logged in, but just in case
         if(loggedUser != null){
             long userId = loggedUser.getId();
-            List<Reservation> reservations = reservationService.findByUser(userId);
-            if(reservations.isEmpty()){
-                mav.addObject("userHasReservations", false);
+            int maxPages = reservationService.findByUserPageCount(AMOUNT_OF_RESERVATIONS, userId);
+            if(page == null || page <1) {
+                page=1;
+            }else if (page > maxPages) {
+                page = maxPages;
             }
-            else{
-                mav.addObject("userHasReservations", true);
-            }
+            mav.addObject("maxPages", maxPages);
+
+            List<Reservation> reservations = reservationService.findByUser(page, AMOUNT_OF_RESERVATIONS, userId);
+            mav.addObject("userHasReservations", !reservations.isEmpty());
             mav.addObject("reservations", reservations);
             mav.addObject("isOwner", false);
             return mav;

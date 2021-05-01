@@ -11,7 +11,7 @@
 <c:if test="${empty param.page or param.page le 1}">
   <c:set var="prevDisabled" value="disabled"/>
 </c:if>
-<c:if test="${param.page ge pages}">
+<c:if test="${param.page ge pages or pages eq 1}">
   <c:set var="nextDisabled" value="disabled"/>
 </c:if>
 
@@ -37,7 +37,7 @@
         <c:param name="page" value="${i}"/>
       </c:url>
       <c:choose>
-        <c:when test="${empty param.page or (not empty prevDisabled and i eq 1)}">
+        <c:when test="${empty param.page and i eq 1 or (not empty prevDisabled and i eq 1)}">
           <li class="page-item active" aria-current="page">
             <a class="page-link bg-secondary" href="${currPage}">${i}<span class="sr-only">(current)</span></a>
           </li>
@@ -47,7 +47,7 @@
             <a class="page-link bg-secondary" style="cursor: pointer;">${i}<span class="sr-only">(current)</span></a>
           </li>
         </c:when>
-        <c:when test="${not empty param.page and param.page gt pages and i eq pages}">
+        <c:when test="${not empty param.page and i eq pages and not empty nextDisabled}">
           <li class="page-item active" aria-current="page">
             <a class="page-link bg-secondary" href="${currPage}">${i}<span class="sr-only">(current)</span></a>
           </li>
@@ -64,7 +64,7 @@
         <c:if test="${not empty param.search}">
           <c:param name="search" value="${param.search}"/>
         </c:if>
-        <c:param name="page" value="${param.page + 1}"/>
+        <c:param name="page" value="${empty param.page ? 2 : param.page + 1}"/>
       </c:url>
       <a class="page-link" href="${nextPage}">
         <span class="" aria-hidden="true">&raquo;</span>
