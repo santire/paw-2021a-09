@@ -99,20 +99,6 @@ public class HomeController {
         return mav;
     }
 
-    @RequestMapping("/restaurants/mine")
-    public ModelAndView restaurants(@ModelAttribute("loggedUser") final User loggedUser) {
-        if (loggedUser != null) {
-            final ModelAndView mav = new ModelAndView("restaurants");
-            List<Restaurant> userRestaurants = restaurantService.getRestaurantsFromOwner(loggedUser.getId());
-            mav.addObject("restaurants", userRestaurants);
-            return mav;
-
-        }
-
-        return new ModelAndView("redirect:/login");
-    }
-
-
     @RequestMapping(path ={"/register"}, method = RequestMethod.GET)
     public ModelAndView registerForm(@ModelAttribute("userForm") final UserForm form,
             final BindingResult errors) {

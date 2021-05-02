@@ -15,6 +15,13 @@
             <strong><c:out value="${confirmationMessage}"/></strong> 
           </div>
         </c:if>
+        <spring:message code="user.edit.confirmationMessage" var="confirmationMessage"/>
+        <c:if test="${editedUser}">
+          <div class="alert alert-success alert-dissapear" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong><c:out value="${confirmationMessage}"/></strong> 
+          </div>
+        </c:if>
         <div class=" p-0 m-0 overflow-hidden row d-none d-lg-flex">
           <div class="column" style="background-color:#bbb; opacity: 0.7;">
             <h2 style="vertical-align : middle;text-align:left;margin-top: 150px;margin-left:80px;font-size: 50px;"><spring:message code="home.phrase"></spring:message></h2>
