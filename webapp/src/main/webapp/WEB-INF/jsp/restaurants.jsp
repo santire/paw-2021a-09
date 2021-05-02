@@ -35,7 +35,7 @@
                   <div class="card mt-2 p-0 mx-0">
                     <div class="card-body">
                       <div class="border-bottom pb-2 ml-2">
-                        <h4 id="burgundy">Filters</h4>
+                        <h4 id="burgundy"><spring:message code="restaurant.filters"/></h4>
                       </div>
 
 
@@ -67,26 +67,26 @@
                       </c:forEach>
 
                         <hr>
-
-                        <label for="minprice">min Price:</label>
+                        <span class="glyphicon glyphicon-home">
+                        <label for="minprice"><spring:message code="restaurant.filters.minPrice"/></label>
                         <input value="${minPrice}" type="number" id="minprice" name="min" min="0">
 
-                        <label for="maxprice">min Price:</label>
+                        <label for="maxprice"><spring:message code="restaurant.filters.maxPrice"/></label>
                         <input value="${maxPrice}" type="number" id="maxprice" name="max" min="0">
 
                         <hr>
-
+                        <span class="glyphicon glyphicon-search"></span>
                         <div class="form-group">
-                        <label for="exampleFormControlSelect3">Order by</label>
-                        <select name="sort" class="form-control" id="exampleFormControlSelect3">
-                          <option value="namedesc">name desc</option>
-                          <option value="nameasc">name asc</option>
-                          <option value="populardesc">popular desc</option>
-                          <option value="popularasc">popular asc</option>
-                          <option value="reservationsdesc">hot desc</option>
-                          <option value="reservationsasc">hot asc</option>
-                          <option value="pricedesc">price desc</option>
-                          <option value="priceasc">price asc</option>
+                        <label for="exampleFormControlSelect3"><spring:message code="restaurant.filters.orderBy"/></label>
+                        <select name="sortby" class="form-control" id="exampleFormControlSelect3">
+                          <option value="populardesc"><spring:message code="restaurant.filters.ratingsdesc"/></option>
+                          <option value="popularasc"><spring:message code="restaurant.filters.ratingsasc"/></option>
+                          <option value="namedesc"><spring:message code="restaurant.filters.namedesc"/></option>
+                          <option value="nameasc"><spring:message code="restaurant.filters.nameasc"/></option>
+                          <option value="reservationsdesc"><spring:message code="restaurant.filters.reservationsdesc"/></option>
+                          <option value="reservationsasc"><spring:message code="restaurant.filters.reservationsasc"/></option>
+                          <option value="pricedesc"><spring:message code="restaurant.filters.pricedesc"/></option>
+                          <option value="priceasc"><spring:message code="restaurant.filters.priceasc"/></option>
                         </select>
                       </div>
 

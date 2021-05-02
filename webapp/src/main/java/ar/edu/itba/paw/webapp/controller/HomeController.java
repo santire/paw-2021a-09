@@ -86,7 +86,9 @@ public class HomeController {
     @RequestMapping(path ={"/restaurants"}, method = RequestMethod.GET)
     public ModelAndView restaurants(@RequestParam(defaultValue = "1") Integer page,
                                     @RequestParam(required = false) String search, @RequestParam(required = false) int[] tags,
-                                    @RequestParam(defaultValue = "1") int min, @RequestParam(defaultValue = "10000") int max) {
+                                    @RequestParam(defaultValue = "1") int min, @RequestParam(defaultValue = "10000") int max,
+                                    @RequestParam(defaultValue = "namedesc") String sortby)
+                                    {
 
         final ModelAndView mav = new ModelAndView("restaurants");
         if (search != null) {
@@ -111,8 +113,38 @@ public class HomeController {
         }
         mav.addObject("tagsChecked", tagsChecked);
 
-
-
+        Sorting sort = Sorting.NAME;
+        boolean desc = true;
+        switch (sortby) {
+            case ("nameasc"):
+                sort = Sorting.NAME;
+                desc = false;
+                break;
+            case ("populardesc"):
+                sort = Sorting.RATING;
+                desc = true;
+                break;
+            case ("popularasc"):
+                sort = Sorting.RATING;
+                desc = false;
+                break;
+            case ("reservationsdesc"):
+                sort = Sorting.RESERVATIONS;
+                desc = true;
+                break;
+            case ("reservationsasc"):
+                sort = Sorting.RESERVATIONS;
+                desc = false;
+                break;
+            case ("pricedesc"):
+                sort = Sorting.PRICE;
+                desc = true;
+                break;
+            case ("priceasc"):
+                sort = Sorting.PRICE;
+                desc = false;
+                break;
+        }
 
         // Catching invalid page value and setting it at max or min
         // depending on the overflow direction
@@ -127,7 +159,7 @@ public class HomeController {
         mav.addObject("searchString", search);
         mav.addObject("maxPages", maxPages);
 
-        mav.addObject("restaurants", restaurantService.getRestaurantsFilteredBy(search, tagsSelected,min,max, Sorting.NAME, true, 7));
+        mav.addObject("restaurants", restaurantService.getRestaurantsFilteredBy(search, tagsSelected,min,max, sort, desc, 7));
         //mav.addObject("restaurants", restaurantService.getAllRestaurants(page, AMOUNT_OF_RESTAURANTS, search));
         mav.addObject("page", page);
         return mav;
