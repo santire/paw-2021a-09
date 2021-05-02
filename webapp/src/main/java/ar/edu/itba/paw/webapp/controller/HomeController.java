@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.webapp.controller;
 
 import ar.edu.itba.paw.model.Restaurant;
+import ar.edu.itba.paw.model.Tags;
 import ar.edu.itba.paw.model.User;
 
 import java.util.ArrayList;
@@ -53,6 +54,10 @@ public class HomeController {
         mav.addObject("popularRestaurants", popularRestaurants);
         LOGGER.debug("Amount of popular restaurants: {}", popularRestaurants.size());
 
+        List<Restaurant> hotRestaurants = restaurantService.getHotRestaurants(7);
+        mav.addObject("hotRestaurants", hotRestaurants);
+        LOGGER.debug("Amount of hot restaurants: {}", hotRestaurants.size());
+
         if(loggedUser != null){
             List<Restaurant> likedRestaurants = likesService.getLikedRestaurants(loggedUser.getId());
             mav.addObject("likedRestaurants", likedRestaurants);
@@ -60,14 +65,29 @@ public class HomeController {
         return mav;
     }
 
-    @RequestMapping("/restaurants")
-    public ModelAndView restaurants(@RequestParam(required = false) String search) {
+    @RequestMapping(path ={"/restaurants"}, method = RequestMethod.GET)
+    public ModelAndView restaurants(@RequestParam(required = false) String search, @RequestParam(required = false) int[] tags) {
         final ModelAndView mav = new ModelAndView("restaurants");
-        if (search == null || search.isEmpty()) {
-            mav.addObject("userIsSearching", false);
+
+
+
+        String searchStr = "";
+
+        if (search != null){
+            searchStr = search;
+        }
+
+
+
+        mav.addObject("tags", Tags.allTags());
+
+
+        if ((search == null || search.isEmpty()) && (tags ==null)) {
+          //  mav.addObject("userIsSearching", false);
             mav.addObject("restaurants", restaurantService.getAllRestaurants());
             return mav;
         }
+        /*
         mav.addObject("userIsSearching", true);
         mav.addObject("searchString", search);
         // To delete after sprint
@@ -75,9 +95,76 @@ public class HomeController {
             mav.addObject("restaurants", new ArrayList<Restaurant>());
             return mav;
         }
-        mav.addObject("restaurants", restaurantService.getAllRestaurants(search));
+*/
+        List<Tags> tagsSelected = new ArrayList<>();
+        if(tags!=null){
+            for( int i : tags){
+                if(Tags.valueOf(i) == null)
+                    return new ModelAndView("redirect:/403");
+
+                tagsSelected.add(Tags.valueOf(i));
+                System.out.println(i);
+            }
+        }
+            mav.addObject("tagsSelected", tags);
+            mav.addObject("restaurants", restaurantService.getRestaurantsFilteredBy(searchStr, tagsSelected,0,10000));
+
+
+
+
+
+
         return mav;
+
     }
+
+
+
+
+
+
+
+    @RequestMapping(path ={"/restaurants-remove-tag"})
+    public ModelAndView restaurantsRemoveTag(@RequestParam String path, @RequestParam int removetag) {
+
+        System.out.println("pedido de quite " + removetag);
+        System.out.println("path " + path);
+
+        return new ModelAndView("redirect:/restaurants?"+path);
+    }
+
+
+
+
+
+
+
+
+
+    @RequestMapping(path ={"/restaurants"}, method = RequestMethod.POST)
+    public ModelAndView restaurants(@RequestParam(required = false) String search, @RequestParam(required = false) int[] tags, @RequestParam("tag") String tag) {
+
+        String t = "";
+
+        if(tags!=null){
+            for( int i : tags){
+                t +="&tags=" + i ;
+            }}
+            t += "&tags=" +tag;
+
+
+        if(search == null)
+            return new ModelAndView("redirect:/restaurants?"+t);
+        else
+            return new ModelAndView("redirect:/restaurants?search="+search+"&"+t);
+
+    }
+
+
+
+
+
+
 
     @RequestMapping("/restaurants/mine")
     public ModelAndView restaurants(@ModelAttribute("loggedUser") final User loggedUser) {
@@ -159,5 +246,31 @@ public class HomeController {
     }
 
  */
+
+
+
+    @RequestMapping(path ={"/tagit"})
+    public ModelAndView tag() {
+        ModelAndView mav = new ModelAndView("home");
+
+
+
+
+        List<Tags> tags = new ArrayList<>();
+        tags.add(Tags.ARGENTINO);
+        tags.add(Tags.ASIATICO);
+
+
+        List<Restaurant> rests = restaurantService.getRestaurantsFilteredBy("", tags, 0, 1000);
+        for( Restaurant res : rests){
+            System.out.println("RRRRRRRRRRR " + res.getName());
+        }
+
+
+
+        return mav;
+    }
+
+
 
 }

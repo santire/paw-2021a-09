@@ -2,6 +2,7 @@ package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.model.Image;
 import ar.edu.itba.paw.model.Restaurant;
+import ar.edu.itba.paw.model.Tags;
 import ar.edu.itba.paw.model.User;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public interface RestaurantDao {
     public List<Restaurant> getAllRestaurants();
     public List<Restaurant> getAllRestaurants(String searchTerm);
     public List<Restaurant> getPopularRestaurants();
+    public List<Restaurant> getHotRestaurants(int lastDays);
 
     // UPDATE
     public void updateName(long id, String name);
@@ -34,5 +36,13 @@ public interface RestaurantDao {
 
     public Optional<User> findRestaurantOwner(long id);
     public List<Restaurant> getRestaurantsFromOwner(long userId);
+
+    public boolean addTag(long restaurantId, int tagId);
+    public boolean removeTag(long restaurantId, int tagId);
+    public List<Tags> tagsInRestaurant(long restaurantId);
+
+    public List<Restaurant> getRestaurantsWithTags(List<Tags> tags);
+
+    public List<Restaurant> getRestaurantsFilteredBy(String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice);
     
 }

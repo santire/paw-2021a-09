@@ -1,9 +1,6 @@
 package ar.edu.itba.paw.persistence;
 
-import ar.edu.itba.paw.model.Image;
-import ar.edu.itba.paw.model.MenuItem;
-import ar.edu.itba.paw.model.Restaurant;
-import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -188,6 +185,20 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<Restaurant> getHotRestaurants(int lastDays) {
+        return jdbcTemplate.query(
+                "SELECT hot.id as restaurant_id, name, address, phone_number, rating, user_id, image_data FROM( SELECT b.restaurant_id, COUNT(*) AS cant FROM reservations b"
+                        +
+                        " WHERE date- interval '"+lastDays+" DAYS' < CURRENT_TIMESTAMP GROUP BY b.restaurant_id ORDER BY cant DESC) AS hot(id,reservations) JOIN"
+                        +
+                        " (SELECT * FROM restaurants r LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id) AS rest(id, name, address, phone_number, rating, user_id, image_id, image_data, r_id)"
+                        +
+                        "ON hot.id = rest.id ORDER BY reservations DESC, rating DESC ", RESTAURANT_ROW_MAPPER).stream()
+                .collect(Collectors.toList());
+    }
+
+
     // UPDATE
 
     @Override
@@ -250,5 +261,80 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 , RESTAURANT_ROW_MAPPER, userId).stream()
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public boolean addTag(long restaurantId, int tagId) {
+        String sql = "INSERT INTO restaurant_tags(restaurant_id, tag_id) VALUES(?, ?) ";
+        Object[] args = new Object[] { restaurantId, tagId };
+
+        return jdbcTemplate.update(sql, args) == 1;
+    }
+
+    @Override
+    public boolean removeTag(long restaurantId, int tagId) {
+        String sql = "DELETE FROM restaurant_tags WHERE restaurant_id = ? AND tag_id = ?";
+        Object[] args = new Object[] { restaurantId, tagId };
+
+        return jdbcTemplate.update(sql, args) == 1;
+    }
+
+    @Override
+    public List<Tags> tagsInRestaurant(long restaurantId) {
+
+        List<Tags> tags = jdbcTemplate.query("SELECT * FROM restaurant_tags  WHERE restaurant_id =?", new Object[]{restaurantId},(rs, rowNum) ->
+                Tags.valueOf(rs.getInt("tag_id"))).stream().collect(Collectors.toList());
+
+        return tags;
+    }
+
+    @Override
+    public List<Restaurant> getRestaurantsWithTags(List<Tags> tags) {
+        String t = ",";
+
+        for(int i=0; i<tags.size(); i++){
+            t += tags.get(i).getValue();
+            if(i!=tags.size()-1)
+                t += ", ";
+        }
+
+        return jdbcTemplate.query(
+                "SELECT DISTINCT r.restaurant_id, name, address, phone_number, rating, user_id, image_data  FROM " +
+                        "(SELECT * FROM restaurants r NATURAL JOIN restaurant_tags WHERE tag_id IN ( 0"+ t +"))AS r " +
+                        "LEFT join restaurant_images i ON r.restaurant_id = i.restaurant_id"
+
+
+                , RESTAURANT_ROW_MAPPER).stream()
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Restaurant> getRestaurantsFilteredBy(String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice) {
+
+        String t = "";
+
+        if(!tags.isEmpty()){
+            t += "WHERE tag_id IN (";
+            for(int i=0; i<tags.size(); i++){
+                t += tags.get(i).getValue();
+                if(i!=tags.size()-1)
+                    t += ", ";
+            }
+            t+=")";
+        }
+
+
+        return jdbcTemplate.query(
+                "SELECT DISTINCT r.restaurant_id, name, address, phone_number, rating, user_id, image_data  FROM " +
+                        "(SELECT * FROM restaurants r NATURAL JOIN restaurant_tags "+ t +" )AS r " +
+                        "LEFT join restaurant_images i ON r.restaurant_id = i.restaurant_id " +
+                        "WHERE name ILIKE '%"+name+"%'" +
+                        "AND r.restaurant_id IN (SELECT r.restaurant_id FROM restaurants r RIGHT JOIN menu_items m ON r.restaurant_id = m.restaurant_id " +
+                        "GROUP BY r.restaurant_id HAVING AVG(price) >"+minAvgPrice+" AND AVG(price) <"+maxAvgPrice+")"
+
+                , RESTAURANT_ROW_MAPPER).stream()
+                .collect(Collectors.toList());
+
+    }
+
 
 }
