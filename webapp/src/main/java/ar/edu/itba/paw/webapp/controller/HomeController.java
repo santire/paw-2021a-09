@@ -24,6 +24,7 @@ import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.exceptions.EmailInUseException;
 import ar.edu.itba.paw.model.exceptions.TokenCreationException;
+import ar.edu.itba.paw.model.exceptions.TokenDoesNotExistException;
 import ar.edu.itba.paw.model.exceptions.TokenExpiredException;
 import ar.edu.itba.paw.service.LikesService;
 import ar.edu.itba.paw.service.RestaurantService;
@@ -155,6 +156,9 @@ public class HomeController {
         } catch(TokenExpiredException e) {
             LOGGER.error("token {} is expired", token);
             return new ModelAndView("redirect:/register").addObject("expiredToken", true);
+        }catch(TokenDoesNotExistException e) {
+            LOGGER.warn("token {} does not exist", token);
+            return new ModelAndView("activate").addObject("invalidToken", true);
         } catch(Exception e) {
             // Unexpected error happened, showing register screen with generic error message
             return new ModelAndView("redirect:/register").addObject("tokenError", true);

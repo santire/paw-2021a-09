@@ -21,6 +21,7 @@ import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.VerificationToken;
 import ar.edu.itba.paw.model.exceptions.EmailInUseException;
 import ar.edu.itba.paw.model.exceptions.TokenCreationException;
+import ar.edu.itba.paw.model.exceptions.TokenDoesNotExistException;
 import ar.edu.itba.paw.model.exceptions.TokenExpiredException;
 import ar.edu.itba.paw.persistence.UserDao;
 
@@ -69,7 +70,7 @@ public class UserServiceImpl implements UserService {
 
     Optional<VerificationToken> maybeToken = userDao.getToken(token);
 
-    VerificationToken verificationToken = maybeToken.orElseThrow(() -> new RuntimeException("Token doesn't exist"));
+    VerificationToken verificationToken = maybeToken.orElseThrow(TokenDoesNotExistException::new);
 
     Instant expiryDate = Instant.from(verificationToken.getCreatedAt().toInstant()).plus(24, ChronoUnit.HOURS);
 

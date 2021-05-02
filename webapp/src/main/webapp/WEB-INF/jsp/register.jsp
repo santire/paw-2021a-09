@@ -8,6 +8,12 @@
 
 <sc:templateLayout simpleTopBar="true">
   <jsp:body>
+    <c:if test="${not empty param.expiredToken}">
+        <div class="alert alert-danger" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong><spring:message code="errors.expiredToken"></spring:message></strong>
+        </div>
+    </c:if>
 
     <h2 class="text-center mt-4"><spring:message code="hello.register.title" /></h2>
     <div class="card border-0 mx-auto w-75">
