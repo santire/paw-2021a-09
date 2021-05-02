@@ -1,5 +1,8 @@
 package ar.edu.itba.paw.service;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ar.edu.itba.paw.exceptions.RestaurantNotFoundException;
 import ar.edu.itba.paw.exceptions.UserNotFoundException;
 import ar.edu.itba.paw.model.Email;
@@ -12,16 +15,23 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
+import java.util.Locale;
+
 
 @EnableAsync
 @Service
 public class EmailServiceImpl implements EmailService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmailServiceImpl.class);
+
 
     @Autowired
     private JavaMailSender emailSender;
@@ -31,6 +41,9 @@ public class EmailServiceImpl implements EmailService {
 
     @Autowired
     private RestaurantService restaurantService;
+
+    @Autowired
+    private MessageSource messageSource;
 
     @Async
     @Override
@@ -96,7 +109,8 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
-    public void sendConfirmationEmail(Reservation reservation) {
+    public void sendConfirmationEmail(Reservation reservation, Locale locale) {
+        LOGGER.debug("contenido locale"+locale.toString());
         Email email = new Email();
         User user = userService.findById(reservation.getUserId()).orElseThrow(UserNotFoundException::new);
         Restaurant restaurant = restaurantService.findById(reservation.getRestaurantId())

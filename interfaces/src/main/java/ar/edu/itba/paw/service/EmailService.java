@@ -6,6 +6,8 @@ import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
 
 import java.util.Date;
+import java.util.Locale;
+
 
 public interface EmailService {
 
@@ -14,6 +16,6 @@ public interface EmailService {
 
     public void sendReservationEmail(User restaurantOwner, User user, Date date, long quantity);
     public void sendConfirmationEmail(User restaurantOwner, User user, Date date, long quantity);
-    public void sendConfirmationEmail(Reservation reservation);
+    public void sendConfirmationEmail(Reservation reservation, Locale locale);
     public void sendRegistrationEmail(String to, String url);
 }

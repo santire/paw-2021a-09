@@ -6,6 +6,8 @@ import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.persistence.ReservationDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.context.i18n.LocaleContextHolder;
+
 
 import java.util.Date;
 import java.util.List;
@@ -37,7 +39,7 @@ public class ReservationServiceImpl implements ReservationService{
 
         //for now its autoconfirmed
         Reservation reservation = reservationDao.addReservation(user.getId(),restaurantId,date,quantity);
-        emailService.sendConfirmationEmail(reservation);
+        emailService.sendConfirmationEmail(reservation,LocaleContextHolder.getLocale());
 
         return reservation;
     }
