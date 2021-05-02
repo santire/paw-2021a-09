@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.VerificationToken;
+import ar.edu.itba.paw.model.exceptions.EmailInUseException;
+import ar.edu.itba.paw.model.exceptions.TokenCreationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -95,7 +97,13 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public Optional<User> register(final String username,final String password,final String firstName,final String lastName,final String email,final String phone) {
+    public User register(
+            final String username,
+            final String password,
+            final String firstName,
+            final String lastName,
+            final String email,
+            final String phone) throws EmailInUseException {
 
 
         MapSqlParameterSource params = new MapSqlParameterSource();
@@ -111,22 +119,26 @@ public class UserDaoImpl implements UserDao {
             userId = jdbcInsert.executeAndReturnKey(params);
         } catch(DuplicateKeyException e) {
             LOGGER.warn("Can't register, email: {} already in use", email);
-            return Optional.empty();
+            throw new EmailInUseException("Email "+ email +" already in use", email);
         }
 
         LOGGER.debug("INSERTED INACTIVE USER. RETURNED ID: {}", userId.longValue());
         User newUser = new User(userId.longValue(),username,password, firstName,lastName,email,phone);
-        return Optional.of(newUser);
+        return newUser;
     }
 
     @Override
-    public void assignTokenToUser(String token, Timestamp createdAt, long userId) {
+    public void assignTokenToUser(String token, Timestamp createdAt, long userId) throws TokenCreationException {
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("token", token);
         params.addValue("created_at", createdAt);
         params.addValue("user_id", userId);
-        jdbcInsertToken.execute(params);
+        try {
+            jdbcInsertToken.execute(params);
+        } catch (Exception e) {
+            throw new TokenCreationException();
+        }
     }
 
     @Override

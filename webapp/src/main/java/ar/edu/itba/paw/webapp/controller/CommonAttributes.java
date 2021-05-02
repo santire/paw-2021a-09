@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.service.UserService;
-import ar.edu.itba.paw.webapp.exceptions.UserNotFoundException;
 
 @ControllerAdvice
 public class CommonAttributes {

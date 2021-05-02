@@ -19,6 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.VerificationToken;
+import ar.edu.itba.paw.model.exceptions.EmailInUseException;
+import ar.edu.itba.paw.model.exceptions.TokenCreationException;
+import ar.edu.itba.paw.model.exceptions.TokenExpiredException;
 import ar.edu.itba.paw.persistence.UserDao;
 
 @Service
@@ -46,12 +49,9 @@ public class UserServiceImpl implements UserService {
   @Transactional
   @Override
   public User register(String username, String password, String firstName, String lastName, String email,
-      String phone) {
+      String phone) throws EmailInUseException, TokenCreationException {
 
-    Optional<User> maybeUser = userDao.register(username,encoder.encode(password), firstName, lastName, email, phone);
-    if (maybeUser.isPresent()) {
-      User user = maybeUser.get();
-
+      User user = userDao.register(username,encoder.encode(password), firstName, lastName, email, phone);
       String url = "http://pawserver.it.itba.edu.ar/paw-2021a-09/activate?token=";
 
       String token = UUID.randomUUID().toString();
@@ -60,14 +60,12 @@ public class UserServiceImpl implements UserService {
       userDao.assignTokenToUser(token, createdAt, user.getId());
 
       emailService.sendRegistrationEmail(email, url+token);
-    }
 
-    return  maybeUser.orElseThrow(UserRegistrationException::new);
+    return  user;
   }
 
   @Override
-  public User activateUserByToken(String token) {
-    // TODO: Add custom exceptions
+  public User activateUserByToken(String token) throws TokenExpiredException {
 
     Optional<VerificationToken> maybeToken = userDao.getToken(token);
 
@@ -77,7 +75,7 @@ public class UserServiceImpl implements UserService {
 
     if(Instant.now().isAfter(expiryDate)) {
       LOGGER.warn("verificationToken {} is expired", token);
-      throw new RuntimeException("Token is expired");
+      throw new TokenExpiredException();
     }
 
     Optional<User> maybeUser = userDao.findById(verificationToken.getUserId());

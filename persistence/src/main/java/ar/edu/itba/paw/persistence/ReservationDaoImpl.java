@@ -60,7 +60,7 @@ public class ReservationDaoImpl implements ReservationDao{
 
     @Override
     public int findByUserPageCount(int amountOnPage, long userId) {
-        return jdbcTemplate.query(
+        int amount = jdbcTemplate.query(
                 "SELECT CEILING(COUNT(*)::numeric/?) as c"
                 +
                 " FROM reservations"
@@ -68,6 +68,7 @@ public class ReservationDaoImpl implements ReservationDao{
                 " WHERE user_id = ?"
                 ,(r,n) -> r.getInt("c"), amountOnPage, userId)
                 .stream().findFirst().orElse(0);
+        return amount <=0 ? 1 : amount;
 
     }
 
@@ -90,7 +91,7 @@ public class ReservationDaoImpl implements ReservationDao{
 
     @Override
     public int findByRestaurantPageCount(int amountOnPage, long restaurantId) {
-        return jdbcTemplate.query(
+        int amount =  jdbcTemplate.query(
                 "SELECT CEILING(COUNT(*)::numeric/?) as c"
                 +
                 " FROM reservations"
@@ -98,6 +99,7 @@ public class ReservationDaoImpl implements ReservationDao{
                 " WHERE restaurant_id = ?"
                 ,(r,n) -> r.getInt("c"), amountOnPage, restaurantId)
                 .stream().findFirst().orElse(0);
+        return amount <= 0 ? 1 : amount;
     }
 
     @Override

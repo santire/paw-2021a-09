@@ -81,6 +81,9 @@
 
           <div>
             <input type="submit" class="btn btn-outline-secondary btn-block w-100 mt-3 px-0 mx-auto" value='<spring:message code="SignUp" />'/>
+            <c:if test="${not empty tokenError}">
+              <p class="px-3 text-danger"><spring:message code="errors.tokenError"/></p>
+            </c:if>
           </div>
         </form:form>
         <div>

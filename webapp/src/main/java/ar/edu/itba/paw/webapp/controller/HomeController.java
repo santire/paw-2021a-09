@@ -22,6 +22,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.exceptions.EmailInUseException;
+import ar.edu.itba.paw.model.exceptions.TokenCreationException;
+import ar.edu.itba.paw.model.exceptions.TokenExpiredException;
 import ar.edu.itba.paw.service.LikesService;
 import ar.edu.itba.paw.service.RestaurantService;
 import ar.edu.itba.paw.service.UserService;
@@ -134,9 +137,12 @@ public class HomeController {
            userService.register(form.getUsername(), form.getPassword(), form.getFirstName(),
                     form.getLastName(), form.getEmail(), form.getPhone());
             return new ModelAndView("activate");
-        } catch (Exception e) {
-            LOGGER.warn("Something went wrong registering user: {}", e.getMessage());
+        } catch (EmailInUseException e) {
+            LOGGER.error("Email {} is already in use (this should have been caught by validator)", e.getEmail());
             return registerForm(form, errors);
+        } catch(TokenCreationException e) {
+            LOGGER.error("Could not generate token");
+            return registerForm(form, errors).addObject("tokenError", true);
         }
     }
 
@@ -146,11 +152,13 @@ public class HomeController {
         User user;
         try {
             user = userService.activateUserByToken(token);
-            //TODO separate this by exceptions
+        } catch(TokenExpiredException e) {
+            LOGGER.error("token {} is expired", token);
+            return new ModelAndView("redirect:/register").addObject("expiredToken", true);
         } catch(Exception e) {
-            LOGGER.error("Couldn't activate user with token {}", token);
-            return new ModelAndView("redirect:/login");
-        } 
+            // Unexpected error happened, showing register screen with generic error message
+            return new ModelAndView("redirect:/register").addObject("tokenError", true);
+        }
 
         UserDetails userDetails = PawUserDetailsService.loadUserByUsername(user.getEmail());
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -160,7 +168,7 @@ public class HomeController {
         return new ModelAndView("redirect:/");
     }
 
-    @RequestMapping("/login")
+    @RequestMapping(value={ "/login" }, method=RequestMethod.GET)
     public ModelAndView login(@RequestParam(value = "error", required = false) final String error) {
         final ModelAndView mav = new ModelAndView("login");
         mav.addObject("error", error!=null);
