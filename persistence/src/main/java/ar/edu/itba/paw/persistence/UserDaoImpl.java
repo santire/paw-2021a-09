@@ -114,7 +114,9 @@ public class UserDaoImpl implements UserDao {
             return Optional.empty();
         }
 
-        return Optional.of(new User(userId.longValue(),username,password, firstName,lastName,email,phone));
+        LOGGER.debug("INSERTED INACTIVE USER. RETURNED ID: {}", userId.longValue());
+        User newUser = new User(userId.longValue(),username,password, firstName,lastName,email,phone);
+        return Optional.of(newUser);
     }
 
     @Override
@@ -123,6 +125,7 @@ public class UserDaoImpl implements UserDao {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("token", token);
         params.addValue("created_at", createdAt);
+        params.addValue("user_id", userId);
         jdbcInsertToken.execute(params);
     }
 

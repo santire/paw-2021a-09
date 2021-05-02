@@ -177,15 +177,4 @@ public class HomeController {
     }
 
 
-/*
-    @ModelAttribute
-    public Optional<User> loggedUser() {
-        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        final Optional<User> user = userService.findByEmail((String) auth.getName());
-        LOGGER.debug("Logged user is {}", user);
-        return user;
-    }
-
- */
-
 }
