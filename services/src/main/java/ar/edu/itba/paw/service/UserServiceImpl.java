@@ -116,35 +116,10 @@ public class UserServiceImpl implements UserService {
      return userDao.isRestaurantOwner(userId);
   }
 
-  @Override
-  public void updatePassword(long id, String password) {
-      userDao.updatePassword(id, encoder.encode(password));
-  }
-  @Override
-  public void updateUsername(long id, String username) {
-      userDao.updateUsername(id, username);
-  }
-  @Override
-  public void updateFistName(long id, String first_name) {
-    userDao.updateFistName(id, first_name);
-  }
-  @Override
-  public void updateLastName(long id, String last_name) {
-    userDao.updateLastName(id, last_name);
-  }
-  @Override
-  public void updatePhone(long id, String phone) {
-    userDao.updatePhone(id, phone);
-  }
 
   @Override
-  public void updateEmail(long id, String email) {
-      userDao.updateEmail(id, email);
-  }
-
-  @Override
-  public void updateUser(long id, String username, String password, String first_name, String last_name, String email, String phone) {
-    userDao.updateUser(id, username, password, first_name, last_name, email, phone);
+  public void updateUser(long id, String username, String password, String firstName, String lastName, String email, String phone) {
+    userDao.updateUser(id, username, password, firstName, lastName, email, phone);
   }
 
 }

@@ -98,7 +98,9 @@
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                       <a class="dropdown-item" href="<c:url value="/register/restaurant"/>"><spring:message code="navbar.registerRestaurant" /></a>
-                      <div class="dropdown-divider"></div>
+                    <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" href="<c:url value="/user/edit"/>"><spring:message code="navbar.updateInfo" /></a>
+                    <div class="dropdown-divider"></div>
                       <a class="dropdown-item" href="<c:url value="/logout"/>"><spring:message code="navbar.logout" /></a>
                 </ul>
             </c:otherwise>

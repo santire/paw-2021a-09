@@ -259,8 +259,10 @@ public class RestaurantController {
 
 
     @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.GET)
-    public ModelAndView editRestaurant(@ModelAttribute("loggedUser") final User loggedUser, 
-            @PathVariable("restaurantId") final long restaurantId, @ModelAttribute("RestaurantForm") final RestaurantForm form) {
+    public ModelAndView editRestaurant(
+            @ModelAttribute("loggedUser") final User loggedUser, 
+            @PathVariable("restaurantId") final long restaurantId, 
+            @ModelAttribute("RestaurantForm") final RestaurantForm form) {
 
             if (loggedUser != null) {
                 Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);

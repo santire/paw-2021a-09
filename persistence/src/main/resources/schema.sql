@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS verification_tokens(
   token_id SERIAL PRIMARY KEY,
   token VARCHAR(36) UNIQUE,
   created_at TIMESTAMP,
-  user_id INTEGER UNIQUE REFERENCES users(user_id) ON DELETE CASCADE
+  user_id INTEGER UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 /* CREATE TABLE IF NOT EXISTS reviews( */
