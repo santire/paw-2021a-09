@@ -51,13 +51,24 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    @Async
+/*    @Async
     @Override
     public void sendEmail(String to) {
         Email email = new Email();
         email.setMailTo(to);
         email.setMailSubject("Page Subj");
         email.setMailContent("Content\n\nSS\n");
+        sendEmail(email);
+    }*/
+
+    @Async
+    @Override
+    public void sendCancellationEmail(String to, Restaurant restaurant, String message) {
+        Email email = new Email();
+        email.setMailTo(to);
+        email.setMailSubject("Your reservation has been cancelled");
+        email.setMailContent("Your reservation for " + restaurant.getName() + " has been cancelled. " +
+                "The restaurant also sent you this message:\n" + message);
         sendEmail(email);
     }
 
@@ -100,11 +111,13 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
-    public void sendRegistrationEmail(String to) {
+    public void sendRegistrationEmail(String to, String url) {
         Email email = new Email();
         email.setMailTo(to);
         email.setMailSubject("Registration Confirmed");
-        email.setMailContent("Your registration at Gourmetable has been confirmed\n\n");
+        email.setMailContent("Your registration at Gourmetable has been confirmed\n"
+                + "Click the following link to finish your registration: " + url +
+                "\n");
         sendEmail(email);
     }
 

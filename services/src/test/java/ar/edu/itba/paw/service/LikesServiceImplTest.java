@@ -69,6 +69,7 @@ public class LikesServiceImplTest {
     public void getLikedRestaurants(){
         Mockito.when(likesDao.getLikedRestaurantsId(Mockito.eq(USER_ID)))
                 .thenReturn(new ArrayList<>(Collections.singletonList(1L)));
+
         Mockito.when(restaurantDao.findById(Mockito.eq(RESTAURANT_ID)))
                 .thenReturn(java.util.Optional.of(new Restaurant(RESTAURANT_ID, NAME, ADDRESS, PHONE_NUMBER, RATING, USER_ID)));
 

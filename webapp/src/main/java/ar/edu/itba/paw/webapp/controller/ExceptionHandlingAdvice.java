@@ -3,6 +3,8 @@ package ar.edu.itba.paw.webapp.controller;
 
 import ar.edu.itba.paw.webapp.exceptions.RestaurantNotFoundException;
 import ar.edu.itba.paw.webapp.exceptions.UserNotFoundException;
+
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -33,7 +35,7 @@ public class ExceptionHandlingAdvice  {
 
 
     //
-    @ExceptionHandler(value = {MethodArgumentTypeMismatchException.class})
+    @ExceptionHandler(value = {MethodArgumentTypeMismatchException.class, MissingServletRequestParameterException.class})
     public ModelAndView methodArgumentTypeMismatch(Exception e)
     {
         final ModelAndView mav = new ModelAndView("error");

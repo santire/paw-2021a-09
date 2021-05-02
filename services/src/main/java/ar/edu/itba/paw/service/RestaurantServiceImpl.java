@@ -1,9 +1,6 @@
 package ar.edu.itba.paw.service;
 
-import ar.edu.itba.paw.model.Image;
-import ar.edu.itba.paw.model.Restaurant;
-import ar.edu.itba.paw.model.Tags;
-import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.persistence.RestaurantDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,16 +12,6 @@ import java.util.Optional;
 public class RestaurantServiceImpl implements RestaurantService{
     @Autowired
     private RestaurantDao restaurantDao;
-
-    @Override
-    public Optional<Restaurant> findById(long id){
-        return this.restaurantDao.findById(id);
-    }
-
-    @Override
-    public List<Restaurant> findByName(String name){
-        return this.restaurantDao.findByName(name);
-    }
 
     // CREATE
 
@@ -43,19 +30,49 @@ public class RestaurantServiceImpl implements RestaurantService{
     // READ
 
     @Override
-    public List<Restaurant> getAllRestaurants(){
-        return this.restaurantDao.getAllRestaurants();
+    public Optional<Restaurant> findById(long id) {
+        return restaurantDao.findById(id);
     }
 
     @Override
-    public List<Restaurant> getAllRestaurants(String searchTerm){
-        return this.restaurantDao.getAllRestaurants(searchTerm);
+    public List<Restaurant> getAllRestaurants(int page, int amountOnPage){
+        return restaurantDao.getAllRestaurants(page, amountOnPage);
+    }
+
+    @Override
+    public List<Restaurant> getPopularRestaurants(int limit, int minValue){
+        return restaurantDao.getPopularRestaurants(limit,  minValue);
+    }
+
+    @Override
+    public Optional<Restaurant> findByIdWithMenu(long id, int menuPage, int amountOnMenuPage){
+        return restaurantDao.findByIdWithMenu(id, menuPage, amountOnMenuPage);
+    }
+    
+    @Override
+    public int findByIdWithMenuPagesCount(int amountOnMenuPage, long id) {
+        return restaurantDao.findByIdWithMenuPagesCount(amountOnMenuPage, id);
+    }
+
+    @Override
+    public List<Restaurant> getRestaurantsFromOwner(int page, int amountOnPage, long userId) {
+        return restaurantDao.getRestaurantsFromOwner(page, amountOnPage, userId);
+    }
+
+    @Override
+    public int getRestaurantsFromOwnerPagesCount(int amountOnPage, long userId) {
+        return restaurantDao.getRestaurantsFromOwnerPagesCount(amountOnPage, userId);
     }
 
 
     @Override
-    public List<Restaurant> getPopularRestaurants(){
-        return this.restaurantDao.getPopularRestaurants();
+    public List<Restaurant> getAllRestaurants(int page, int amountOnPage, String searchTerm){
+        return restaurantDao.getAllRestaurants(page, amountOnPage, searchTerm);
+    }
+
+    @Override
+    public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm) {
+        return restaurantDao.getAllRestaurantPagesCount(amountOnPage, searchTerm);
     }
 
     @Override
@@ -89,12 +106,12 @@ public class RestaurantServiceImpl implements RestaurantService{
 
     @Override
     public boolean deleteRestaurantById(long id){
-        return this.restaurantDao.deleteRestaurantById(id);
+        return restaurantDao.deleteRestaurantById(id);
     }
 
     @Override
     public boolean deleteRestaurantByName(String name){
-        return this.restaurantDao.deleteRestaurantByName(name);
+        return restaurantDao.deleteRestaurantByName(name);
     }
 
     // ??
@@ -105,8 +122,8 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     @Override
-    public List<Restaurant> getRestaurantsFromOwner(long userId) {
-        return restaurantDao.getRestaurantsFromOwner(userId);
+    public List<Restaurant> findByName(String name){
+        return restaurantDao.findByName(name);
     }
 
     @Override
@@ -141,8 +158,9 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     @Override
-    public List<Restaurant> getRestaurantsFilteredBy(String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice) {
-        return restaurantDao.getRestaurantsFilteredBy(name,tags,minAvgPrice,maxAvgPrice);
+    public List<Restaurant> getRestaurantsFilteredBy(String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays) {
+        return restaurantDao.getRestaurantsFilteredBy(name,tags,minAvgPrice,maxAvgPrice,sort,desc,lastDays);
     }
+
 
 }

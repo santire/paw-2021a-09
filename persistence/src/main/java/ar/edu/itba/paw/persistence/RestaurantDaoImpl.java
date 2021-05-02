@@ -111,6 +111,21 @@ public class RestaurantDaoImpl implements RestaurantDao {
     @Override
     public Optional<Restaurant> findById(long id) {
         return jdbcTemplate.query(
+                "SELECT r.*, i.image_data"
+                +
+                " FROM restaurants r"
+                +
+                " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id"
+                +
+                " WHERE r.restaurant_id=?"
+                , RESTAURANT_ROW_MAPPER, id)
+                .stream().findFirst();
+
+    }
+
+    @Override
+    public Optional<Restaurant> findByIdWithMenu(long id, int menuPage, int amountOnMenuPage) {
+        return jdbcTemplate.query(
                 " SELECT r.*, m.menu_item_id, m.name as menu_item_name, m.description, m.price, m.restaurant_id, i.image_data"
                 + 
                 " FROM restaurants r"
@@ -119,8 +134,29 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 +
                 " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id"
                 +
-                "  WHERE r.restaurant_id = ?",
-                RESTAURANT_NESTED_MAPPER, id).stream().findFirst();
+                "  WHERE r.restaurant_id = ?"
+                +
+                " ORDER BY menu_item_id DESC"
+                +
+                " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"
+                ,RESTAURANT_NESTED_MAPPER, id, (menuPage-1)*amountOnMenuPage, amountOnMenuPage)
+                .stream().findFirst();
+    }
+
+    @Override
+    public int findByIdWithMenuPagesCount(int amountOnMenuPage, long id) {
+
+        return jdbcTemplate.query(
+                " SELECT CEILING(COUNT(m.menu_item_id)::numeric/?) as c"
+                + 
+                " FROM restaurants r"
+                +
+                " LEFT JOIN menu_items m ON r.restaurant_id = m.restaurant_id"
+                +
+                "  WHERE r.restaurant_id = ?"
+                ,(r, n) -> r.getInt("c"), amountOnMenuPage, id)
+                .stream().findFirst().orElse(0);
+
     }
 
     @Override
@@ -139,49 +175,93 @@ public class RestaurantDaoImpl implements RestaurantDao {
     }
 
     @Override
-    public List<Restaurant> getAllRestaurants() {
+    public List<Restaurant> getAllRestaurants(int page, int amountOnPage) {
         return jdbcTemplate.query(
                 "SELECT * FROM restaurants r"
                 +
                 " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id"
-                , RESTAURANT_ROW_MAPPER).stream()
+                +
+                " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"
+                ,RESTAURANT_ROW_MAPPER, (page-1)*amountOnPage, amountOnPage).stream()
                 .collect(Collectors.toList());
     }
 
-/*    @Override
-    public List<Restaurant> getAllRestaurants(String searchTerm) {
+    @Override
+    public List<Restaurant> getRestaurantsFromOwner(int page, int amountOnPage, long userId) {
+        return jdbcTemplate.query(
+                "SELECT * FROM restaurants r"
+                +
+                " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id"
+                +
+                " WHERE user_id = ?"
+                +
+                " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"
+                , RESTAURANT_ROW_MAPPER, userId, (page-1)*amountOnPage, amountOnPage).stream()
+                .collect(Collectors.toList());
+    }
+
+   @Override
+   public int getRestaurantsFromOwnerPagesCount(int amountOnPage, long userId) {
+        return jdbcTemplate.query(
+                "SELECT CEILING(COUNT(*)::numeric/?) as c FROM restaurants"
+                +
+                " WHERE user_id = ?"
+                , (r,s) -> r.getInt("c"), amountOnPage, userId)
+                .stream().findFirst().orElse(0);
+   }
+
+    @Override
+    public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm) {
+        return jdbcTemplate.query(
+                "SELECT CEILING(COUNT(*)::numeric/?) as c FROM restaurants"
+                + 
+                " WHERE name ILIKE ?"
+                ,(r, n) -> r.getInt("c"), amountOnPage, '%' + searchTerm + '%')
+                .stream().findFirst().orElse(0);
+    }
+
+    @Override
+    public List<Restaurant> getAllRestaurants(int page, int amountOnPage, String searchTerm) {
         return jdbcTemplate
             .query(
                 "SELECT * FROM restaurants r"
                 +
-                " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE name ILIKE ?"
-                , RESTAURANT_ROW_MAPPER, "%" + searchTerm.trim() + "%")
-                .stream().collect(Collectors.toList());
-    }*/
-
-    @Override
-    public List<Restaurant> getAllRestaurants(String searchTerm) {
-/*        return jdbcTemplate
-                .query("SELECT *, similarity(name, ?) AS sml FROM restaurants r"
-                        +
-                        " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE similarity(name, ?)>0 ORDER BY sml DESC, name ", RESTAURANT_ROW_MAPPER, searchTerm, searchTerm)
-                .stream().collect(Collectors.toList());*/
-        return jdbcTemplate
-                .query("SELECT * FROM restaurants r"
-                        +
-                        " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE name ILIKE ?", RESTAURANT_ROW_MAPPER, '%' + searchTerm + '%')
+                " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id"
+                +
+                " WHERE name ILIKE ?"
+                +
+                " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"
+                , RESTAURANT_ROW_MAPPER, "%" + searchTerm.trim() + "%", (page-1)*amountOnPage, amountOnPage)
                 .stream().collect(Collectors.toList());
     }
+
+    // @Override
+    // public List<Restaurant> getAllRestaurants(String searchTerm) {
+       // return jdbcTemplate
+                // .query("SELECT *, similarity(name, ?) AS sml FROM restaurants r"
+                        // +
+                        // " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE similarity(name, ?)>0 ORDER BY sml DESC, name ", RESTAURANT_ROW_MAPPER, searchTerm, searchTerm)
+                // .stream().collect(Collectors.toList());
+        // return jdbcTemplate
+                // .query("SELECT * FROM restaurants r"
+                        // +
+                        // " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE name ILIKE ?", RESTAURANT_ROW_MAPPER, '%' + searchTerm + '%')
+                // .stream().collect(Collectors.toList());
+    // }
 
     // TODO: this would probably be better as getRestaurantsByMinRating and
     // pass the rating as an argument
     @Override
-    public List<Restaurant> getPopularRestaurants() {
+    public List<Restaurant> getPopularRestaurants(int limit, int minValue) {
         return jdbcTemplate.query(
                 "SELECT * FROM restaurants r"
                 +
-                " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE rating >= 9"
-                , RESTAURANT_ROW_MAPPER).stream()
+                " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE rating >= ?"
+                +
+                " ORDER BY rating DESC"
+                +
+                " FETCH NEXT ? ROWS ONLY"
+                , RESTAURANT_ROW_MAPPER, minValue, limit).stream()
                 .collect(Collectors.toList());
     }
 
@@ -252,15 +332,6 @@ public class RestaurantDaoImpl implements RestaurantDao {
         return userDao.findById(userId);
     }
 
-    @Override
-    public List<Restaurant> getRestaurantsFromOwner(long userId) {
-        return jdbcTemplate.query(
-                "SELECT * FROM restaurants r"
-                +
-                " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE user_id = ?"
-                , RESTAURANT_ROW_MAPPER, userId).stream()
-                .collect(Collectors.toList());
-    }
 
     @Override
     public boolean addTag(long restaurantId, int tagId) {
@@ -308,10 +379,8 @@ public class RestaurantDaoImpl implements RestaurantDao {
     }
 
     @Override
-    public List<Restaurant> getRestaurantsFilteredBy(String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice) {
-
+    public List<Restaurant> getRestaurantsFilteredBy(String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays) {
         String t = "";
-
         if(!tags.isEmpty()){
             t += "WHERE tag_id IN (";
             for(int i=0; i<tags.size(); i++){
@@ -322,14 +391,36 @@ public class RestaurantDaoImpl implements RestaurantDao {
             t+=")";
         }
 
+        String orderby="name";
+        String order="DESC";
+        if(!desc)
+            order="ASC";
+
+        switch (sort){
+            case RESERVATIONS:
+                orderby = "reservations";
+                break;
+            case RATING:
+                orderby = "rating";
+                break;
+            case PRICE:
+                orderby = "price";
+                break;
+
+        }
 
         return jdbcTemplate.query(
-                "SELECT DISTINCT r.restaurant_id, name, address, phone_number, rating, user_id, image_data  FROM " +
+                "SELECT r.restaurant_id, r.name, r.address, r.phone_number, r.rating, r.user_id, image_data, AVG(price) as price, COALESCE(q,0) as reservations  FROM" +
                         "(SELECT * FROM restaurants r NATURAL JOIN restaurant_tags "+ t +" )AS r " +
-                        "LEFT join restaurant_images i ON r.restaurant_id = i.restaurant_id " +
-                        "WHERE name ILIKE '%"+name+"%'" +
-                        "AND r.restaurant_id IN (SELECT r.restaurant_id FROM restaurants r RIGHT JOIN menu_items m ON r.restaurant_id = m.restaurant_id " +
-                        "GROUP BY r.restaurant_id HAVING AVG(price) >"+minAvgPrice+" AND AVG(price) <"+maxAvgPrice+")"
+                        "LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id " +
+                        "RIGHT JOIN menu_items m ON r.restaurant_id = m.restaurant_id " +
+                        "LEFT JOIN (select r.restaurant_id, COUNT(quantity) from restaurants r left JOIN reservations b ON r.restaurant_id = b.restaurant_id " +
+                        "WHERE date- interval '"+lastDays+" DAYS' < CURRENT_TIMESTAMP " +
+                        "GROUP BY r.restaurant_id)as hot(rid,q) on r.restaurant_id = hot.rid " +
+                        "WHERE r.name ILIKE '%"+name+"%'" +
+                        "GROUP BY r.restaurant_id, r.name, r.address, r.phone_number, r.rating, r.user_id, image_data, q " +
+                        "HAVING AVG(price) >"+minAvgPrice+" AND AVG(price) <"+maxAvgPrice+" " +
+                        "ORDER BY "+orderby+" "+order
 
                 , RESTAURANT_ROW_MAPPER).stream()
                 .collect(Collectors.toList());

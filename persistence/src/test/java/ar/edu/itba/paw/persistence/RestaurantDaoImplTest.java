@@ -32,6 +32,7 @@ public class RestaurantDaoImplTest {
     // General purpose
     private static final int INSERTED_SIZE = 3;
     private static final int NEW_RATING = 3;
+    private static final int AMOUNT_ON_PAGE = 6;
 
     // Restaurant to search
     private static final long ID = 1;
@@ -79,7 +80,7 @@ public class RestaurantDaoImplTest {
 
     @Test
     public void testListAllRestaurants(){
-        List<Restaurant> restaurantList = restaurantDao.getAllRestaurants();
+        List<Restaurant> restaurantList = restaurantDao.getAllRestaurants(1, AMOUNT_ON_PAGE);
         assertEquals(INSERTED_SIZE, restaurantList.size());
     }
 
@@ -98,20 +99,57 @@ public class RestaurantDaoImplTest {
 
     @Test
     public void testRestaurantByIdWithMenu() {
-        Optional<Restaurant> maybeRestaurant = restaurantDao.findById(3);
+        // Get first page of menu with 3 items 
+        Optional<Restaurant> maybeRestaurant = restaurantDao.findByIdWithMenu(3, 1, 3);
 
         assertTrue(maybeRestaurant.isPresent());
         Restaurant kfc = maybeRestaurant.get();
         List<MenuItem> menuActual = kfc.getMenu();
+
+        // Menu items are ordered by last added by default
         List<MenuItem> menuExpected = Arrays.asList(
-            new MenuItem(1, "Fried Chicken Original", "Delicious fried chicken", 3.99f),
+            new MenuItem(3, "Vegan Friendly Option", "It's literally just water", 10.99f),
             new MenuItem(2, "Fried Chicken Crispy", "Delicious fried chicken but crispy", 4.99f),
-            new MenuItem(3, "Vegan Friendly Option", "It's literally just water", 10.99f)
+            new MenuItem(1, "Fried Chicken Original", "Delicious fried chicken", 3.99f)
             );
 
         assertEquals(menuExpected.get(0).getName(), menuActual.get(0).getName());
         assertEquals(menuExpected.get(0).getDescription(), menuActual.get(0).getDescription());
         assertEquals(menuExpected.get(0).getPrice(), menuActual.get(0).getPrice(), 0.01);
+
+        assertEquals(menuExpected.get(1).getName(), menuActual.get(1).getName());
+        assertEquals(menuExpected.get(1).getDescription(), menuActual.get(1).getDescription());
+        assertEquals(menuExpected.get(1).getPrice(), menuActual.get(1).getPrice(), 0.01);
+
+        assertEquals(menuExpected.get(2).getName(), menuActual.get(2).getName());
+        assertEquals(menuExpected.get(2).getDescription(), menuActual.get(2).getDescription());
+        assertEquals(menuExpected.get(2).getPrice(), menuActual.get(2).getPrice(), 0.01);
+    }
+
+    @Test
+    public void testRestaurantByIdWithMenuShortPage() {
+        // Get first page of menu with 2 items 
+        Optional<Restaurant> maybeRestaurant = restaurantDao.findByIdWithMenu(3, 1, 2);
+
+        assertTrue(maybeRestaurant.isPresent());
+        Restaurant kfc = maybeRestaurant.get();
+        List<MenuItem> menuActual = kfc.getMenu();
+        List<MenuItem> menuExpected = Arrays.asList(
+            new MenuItem(3, "Vegan Friendly Option", "It's literally just water", 10.99f),
+            new MenuItem(2, "Fried Chicken Crispy", "Delicious fried chicken but crispy", 4.99f),
+            new MenuItem(1, "Fried Chicken Original", "Delicious fried chicken", 3.99f)
+            );
+
+        //Should only have 2 menu items because of page size
+        assertEquals(2, menuActual.size());
+
+        assertEquals(menuExpected.get(0).getName(), menuActual.get(0).getName());
+        assertEquals(menuExpected.get(0).getDescription(), menuActual.get(0).getDescription());
+        assertEquals(menuExpected.get(0).getPrice(), menuActual.get(0).getPrice(), 0.01);
+
+        assertEquals(menuExpected.get(1).getName(), menuActual.get(1).getName());
+        assertEquals(menuExpected.get(1).getDescription(), menuActual.get(1).getDescription());
+        assertEquals(menuExpected.get(1).getPrice(), menuActual.get(1).getPrice(), 0.01);
     }
 
     @Test

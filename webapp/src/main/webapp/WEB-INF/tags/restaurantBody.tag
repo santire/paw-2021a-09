@@ -56,6 +56,10 @@
         <ul class="list-group list-group-flush">
           <sc:menu menu="${restaurant.getMenu()}" />
         </ul>
+      <c:url value="/restaurant/${restaurant.getId()}" var="url"/>
+      <div class="mx-auto">
+        <sc:pagination baseUrl="${url}" pages="${maxPages}"/>
+      </div>
       </c:otherwise>
     </c:choose>
   </div>
@@ -71,7 +75,23 @@
         <h3 class="pb-1 text-center border-bottom">
           <spring:message code="restaurants.reservation"/>
         </h3>
-        <sc:reservationForm/> 
+        <c:choose>
+          <c:when test="${not empty loggedUser}">
+            <sc:reservationForm/>
+          </c:when>
+          <c:otherwise>
+            <h5 class="text-center mt-5">
+              <a href="/login">
+                <spring:message code="general.toUser.login"></spring:message>
+              </a>
+              <spring:message code="general.or"/>
+              <a href="/register">
+                <spring:message code="general.toUser.register"></spring:message>
+              </a>
+              <spring:message code="general.toMakeReservations"/>.
+            </h5>
+          </c:otherwise>
+        </c:choose>
       </c:otherwise>
     </c:choose>
     </div>

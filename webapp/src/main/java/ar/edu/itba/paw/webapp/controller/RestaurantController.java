@@ -1,10 +1,6 @@
 package ar.edu.itba.paw.webapp.controller;
 
-import ar.edu.itba.paw.model.Image;
-import ar.edu.itba.paw.model.Rating;
-import ar.edu.itba.paw.model.Restaurant;
-import ar.edu.itba.paw.model.User;
-import ar.edu.itba.paw.model.MenuItem;
+import ar.edu.itba.paw.model.*;
 
 import javax.validation.Valid;
 
@@ -39,18 +35,19 @@ import ar.edu.itba.paw.webapp.exceptions.RestaurantNotFoundException;
 
 import java.util.*;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 
 @Controller
 public class RestaurantController {
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
-
-
-
-	private static final String MenuItem = null;
-
-
+    private static final int AMOUNT_OF_MENU_ITEMS = 5;
+    private static final int AMOUNT_OF_RESTAURANTS = 10;
+    private static final int AMOUNT_OF_RESERVATIONS = 2;
 
     @Autowired
     private UserService userService;
@@ -74,8 +71,18 @@ public class RestaurantController {
     public ModelAndView restaurant(@ModelAttribute("loggedUser") final User loggedUser,
             @ModelAttribute("reservationForm") final ReservationForm form,
             @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
+            @RequestParam(defaultValue="1") Integer page,
             @PathVariable("restaurantId") final long restaurantId) {
         final ModelAndView mav = new ModelAndView("restaurant");
+
+        int maxPages = restaurantService.findByIdWithMenuPagesCount(AMOUNT_OF_MENU_ITEMS, restaurantId);
+
+        if(page == null || page <1) {
+            page=1;
+        }else if (page > maxPages) {
+            page = maxPages;
+        }
+        mav.addObject("maxPages", maxPages);
 
         if(loggedUser != null){
             Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
@@ -91,7 +98,7 @@ public class RestaurantController {
         }
 
         mav.addObject("restaurant",
-                restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new));
+                restaurantService.findByIdWithMenu(restaurantId, page, AMOUNT_OF_MENU_ITEMS).orElseThrow(RestaurantNotFoundException::new));
         return mav;
     }
 
@@ -100,26 +107,32 @@ public class RestaurantController {
             @Valid @ModelAttribute("reservationForm") final ReservationForm form,
             final BindingResult errors,
              @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
-            final BindingResult menuErrors, @PathVariable("restaurantId") final long restaurantId,
+            final BindingResult menuErrors, 
+            @RequestParam(defaultValue="1") Integer page,
+            @PathVariable("restaurantId") final long restaurantId,
             RedirectAttributes redirectAttributes) {
 
+        if (form != null && errors != null) {
+            int currentHours = LocalTime.now().getHour();
+            if (form.getDate() <= currentHours) {
+                errors.rejectValue("date",
+                                    "reservationForm.date",
+                                    "Date is before current time");
+            }
+        }
         if (errors.hasErrors()) {
-            return restaurant(loggedUser, form, menuForm, restaurantId);
+            return restaurant(loggedUser, form, menuForm,page, restaurantId);
         }
 
-        User user;
-        Optional<User> maybeUser = userService.findByEmail(form.getEmail());
-        if (maybeUser.isPresent()) {
-            user = maybeUser.get();
+        if (loggedUser != null) {
+            LocalDateTime todayAtDate = LocalDate.now().atTime(form.getDate(), 0);
+            Date date = Date.from(todayAtDate.atZone(ZoneId.systemDefault()).toInstant());
+            reservationService.addReservation(loggedUser.getId(), restaurantId, date, Long.parseLong(form.getQuantity()));
+            redirectAttributes.addFlashAttribute("madeReservation", true);
         } else {
-            user = userService.register(form.getEmail());
+            return new ModelAndView("redirect:/register");
         }
-        Date date = new Date();
-        date.setHours(form.getDate());
-        date.setMinutes(0);
-        date.setSeconds(0);
-        reservationService.addReservation(user.getId(), restaurantId, date, Long.parseLong(form.getQuantity()));
-        redirectAttributes.addFlashAttribute("madeReservation", true);
+
         return new ModelAndView("redirect:/");
     }
 
@@ -127,10 +140,13 @@ public class RestaurantController {
     public ModelAndView addMenu(@ModelAttribute("loggedUser") final User loggedUser,
              @ModelAttribute("reservationForm") final ReservationForm form,
              @Valid @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
-            final BindingResult errors, @PathVariable("restaurantId") final long restaurantId,
-            RedirectAttributes redirectAttributes) {
+             final BindingResult errors, 
+             @RequestParam(defaultValue="1") Integer page,
+             @PathVariable("restaurantId") final long restaurantId,
+             RedirectAttributes redirectAttributes) {
+
         if(errors.hasErrors()) {
-            return restaurant(loggedUser, form, menuForm, restaurantId);
+            return restaurant(loggedUser, form, menuForm, page, restaurantId);
         }
         if (loggedUser != null) {
             boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
@@ -224,16 +240,15 @@ public class RestaurantController {
 
 
     @RequestMapping(path = { "/restaurant/{restaurantId}/delete" })
-    public ModelAndView deleteRestaurant(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId) {
+    public ModelAndView deleteRestaurant(@ModelAttribute("loggedUser") final User loggedUser, 
+            @PathVariable("restaurantId") final long restaurantId) {
 
         if (loggedUser != null) {
-        List<Restaurant> restaurants = restaurantService.getRestaurantsFromOwner(loggedUser.getId());
-
             if(userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId)){
                 restaurantService.deleteRestaurantById(restaurantId);
-                if(restaurantService.getRestaurantsFromOwner(loggedUser.getId()).isEmpty())
+                if(userService.isRestaurantOwner(loggedUser.getId())){
                     updateAuthorities(loggedUser);
-
+                }
                 return new ModelAndView("redirect:/restaurants/user/" + loggedUser.getId());
             }
         }
@@ -244,8 +259,10 @@ public class RestaurantController {
 
 
     @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.GET)
-    public ModelAndView editRestaurant(@ModelAttribute("loggedUser") final User loggedUser, 
-            @PathVariable("restaurantId") final long restaurantId, @ModelAttribute("RestaurantForm") final RestaurantForm form) {
+    public ModelAndView editRestaurant(
+            @ModelAttribute("loggedUser") final User loggedUser, 
+            @PathVariable("restaurantId") final long restaurantId, 
+            @ModelAttribute("RestaurantForm") final RestaurantForm form) {
 
             if (loggedUser != null) {
                 Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
@@ -300,13 +317,64 @@ public class RestaurantController {
         return new ModelAndView("redirect:/403");
     }
 
+    @RequestMapping(path={"/restaurant/{restaurantId}/manage"})
+    public ModelAndView manageRestaurant(
+            @ModelAttribute("loggedUser") final User loggedUser,
+            @PathVariable("restaurantId") final long restaurantId,
+            @RequestParam(defaultValue = "1") Integer page) {
+
+        if (loggedUser != null) {
+            final ModelAndView mav =  new ModelAndView("manageRestaurant");
+            Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
+            if(restaurant.isPresent()){
+                if(restaurant.get().getUserId() != loggedUser.getId()){
+                    return new ModelAndView("redirect:/403");
+                }
+                int maxPages = reservationService.findByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
+                if(page == null || page <1) {
+                    page=1;
+                }else if (page > maxPages) {
+                    page = maxPages;
+                }
+                mav.addObject("restaurant", restaurant.get());
+                List<Reservation> reservations = reservationService.findByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
+                if(reservations.isEmpty()){
+                    mav.addObject("restaurantHasReservations", false);
+                }
+                else{
+                    mav.addObject("maxPages", maxPages);
+                    mav.addObject("restaurantHasReservations", true);
+                    mav.addObject("reservations", reservations);
+                    mav.addObject("isOwner", true);
+                }
+                return mav;
+            }
+            else{
+                return new ModelAndView("redirect:/404");
+            }
+        }
+        return new ModelAndView("redirect:/403");
+    }
+
 
     @RequestMapping("/restaurants/user/{userId}")
-    public ModelAndView userRestaurants(@ModelAttribute("loggedUser") final User loggedUser,
-                                        @PathVariable("userId") final long userId) {
+    public ModelAndView userRestaurants(
+            @ModelAttribute("loggedUser") final User loggedUser,
+            @PathVariable("userId") final long userId,
+            @RequestParam(defaultValue = "1") Integer page) {
+
+        // Shouldn't be able to get here unless logged it but just in case
         if(loggedUser != null){
             final ModelAndView mav = new ModelAndView("myRestaurants");
-            List<Restaurant> restaurants = restaurantService.getRestaurantsFromOwner(userId);
+            int maxPages = restaurantService.getRestaurantsFromOwnerPagesCount(AMOUNT_OF_RESTAURANTS, userId);
+
+            if(page == null || page <1) {
+                page=1;
+            }else if (page > maxPages) {
+                page = maxPages;
+            }
+            mav.addObject("maxPages", maxPages);
+            List<Restaurant> restaurants = restaurantService.getRestaurantsFromOwner(page, AMOUNT_OF_RESTAURANTS, userId);
             mav.addObject("userHasRestaurants", !restaurants.isEmpty());
             mav.addObject("restaurants", restaurants);
             return mav;
@@ -351,7 +419,7 @@ public class RestaurantController {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             Collection<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-            if(!restaurantService.getRestaurantsFromOwner(loggedUser.getId()).isEmpty()){
+            if(userService.isRestaurantOwner(loggedUser.getId())){
                 authorities.add(new SimpleGrantedAuthority("ROLE_RESTAURANTOWNER"));
             }
             Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);

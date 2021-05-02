@@ -4,144 +4,82 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="sc" tagdir="/WEB-INF/tags" %>
 
+<c:url value="/user/edit" var="postFormUrl"/>
 
-<sc:templateLayout>
-    <jsp:body>
+<sc:templateLayout simpleTopBar="true">
+  <jsp:body>
 
-        <c:url value="/user/edit" var="path"/>
-        <form:form modelAttribute="updateUserForm" action="${path}?edit-username" method="post" >
-            <div>
-                <form:errors path="username" cssStyle="color: red;" element="p"/>
-                <form:label path="username">
-                    Username:
-                    <form:input type="text" path="username" placeholder="${user.username}"/>
-                </form:label>
-            </div>
-            <div>
-                <input type="submit" value="Save"/>
-            </div>
-        </form:form>
-
-        <form:form modelAttribute="updateUserForm" action="${path}?edit-password" method="post">
-            <div>
-                <form:errors path="password" cssStyle="color: red;" element="p"/>
-                <form:label path="password">
-                    Password:
-                    <form:input type="password" path="password" placeholder="********"/>
-                </form:label>
-            </div>
-            <c:if test= "${error == 'password'}">
-                <div style="color:red;">
-                    passwords doesnt match
+  <spring:message code="user.edit.errorMessage" var="errorMessage"/>
+  <c:if test="${somethingWrong}">
+    <div class="alert alert-danger alert-dissapear" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <strong><c:out value="${errorMessage}"/></strong> 
+    </div>
+  </c:if>
+    <h2 class="text-center mt-4"><spring:message code="user.edit.title" /></h2>
+    <div class="card border-0 mx-auto w-50">
+      <div class="card body border-0">
+        <form:form
+           modelAttribute="updateUserForm"
+           action="${postFormUrl}"
+           method="post"
+        >
+           <div class="row row-cols-1 row-cols-lg-1 justify-content-center">
+                <div>
+                    <form:label class="px-3 mx-auto w-100" path="username">
+                      <spring:message code="Username" />:
+                      <form:input 
+                          class="form-control mx-auto w-100 px-1 mx-auto w-100 input-group-text text-left"
+                          type="text" 
+                          value="${loggedUser.getName()}"
+                          path="username"/>
+                    </form:label>
+                    <form:errors path="username" class="px-3 text-danger" element="p"/>
                 </div>
-            </c:if>
-            <div>
-                <form:errors path="repeatPassword" cssStyle="color: red;" element="p"/>
-                <form:label path="password">
-                    Repeat Password:
-                    <form:input type="password" path="repeatPassword" placeholder="********"/>
-                </form:label>
-            </div>
-            <div>
-                <input type="submit" value="Save"/>
-            </div>
-        </form:form>
+                <div class="mx-auto">
+                    <form:label class="px-3 mx-auto w-100" path="firstName">
+                      <spring:message code="FirstName" />:
+                      <form:input 
+                          class="px-1 mx-auto w-100 input-group-text text-left"
+                          value="${loggedUser.getFirstName()}"
+                          type="text"
+                          path="firstName"/>
+                    </form:label>
+                    <form:errors path="firstName" class="px-3 text-danger" element="p"/>
+                </div>
+                <div class="mx-auto">
+                    <form:label class="px-3 mx-auto w-100" path="lastName">
+                      <spring:message code="FamilyName" />:
+                      <form:input 
+                          class="px-1 mx-auto w-100 input-group-text text-left"
+                          type="text"
+                          value="${loggedUser.getLastName()}"
+                          path="lastName"/>
+                    </form:label>
+                    <form:errors path="lastName" class="px-3 text-danger" element="p"/>
+                </div>
 
-        <form:form modelAttribute="updateUserForm" action="${path}?edit-first-name" method="post" >
-            <div>
-                <form:errors path="firstName" cssStyle="color: red;" element="p"/>
-                <form:label path="firstName">
-                    First Name:
-                    <form:input type="text" path="firstName" placeholder="${user.firstName}"/>
-                </form:label>
-            </div>
-            <div>
-                <input type="submit" value="Save"/>
-            </div>
-        </form:form>
-
-        <form:form modelAttribute="updateUserForm" action="${path}?edit-last-name" method="post" >
-            <div>
-                <form:errors path="lastName" cssStyle="color: red;" element="p"/>
-                <form:label path="lastName">
-                    Family Name:
-                    <form:input type="text" path="lastName" placeholder="${user.lastName}"/>
-                </form:label>
-            </div>
-            <div>
-                <input type="submit" value="Save"/>
-            </div>
-        </form:form>
-
-        <!--
-        <form:form modelAttribute="updateUserForm" action="${path}?edit-email" method="post" >
-            <div>
-                <form:errors  name="emailError" cssStyle="color: red;" element="p"/>
-                <form:errors path="email" cssStyle="color: red;" element="p"/>
-                <form:label path="email">
-                    E-Mail:
-                    <form:input type="text" path="email" placeholder="${user.email}"/>
-                </form:label>
-            </div>
-            <div>
-                <input type="submit" value="Save"/>
-            </div>
-        </form:form>
-         -->
-
-        <form:form modelAttribute="updateUserForm" action="${path}?edit-phone" method="post" >
-            <div>
-                <form:errors path="phone" cssStyle="color: red;" element="p"/>
-                <form:label path="phone">
-                    Phone Number:
-                    <form:input type="text" path="phone" placeholder="${user.phone}"/>
-                </form:label>
-            </div>
-            <div>
-                <input type="submit" value="Save"/>
-            </div>
-        </form:form>
-
-
-
-
-        My restaurants:
-
-        <c:forEach var="restaurant" items="${restaurants}" >
-            <div class="col mb-4">
-                    ${restaurant.name}
-                <a href="<c:url value="/restaurant/${restaurant.id}/edit"/>" class="btn btn-secondary btn-lg"><span class="glyphicon glyphicon-home"></span>Edit</a>
-
-                <!-- Button trigger modal -->
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModal">
-                    Delete
-                </button>
-                <!-- Modal -->
-                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Delete restaurant</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                You cant undo this action
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <a href="<c:url value="/restaurant/${restaurant.id}/delete"/>" class="btn btn-danger">Confirm</a>
-                            </div>
-                        </div>
-                    </div>
+                <div>
+                    <form:label class="px-3 mx-auto w-100" path="phone">
+                      <spring:message code="PhoneNumber" />:
+                      <form:input 
+                          class="px-1 mx-auto w-100 input-group-text text-left"
+                          type="text"
+                          value="${loggedUser.getPhone()}"
+                          path="phone"/>
+                    </form:label>
+                    <form:errors path="phone" class="px-3 text-danger" element="p"/>
+                </div>
+                <div>
+                    <input type="submit"
+                    class="btn btn-outline-secondary btn-block w-100 mt-3 px-0 mx-auto"
+                    value='<spring:message code="user.edit.editButton" />'
+                    />
                 </div>
             </div>
-        </c:forEach>
+        </form:form>
+      </div>
+    </div>
 
-
-    </jsp:body>
+  </jsp:body>
 </sc:templateLayout>
-
-
-

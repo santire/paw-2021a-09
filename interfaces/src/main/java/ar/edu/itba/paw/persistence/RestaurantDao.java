@@ -1,26 +1,32 @@
 package ar.edu.itba.paw.persistence;
 
-import ar.edu.itba.paw.model.Image;
-import ar.edu.itba.paw.model.Restaurant;
-import ar.edu.itba.paw.model.Tags;
-import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.*;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface RestaurantDao {
-    
+
     // CREATE
     public Restaurant registerRestaurant(String name, String address, String phoneNumber, float rating, long userId);
     public boolean setImageByRestaurantId(Image image, long restaurantId);
 
     // READ
     public Optional<Restaurant> findById(long id);
+
+    public Optional<Restaurant> findByIdWithMenu(long id, int menuPage, int amountOnMenuPage);
+    public int findByIdWithMenuPagesCount(int amountOnMenuPage, long id);
+
+    public List<Restaurant> getAllRestaurants(int page, int amountOnPage, String searchTerm);
+    public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm);
+
+    public List<Restaurant> getRestaurantsFromOwner(int page, int amountOnPage, long userId);
+    public int getRestaurantsFromOwnerPagesCount(int amountOnPage, long userId);
+
+    public List<Restaurant> getPopularRestaurants(int limit, int minValue);
+
+    public List<Restaurant> getAllRestaurants(int page, int amountOnPage);
     public List<Restaurant> findByName(String name);
-    public List<Restaurant> getAllRestaurants();
-    public List<Restaurant> getAllRestaurants(String searchTerm);
-    public List<Restaurant> getPopularRestaurants();
-    public List<Restaurant> getHotRestaurants(int lastDays);
 
     // UPDATE
     public void updateName(long id, String name);
@@ -35,14 +41,16 @@ public interface RestaurantDao {
     public boolean deleteRestaurantByName(String name);
 
     public Optional<User> findRestaurantOwner(long id);
-    public List<Restaurant> getRestaurantsFromOwner(long userId);
 
+
+
+
+    public List<Restaurant> getHotRestaurants(int lastDays);
     public boolean addTag(long restaurantId, int tagId);
     public boolean removeTag(long restaurantId, int tagId);
     public List<Tags> tagsInRestaurant(long restaurantId);
 
     public List<Restaurant> getRestaurantsWithTags(List<Tags> tags);
+    public List<Restaurant> getRestaurantsFilteredBy(String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays);
 
-    public List<Restaurant> getRestaurantsFilteredBy(String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice);
-    
 }

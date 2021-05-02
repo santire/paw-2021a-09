@@ -1,33 +1,34 @@
 package ar.edu.itba.paw.webapp.controller;
 
-import ar.edu.itba.paw.model.Restaurant;
-import ar.edu.itba.paw.model.Tags;
-import ar.edu.itba.paw.model.User;
+
+import ar.edu.itba.paw.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
 
-
-import ar.edu.itba.paw.service.LikesService;
-import ar.edu.itba.paw.service.RestaurantService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-
-
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
+import ar.edu.itba.paw.model.Restaurant;
+import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.service.LikesService;
+import ar.edu.itba.paw.service.RestaurantService;
 import ar.edu.itba.paw.service.UserService;
-
+import ar.edu.itba.paw.webapp.auth.PawUserDetailsService;
 import ar.edu.itba.paw.webapp.forms.UserForm;
 
 
@@ -36,6 +37,9 @@ import ar.edu.itba.paw.webapp.forms.UserForm;
 public class HomeController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HomeController.class);
+    private static final int AMOUNT_OF_RESTAURANTS = 6;
+    private static final int AMOUNT_OF_POPULAR_RESTAURANTS = 10;
+    private static final int POPULAR_MIN_RATING = 8;
 
     @Autowired
     private UserService userService;
@@ -46,11 +50,20 @@ public class HomeController {
     @Autowired
     private RestaurantService restaurantService;
 
+    @Autowired
+    private PawUserDetailsService PawUserDetailsService;
+
 
     @RequestMapping("/")
-    public ModelAndView helloWorld(@ModelAttribute("loggedUser") final User loggedUser) {
+    public ModelAndView helloWorld(@ModelAttribute("loggedUser") final User loggedUser, 
+            @RequestParam(defaultValue = "1") Integer page) {
         final ModelAndView mav = new ModelAndView("home");
-        List<Restaurant> popularRestaurants = restaurantService.getPopularRestaurants();
+
+        if(page == null || page <1) {
+            page=1;
+        }
+
+        List<Restaurant> popularRestaurants = restaurantService.getPopularRestaurants(AMOUNT_OF_POPULAR_RESTAURANTS, POPULAR_MIN_RATING);
         mav.addObject("popularRestaurants", popularRestaurants);
         LOGGER.debug("Amount of popular restaurants: {}", popularRestaurants.size());
 
@@ -65,164 +78,129 @@ public class HomeController {
         return mav;
     }
 
+
+
+
+
+
     @RequestMapping(path ={"/restaurants"}, method = RequestMethod.GET)
-    public ModelAndView restaurants(@RequestParam(required = false) String search, @RequestParam(required = false) int[] tags) {
+    public ModelAndView restaurants(@RequestParam(defaultValue = "1") Integer page,
+                                    @RequestParam(required = false) String search, @RequestParam(required = false) int[] tags,
+                                    @RequestParam(defaultValue = "1") int min, @RequestParam(defaultValue = "10000") int max) {
+
         final ModelAndView mav = new ModelAndView("restaurants");
-
-
-
-        String searchStr = "";
-
-        if (search != null){
-            searchStr = search;
+        if (search != null) {
+            search = search.trim().replaceAll("[^a-zA-Z0-9 ()'´¨!]", "");
+        }else {
+            search = "";
         }
 
-
-
+        mav.addObject("minPrice", min);
+        mav.addObject("maxPrice", max);
         mav.addObject("tags", Tags.allTags());
 
-
-        if ((search == null || search.isEmpty()) && (tags ==null)) {
-          //  mav.addObject("userIsSearching", false);
-            mav.addObject("restaurants", restaurantService.getAllRestaurants());
-            return mav;
-        }
-        /*
-        mav.addObject("userIsSearching", true);
-        mav.addObject("searchString", search);
-        // To delete after sprint
-        if(search.startsWith("%")){
-            mav.addObject("restaurants", new ArrayList<Restaurant>());
-            return mav;
-        }
-*/
         List<Tags> tagsSelected = new ArrayList<>();
+        List<Integer> tagsChecked = new ArrayList<>();
         if(tags!=null){
             for( int i : tags){
                 if(Tags.valueOf(i) == null)
                     return new ModelAndView("redirect:/403");
-
                 tagsSelected.add(Tags.valueOf(i));
-                System.out.println(i);
+                tagsChecked.add(i);
             }
         }
-            mav.addObject("tagsSelected", tags);
-            mav.addObject("restaurants", restaurantService.getRestaurantsFilteredBy(searchStr, tagsSelected,0,10000));
+        mav.addObject("tagsChecked", tagsChecked);
 
 
 
 
-
-
-        return mav;
-
-    }
-
-
-
-
-
-
-
-    @RequestMapping(path ={"/restaurants-remove-tag"})
-    public ModelAndView restaurantsRemoveTag(@RequestParam String path, @RequestParam int removetag) {
-
-        System.out.println("pedido de quite " + removetag);
-        System.out.println("path " + path);
-
-        return new ModelAndView("redirect:/restaurants?"+path);
-    }
-
-
-
-
-
-
-
-
-
-    @RequestMapping(path ={"/restaurants"}, method = RequestMethod.POST)
-    public ModelAndView restaurants(@RequestParam(required = false) String search, @RequestParam(required = false) int[] tags, @RequestParam("tag") String tag) {
-
-        String t = "";
-
-        if(tags!=null){
-            for( int i : tags){
-                t +="&tags=" + i ;
-            }}
-            t += "&tags=" +tag;
-
-
-        if(search == null)
-            return new ModelAndView("redirect:/restaurants?"+t);
-        else
-            return new ModelAndView("redirect:/restaurants?search="+search+"&"+t);
-
-    }
-
-
-
-
-
-
-
-    @RequestMapping("/restaurants/mine")
-    public ModelAndView restaurants(@ModelAttribute("loggedUser") final User loggedUser) {
-        if (loggedUser != null) {
-            final ModelAndView mav = new ModelAndView("restaurants");
-            List<Restaurant> userRestaurants = restaurantService.getRestaurantsFromOwner(loggedUser.getId());
-            mav.addObject("restaurants", userRestaurants);
-            return mav;
-
+        // Catching invalid page value and setting it at max or min
+        // depending on the overflow direction
+        int maxPages = restaurantService.getAllRestaurantPagesCount(AMOUNT_OF_RESTAURANTS, search);
+        if(page == null || page <1) {
+            page=1;
+        }else if (page > maxPages) {
+            page = maxPages;
         }
 
-        return new ModelAndView("redirect:/login");
+        mav.addObject("userIsSearching", !search.isEmpty());
+        mav.addObject("searchString", search);
+        mav.addObject("maxPages", maxPages);
+
+        mav.addObject("restaurants", restaurantService.getRestaurantsFilteredBy(search, tagsSelected,min,max, Sorting.NAME, true, 7));
+        //mav.addObject("restaurants", restaurantService.getAllRestaurants(page, AMOUNT_OF_RESTAURANTS, search));
+        mav.addObject("page", page);
+        return mav;
     }
+
+
 
 
     @RequestMapping(path ={"/register"}, method = RequestMethod.GET)
-    public ModelAndView registerForm(@ModelAttribute("userForm") final UserForm form,@RequestParam(value = "error", required = false) final String error) {
-       ModelAndView mav = new ModelAndView("register");
-       if(error != null){
-           mav.addObject("error", error);
-       }
-        return mav;
+    public ModelAndView registerForm(@ModelAttribute("userForm") final UserForm form,
+            final BindingResult errors) {
+       return new ModelAndView("register");
     }
 
 
 
     @RequestMapping(path ={"/register"}, method = RequestMethod.POST)
-    public ModelAndView register(@Valid @ModelAttribute("userForm") final UserForm form, final BindingResult errors ) {
+    public ModelAndView register(@Valid @ModelAttribute("userForm") final UserForm form, 
+            final BindingResult errors ) {
         // if there are errors it goes back to the register form without losing data
         // but letting the user know it has errors
-        if(!form.getPassword().equals(form.getRepeatPassword())){
-            return registerForm(form, "password");
+        if(form != null && errors != null){
+            if(form.getPassword() == null || !form.getPassword().equals(form.getRepeatPassword())) {
+                errors.rejectValue("repeatPassword", 
+                                    "userForm.repeatPassword",
+                                    "Passwords do not match");
+            }
+            if (form.getEmail() == null || !form.getEmail().trim().isEmpty() 
+                    && userService.findByEmail(form.getEmail()).isPresent()){
+                errors.rejectValue("emailInUse", 
+                                    "userForm.emailInUse",
+                                    "Email is already in use");
+            }
         }
-        if (errors.hasErrors()) {
-            return registerForm(form,null);
+
+        if (errors!=null && errors.hasErrors()) {
+            return registerForm(form,errors);
         }
 
         try{
-           final User user = userService.register(form.getUsername(), form.getPassword(), form.getFirstName(),
+           userService.register(form.getUsername(), form.getPassword(), form.getFirstName(),
                     form.getLastName(), form.getEmail(), form.getPhone());
-
-            return new ModelAndView("redirect:/login");
+            return new ModelAndView("activate");
         } catch (Exception e) {
-
-            return registerForm(form, "email");
+            LOGGER.warn("Something went wrong registering user: {}", e.getMessage());
+            return registerForm(form, errors);
         }
+    }
+
+
+    @RequestMapping(value={"/activate"}, method = RequestMethod.GET)
+    public ModelAndView activate(@RequestParam(name="token", required=true) final String token) {
+        User user;
+        try {
+            user = userService.activateUserByToken(token);
+            //TODO separate this by exceptions
+        } catch(Exception e) {
+            LOGGER.error("Couldn't activate user with token {}", token);
+            return new ModelAndView("redirect:/login");
+        } 
+
+        UserDetails userDetails = PawUserDetailsService.loadUserByUsername(user.getEmail());
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                userDetails, userDetails.getPassword(), userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        return new ModelAndView("redirect:/");
     }
 
     @RequestMapping("/login")
     public ModelAndView login(@RequestParam(value = "error", required = false) final String error) {
         final ModelAndView mav = new ModelAndView("login");
-
-        if (error != null) {
-            mav.addObject("error", true);
-        }
-        else{
-            mav.addObject("error", false);
-        }
+        mav.addObject("error", error!=null);
 
         return mav;
     }
@@ -234,43 +212,6 @@ public class HomeController {
 
         return mav;
     }
-
-
-/*
-    @ModelAttribute
-    public Optional<User> loggedUser() {
-        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        final Optional<User> user = userService.findByEmail((String) auth.getName());
-        LOGGER.debug("Logged user is {}", user);
-        return user;
-    }
-
- */
-
-
-
-    @RequestMapping(path ={"/tagit"})
-    public ModelAndView tag() {
-        ModelAndView mav = new ModelAndView("home");
-
-
-
-
-        List<Tags> tags = new ArrayList<>();
-        tags.add(Tags.ARGENTINO);
-        tags.add(Tags.ASIATICO);
-
-
-        List<Restaurant> rests = restaurantService.getRestaurantsFilteredBy("", tags, 0, 1000);
-        for( Restaurant res : rests){
-            System.out.println("RRRRRRRRRRR " + res.getName());
-        }
-
-
-
-        return mav;
-    }
-
 
 
 }
