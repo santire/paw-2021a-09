@@ -103,7 +103,7 @@ public class HomeController {
     public ModelAndView restaurants(@ModelAttribute("loggedUser") final User loggedUser) {
         if (loggedUser != null) {
             final ModelAndView mav = new ModelAndView("restaurants");
-            List<Restaurant> userRestaurants = restaurantService.getRestaurantsFromOwner(loggedUser.getId());
+            List<Restaurant> userRestaurants = restaurantService.getRestaurantsFromOwner(1,1,loggedUser.getId());
             mav.addObject("restaurants", userRestaurants);
             return mav;
 

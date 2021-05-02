@@ -50,7 +50,7 @@ public class UserController {
             mav.addObject("error", error);
         }
         mav.addObject("user", loggedUser);
-        List<Restaurant> restaurants = restaurantService.getRestaurantsFromOwner(loggedUser.getId());
+        List<Restaurant> restaurants = restaurantService.getRestaurantsFromOwner(1,1,loggedUser.getId());
         mav.addObject("restaurants", restaurants);
 
         return mav;
