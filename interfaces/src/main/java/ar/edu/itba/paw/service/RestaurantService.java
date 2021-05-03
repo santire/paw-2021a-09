@@ -1,8 +1,6 @@
 package ar.edu.itba.paw.service;
 
-import ar.edu.itba.paw.model.Image;
-import ar.edu.itba.paw.model.Restaurant;
-import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,15 +17,21 @@ public interface RestaurantService {
     public Optional<Restaurant> findByIdWithMenu(long id, int menuPage, int amountOnMenuPage);
     public int findByIdWithMenuPagesCount(int amountOnMenuPage, long id);
 
+    public List<Restaurant> getAllRestaurants(int page, int amountOnPage, String searchTerm);
+    public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm);
+
     public List<Restaurant> getRestaurantsFromOwner(int page, int amountOnPage, long userId);
     public int getRestaurantsFromOwnerPagesCount(int amountOnPage, long userId);
 
-    public List<Restaurant> getAllRestaurants(int page, int amountOnPage, String searchTerm);
-    public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm);
     public List<Restaurant> getPopularRestaurants(int limit, int minValue);
 
     public List<Restaurant> getAllRestaurants(int page, int amountOnPage);
     public List<Restaurant> findByName(String name);
+
+
+
+    public List<Restaurant> getHotRestaurants(int lastDays);
+
 
     // UPDATE
     public void updateName(long id, String name);
@@ -40,4 +44,15 @@ public interface RestaurantService {
     public boolean deleteRestaurantByName(String name);
 
     public Optional<User> findRestaurantOwner(long id);
+
+
+
+    public boolean addTag(long restaurantId, Tags tagId);
+    public boolean removeTag(long restaurantId, Tags tagId);
+
+    public List<Tags> tagsInRestaurant(long restaurantId);
+    public List<Restaurant> getRestaurantsWithTags(List<Tags> tags);
+    public List<Restaurant> getRestaurantsFilteredBy(String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays);
+
+
 }

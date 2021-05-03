@@ -1,5 +1,8 @@
 package ar.edu.itba.paw.webapp.controller;
 
+
+import ar.edu.itba.paw.model.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,6 +71,10 @@ public class HomeController {
         mav.addObject("popularRestaurants", popularRestaurants);
         LOGGER.debug("Amount of popular restaurants: {}", popularRestaurants.size());
 
+        List<Restaurant> hotRestaurants = restaurantService.getHotRestaurants(7);
+        mav.addObject("hotRestaurants", hotRestaurants);
+        LOGGER.debug("Amount of hot restaurants: {}", hotRestaurants.size());
+
         if(loggedUser != null){
             List<Restaurant> likedRestaurants = likesService.getLikedRestaurants(loggedUser.getId());
             mav.addObject("likedRestaurants", likedRestaurants);
@@ -75,9 +82,17 @@ public class HomeController {
         return mav;
     }
 
-    @RequestMapping("/restaurants")
+
+
+
+
+
+    @RequestMapping(path ={"/restaurants"}, method = RequestMethod.GET)
     public ModelAndView restaurants(@RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(required = false) String search) {
+                                    @RequestParam(required = false) String search, @RequestParam(required = false) int[] tags,
+                                    @RequestParam(defaultValue = "1") int min, @RequestParam(defaultValue = "10000") int max,
+                                    @RequestParam(defaultValue = "namedesc") String sortby)
+                                    {
 
         final ModelAndView mav = new ModelAndView("restaurants");
         if (search != null) {
@@ -86,7 +101,56 @@ public class HomeController {
             search = "";
         }
 
-        // Catching invalid page value and setting it at max or min 
+        mav.addObject("minPrice", min);
+        mav.addObject("maxPrice", max);
+        mav.addObject("tags", Tags.allTags());
+
+        List<Tags> tagsSelected = new ArrayList<>();
+        List<Integer> tagsChecked = new ArrayList<>();
+        if(tags!=null){
+            for( int i : tags){
+                if(Tags.valueOf(i) == null)
+                    return new ModelAndView("redirect:/403");
+                tagsSelected.add(Tags.valueOf(i));
+                tagsChecked.add(i);
+            }
+        }
+        mav.addObject("tagsChecked", tagsChecked);
+
+        Sorting sort = Sorting.NAME;
+        boolean desc = true;
+        switch (sortby) {
+            case ("nameasc"):
+                sort = Sorting.NAME;
+                desc = false;
+                break;
+            case ("populardesc"):
+                sort = Sorting.RATING;
+                desc = true;
+                break;
+            case ("popularasc"):
+                sort = Sorting.RATING;
+                desc = false;
+                break;
+            case ("reservationsdesc"):
+                sort = Sorting.RESERVATIONS;
+                desc = true;
+                break;
+            case ("reservationsasc"):
+                sort = Sorting.RESERVATIONS;
+                desc = false;
+                break;
+            case ("pricedesc"):
+                sort = Sorting.PRICE;
+                desc = true;
+                break;
+            case ("priceasc"):
+                sort = Sorting.PRICE;
+                desc = false;
+                break;
+        }
+
+        // Catching invalid page value and setting it at max or min
         // depending on the overflow direction
         int maxPages = restaurantService.getAllRestaurantPagesCount(AMOUNT_OF_RESTAURANTS, search);
         if(page == null || page <1) {
@@ -98,10 +162,15 @@ public class HomeController {
         mav.addObject("userIsSearching", !search.isEmpty());
         mav.addObject("searchString", search);
         mav.addObject("maxPages", maxPages);
-        mav.addObject("restaurants", restaurantService.getAllRestaurants(page, AMOUNT_OF_RESTAURANTS, search));
+
+        mav.addObject("restaurants", restaurantService.getRestaurantsFilteredBy(search, tagsSelected,min,max, sort, desc, 7));
+        //mav.addObject("restaurants", restaurantService.getAllRestaurants(page, AMOUNT_OF_RESTAURANTS, search));
         mav.addObject("page", page);
         return mav;
     }
+
+
+
 
     @RequestMapping(path ={"/register"}, method = RequestMethod.GET)
     public ModelAndView registerForm(@ModelAttribute("userForm") final UserForm form,

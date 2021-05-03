@@ -1,8 +1,6 @@
 package ar.edu.itba.paw.service;
 
-import ar.edu.itba.paw.model.Image;
-import ar.edu.itba.paw.model.Restaurant;
-import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.persistence.RestaurantDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -77,6 +75,11 @@ public class RestaurantServiceImpl implements RestaurantService{
         return restaurantDao.getAllRestaurantPagesCount(amountOnPage, searchTerm);
     }
 
+    @Override
+    public List<Restaurant> getHotRestaurants(int lastDays) {
+        return this.restaurantDao.getHotRestaurants(lastDays);
+    }
+
     // UPDATE
     @Override
     public void updateName(long id, String name) {
@@ -122,5 +125,42 @@ public class RestaurantServiceImpl implements RestaurantService{
     public List<Restaurant> findByName(String name){
         return restaurantDao.findByName(name);
     }
+
+    @Override
+    public boolean addTag(long restaurantId, Tags tag) {
+
+        List<Tags> tags = restaurantDao.tagsInRestaurant(restaurantId);
+
+        if(tags.size() >= 3 || tags.contains(tag))
+            return false;
+
+
+        restaurantDao.addTag(restaurantId,tag.getValue());
+
+        return true;
+    }
+
+    @Override
+    public boolean removeTag(long restaurantId, Tags tag) {
+
+
+        return restaurantDao.removeTag(restaurantId,tag.getValue());
+    }
+
+    @Override
+    public List<Tags> tagsInRestaurant(long restaurantId) {
+        return restaurantDao.tagsInRestaurant(restaurantId);
+    }
+
+    @Override
+    public List<Restaurant> getRestaurantsWithTags(List<Tags> tags) {
+        return restaurantDao.getRestaurantsWithTags(tags);
+    }
+
+    @Override
+    public List<Restaurant> getRestaurantsFilteredBy(String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays) {
+        return restaurantDao.getRestaurantsFilteredBy(name,tags,minAvgPrice,maxAvgPrice,sort,desc,lastDays);
+    }
+
 
 }

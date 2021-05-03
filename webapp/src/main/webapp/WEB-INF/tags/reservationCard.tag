@@ -7,27 +7,27 @@
 <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
 <%--<div class="row">--%>
 
-    <div class="card border-0">
-        <div class="row">
-            <div class="col border d-flex align-items-center justify-content-center border-0">
-                    <c:choose>
-                        <c:when test="${reservation.getRestaurant().getMaybeProfileImage().isPresent()}">
-                            <c:url value="data:image/jpg;base64,${reservation.getRestaurant().getMaybeProfileImage().get().getImageEnconded()}" var="imgUrl"/>
-                        </c:when>
-                        <c:otherwise>
-                            <c:url value="/resources/images/noimage.jpg" var="imgUrl"/>
-                        </c:otherwise>
-                    </c:choose>
-                <c:url value="/restaurant/${reservation.getRestaurant().getId()}" var="restaurantPage"/>
-                    <a href="${restaurantPage}">
-                        <img
-                                src="${imgUrl}"
-                                class="restaurant-img card-img img-fluid img-thumbnail rounded card-img-top"
-                                alt="..."
-                        />
-                    </a>
-            </div>
-            <div class="col border d-flex align-items-center justify-content-center border-0">
+<div class="card border-0">
+    <div class="row">
+        <div class="col border d-flex align-items-center justify-content-center border-0">
+            <c:choose>
+                <c:when test="${reservation.getRestaurant().getMaybeProfileImage().isPresent()}">
+                    <c:url value="data:image/jpg;base64,${reservation.getRestaurant().getMaybeProfileImage().get().getImageEnconded()}" var="imgUrl"/>
+                </c:when>
+                <c:otherwise>
+                    <c:url value="/resources/images/noimage.jpg" var="imgUrl"/>
+                </c:otherwise>
+            </c:choose>
+            <c:url value="/restaurant/${reservation.getRestaurant().getId()}" var="restaurantPage"/>
+            <a href="${restaurantPage}">
+                <img
+                        src="${imgUrl}"
+                        class="restaurant-img card-img img-fluid img-thumbnail rounded card-img-top"
+                        alt="..."
+                />
+            </a>
+        </div>
+        <div class="col border d-flex align-items-center justify-content-center border-0">
                 <span class="block">
                     <div class="p-2 bd-highlight text-muted">${reservation.getRestaurant().getName()}</div>
                     <div class="p-2 bd-highlight text-muted">${reservation.getRestaurant().getAddress()}</div>
@@ -36,11 +36,11 @@
                         <spring:message code="reservation.card.people"/></div>
                     <div class="p-2 bd-highlight"><spring:message code="reservation.card.date"/>: ${reservation.getDate()}</div>
                 </span>
-            </div>
-            <div class="col border d-flex align-items-center justify-content-center border-0">
-                <c:url value="/reservations/${reservation.getId()}/modify" var="modifyReservationPath"/>
-                <c:url value="/reservations/${reservation.getId()}/cancel" var="cancelReservationPath"/>
-                <span class="block">
+        </div>
+        <div class="col border d-flex align-items-center justify-content-center border-0">
+            <c:url value="/reservations/${reservation.getId()}/modify" var="modifyReservationPath"/>
+            <c:url value="/reservations/${reservation.getId()}/cancel" var="cancelReservationPath"/>
+            <span class="block">
                     <c:choose>
                         <c:when test="${isOwner}">
                             <button type="button" class="btn btn-danger text-white" data-toggle="modal" data-target="#confirmationModalCenter">
@@ -61,22 +61,22 @@
                                 <input type="submit" class="btn btn-primary text-white mt-3" value="<spring:message code="myReservations.modify"/>">
                             </form>
                             <div id="datetime"></div>
-<%--                            <script type="text/javascript">
-                                $("#datetime").datetimepicker();
-                            </script>--%>
+                            <%--                            <script type="text/javascript">
+                                                            $("#datetime").datetimepicker();
+                                                        </script>--%>
 
                         </c:otherwise>
                     </c:choose>
                 </span>
-            </div>
         </div>
-        <c:if test="${!isOwner}">
-            <form class="mt-4" action="${cancelReservationPath}" method="post">
-                <input type="submit" class="btn btn-danger text-white" value="<spring:message code="myReservations.cancelReservation"/>" >
-            </form>
-        </c:if>
-        <hr style="height:2px;border-width:0;color:gray;background-color:gray">
     </div>
+    <c:if test="${!isOwner}">
+        <form class="mt-4" action="${cancelReservationPath}" method="post">
+            <input type="submit" class="btn btn-danger text-white" value="<spring:message code="myReservations.cancelReservation"/>" >
+        </form>
+    </c:if>
+    <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+</div>
 
 <!-- Modal -->
 <div class="modal fade" id="confirmationModalCenter" tabindex="-1" role="dialog" aria-labelledby="confirmationModalCenterTitle" aria-hidden="true">
@@ -105,4 +105,6 @@
         </div>
     </div>
 </div>
+
+
 

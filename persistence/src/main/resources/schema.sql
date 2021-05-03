@@ -104,4 +104,8 @@ CREATE TABLE IF NOT EXISTS restaurants_tags(
   CONSTRAINT restaurants_tags_pkey PRIMARY KEY (restaurant_id, tag_id)
 );
 */
-
+CREATE TABLE IF NOT EXISTS restaurant_tags(
+    restaurant_id INTEGER REFERENCES restaurants(restaurant_id),
+    tag_id INTEGER,
+    CONSTRAINT restaurants_tags_pkey PRIMARY KEY (restaurant_id, tag_id)
+    );
