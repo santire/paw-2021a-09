@@ -24,7 +24,7 @@ public interface EmailService {
     //public void sendConfirmationEmail(User restaurantOwner, User user, Date date, long quantity);
     //public void sendConfirmationEmail(Reservation reservation);
 
-    public void sendRegistrationEmail(String to, String url);
-    public void sendResetPasswordEmail(String to, String url);
+    //public void sendRegistrationEmail(String to, String url);
+    //public void sendResetPasswordEmail(String to, String url);
 
 }

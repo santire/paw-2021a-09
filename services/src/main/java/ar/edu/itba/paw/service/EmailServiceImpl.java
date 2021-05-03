@@ -128,6 +128,8 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(email);
     }
 */
+
+/*
     @Async
     @Override
     public void sendRegistrationEmail(String to, String url) {
@@ -139,8 +141,9 @@ public class EmailServiceImpl implements EmailService {
                 "\n");
         sendEmail(email);
     }
+*/
 
-
+/*
     @Async
     @Override
     public void sendResetPasswordEmail(String to, String url) {
@@ -152,6 +155,6 @@ public class EmailServiceImpl implements EmailService {
                 "\n");
         sendEmail(email);
     }
-
+*/
 
 }
