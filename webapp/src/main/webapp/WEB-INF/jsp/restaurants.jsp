@@ -19,6 +19,7 @@
                 </c:otherwise>
               </c:choose>
             </c:when>
+
             <c:otherwise>
               <c:choose>
                 <c:when test="${userIsSearching}">
@@ -29,7 +30,8 @@
                 </c:otherwise>
               </c:choose>
 
-
+            </c:otherwise>
+          </c:choose>
               <div class="row row-cols-1 row-cols-md-3">
                 <div class="col-md-3">
                   <div class="card mt-2 p-0 mx-0">
@@ -114,13 +116,13 @@
                     </div>
                   </c:forEach>
                 </div>
+
                 <c:url value="/restaurants" var="url"/>
                 <div class="mx-auto">
                   <sc:pagination baseUrl="${url}" pages="${maxPages}"/>
                 </div>
               </div>
-            </c:otherwise>
-          </c:choose>
+
         </div>
       </section>
     </main>

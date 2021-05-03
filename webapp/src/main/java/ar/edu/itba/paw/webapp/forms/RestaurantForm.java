@@ -24,6 +24,15 @@ public class RestaurantForm {
     @MultipartFileSizeValid
     private MultipartFile profileImage;
 
+    private Integer[] tags;
+
+    public Integer[] getTags() {
+        return tags;
+    }
+    public void setTags(Integer[] tags) {
+        this.tags = tags;
+    }
+
     public void setName(String name) { this.name = name; }
     public void setAddress(String address) { this.address = address; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }

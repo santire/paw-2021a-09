@@ -49,6 +49,39 @@
                 </form:label>
                 <form:errors path="phoneNumber" class="px-3 text-danger" element="p"/>
 
+
+            <div class="container">
+                <spring:message code="restaurant.edit.tags" />
+                <form:errors path="tags" class="px-3 text-danger" element="p"/>
+                <div class="row">
+                  <c:forEach var="id" items="${tags.keySet()}" >
+                      <c:choose>
+                          <c:when test="${ tagsChecked.contains(id) == true}">
+                          <div class="col-md-4">
+                                  <div class="form-check">
+                                      <form:checkbox path="tags" class="form-check-input" name="tags" value="${id}" id="flexCheckChecked" checked="checked"/>
+                                      <label class="form-check-label" for="flexCheckChecked">
+                                          <spring:message code="restaurant.tag.${id}"/>
+                                      </label>
+                                  </div>
+                          </div>
+                          </c:when>
+                          <c:otherwise>
+                              <div class="col-md-4">
+                                  <div class="form-check">
+                                      <form:checkbox path="tags" class="form-check-input" name="tags" value="${id}" id="flexCheckDefault"/>
+                                      <label class="form-check-label" for="flexCheckDefault">
+                                          <spring:message code="restaurant.tag.${id}"/>
+                                      </label>
+                                  </div>
+                              </div>
+                          </c:otherwise>
+                      </c:choose>
+                  </c:forEach>
+                </div>
+            </div>
+
+
                 <form:label class="px-3 mx-auto w-100" path="profileImage">
                     <spring:message code="restaurant.edit.profileImage"/>
                 </form:label>

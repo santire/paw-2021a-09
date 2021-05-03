@@ -168,13 +168,21 @@ public class RestaurantController {
     @RequestMapping(path = { "/register/restaurant" }, method = RequestMethod.GET)
     public ModelAndView registerRestaurant( @ModelAttribute("loggedUser") final User loggedUser, @ModelAttribute("RestaurantForm") final RestaurantForm form) {
 
-            return new ModelAndView("registerRestaurant");
+        ModelAndView mav =  new ModelAndView("registerRestaurant");
+        mav.addObject("tags", Tags.allTags());
+
+        return mav;
     }
 
 
 
     @RequestMapping(path = { "/register/restaurant" }, method = RequestMethod.POST)
     public ModelAndView registerRestaurant( @ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("RestaurantForm") final RestaurantForm form, final BindingResult errors) {
+
+        if (form.getTags().length>3) {
+            errors.rejectValue("tags", "restaurant.edit.tagsLimit");
+        }
+
         if (errors.hasErrors()) {
             LOGGER.debug("Form has errors at /register/restaurant");
             return registerRestaurant(loggedUser, form);
@@ -192,6 +200,11 @@ public class RestaurantController {
                     LOGGER.error("error while setting restaurant profile image");
                 }
             }
+            for( Integer i :form.getTags()){
+                restaurantService.addTag(restaurant.getId(),Tags.valueOf(i));
+            }
+
+
             return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
         }
         return new ModelAndView("redirect:/login");
@@ -278,6 +291,15 @@ public class RestaurantController {
                         restaurant.setPhoneNumber(form.getPhoneNumber());
                     }
                     mav.addObject("restaurant", restaurant);
+
+                    mav.addObject("tags", Tags.allTags());
+                    List<Integer> tagsChecked = new ArrayList();
+                    for( Tags t :restaurantService.tagsInRestaurant(restaurantId)){
+                        tagsChecked.add(t.getValue());
+                    }
+                    mav.addObject("tagsChecked", tagsChecked);
+
+
                     return mav;
                 }
             }
@@ -290,6 +312,12 @@ public class RestaurantController {
             @PathVariable("restaurantId") final long restaurantId, 
             @Valid @ModelAttribute("RestaurantForm") final RestaurantForm form,
             final BindingResult errors) {
+
+
+        if (form.getTags().length>3) {
+            errors.rejectValue("tags", "restaurant.edit.tagsLimit");
+        }
+
 
         if (errors.hasErrors()) {
             LOGGER.debug("Form has errors at /restaurant/{}/edit", restaurantId);
@@ -311,6 +339,14 @@ public class RestaurantController {
                     LOGGER.error("error while setting restaurant profile image");
                 }
             }
+
+            for( Tags t :restaurantService.tagsInRestaurant(restaurantId)){
+                restaurantService.removeTag(restaurantId,t);
+            }
+            for( Integer i :form.getTags()){
+                restaurantService.addTag(restaurantId,Tags.valueOf(i));
+            }
+
 
             return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
         }
