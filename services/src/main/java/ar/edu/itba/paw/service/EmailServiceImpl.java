@@ -74,6 +74,7 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(email);
     }*/
 
+    /*
     @Async
     @Override
     public void sendCancellationEmail(String to, Restaurant restaurant, String message) {
@@ -139,4 +140,5 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(email);
     }
 
+    */
 }
