@@ -99,20 +99,6 @@ public class HomeController {
         return mav;
     }
 
-    @RequestMapping("/restaurants/mine")
-    public ModelAndView restaurants(@ModelAttribute("loggedUser") final User loggedUser) {
-        if (loggedUser != null) {
-            final ModelAndView mav = new ModelAndView("restaurants");
-            List<Restaurant> userRestaurants = restaurantService.getRestaurantsFromOwner(1,1,loggedUser.getId());
-            mav.addObject("restaurants", userRestaurants);
-            return mav;
-
-        }
-
-        return new ModelAndView("redirect:/login");
-    }
-
-
     @RequestMapping(path ={"/register"}, method = RequestMethod.GET)
     public ModelAndView registerForm(@ModelAttribute("userForm") final UserForm form,
             final BindingResult errors) {
@@ -190,16 +176,5 @@ public class HomeController {
         return mav;
     }
 
-
-/*
-    @ModelAttribute
-    public Optional<User> loggedUser() {
-        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        final Optional<User> user = userService.findByEmail((String) auth.getName());
-        LOGGER.debug("Logged user is {}", user);
-        return user;
-    }
-
- */
 
 }
