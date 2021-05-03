@@ -10,7 +10,9 @@ public class Reservation {
     private long userId;
     private Date date;
     private long quantity;
+    private boolean confirmed;
 
+    private User user;
     private Restaurant restaurant;
 
     public Reservation(long id, long userId, long restaurantId, Date date, long quantity) {
@@ -27,6 +29,15 @@ public class Reservation {
         this.date = date;
         this.quantity = quantity;
         this.restaurant = restaurant;
+    }
+
+    public Reservation(long id, long userId, long restaurantId, Date date, long quantity, boolean confirmed) {
+        this.id = id;
+        this.userId = userId;
+        this.restaurantId = restaurantId;
+        this.date = date;
+        this.quantity = quantity;
+        this.confirmed = confirmed;
     }
 
 
@@ -80,4 +91,12 @@ public class Reservation {
     public void setRestaurant(Restaurant restaurant) { this.restaurant = restaurant; }
 
     public Restaurant getRestaurant() { return restaurant; }
+
+    public boolean isConfirmed() { return confirmed; }
+
+    public void setConfirmed(boolean confirmed) { this.confirmed = confirmed; }
+
+    public User getUser() { return user; }
+
+    public void setUser(User user) { this.user = user; }
 }

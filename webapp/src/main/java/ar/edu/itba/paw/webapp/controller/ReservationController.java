@@ -115,4 +115,25 @@ public class ReservationController {
         }
         return new ModelAndView("redirect:/login");
     }
+
+    @RequestMapping(path = "/reservations/{restaurantId}/{reservationId}/confirm", method = RequestMethod.POST)
+    public ModelAndView confirmReservation(@ModelAttribute("loggedUser") final User loggedUser,
+                                           @PathVariable("restaurantId") final long restaurantId,
+                                           @PathVariable("reservationId") final int reservationId){
+        if(loggedUser != null){
+            Optional<Reservation> reservation = reservationService.findById(reservationId);
+            if(reservation.isPresent()){
+                Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
+                if(restaurant.isPresent()){
+                    if(restaurant.get().getUserId() == loggedUser.getId()){
+                        reservationService.confirmReservation(reservationId);
+                        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage");
+                    }
+                    return new ModelAndView("redirect:/403");
+                }
+            }
+            return new ModelAndView("redirect:/400");
+        }
+        return new ModelAndView("redirect:/login");
+    }
 }

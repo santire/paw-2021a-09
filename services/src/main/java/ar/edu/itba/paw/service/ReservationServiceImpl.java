@@ -7,9 +7,8 @@ import ar.edu.itba.paw.persistence.ReservationDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import javax.swing.text.html.Option;
+import java.util.*;
 
 @Service
 public class ReservationServiceImpl implements ReservationService{
@@ -83,10 +82,15 @@ public class ReservationServiceImpl implements ReservationService{
     public List<Reservation> findByRestaurant(long restaurantId) {
         List<Reservation> reservations =  reservationDao.findByRestaurant(restaurantId);
         Optional<Restaurant> restaurant;
+        Optional<User> user;
         for(Reservation reservation : reservations){
             restaurant = restaurantService.findById(reservation.getRestaurantId());
+            user = userService.findById(reservation.getId());
             if(restaurant.isPresent()){
                 reservation.setRestaurant(restaurant.get());
+            }
+            if(user.isPresent()){
+                reservation.setUser(user.get());
             }
         }
         return reservations;
@@ -96,23 +100,85 @@ public class ReservationServiceImpl implements ReservationService{
         List<Reservation> reservations =  reservationDao.findByRestaurant(page, amountOnPage, restaurantId);
         reservations.stream().forEach(r -> {
             Optional<Restaurant> restaurant = restaurantService.findById(r.getRestaurantId());
+            Optional<User> user = userService.findById(r.getUserId());
             if(restaurant.isPresent()) {
                 r.setRestaurant(restaurant.get());
+            }
+            if(user.isPresent()){
+                r.setUser(user.get());
             }
         });
 	  	return reservations;
 	  }
 
+	  // NOT USED YET
+    @Override
+    public List<Reservation> findConfirmedByRestaurant(int page, int amountOnPage, long restaurantId) {
+        List<Reservation> reservations =  reservationDao.findConfirmedByRestaurant(page, amountOnPage, restaurantId);
+        reservations.stream().forEach(r -> {
+            Optional<Restaurant> restaurant = restaurantService.findById(r.getRestaurantId());
+            Optional<User> user = userService.findById(r.getUserId());
+            if(restaurant.isPresent()) {
+                r.setRestaurant(restaurant.get());
+            }
+            if(user.isPresent()){
+                r.setUser(user.get());
+            }
+        });
+        return reservations;
+    }
+
+    // NOT USED YET
+    @Override
+    public List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId) {
+        List<Reservation> reservations =  reservationDao.findPendingByRestaurant(page, amountOnPage, restaurantId);
+        reservations.stream().forEach(r -> {
+            Optional<Restaurant> restaurant = restaurantService.findById(r.getRestaurantId());
+            Optional<User> user = userService.findById(r.getUserId());
+            if(restaurant.isPresent()) {
+                r.setRestaurant(restaurant.get());
+            }
+            if(user.isPresent()){
+                r.setUser(user.get());
+            }
+        });
+        return reservations;
+    }
+
 	  @Override
 	  public int findByRestaurantPageCount(int amountOnPage, long restaurantId) {
 	  	return reservationDao.findByRestaurantPageCount(amountOnPage, restaurantId);
 	  }
-    
+
+	  @Override
+      public HashMap<String, List<Reservation>> findByRestaurantByConfirmation(long restaurantId){
+        List<Reservation> allReservations = reservationDao.findByRestaurant(restaurantId);
+        HashMap<String, List<Reservation>> separatedReservations = new HashMap<>();
+        List<Reservation> confirmedReservations = new ArrayList<>();
+        List<Reservation> pendingReservations = new ArrayList<>();
+        for(Reservation reservation : allReservations){
+            if(reservation.isConfirmed()){
+                confirmedReservations.add(reservation);
+            }
+            else{
+                pendingReservations.add(reservation);
+            }
+        }
+        separatedReservations.put("confirmed", confirmedReservations);
+        separatedReservations.put("pending", pendingReservations);
+        return separatedReservations;
+      }
+
 
     // UPDATE
     @Override
     public Optional<Reservation> modifyReservation(int reservationId, Date date, long quantity){
         return reservationDao.modifyReservation(reservationId, date, quantity);
+    }
+
+    @Override
+    public boolean confirmReservation(int reservationId){
+        return reservationDao.confirmReservation(reservationId);
     }
 
     // DESTROY

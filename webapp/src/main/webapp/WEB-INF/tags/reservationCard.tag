@@ -5,7 +5,6 @@
 <%@attribute name="reservation" required="true" type="ar.edu.itba.paw.model.Reservation"%>
 <%@attribute name="isOwner" required="true" type="java.lang.Boolean"%>
 <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-<%--<div class="row">--%>
 
     <div class="card border-0">
         <div class="row">
@@ -42,39 +41,57 @@
                 <c:url value="/reservations/${reservation.getId()}/cancel" var="cancelReservationPath"/>
                 <span class="block">
                     <c:choose>
+                        <c:when test="${reservation.isConfirmed()}">
+                            <h5 class="mb-5 mx-auto" style="color: darkgreen"><spring:message code="reservation.card.confirmed"/></h5>
+                        </c:when>
+                        <c:otherwise>
+                            <h5 class="mb-5" style="color: goldenrod"><spring:message code="reservation.card.pending"/></h5>
+                        </c:otherwise>
+                    </c:choose>
+
+                    <c:choose>
                         <c:when test="${isOwner}">
+                            <c:if test="${!reservation.isConfirmed()}">
+                                <c:url value="/reservations/${restaurant.getId()}/${reservation.getId()}/confirm" var="confirmationPath"/>
+                                <form action="${confirmationPath}" method="post">
+                                <input type="submit" class="btn btn-success text-white" value="<spring:message code="restaurant.manage.confirmReservation"/> ">
+                            </form>
+                            </c:if>
+
                             <button type="button" class="btn btn-danger text-white" data-toggle="modal" data-target="#confirmationModalCenter">
                                 <spring:message code="myReservations.cancelReservation"/>
                             </button>
                         </c:when>
                         <c:otherwise>
-                            <span class="align-text-top">
-                                <h5><spring:message code="myReservations.change"/></h5>
-                            </span>
-                            <form action="${modifyReservationPath}" class="mt-3" method="post">
-                                <div class="input-group mb-3 d-inline" >
-                                    <div class="input-group-prepend ">
-                                        <span class="input-group-text d-inline"><i class="fa fa-users"></i></span>
-                                        <input type="number" min="1" max="12" value="${reservation.getQuantity()}" name="quantity">
-                                    </div>
-                                </div>
-                                <input type="submit" class="btn btn-primary text-white mt-3" value="<spring:message code="myReservations.modify"/>">
-                            </form>
-                            <div id="datetime"></div>
-<%--                            <script type="text/javascript">
-                                $("#datetime").datetimepicker();
-                            </script>--%>
-
+                            <%--                            CHANGE RESERVATION QUANTITY--%>
+<%--                            <span class="align-text-top">--%>
+<%--                                <h5><spring:message code="myReservations.change"/></h5>--%>
+<%--                            </span>--%>
+<%--                            <form action="${modifyReservationPath}" class="mt-3" method="post">--%>
+<%--                                <div class="input-group mb-3 d-inline" >--%>
+<%--                                    <div class="input-group-prepend ">--%>
+<%--                                        <span class="input-group-text d-inline"><i class="fa fa-users"></i></span>--%>
+<%--                                        <input type="number" min="1" max="12" value="${reservation.getQuantity()}" name="quantity">--%>
+<%--                                    </div>--%>
+<%--                                </div>--%>
+<%--                                <input type="submit" class="btn btn-primary text-white mt-3" value="<spring:message code="myReservations.modify"/>">--%>
+<%--                            </form>--%>
                         </c:otherwise>
                     </c:choose>
                 </span>
             </div>
         </div>
-        <c:if test="${!isOwner}">
-            <form class="mt-4" action="${cancelReservationPath}" method="post">
-                <input type="submit" class="btn btn-danger text-white" value="<spring:message code="myReservations.cancelReservation"/>" >
-            </form>
-        </c:if>
+        <c:choose>
+            <c:when test="${!isOwner}">
+                <form class="mt-4" action="${cancelReservationPath}" method="post">
+                    <input type="submit" class="btn btn-danger text-white" value="<spring:message code="myReservations.cancelReservation"/>" >
+                </form>
+            </c:when>
+            <c:otherwise>
+                <h5 class="mt-4"><spring:message code="reservation.card.contactInformation"/></h5>
+                <p>${reservation.getUser().getFirstName()} ${reservation.getUser().getLastName()} - ${reservation.getUser().getPhone()}</p>
+            </c:otherwise>
+        </c:choose>
         <hr style="height:2px;border-width:0;color:gray;background-color:gray">
     </div>
 

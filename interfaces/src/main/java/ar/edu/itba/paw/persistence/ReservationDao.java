@@ -20,12 +20,15 @@ public interface ReservationDao {
 
     public List<Reservation> findByRestaurant(long restaurantId);
     public List<Reservation> findByRestaurant(int page, int amountOnPage, long restaurantId);
+    public List<Reservation> findConfirmedByRestaurant(int page, int amountOnPage, long restaurantId);
+    public List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId);
     public int findByRestaurantPageCount(int amountOnPage, long restaurantId);
 
     public Optional<Reservation> findById(int id);
 
     // UPDATE
     public Optional<Reservation> modifyReservation(int reservationId, Date date, long quantity);
+    public boolean confirmReservation(int reservationId);
 
     // DESTROY
     public boolean cancelReservation(int id);

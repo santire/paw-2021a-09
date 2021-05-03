@@ -11,10 +11,10 @@
                     <h2 class="display-5 mt-5"><spring:message code="restaurant.manage.title"/> ${restaurant.getName()}</h2>
                     <ul class="nav nav-pills nav-fill navtop mt-5">
                         <li class="nav-item">
-                            <a class="nav-link active"  href="#reservations" data-toggle="pill" role="tab"><spring:message code="restaurant.manage.reservationTab"/></a>
+                            <a class="nav-link active"  href="#reservations" data-toggle="pill" role="tab"><spring:message code="restaurant.manage.confirmedTab"/></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#reviews" data-toggle="pill" role="tab"><spring:message code="restaurant.manage.reviewsTab"/></a>
+                            <a class="nav-link" href="#pending" data-toggle="pill" role="tab"><spring:message code="restaurant.manage.pendingTab"/></a>
                         </li>
                     </ul>
                     <div class="tab-content mt-5">
@@ -40,7 +40,7 @@
                                 </c:otherwise>
                             </c:choose>
                         </div>
-                        <div class="tab-pane fade show active" role="tabpanel" id="reviews">
+                        <div class="tab-pane fade show active" role="tabpanel" id="pending">
 
                         </div>
                     </div>
