@@ -13,7 +13,7 @@ public interface EmailService {
 
     //public void sendCancellationEmail(String to, Restaurant restaurant, String message);
     public void sendEmail(Email mail);
-
+    public void sendEmail(Email mail, String plainText);
 
     //public void sendReservationEmail(User restaurantOwner, User user, Date date, long quantity);
     //public void sendConfirmationEmail(User restaurantOwner, User user, Date date, long quantity);
