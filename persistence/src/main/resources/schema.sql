@@ -74,6 +74,13 @@ CREATE TABLE IF NOT EXISTS verification_tokens(
   user_id INTEGER UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS password_tokens(
+  token_id SERIAL PRIMARY KEY,
+  token VARCHAR(36) UNIQUE,
+  created_at TIMESTAMP,
+  user_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
+);
+
 /* CREATE TABLE IF NOT EXISTS reviews( */
   /* review_id SERIAL PRIMARY KEY, */
   /* user_rating INTEGER, */

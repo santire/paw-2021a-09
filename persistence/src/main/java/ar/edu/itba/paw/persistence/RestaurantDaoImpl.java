@@ -2,6 +2,8 @@ package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.model.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -21,6 +23,8 @@ import java.util.stream.Collectors;
 
 @Repository
 public class RestaurantDaoImpl implements RestaurantDao {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantDaoImpl.class);
 
     @Autowired
     private UserDao userDao;
@@ -125,6 +129,7 @@ public class RestaurantDaoImpl implements RestaurantDao {
 
     @Override
     public Optional<Restaurant> findByIdWithMenu(long id, int menuPage, int amountOnMenuPage) {
+        LOGGER.error("MENU PAGE: {}", menuPage);
         return jdbcTemplate.query(
                 " SELECT r.*, m.menu_item_id, m.name as menu_item_name, m.description, m.price, m.restaurant_id, i.image_data"
                 + 
@@ -146,7 +151,7 @@ public class RestaurantDaoImpl implements RestaurantDao {
     @Override
     public int findByIdWithMenuPagesCount(int amountOnMenuPage, long id) {
 
-        return jdbcTemplate.query(
+        int amount = jdbcTemplate.query(
                 " SELECT CEILING(COUNT(m.menu_item_id)::numeric/?) as c"
                 + 
                 " FROM restaurants r"
@@ -156,6 +161,7 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 "  WHERE r.restaurant_id = ?"
                 ,(r, n) -> r.getInt("c"), amountOnMenuPage, id)
                 .stream().findFirst().orElse(0);
+        return amount <= 0 ? 1 : amount;
 
     }
 
@@ -202,22 +208,24 @@ public class RestaurantDaoImpl implements RestaurantDao {
 
    @Override
    public int getRestaurantsFromOwnerPagesCount(int amountOnPage, long userId) {
-        return jdbcTemplate.query(
+        int amount =  jdbcTemplate.query(
                 "SELECT CEILING(COUNT(*)::numeric/?) as c FROM restaurants"
                 +
                 " WHERE user_id = ?"
                 , (r,s) -> r.getInt("c"), amountOnPage, userId)
                 .stream().findFirst().orElse(0);
+        return amount <= 0 ? 1 : amount;
    }
 
     @Override
     public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm) {
-        return jdbcTemplate.query(
+        int amount =  jdbcTemplate.query(
                 "SELECT CEILING(COUNT(*)::numeric/?) as c FROM restaurants"
                 + 
                 " WHERE name ILIKE ?"
                 ,(r, n) -> r.getInt("c"), amountOnPage, '%' + searchTerm + '%')
                 .stream().findFirst().orElse(0);
+        return amount <= 0 ? 1 : amount;
     }
 
     @Override

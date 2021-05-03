@@ -2,6 +2,7 @@ package ar.edu.itba.paw.persistence;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Optional;
 
@@ -19,6 +20,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.exceptions.EmailInUseException;
 import ar.edu.itba.paw.persistence.config.TestConfig;
 
 @Rollback
@@ -49,9 +51,8 @@ public class UserDaoImplTest {
   }
 
   @Test
-  public void testRegister() {
-    final User user = userDao.register(USERNAME,PASSWORD,FIRST_NAME,LAST_NAME,EMAIL,PHONE).get();
-
+  public void testRegister() throws EmailInUseException{
+    final User user = userDao.register(USERNAME,PASSWORD,FIRST_NAME,LAST_NAME,EMAIL,PHONE);
     assertEquals(USERNAME, user.getName());
     assertEquals(USERNAME, user.getUsername());
     assertEquals(PASSWORD, user.getPassword());
@@ -64,7 +65,6 @@ public class UserDaoImplTest {
     // the @Sql annotation and the other one is the one being registered in this
     // method
     assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "users"));
-
   }
 
   @Test

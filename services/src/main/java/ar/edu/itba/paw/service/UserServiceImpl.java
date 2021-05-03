@@ -2,12 +2,13 @@ package ar.edu.itba.paw.service;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import ar.edu.itba.paw.exceptions.UserRegistrationException;
 import ar.edu.itba.paw.model.Restaurant;
 
 import org.slf4j.Logger;
@@ -19,6 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.VerificationToken;
+import ar.edu.itba.paw.model.exceptions.EmailInUseException;
+import ar.edu.itba.paw.model.exceptions.TokenCreationException;
+import ar.edu.itba.paw.model.exceptions.TokenDoesNotExistException;
+import ar.edu.itba.paw.model.exceptions.TokenExpiredException;
+import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
 import ar.edu.itba.paw.persistence.UserDao;
 
 @Service
@@ -35,9 +41,6 @@ public class UserServiceImpl implements UserService {
   @Autowired
   private EmailService emailService;
 
-  @Autowired
-  private RestaurantService restaurantService;
-
   @Override
   public Optional<User> findById(long id) {
     return this.userDao.findById(id);
@@ -46,53 +49,63 @@ public class UserServiceImpl implements UserService {
   @Transactional
   @Override
   public User register(String username, String password, String firstName, String lastName, String email,
-      String phone) {
+      String phone) throws EmailInUseException, TokenCreationException {
 
-    Optional<User> maybeUser = userDao.register(username,encoder.encode(password), firstName, lastName, email, phone);
-    if (maybeUser.isPresent()) {
-      User user = maybeUser.get();
-
+      User user = userDao.register(username,encoder.encode(password), firstName, lastName, email, phone);
       String url = "http://pawserver.it.itba.edu.ar/paw-2021a-09/activate?token=";
 
       String token = UUID.randomUUID().toString();
-      Timestamp createdAt = Timestamp.from(Instant.now());
+      LocalDateTime createdAt = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.systemDefault());
 
       userDao.assignTokenToUser(token, createdAt, user.getId());
 
       emailService.sendRegistrationEmail(email, url+token);
-    }
 
-    return  maybeUser.orElseThrow(UserRegistrationException::new);
+    return  user;
+  }
+
+  @Transactional
+  @Override
+  public void requestPasswordReset(String email) throws TokenCreationException {
+    User user = userDao.findByEmail(email).orElseThrow(UserNotFoundException::new);
+    String url = "http://pawserver.it.itba.edu.ar/paw-2021a-09/reset-password?token=";
+    String token = UUID.randomUUID().toString();
+    LocalDateTime createdAt = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.systemDefault());
+
+    userDao.assignPasswordTokenToUser(token, createdAt, user.getId());
+
+    emailService.sendResetPasswordEmail(email, url+token);
+      
   }
 
   @Override
-  public User activateUserByToken(String token) {
-    // TODO: Add custom exceptions
+  public User activateUserByToken(String token) throws TokenExpiredException {
+
 
     Optional<VerificationToken> maybeToken = userDao.getToken(token);
+    User user = getUserFromMaybeToken(maybeToken);
 
-    VerificationToken verificationToken = maybeToken.orElseThrow(() -> new RuntimeException("Token doesn't exist"));
-
-    Instant expiryDate = Instant.from(verificationToken.getCreatedAt().toInstant()).plus(24, ChronoUnit.HOURS);
-
-    if(Instant.now().isAfter(expiryDate)) {
-      LOGGER.warn("verificationToken {} is expired", token);
-      throw new RuntimeException("Token is expired");
-    }
-
-    Optional<User> maybeUser = userDao.findById(verificationToken.getUserId());
-    /*
-    User user = maybeUser.orElseThrow(() -> {
-      // If the data source is configured properly there shouldn't be an invalid user id
-      // assigned to a verification token. If this happens something's wrong...
-      LOGGER.error("id {} associated to token {} is not valid.");
-      throw new RuntimeException("Invalid user id");
-    });
-     */
-    User user = maybeUser.orElseThrow(() -> new RuntimeException("Invalid user id"));
-    
     user = userDao.activateUserById(user.getId()).orElseThrow(() -> new RuntimeException("Couldn't activate user"));
     userDao.deleteToken(token);
+    return user;
+  }
+
+  @Override
+  public User updatePasswordByToken(String token, String password) throws TokenExpiredException {
+
+    Optional<VerificationToken> maybeToken = userDao.getPasswordToken(token);
+    User user = getUserFromMaybeToken(maybeToken);
+
+    user = userDao.activateUserById(user.getId()).orElseThrow(() -> new RuntimeException("Couldn't activate user"));
+    updateUser(user.getId(), 
+                user.getName(),
+                encoder.encode(password),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getPhone());
+
+    userDao.deleteAssociatedPasswordTokens(token);
     return user;
   }
 
@@ -125,4 +138,26 @@ public class UserServiceImpl implements UserService {
     userDao.updateUser(id, username, password, firstName, lastName, email, phone);
   }
 
+  private User getUserFromMaybeToken(Optional<VerificationToken> maybeToken) throws TokenExpiredException {
+    VerificationToken verificationToken = maybeToken.orElseThrow(TokenDoesNotExistException::new);
+    Instant expiryDate = Instant.from(verificationToken.getCreatedAt().toInstant()).plus(24, ChronoUnit.HOURS);
+
+    if(Instant.now().isAfter(expiryDate)) {
+      LOGGER.warn("verificationToken {} is expired", verificationToken.getToken());
+      throw new TokenExpiredException();
+    }
+
+    /*Optional<User> maybeUser = userDao.findById(verificationToken.getUserId());
+    return maybeUser.orElseThrow(() -> {
+      // If the data source is configured properly there shouldn't be an invalid user id
+      // assigned to a verification token. If this happens something's wrong...
+      LOGGER.error("id {} associated to token {} is not valid.");
+      throw new RuntimeException("Invalid user id");
+    });
+
+     */
+    Optional<User> maybeUser = userDao.findById(verificationToken.getUserId());
+    User user = maybeUser.orElseThrow(() -> new RuntimeException("Invalid user id"));
+    return user;
+  }
 }

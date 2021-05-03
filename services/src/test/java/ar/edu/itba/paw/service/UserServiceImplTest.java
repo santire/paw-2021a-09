@@ -2,6 +2,7 @@ package ar.edu.itba.paw.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
 
@@ -16,6 +17,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.exceptions.EmailInUseException;
+import ar.edu.itba.paw.model.exceptions.TokenCreationException;
 import ar.edu.itba.paw.persistence.UserDao;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -42,7 +45,7 @@ public class UserServiceImplTest {
   private PasswordEncoder encoder;
 
   @Test
-  public void testRegister() {
+  public void testRegister() throws EmailInUseException, TokenCreationException {
 
     Mockito.when(mockDao.register(
     Mockito.eq(USERNAME),
@@ -53,11 +56,11 @@ public class UserServiceImplTest {
     Mockito.eq(PHONE)
     
     )).thenReturn(
-      Optional.of(new User(1, USERNAME,PASSWORD,FIRST_NAME,LAST_NAME,EMAIL,PHONE)));
+      (new User(1, USERNAME,PASSWORD,FIRST_NAME,LAST_NAME,EMAIL,PHONE)));
 
     Mockito.when(encoder.encode(PASSWORD)).thenReturn(PASSWORD);
 
-    User user = userService.register(USERNAME,PASSWORD,FIRST_NAME,LAST_NAME,EMAIL,PHONE);
+    User user= userService.register(USERNAME,PASSWORD,FIRST_NAME,LAST_NAME,EMAIL,PHONE);
 
     assertEquals(USERNAME, user.getName());
     assertEquals(USERNAME, user.getUsername());
