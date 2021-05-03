@@ -275,7 +275,7 @@ public class RestaurantController {
                         restaurant.setAddress(form.getAddress());
                     }
                     if(form.getPhoneNumber() != null && !form.getPhoneNumber().isEmpty()) {
-                        restaurant.setName(form.getPhoneNumber());
+                        restaurant.setPhoneNumber(form.getPhoneNumber());
                     }
                     mav.addObject("restaurant", restaurant);
                     return mav;

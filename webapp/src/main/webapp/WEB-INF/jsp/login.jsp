@@ -43,6 +43,9 @@
                             <spring:message code="hello.login.rememberme"></spring:message>
                         </label>
                   </div>
+                  <div class="px-3">
+                    <spring:message code="login.forgotPassword"/> <a href="<c:url value="/forgot-password"/>"><spring:message code="register.clickHere"/></a>
+                  </div>
                   <div>
                     <input type="submit" 
                     class="btn btn-outline-secondary btn-block w-100 mt-3 px-0 mx-auto" 
