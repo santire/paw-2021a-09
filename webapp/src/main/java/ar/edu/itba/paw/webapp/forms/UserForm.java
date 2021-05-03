@@ -16,9 +16,12 @@ public class UserForm {
   @Size(min = 8, max = 100)
   private String repeatPassword;
 
+
+  @Pattern(regexp = "[a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]+")
   @Size(min = 2, max = 100)
   private String firstName;
 
+  @Pattern(regexp = "[a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]+")
   @Size(min = 2, max = 100)
   private String lastName;
 
