@@ -121,4 +121,16 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(email);
     }
 
+    @Async
+    @Override
+    public void sendResetPasswordEmail(String to, String url) {
+        Email email = new Email();
+        email.setMailTo(to);
+        email.setMailSubject("Reset Password");
+        email.setMailContent("You have requested a password reset, if this wasn't you ignore this email.\n"
+                + "Click the following link to reset password: " + url +
+                "\n");
+        sendEmail(email);
+    }
+
 }

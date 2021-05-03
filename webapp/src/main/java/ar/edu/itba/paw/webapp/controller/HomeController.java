@@ -52,7 +52,7 @@ public class HomeController {
     private RestaurantService restaurantService;
 
     @Autowired
-    private PawUserDetailsService PawUserDetailsService;
+    private PawUserDetailsService pawUserDetailsService;
 
 
     @RequestMapping("/")
@@ -164,7 +164,7 @@ public class HomeController {
             return new ModelAndView("redirect:/register").addObject("tokenError", true);
         }
 
-        UserDetails userDetails = PawUserDetailsService.loadUserByUsername(user.getEmail());
+        UserDetails userDetails = pawUserDetailsService.loadUserByUsername(user.getEmail());
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 userDetails, userDetails.getPassword(), userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
