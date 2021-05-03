@@ -20,9 +20,9 @@
                     <div class="tab-content mt-5">
                         <div class="tab-pane fade show active" role="tabpanel" id="reservations">
                             <c:choose>
-                                <c:when test="${restaurantHasReservations}">
+                                <c:when test="${restaurantHasConfirmedReservations}">
                                     <h2 class="display-5 text-center mt-5"><spring:message code="restaurant.manage.reservationsTitle" /></h2>
-                                    <c:forEach var="reservation" items="${reservations}">
+                                    <c:forEach var="reservation" items="${confirmedReservations}">
                                         <div class="row mt-5">
                                             <sc:reservationCard
                                                     reservation="${reservation}"
@@ -30,10 +30,10 @@
                                             />
                                         </div>
                                     </c:forEach>
-                                    <c:url value="/restaurant/${restaurantId}/manage" var="url"/>
-                                    <div class="mx-auto">
-                                        <sc:pagination baseUrl="${url}" pages="${maxPages}"/>
-                                    </div>
+<%--                                    <c:url value="/restaurant/${restaurantId}/manage" var="url"/>--%>
+<%--                                    <div class="mx-auto">--%>
+<%--                                        <sc:pagination baseUrl="${url}" pages="${maxPages}"/>--%>
+<%--                                    </div>--%>
                                 </c:when>
                                 <c:otherwise>
                                     <h2 class="display-5 text-center mt-5"><spring:message code="restaurant.manage.noReservations" /></h2>
@@ -41,7 +41,26 @@
                             </c:choose>
                         </div>
                         <div class="tab-pane fade show active" role="tabpanel" id="pending">
-
+                            <c:choose>
+                                <c:when test="${restaurantHasPendingReservations}">
+                                    <h2 class="display-5 text-center mt-5"><spring:message code="restaurant.manage.reservationsTitle" /></h2>
+                                    <c:forEach var="reservation" items="${pendingReservations}">
+                                        <div class="row mt-5">
+                                            <sc:reservationCard
+                                                    reservation="${reservation}"
+                                                    isOwner="${isOwner}"
+                                            />
+                                        </div>
+                                    </c:forEach>
+<%--                                    <c:url value="/restaurant/${restaurantId}/manage" var="url"/>--%>
+<%--                                    <div class="mx-auto">--%>
+<%--                                        <sc:pagination baseUrl="${url}" pages="${maxPages}"/>--%>
+<%--                                    </div>--%>
+                                </c:when>
+                                <c:otherwise>
+                                    <h2 class="display-5 text-center mt-5"><spring:message code="restaurant.manage.noReservations" /></h2>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                     </div>
                 </div>

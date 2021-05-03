@@ -7,7 +7,7 @@
 <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
 
     <div class="card border-0">
-        <div class="row">
+        <div class="row row-cols-1 row-cols-md-3">
             <div class="col border d-flex align-items-center justify-content-center border-0">
                     <c:choose>
                         <c:when test="${reservation.getRestaurant().getMaybeProfileImage().isPresent()}">

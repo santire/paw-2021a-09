@@ -337,16 +337,21 @@ public class RestaurantController {
                     page = maxPages;
                 }
                 mav.addObject("restaurant", restaurant.get());
-                List<Reservation> reservations = reservationService.findByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
-                if(reservations.isEmpty()){
-                    mav.addObject("restaurantHasReservations", false);
-                }
-                else{
-                    mav.addObject("maxPages", maxPages);
-                    mav.addObject("restaurantHasReservations", true);
-                    mav.addObject("reservations", reservations);
-                    mav.addObject("isOwner", true);
-                }
+                List<Reservation> confirmedReservations = reservationService.findConfirmedByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
+                List<Reservation> pendingReservations = reservationService.findPendingByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
+
+                //List<Reservation> reservations = reservationService.findByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
+                if(confirmedReservations.isEmpty()){ mav.addObject("restaurantHasConfirmedReservations", false); }
+                else { mav.addObject("restaurantHasConfirmedReservations", true); }
+
+                if(pendingReservations.isEmpty()){ mav.addObject("restaurantHasPendingReservations", false); }
+                else { mav.addObject("restaurantHasPendingReservations", true); }
+
+                mav.addObject("maxPages", maxPages);
+                mav.addObject("confirmedReservations", confirmedReservations);
+                mav.addObject("pendingReservations", pendingReservations);
+                mav.addObject("isOwner", true);
+
                 return mav;
             }
             else{
