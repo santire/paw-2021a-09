@@ -1,6 +1,5 @@
 package ar.edu.itba.paw.webapp.forms;
 
-import org.hibernate.validator.constraints.Email;
 
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -26,7 +25,8 @@ public class UserForm {
   @Size(min = 6, max = 100)
   // @Pattern(regexp =
   // "/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/")
-  @Email
+
+  @Pattern(regexp = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$")
   private String email;
 
   private boolean emailInUse;

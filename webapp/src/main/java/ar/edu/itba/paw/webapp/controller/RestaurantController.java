@@ -1,13 +1,13 @@
 package ar.edu.itba.paw.webapp.controller;
 
 import ar.edu.itba.paw.model.*;
+import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
 
 import javax.validation.Valid;
 
 
 import ar.edu.itba.paw.service.MenuService;
 import ar.edu.itba.paw.service.ReservationService;
-import ar.edu.itba.paw.webapp.exceptions.UserNotFoundException;
 
 import ar.edu.itba.paw.service.*;
 import ar.edu.itba.paw.webapp.forms.MenuItemForm;
@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import ar.edu.itba.paw.webapp.exceptions.RestaurantNotFoundException;
 
 import java.util.*;
 import java.io.IOException;
@@ -97,6 +96,7 @@ public class RestaurantController {
             mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
         }
 
+        LOGGER.error("page value: {}", page);
         mav.addObject("restaurant",
                 restaurantService.findByIdWithMenu(restaurantId, page, AMOUNT_OF_MENU_ITEMS).orElseThrow(RestaurantNotFoundException::new));
         return mav;
@@ -275,7 +275,7 @@ public class RestaurantController {
                         restaurant.setAddress(form.getAddress());
                     }
                     if(form.getPhoneNumber() != null && !form.getPhoneNumber().isEmpty()) {
-                        restaurant.setName(form.getPhoneNumber());
+                        restaurant.setPhoneNumber(form.getPhoneNumber());
                     }
                     mav.addObject("restaurant", restaurant);
                     return mav;

@@ -1,17 +1,17 @@
 package ar.edu.itba.paw.webapp.controller;
 
 
-import ar.edu.itba.paw.webapp.exceptions.RestaurantNotFoundException;
-import ar.edu.itba.paw.webapp.exceptions.UserNotFoundException;
 
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
+
+import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
+import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
 
 @ControllerAdvice
 public class ExceptionHandlingAdvice  {

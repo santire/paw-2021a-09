@@ -14,8 +14,17 @@ public interface EmailService {
     //public void sendCancellationEmail(String to, Restaurant restaurant, String message);
     public void sendEmail(Email mail);
 
+
     //public void sendReservationEmail(User restaurantOwner, User user, Date date, long quantity);
     //public void sendConfirmationEmail(User restaurantOwner, User user, Date date, long quantity);
     //public void sendConfirmationEmail(Reservation reservation, Locale locale);
     //public void sendRegistrationEmail(String to, String url);
+
+    //public void sendReservationEmail(User restaurantOwner, User user, Date date, long quantity);
+    //public void sendConfirmationEmail(User restaurantOwner, User user, Date date, long quantity);
+    //public void sendConfirmationEmail(Reservation reservation);
+
+    public void sendRegistrationEmail(String to, String url);
+    public void sendResetPasswordEmail(String to, String url);
+
 }

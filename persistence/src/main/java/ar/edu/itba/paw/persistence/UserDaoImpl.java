@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.VerificationToken;
+import ar.edu.itba.paw.model.exceptions.EmailInUseException;
+import ar.edu.itba.paw.model.exceptions.TokenCreationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -16,6 +18,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import javax.sql.DataSource;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Repository
@@ -46,12 +49,14 @@ public class UserDaoImpl implements UserDao {
     private JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
     private final SimpleJdbcInsert jdbcInsertToken;
+    private final SimpleJdbcInsert jdbcInsertPasswordToken;
 
     @Autowired
     public UserDaoImpl(final DataSource ds) {
         jdbcTemplate = new JdbcTemplate(ds);
         jdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("users").usingGeneratedKeyColumns("user_id");
         jdbcInsertToken = new SimpleJdbcInsert(jdbcTemplate).withTableName("verification_tokens").usingGeneratedKeyColumns("token_id");
+        jdbcInsertPasswordToken = new SimpleJdbcInsert(jdbcTemplate).withTableName("password_tokens").usingGeneratedKeyColumns("token_id");
     }
 
 
@@ -95,7 +100,13 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public Optional<User> register(final String username,final String password,final String firstName,final String lastName,final String email,final String phone) {
+    public User register(
+            final String username,
+            final String password,
+            final String firstName,
+            final String lastName,
+            final String email,
+            final String phone) throws EmailInUseException {
 
 
         MapSqlParameterSource params = new MapSqlParameterSource();
@@ -111,27 +122,52 @@ public class UserDaoImpl implements UserDao {
             userId = jdbcInsert.executeAndReturnKey(params);
         } catch(DuplicateKeyException e) {
             LOGGER.warn("Can't register, email: {} already in use", email);
-            return Optional.empty();
+            throw new EmailInUseException("Email "+ email +" already in use", email);
         }
 
         LOGGER.debug("INSERTED INACTIVE USER. RETURNED ID: {}", userId.longValue());
         User newUser = new User(userId.longValue(),username,password, firstName,lastName,email,phone);
-        return Optional.of(newUser);
+        return newUser;
     }
 
     @Override
-    public void assignTokenToUser(String token, Timestamp createdAt, long userId) {
+    public void assignTokenToUser(String token, LocalDateTime createdAt, long userId) throws TokenCreationException {
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("token", token);
-        params.addValue("created_at", createdAt);
+        params.addValue("created_at", Timestamp.valueOf(createdAt));
         params.addValue("user_id", userId);
-        jdbcInsertToken.execute(params);
+        try {
+            jdbcInsertToken.execute(params);
+        } catch (Exception e) {
+            throw new TokenCreationException();
+        }
+    }
+
+    @Override
+    public void assignPasswordTokenToUser(String token, LocalDateTime createdAt, long userId)
+            throws TokenCreationException {
+        
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("token", token);
+        params.addValue("created_at", Timestamp.valueOf(createdAt));
+        params.addValue("user_id", userId);
+        try {
+            jdbcInsertPasswordToken.execute(params);
+        } catch (Exception e) {
+            throw new TokenCreationException();
+        }
     }
 
     @Override
     public Optional<VerificationToken> getToken(String token) {
         return jdbcTemplate.query("SELECT * FROM verification_tokens WHERE token = ?", TOKEN_ROW_MAPPER, token)
+            .stream().findFirst();
+    }
+
+    @Override
+    public Optional<VerificationToken> getPasswordToken(String token) {
+        return jdbcTemplate.query("SELECT * FROM password_tokens WHERE token = ?", TOKEN_ROW_MAPPER, token)
             .stream().findFirst();
     }
 
@@ -151,6 +187,23 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    public void deleteAssociatedPasswordTokens(String token) {
+        try {
+            jdbcTemplate.update(
+                    "DELETE FROM password_tokens"
+                    +
+                    " WHERE user_id IN ("
+                    + 
+                    " SELECT user_id FROM password_tokens"
+                    + 
+                    " WHERE token=?)"
+                    , token);
+        } catch (Exception e) {
+            LOGGER.error("Something went wrong deleting token {}", token);
+        }
+    }
+
+    @Override
     public void updateUser(long id, String username, String password, String firstName, String lastName, String email, String phone) {
         jdbcTemplate.update(
                 "UPDATE users"
@@ -162,4 +215,22 @@ public class UserDaoImpl implements UserDao {
     }
 
 
+    @Override
+    public void purgeAllExpiredTokensSince(LocalDateTime expiredCreatedAt) {
+        Timestamp expiredCreatedAtTimestamp = Timestamp.valueOf(expiredCreatedAt);
+        try {
+            jdbcTemplate.update(
+                    "DELETE FROM password_tokens"
+                    +
+                    " WHERE created_at > ?"
+                    , expiredCreatedAtTimestamp);
+            jdbcTemplate.update(
+                    "DELETE FROM verification_tokens"
+                    +
+                    " WHERE created_at < ?"
+                    , expiredCreatedAtTimestamp);
+        } catch (Exception e) {
+            LOGGER.error("Something went wrong deleting tokens. Expiry date {}", expiredCreatedAt.toString());
+        }
+    }
 }
