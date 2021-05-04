@@ -94,7 +94,8 @@ public class RestaurantController {
                 mav.addObject("userRatingToRestaurant", userRating.get().getRating());
             }
             mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
-            List<String> times = Arrays.asList("19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30");
+            List<String> times = restaurantService.availableStringTime(restaurantId);
+            /*List<String> times = Arrays.asList("19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30");*/
             mav.addObject("times", times);
         }
 
@@ -122,7 +123,13 @@ public class RestaurantController {
             if (time.getHour() <= currentHours) {
                 errors.rejectValue("time",
                                     "reservationForm.time",
-                                    "Date is before current time");
+                                    "Selected hour has already passed");
+            }
+            // Range validator
+            if(!restaurantService.availableTime(restaurantId).contains(time)){
+                errors.rejectValue("time",
+                        "reservationForm.time",
+                        "Select an hour from list");
             }
         }
         if (errors.hasErrors()) {

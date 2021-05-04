@@ -7,6 +7,9 @@ import ar.edu.itba.paw.persistence.RestaurantDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -116,6 +119,26 @@ public class RestaurantServiceImpl implements RestaurantService{
     @Override
     public Optional<User> findRestaurantOwner(long id) {
         return restaurantDao.findRestaurantOwner(id);
+    }
+
+    // For now, returns default available hours.
+    @Override
+    public List<LocalTime> availableTime(long restaurantId){
+        LocalTime time;
+        List<String> times = Arrays.asList("19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30");
+        List<LocalTime> availableHours = new ArrayList<>();
+        for(String str : times){
+            time = LocalTime.parse(str);
+            availableHours.add(time);
+        }
+        return availableHours;
+    }
+
+    // For now, returns default available hours.
+    @Override
+    public List<String> availableStringTime(long restaurantId){
+        List<String> times = Arrays.asList("19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30");
+        return times;
     }
 
     @Override
