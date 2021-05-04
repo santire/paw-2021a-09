@@ -34,12 +34,12 @@
                     </c:if>
                     <c:if test= "${code == '498'}">
                         <div class="error-details">
-                            The user you are looking for doesnt exits
+                            <spring:message code="error.498.details" />
                         </div>
                     </c:if>
                     <c:if test= "${code == '499'}">
                         <div class="error-details">
-                            The restaurant you are looking for doesnt exits
+                            <spring:message code="error.499.details" />
                         </div>
                     </c:if>
 
