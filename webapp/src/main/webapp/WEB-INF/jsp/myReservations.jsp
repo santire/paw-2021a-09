@@ -22,7 +22,7 @@
                                 </c:forEach>
                                 <c:url value="/reservations" var="url"/>
                                 <div class="mx-auto">
-                                    <sc:pagination baseUrl="${url}" pages="${maxPages}"/>
+                                    <sc:pagination baseUrl="/reservations" pages="${maxPages}"/>
                                 </div>
                             <%--</div>--%>
                         </c:when>
