@@ -24,10 +24,8 @@
     <div class="card-body d-flex flex-column">
         <div class="mt-auto">
             <h6 class="card-title text-break text-center">${restaurant.getName()}</h6>
-            <%-- <p class="card-text">${restaurant.getDescription()}</p> --%>
             <p class="text-secondary text-center">${restaurant.getRating()}/10 <i class="fa fa-cutlery" aria-hidden="true"></i></p>
             <a href="<c:url value="/restaurant/${restaurant.getId()}"/>" class="btn btn-outline-secondary btn-block"><spring:message code="restaurants.seeMore" /></a>
-            <a href="<c:url value="/restaurant/${restaurant.getId()}/manage"/>" class="btn btn-outline-warning btn-block"><spring:message code="restaurants.manage" /></a>
         </div>
     </div>
 </div>

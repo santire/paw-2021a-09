@@ -8,40 +8,51 @@
         <main>
             <section>
                 <div class="container mt-4">
-                    <h2 class="display-5 mt-5"><spring:message code="restaurant.manage.title"/> ${restaurant.getName()}</h2>
+                    <a href="<c:url value="/restaurant/${restaurant.getId()}"/>">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                        </svg>
+                        <p class="d-inline">${restaurant.getName()}</p>
+                    </a>
+                    <h2 class="display-5 mt-5"><spring:message code="restaurant.manage.title"/> ${restaurant.getName()} reservations</h2>
                     <ul class="nav nav-pills nav-fill navtop mt-5">
                         <li class="nav-item">
-                            <a class="nav-link active"  href="#reservations" data-toggle="pill" role="tab"><spring:message code="restaurant.manage.reservationTab"/></a>
+                            <a class="nav-link active"  href="#confirmed" data-toggle="pill" role="tab"><spring:message code="restaurant.manage.confirmedTab"/></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#reviews" data-toggle="pill" role="tab"><spring:message code="restaurant.manage.reviewsTab"/></a>
+                            <a class="nav-link" href="#pending" data-toggle="pill" role="tab"><spring:message code="restaurant.manage.pendingTab"/></a>
                         </li>
                     </ul>
                     <div class="tab-content mt-5">
-                        <div class="tab-pane fade show active" role="tabpanel" id="reservations">
+                        <div class="tab-pane fade show active" role="tabpanel" id="confirmed">
                             <c:choose>
-                                <c:when test="${restaurantHasReservations}">
-                                    <h2 class="display-5 text-center mt-5"><spring:message code="restaurant.manage.reservationsTitle" /></h2>
-                                    <c:forEach var="reservation" items="${reservations}">
+                                <c:when test="${restaurantHasConfirmedReservations}">
+                                    <c:forEach var="reservation" items="${confirmedReservations}">
                                         <div class="row mt-5">
-                                            <sc:reservationCard
-                                                    reservation="${reservation}"
-                                                    isOwner="${isOwner}"
-                                            />
+                                            <sc:ownerReservationCards
+                                                    reservation="${reservation}"/>
                                         </div>
                                     </c:forEach>
-                                    <c:url value="/restaurant/${restaurantId}/manage" var="url"/>
-                                    <div class="mx-auto">
-                                        <sc:pagination baseUrl="/restaurant/${restaurantId}/manage" pages="${maxPages}"/>
-                                    </div>
                                 </c:when>
                                 <c:otherwise>
                                     <h2 class="display-5 text-center mt-5"><spring:message code="restaurant.manage.noReservations" /></h2>
                                 </c:otherwise>
                             </c:choose>
                         </div>
-                        <div class="tab-pane fade show active" role="tabpanel" id="reviews">
-
+                        <div class="tab-pane fade show" role="tabpanel" id="pending">
+                            <c:choose>
+                                <c:when test="${restaurantHasPendingReservations}">
+                                    <c:forEach var="reservation" items="${pendingReservations}">
+                                        <div class="row mt-5">
+                                            <sc:ownerReservationCards
+                                                    reservation="${reservation}"/>
+                                        </div>
+                                    </c:forEach>
+                                </c:when>
+                                <c:otherwise>
+                                    <h2 class="display-5 text-center mt-5"><spring:message code="restaurant.manage.noPendingReservations" /></h2>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                     </div>
                 </div>

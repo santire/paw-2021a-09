@@ -31,9 +31,6 @@
         </li>
         <c:if test="${!empty loggedUser}">
           <li class="nav-item ${hide}">
-            <a class="nav-link" href="<c:url value="/restaurants/user/${loggedUser.getId()}"/>"><spring:message code="navbar.myRestaurants" /></a>
-          </li>
-          <li class="nav-item ${hide}">
             <a class="nav-link" href="<c:url value="/reservations"/>"><spring:message code="navbar.myReservations" /></a>
           </li>
         </c:if>
@@ -97,12 +94,16 @@
                       <c:out value="${loggedUser.getName()}"/>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                      <h6 class="dropdown-header">Restaurants</h6>
                       <a class="dropdown-item" href="<c:url value="/register/restaurant"/>"><spring:message code="navbar.registerRestaurant" /></a>
-                    <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" href="<c:url value="/restaurants/user/${loggedUser.getId()}"/>"><spring:message code="navbar.myRestaurants" /></a>
+                      <div class="dropdown-divider"></div>
+                      <h6 class="dropdown-header">Account</h6>
                       <a class="dropdown-item" href="<c:url value="/user/edit"/>"><spring:message code="navbar.updateInfo" /></a>
-                    <div class="dropdown-divider"></div>
+                      <div class="dropdown-divider"></div>
                       <a class="dropdown-item" href="<c:url value="/logout"/>"><spring:message code="navbar.logout" /></a>
                 </ul>
+
             </c:otherwise>
         </c:choose>
       </div>

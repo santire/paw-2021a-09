@@ -83,25 +83,14 @@ public class EmailServiceImpl implements EmailService {
 
     }
 
-/*    @Async
-    @Override
-    public void sendEmail(String to) {
-        Email email = new Email();
-        email.setMailTo(to);
-        email.setMailSubject("Page Subj");
-        email.setMailContent("Content\n\nSS\n");
-        sendEmail(email);
-    }*/
-
     /*
     @Async
     @Override
-    public void sendCancellationEmail(String to, Restaurant restaurant, String message) {
+    public void sendRejectionEmail(String to, Restaurant restaurant) {
         Email email = new Email();
         email.setMailTo(to);
-        email.setMailSubject("Your reservation has been cancelled");
-        email.setMailContent("Your reservation for " + restaurant.getName() + " has been cancelled. " +
-                "The restaurant also sent you this message:\n" + message);
+        email.setMailSubject("Your reservation has been rejected");
+        email.setMailContent("Your reservation for " + restaurant.getName() + " has been rejected by the owner. ");
         sendEmail(email);
     }
 

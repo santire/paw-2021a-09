@@ -1,5 +1,5 @@
 $(function () {
-  $("select").selectpicker({
+  $("my-select").selectpicker({
     countSelectedText: function (i, n) {
       return "" + i + " tags";
     },

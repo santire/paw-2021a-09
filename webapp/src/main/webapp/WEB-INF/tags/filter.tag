@@ -18,7 +18,7 @@
           name="tags"
           class="my-select selectpicker" 
           title="<spring:message code="restaurant.filters.allTags"/>"
-          multiple data-selected-text-format="count > 2"
+          multiple
           data-live-search="true"
           >
             <c:forEach var="tagId" items="${tags.keySet()}">

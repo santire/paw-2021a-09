@@ -437,6 +437,8 @@ public class RestaurantDaoImpl implements RestaurantDao {
         String orderBy=sort.getSortType();
         String order="DESC";
         LOGGER.debug("SORTING FOR: {} {}", orderBy, order);
+        LOGGER.debug("Where: {}", TAG_CHECK_QUERY);
+
 
         if(!desc)
             order="ASC";

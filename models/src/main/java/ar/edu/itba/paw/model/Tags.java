@@ -33,7 +33,7 @@ public enum Tags {
     ARABE(27);
 
     private int value;
-    private static Map map = new HashMap<>();
+    private static Map<Integer, Tags> map = new HashMap<>();
 
     private Tags(int value) {
         this.value = value;
@@ -46,14 +46,14 @@ public enum Tags {
     }
 
     public static Tags valueOf(int tag) {
-        return (Tags) map.get(tag);
+        return  map.get(tag);
     }
 
     public int getValue() {
         return value;
     }
 
-    public static Map allTags(){
+    public static Map<Integer, Tags> allTags(){
         return  map;
     }
 
