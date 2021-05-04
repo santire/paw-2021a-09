@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +42,8 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 profileImage = new Image(imageData);
             }
             restaurant.setProfileImage(profileImage);
+            // like and hot not always present
+            // LOGGER.debug("REST NAME: {}, HOT: {}, LIKES: {}", restaurant.getName(), rs.getString("hotness"), rs.getString("likes"));
             return restaurant;
     };
 
@@ -243,20 +246,6 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 .stream().collect(Collectors.toList());
     }
 
-    // @Override
-    // public List<Restaurant> getAllRestaurants(String searchTerm) {
-       // return jdbcTemplate
-                // .query("SELECT *, similarity(name, ?) AS sml FROM restaurants r"
-                        // +
-                        // " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE similarity(name, ?)>0 ORDER BY sml DESC, name ", RESTAURANT_ROW_MAPPER, searchTerm, searchTerm)
-                // .stream().collect(Collectors.toList());
-        // return jdbcTemplate
-                // .query("SELECT * FROM restaurants r"
-                        // +
-                        // " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE name ILIKE ?", RESTAURANT_ROW_MAPPER, '%' + searchTerm + '%')
-                // .stream().collect(Collectors.toList());
-    // }
-
     // TODO: this would probably be better as getRestaurantsByMinRating and
     // pass the rating as an argument
     @Override
@@ -388,50 +377,113 @@ public class RestaurantDaoImpl implements RestaurantDao {
 
     @Override
     public List<Restaurant> getRestaurantsFilteredBy(String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays) {
-        String t = "";
+        String TAG_CHECK_QUERY = " ";
         if(!tags.isEmpty()){
-            t += "WHERE tag_id IN (";
+            TAG_CHECK_QUERY += " WHERE tag_id IN (";
             for(int i=0; i<tags.size(); i++){
-                t += tags.get(i).getValue();
+                TAG_CHECK_QUERY += tags.get(i).getValue();
                 if(i!=tags.size()-1)
-                    t += ", ";
+                    TAG_CHECK_QUERY += ", ";
             }
-            t+=")";
+            TAG_CHECK_QUERY+=")";
         }
 
-        String orderby="name";
+        String orderBy="name";
         String order="DESC";
         if(!desc)
             order="ASC";
 
         switch (sort){
             case RESERVATIONS:
-                orderby = "reservations";
+                orderBy = "hotness";
                 break;
             case RATING:
-                orderby = "rating";
+                orderBy = "rating";
                 break;
+            case LIKES:
+                orderBy = "likes";
             case PRICE:
-                orderby = "price";
+                orderBy = "price";
                 break;
 
         }
 
-        return jdbcTemplate.query(
-                "SELECT r.restaurant_id, r.name, r.address, r.phone_number, r.rating, r.user_id, image_data, AVG(price) as price, COALESCE(q,0) as reservations  FROM" +
-                        "(SELECT * FROM restaurants r NATURAL JOIN restaurant_tags "+ t +" )AS r " +
-                        "LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id " +
-                        "RIGHT JOIN menu_items m ON r.restaurant_id = m.restaurant_id " +
-                        "LEFT JOIN (select r.restaurant_id, COUNT(quantity) from restaurants r left JOIN reservations b ON r.restaurant_id = b.restaurant_id " +
-                        "WHERE date- interval '"+lastDays+" DAYS' < CURRENT_TIMESTAMP " +
-                        "GROUP BY r.restaurant_id)as hot(rid,q) on r.restaurant_id = hot.rid " +
-                        "WHERE r.name ILIKE '%"+name+"%'" +
-                        "GROUP BY r.restaurant_id, r.name, r.address, r.phone_number, r.rating, r.user_id, image_data, q " +
-                        "HAVING AVG(price) >"+minAvgPrice+" AND AVG(price) <"+maxAvgPrice+" " +
-                        "ORDER BY "+orderby+" "+order
-
-                , RESTAURANT_ROW_MAPPER).stream()
+        List<Restaurant> restaurants = jdbcTemplate.query(
+                "SELECT r.restaurant_id, r.name, r.address, r.phone_number,"
+                +
+                        " r.rating, r.user_id, image_data,"
+                        +
+                        " AVG(price) as price, COALESCE(q,0) as hotness, COALESCE(l, 0) as likes"
+                +
+                " FROM ("
+                    +
+                    // left join to get restaurants with no tag too
+                    " SELECT r1.* FROM restaurants r1 LEFT JOIN restaurant_tags rt"
+                    +
+                    " ON r1.restaurant_id = rt.restaurant_id"
+                    +
+                    TAG_CHECK_QUERY
+                    +
+                    ") AS r"
+                +
+                " LEFT JOIN ("
+                    +
+                    " SELECT restaurant_id, COUNT(reservation_id)"
+                    +
+                    " FROM reservations"
+                    +
+                    " WHERE date > 'now'::timestamp - '1 week'::interval"
+                    +
+                    " GROUP BY restaurant_id"
+                    +
+                    ") AS hot(rid, q)"
+                    +
+                    " ON r.restaurant_id=hot.rid"
+                +
+                " LEFT JOIN ("
+                    +
+                    " SELECT restaurant_id, COUNT(like_id)"
+                    +
+                    " FROM likes"
+                    +
+                    " GROUP BY restaurant_id"
+                    +
+                    ") AS lik(rid, l)"
+                    +
+                    " ON r.restaurant_id=lik.rid"
+                +
+                " LEFT JOIN menu_items m ON r.restaurant_id = m.restaurant_id"
+                +
+                " LEFT JOIN restaurant_images i ON r.restaurant_id=i.restaurant_id"
+                +
+                " WHERE r.name ILIKE ?"
+                +
+                " AND price BETWEEN ? AND ?"
+                +
+                " GROUP BY r.restaurant_id, r.name, r.phone_number, r.rating,"
+                        + " r.address, r.user_id, image_data, hotness, likes"
+                +
+                " ORDER BY " + orderBy+ " " + order 
+                , RESTAURANT_ROW_MAPPER, "%"+name+"%", minAvgPrice, maxAvgPrice).stream()
                 .collect(Collectors.toList());
+
+        return restaurants;
+        // return jdbcTemplate.query(
+                // "SELECT r.restaurant_id, r.name, r.address, r.phone_number, r.rating, r.user_id, image_data, AVG(price) as price, COALESCE(q,0) as reservations  FROM" +
+                        // "(SELECT * FROM restaurants r LEFT JOIN restaurant_tags rt ON r.restaurant_id = rt.restaurant_id "+ t +" )AS r " +
+                        // "LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id " +
+                        // "RIGHT JOIN menu_items m ON r.restaurant_id = m.restaurant_id " +
+                        // "LEFT JOIN (select r.restaurant_id, COUNT(quantity) from restaurants r left JOIN reservations b ON r.restaurant_id = b.restaurant_id " +
+                        // "WHERE date- interval '"+lastDays+" DAYS' < CURRENT_TIMESTAMP " +
+                        // "GROUP BY r.restaurant_id)as hot(rid,q) on r.restaurant_id = hot.rid " +
+                        // "WHERE r.name ILIKE '%"+name+"%'" +
+                        // "GROUP BY r.restaurant_id, r.name, r.address, r.phone_number, r.rating, r.user_id, image_data, q " +
+                        // "HAVING AVG(price) >"+minAvgPrice+" AND AVG(price) <"+maxAvgPrice+" " +
+                        // "ORDER BY "+orderby+" "+order
+
+                // , RESTAURANT_ROW_MAPPER).stream()
+                // .collect(Collectors.toList());
+        
 
     }
 

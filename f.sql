@@ -61,4 +61,13 @@ OFFSET ? FETCH NEXT ? ROWS ONLY
       
 
 
-
+SELECT r.name, COALESCE(q, 0) as hotness
+FROM (
+      SELECT r1.* FROM restaurants r1 LEFT JOIN restaurant_tags rt
+      ON r1.restaurant_id = rt.restaurant_id
+) AS r
+LEFT JOIN (
+      SELECT restaurant_id, COUNT(reservation_id)
+      FROM reservations
+      GROUP BY restaurant_id
+) AS hot(rid, q)

@@ -4,5 +4,6 @@ public enum Sorting {
     RATING,
     RESERVATIONS,
     PRICE,
+    LIKES,
     NAME
 }
