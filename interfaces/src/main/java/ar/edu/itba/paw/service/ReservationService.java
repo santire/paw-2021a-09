@@ -26,6 +26,6 @@ public interface ReservationService {
     public Optional<Reservation> modifyReservation(int reservationId, Date date, long quantity);
 
     //DESTROY
-    public boolean cancelReservation(int id);
+    public boolean cancelReservation(int id, String message);
 
 }

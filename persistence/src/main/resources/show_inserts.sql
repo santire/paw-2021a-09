@@ -1,9 +1,9 @@
 
 
 /*Insert Users values*/
-INSERT INTO users (username, password, first_name, last_name, email, phone)
+/*INSERT INTO users (username, password, first_name, last_name, email, phone)
 VALUES ('mluque', '123456', 'manuel', 'luque', 'mluque@itba.edu.ar', '1135679821');
-
+*/
 
 /************************/
 
