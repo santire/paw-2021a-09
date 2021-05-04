@@ -70,7 +70,7 @@ public class ReservationController {
     public ModelAndView cancelReservation(@ModelAttribute("loggedUser") final User loggedUser,
                                           @PathVariable("reservationId") final int reservationId){
         if(loggedUser != null){
-            reservationService.cancelReservation(reservationId);
+            reservationService.cancelReservation(reservationId,"");
             return new ModelAndView("redirect:/reservations");
         }
         else return new ModelAndView("redirect:/login");
@@ -106,7 +106,7 @@ public class ReservationController {
                 if(userToCancel.isPresent()){
                     Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
                     if(restaurant.isPresent()){
-                        reservationService.cancelReservation(reservationId);
+                        reservationService.cancelReservation(reservationId, cancellationMessage);
                        
                         //emailService.sendCancellationEmail(userToCancel.get().getEmail(), restaurant.get(), cancellationMessage);
                         return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage");
