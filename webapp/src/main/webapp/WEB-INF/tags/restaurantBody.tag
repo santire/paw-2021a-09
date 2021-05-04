@@ -38,6 +38,9 @@
                   </p>
                 </a>
               </div>
+              <div>
+                <a href="<c:url value="/restaurant/${restaurant.getId()}/manage"/>" class="btn btn-outline-warning btn-block mt-4"><spring:message code="restaurant.reservation.button" /></a>
+              </div>
             </c:if>
           </div>
         </div>

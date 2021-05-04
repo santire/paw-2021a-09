@@ -10,6 +10,7 @@ import java.util.Date;
 public interface EmailService {
 
     public void sendCancellationEmail(String to, Restaurant restaurant, String message);
+    public void sendRejectionEmail(String to, Restaurant restaurant);
     public void sendEmail(Email mail);
 
     public void sendReservationEmail(User restaurantOwner, User user, Date date, long quantity);

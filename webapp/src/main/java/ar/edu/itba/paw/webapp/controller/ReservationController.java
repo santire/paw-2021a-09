@@ -59,7 +59,7 @@ public class ReservationController {
             List<Reservation> reservations = reservationService.findByUser(page, AMOUNT_OF_RESERVATIONS, userId);
             mav.addObject("userHasReservations", !reservations.isEmpty());
             mav.addObject("reservations", reservations);
-            mav.addObject("isOwner", false);
+            /*mav.addObject("isOwner", false);*/
             return mav;
         }
         else return new ModelAndView("redirect:/login");
@@ -116,6 +116,28 @@ public class ReservationController {
         return new ModelAndView("redirect:/login");
     }
 
+    @RequestMapping(path = "/reservations/{restaurantId}/{reservationId}/reject", method = RequestMethod.POST)
+    public ModelAndView rejectReservationFromOwner(@ModelAttribute("loggedUser") final User loggedUser,
+                                                   @PathVariable("restaurantId") final long restaurantId,
+                                                   @PathVariable("reservationId") final int reservationId){
+        if(loggedUser != null){
+            Optional<Reservation> reservation = reservationService.findById(reservationId);
+            if(reservation.isPresent()){
+                Optional<User> userToCancel = userService.findById(reservation.get().getUserId());
+                if(userToCancel.isPresent()){
+                    Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
+                    if(restaurant.isPresent()){
+                        reservationService.cancelReservation(reservationId);
+                        emailService.sendRejectionEmail(userToCancel.get().getEmail(), restaurant.get());
+                        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage");
+                    }
+                }
+            }
+            return new ModelAndView("redirect:/400");
+        }
+        return new ModelAndView("redirect:/login");
+    }
+
     @RequestMapping(path = "/reservations/{restaurantId}/{reservationId}/confirm", method = RequestMethod.POST)
     public ModelAndView confirmReservation(@ModelAttribute("loggedUser") final User loggedUser,
                                            @PathVariable("restaurantId") final long restaurantId,
@@ -127,6 +149,7 @@ public class ReservationController {
                 if(restaurant.isPresent()){
                     if(restaurant.get().getUserId() == loggedUser.getId()){
                         reservationService.confirmReservation(reservationId);
+                        emailService.sendConfirmationEmail(reservation.get());
                         return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage");
                     }
                     return new ModelAndView("redirect:/403");

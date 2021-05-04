@@ -350,7 +350,6 @@ public class RestaurantController {
                 mav.addObject("maxPages", maxPages);
                 mav.addObject("confirmedReservations", confirmedReservations);
                 mav.addObject("pendingReservations", pendingReservations);
-                mav.addObject("isOwner", true);
 
                 return mav;
             }
@@ -386,36 +385,6 @@ public class RestaurantController {
         }
         return new ModelAndView("redirect:/403");
     }
-
-
-    // @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-name")
-    // public ModelAndView editRestaurantName(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors, @PathVariable("restaurantId") final long restaurantId ) {
-        // if (errors.hasErrors()) {
-            // return editRestaurant(loggedUser, restaurantId, form);
-        // }
-        // restaurantService.updateName(restaurantId, form.getName());
-        // return new ModelAndView("redirect:/restaurant/" + restaurantId + "/edit");
-    // }
-
-    // @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-address")
-    // public ModelAndView editRestaurantAddress(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors,  @PathVariable("restaurantId") final long restaurantId ) {
-        // if (errors.hasErrors()) {
-            // return editRestaurant(loggedUser, restaurantId, form);
-        // }
-        // restaurantService.updateAddress(restaurantId, form.getAddress());
-        // return new ModelAndView("redirect:/restaurant/" + restaurantId + "/edit");
-    // }
-
-    // @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-phone")
-    // public ModelAndView editRestaurantPhone(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors,  @PathVariable("restaurantId") final long restaurantId ) {
-        // if (errors.hasErrors()) {
-            // return editRestaurant(loggedUser, restaurantId, form);
-        // }
-        // restaurantService.updatePhoneNumber(restaurantId, form.getPhoneNumber());
-        // return new ModelAndView("redirect:/restaurant/" + restaurantId + "/edit");
-    // }
-
-
 
 
 

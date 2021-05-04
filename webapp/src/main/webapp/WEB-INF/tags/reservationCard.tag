@@ -54,13 +54,17 @@
                             <c:if test="${!reservation.isConfirmed()}">
                                 <c:url value="/reservations/${restaurant.getId()}/${reservation.getId()}/confirm" var="confirmationPath"/>
                                 <form action="${confirmationPath}" method="post">
-                                <input type="submit" class="btn btn-success text-white" value="<spring:message code="restaurant.manage.confirmReservation"/> ">
-                            </form>
+                                    <input type="submit" class="btn btn-success text-white" value="<spring:message code="restaurant.manage.confirmReservation"/> ">
+                                </form>
                             </c:if>
 
-                            <button type="button" class="btn btn-danger text-white" data-toggle="modal" data-target="#confirmationModalCenter">
+                            <button type="button" class="btn btn-danger text-white" data-toggle="modal" data-target="#rejectionModal${reservation.getId()}">
                                 <spring:message code="myReservations.cancelReservation"/>
                             </button>
+                           <%-- <c:url value="/reservations/${restaurant.getId()}/${reservation.getId()}/cancel" var="cancelationPath"/>
+                            <form action="${cancelationPath}" method="post">
+                                <input type="submit" class="btn btn-danger text-white" value="<spring:message code="myReservations.cancelReservation"/> ">
+                            </form>--%>
                         </c:when>
                         <c:otherwise>
                             <%--                            CHANGE RESERVATION QUANTITY--%>
@@ -93,14 +97,43 @@
             </c:otherwise>
         </c:choose>
         <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+
+        <!-- Modal -->
+        <div class="modal fade" id="confirmationModalCenter${reservation.getId()}" tabindex="-1" role="dialog" aria-labelledby="confirmationModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmationModalLongTitle"><spring:message code="restaurant.manage.confirmation"/></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <c:url value="/reservations/${restaurant.getId()}/${reservation.getId()}/cancel" var="cancelationPath"/>
+                    <form action="${cancelationPath}" method="post">
+                        <div class="modal-body">
+                            <p><spring:message code="restaurant.manage.modal.requestMessage"/></p>
+                            <div class="input-group">
+                                <textarea class="form-control" aria-label="With textarea" name="cancellationMessage" id="cancellationMessage"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="submit" class="btn btn-danger text-white" value="<spring:message code="restaurant.manage.confirmCancellation"/> ">
+                            <button type="button" class="btn btn-secondary text-white" data-dismiss="modal"><spring:message code="restaurant.manage.modal.goBack"/></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
+
 <!-- Modal -->
-<div class="modal fade" id="confirmationModalCenter" tabindex="-1" role="dialog" aria-labelledby="confirmationModalCenterTitle" aria-hidden="true">
+<div class="modal fade" id="rejectionModal${reservation.getId()}" tabindex="-1" role="dialog" aria-labelledby="rejectionModal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="confirmationModalLongTitle"><spring:message code="restaurant.manage.confirmation"/></h5>
+                <h5 class="modal-title" id="rejection"><spring:message code="restaurant.manage.confirmation"/></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -111,7 +144,7 @@
                 <div class="modal-body">
                     <p><spring:message code="restaurant.manage.modal.requestMessage"/></p>
                     <div class="input-group">
-                        <textarea class="form-control" aria-label="With textarea" name="cancellationMessage" id="cancellationMessage"></textarea>
+                        <textarea class="form-control" aria-label="With textarea" name="cancellationMessage" id="rejectionMessage"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">

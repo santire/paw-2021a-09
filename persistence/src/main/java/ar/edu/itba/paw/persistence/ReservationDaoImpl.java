@@ -38,7 +38,7 @@ public class ReservationDaoImpl implements ReservationDao{
         jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("reservations")
                 .usingGeneratedKeyColumns("reservation_id")
-                .usingColumns("user_id", "restaurant_id", "date", "quantity");
+                .usingColumns("user_id", "restaurant_id", "date", "quantity", "confirmed");
     }
 
 

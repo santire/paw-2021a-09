@@ -27,16 +27,7 @@ public class ReservationServiceImpl implements ReservationService{
     @Override
     public Reservation addReservation(long userId, long restaurantId, Date date, long quantity) {
         User user = userService.findById(userId).orElseThrow(() -> new IllegalStateException("Reservation: User doesnt exist"));
-
-        // User restaurantOwner = restaurantService.findRestaurantOwner(restaurantId).orElseThrow(() -> new IllegalStateException("Reservation: Restaurant doesnt exist"));
-
-
-        //send email to restaurant
-        // emailService.sendReservationEmail(restaurantOwner, user, date, quantity);
-
-        //for now its autoconfirmed
         Reservation reservation = reservationDao.addReservation(user.getId(),restaurantId,date,quantity);
-        emailService.sendConfirmationEmail(reservation);
 
         return reservation;
     }
@@ -111,7 +102,6 @@ public class ReservationServiceImpl implements ReservationService{
 	  	return reservations;
 	  }
 
-	  // NOT USED YET
     @Override
     public List<Reservation> findConfirmedByRestaurant(int page, int amountOnPage, long restaurantId) {
         List<Reservation> reservations =  reservationDao.findConfirmedByRestaurant(page, amountOnPage, restaurantId);
@@ -128,7 +118,6 @@ public class ReservationServiceImpl implements ReservationService{
         return reservations;
     }
 
-    // NOT USED YET
     @Override
     public List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId) {
         List<Reservation> reservations =  reservationDao.findPendingByRestaurant(page, amountOnPage, restaurantId);
