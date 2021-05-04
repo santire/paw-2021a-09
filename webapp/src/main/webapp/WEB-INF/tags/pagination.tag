@@ -23,6 +23,23 @@
                     <c:if test="${not empty param.search}">
                         <c:param name="search" value="${param.search}"/>
                     </c:if>
+                    <c:if test="${not empty param.tags}">
+                        <c:forEach var="tag" items="${paramValues.tags}">
+                            <c:param name="tags" value="${tag}"/>
+                        </c:forEach>
+                    </c:if>
+                    <c:if test="${not empty param.min}">
+                        <c:param name="min" value="${param.min}"/>
+                    </c:if>
+                    <c:if test="${not empty param.max}">
+                        <c:param name="max" value="${param.max}"/>
+                    </c:if>
+                    <c:if test="${not empty param.sortBy}">
+                        <c:param name="sortBy" value="${param.sortBy}"/>
+                    </c:if>
+                    <c:if test="${not empty param.order}">
+                        <c:param name="order" value="${param.order}"/>
+                    </c:if>
                     <c:param name="page" value="${param.page-1}"/>
                 </c:url>
                 <a class="page-link" href="${prevPage}" tabindex="-1" aria-disabled="true">
@@ -33,6 +50,23 @@
                 <c:url value="${baseUrl}" var="currPage">
                     <c:if test="${not empty param.search}">
                         <c:param name="search" value="${param.search}"/>
+                    </c:if>
+                    <c:if test="${not empty param.tags}">
+                        <c:forEach var="tag" items="${paramValues.tags}">
+                            <c:param name="tags" value="${tag}"/>
+                        </c:forEach>
+                    </c:if>
+                    <c:if test="${not empty param.min}">
+                        <c:param name="min" value="${param.min}"/>
+                    </c:if>
+                    <c:if test="${not empty param.max}">
+                        <c:param name="max" value="${param.max}"/>
+                    </c:if>
+                    <c:if test="${not empty param.sortBy}">
+                        <c:param name="sortBy" value="${param.sortBy}"/>
+                    </c:if>
+                    <c:if test="${not empty param.order}">
+                        <c:param name="order" value="${param.order}"/>
                     </c:if>
                     <c:param name="page" value="${i}"/>
                 </c:url>
@@ -63,6 +97,23 @@
                 <c:url value="${baseUrl}" var="nextPage">
                     <c:if test="${not empty param.search}">
                         <c:param name="search" value="${param.search}"/>
+                    </c:if>
+                    <c:if test="${not empty param.tags}">
+                        <c:forEach var="tag" items="${paramValues.tags}">
+                            <c:param name="tags" value="${tag}"/>
+                        </c:forEach>
+                    </c:if>
+                    <c:if test="${not empty param.min}">
+                        <c:param name="min" value="${param.min}"/>
+                    </c:if>
+                    <c:if test="${not empty param.max}">
+                        <c:param name="max" value="${param.max}"/>
+                    </c:if>
+                    <c:if test="${not empty param.sortBy}">
+                        <c:param name="sortBy" value="${param.sortBy}"/>
+                    </c:if>
+                    <c:if test="${not empty param.order}">
+                        <c:param name="order" value="${param.order}"/>
                     </c:if>
                     <c:param name="page" value="${empty param.page ? 2 : param.page + 1}"/>
                 </c:url>

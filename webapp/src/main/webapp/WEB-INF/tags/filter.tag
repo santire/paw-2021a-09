@@ -9,6 +9,7 @@
       </h4>
     </div>
     <form>
+      <input type="hidden" id="seatchinput" name="search" value="${searchString}">
       <div class="form-group">
         <label for="tags">
           <spring:message code="restaurant.filters.tags"/>
