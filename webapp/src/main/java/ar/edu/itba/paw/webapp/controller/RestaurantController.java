@@ -94,6 +94,9 @@ public class RestaurantController {
                 mav.addObject("userRatingToRestaurant", userRating.get().getRating());
             }
             mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
+            List<String> times = restaurantService.availableStringTime(restaurantId);
+            /*List<String> times = Arrays.asList("19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30");*/
+            mav.addObject("times", times);
         }
 
         LOGGER.error("page value: {}", page);
@@ -112,12 +115,21 @@ public class RestaurantController {
             @PathVariable("restaurantId") final long restaurantId,
             RedirectAttributes redirectAttributes) {
 
+        LocalTime time;
         if (form != null && errors != null) {
+            /*time = LocalTime.parse(form.getTime());*/
+            time = form.getTime();
             int currentHours = LocalTime.now().getHour();
-            if (form.getDate() <= currentHours) {
-                errors.rejectValue("date",
-                                    "reservationForm.date",
-                                    "Date is before current time");
+            if (time.getHour() <= currentHours) {
+                errors.rejectValue("time",
+                                    "reservationForm.time",
+                                    "Selected hour has already passed");
+            }
+            // Range validator
+            if(!restaurantService.availableTime(restaurantId).contains(time)){
+                errors.rejectValue("time",
+                        "reservationForm.time",
+                        "Select an hour from list");
             }
         }
         if (errors.hasErrors()) {
@@ -125,9 +137,11 @@ public class RestaurantController {
         }
 
         if (loggedUser != null) {
-            LocalDateTime todayAtDate = LocalDate.now().atTime(form.getDate(), 0);
-            Date date = Date.from(todayAtDate.atZone(ZoneId.systemDefault()).toInstant());
-            reservationService.addReservation(loggedUser.getId(), restaurantId, date, Long.parseLong(form.getQuantity()));
+            /*time = LocalTime.parse(form.getTime());*/
+            time = form.getTime();
+            LocalDateTime todayAtDate = LocalDate.now().atTime(time.getHour(), time.getMinute());
+            /*Date date = Date.from(todayAtDate.atZone(ZoneId.systemDefault()).toInstant());*/
+            reservationService.addReservation(loggedUser.getId(), restaurantId, todayAtDate, Long.parseLong(form.getQuantity()));
             redirectAttributes.addFlashAttribute("madeReservation", true);
         } else {
             return new ModelAndView("redirect:/register");
@@ -337,16 +351,20 @@ public class RestaurantController {
                     page = maxPages;
                 }
                 mav.addObject("restaurant", restaurant.get());
-                List<Reservation> reservations = reservationService.findByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
-                if(reservations.isEmpty()){
-                    mav.addObject("restaurantHasReservations", false);
-                }
-                else{
-                    mav.addObject("maxPages", maxPages);
-                    mav.addObject("restaurantHasReservations", true);
-                    mav.addObject("reservations", reservations);
-                    mav.addObject("isOwner", true);
-                }
+                List<Reservation> confirmedReservations = reservationService.findConfirmedByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
+                List<Reservation> pendingReservations = reservationService.findPendingByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
+
+                //List<Reservation> reservations = reservationService.findByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
+                if(confirmedReservations.isEmpty()){ mav.addObject("restaurantHasConfirmedReservations", false); }
+                else { mav.addObject("restaurantHasConfirmedReservations", true); }
+
+                if(pendingReservations.isEmpty()){ mav.addObject("restaurantHasPendingReservations", false); }
+                else { mav.addObject("restaurantHasPendingReservations", true); }
+
+                mav.addObject("maxPages", maxPages);
+                mav.addObject("confirmedReservations", confirmedReservations);
+                mav.addObject("pendingReservations", pendingReservations);
+
                 return mav;
             }
             else{
@@ -381,36 +399,6 @@ public class RestaurantController {
         }
         return new ModelAndView("redirect:/403");
     }
-
-
-    // @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-name")
-    // public ModelAndView editRestaurantName(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors, @PathVariable("restaurantId") final long restaurantId ) {
-        // if (errors.hasErrors()) {
-            // return editRestaurant(loggedUser, restaurantId, form);
-        // }
-        // restaurantService.updateName(restaurantId, form.getName());
-        // return new ModelAndView("redirect:/restaurant/" + restaurantId + "/edit");
-    // }
-
-    // @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-address")
-    // public ModelAndView editRestaurantAddress(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors,  @PathVariable("restaurantId") final long restaurantId ) {
-        // if (errors.hasErrors()) {
-            // return editRestaurant(loggedUser, restaurantId, form);
-        // }
-        // restaurantService.updateAddress(restaurantId, form.getAddress());
-        // return new ModelAndView("redirect:/restaurant/" + restaurantId + "/edit");
-    // }
-
-    // @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST, params = "edit-restaurant-phone")
-    // public ModelAndView editRestaurantPhone(@ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("updateRestaurantForm") final RestaurantForm form, final BindingResult errors,  @PathVariable("restaurantId") final long restaurantId ) {
-        // if (errors.hasErrors()) {
-            // return editRestaurant(loggedUser, restaurantId, form);
-        // }
-        // restaurantService.updatePhoneNumber(restaurantId, form.getPhoneNumber());
-        // return new ModelAndView("redirect:/restaurant/" + restaurantId + "/edit");
-    // }
-
-
 
 
 

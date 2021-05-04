@@ -4,6 +4,7 @@ import ar.edu.itba.paw.model.Image;
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,4 +41,6 @@ public interface RestaurantService {
     public boolean deleteRestaurantByName(String name);
 
     public Optional<User> findRestaurantOwner(long id);
+    public List<LocalTime> availableTime(long restaurantId);
+    public List<String> availableStringTime(long restaurantId);
 }
