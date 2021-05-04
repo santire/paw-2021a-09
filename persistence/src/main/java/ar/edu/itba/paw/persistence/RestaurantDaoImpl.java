@@ -434,35 +434,19 @@ public class RestaurantDaoImpl implements RestaurantDao {
             TAG_CHECK_QUERY+=")";
         }
 
-        String orderBy="name";
+        String orderBy=sort.getSortType();
         String order="DESC";
+        LOGGER.debug("SORTING FOR: {} {}", orderBy, order);
+
         if(!desc)
             order="ASC";
-
-        switch (sort){
-            case NAME:
-                orderBy = "name";
-                break;
-            case RESERVATIONS:
-                orderBy = "hotness";
-                break;
-            case RATING:
-                orderBy = "rating";
-                break;
-            case LIKES:
-                orderBy = "likes";
-            case PRICE:
-                orderBy = "price";
-                break;
-
-        }
 
         List<Restaurant> restaurants = jdbcTemplate.query(
                 "SELECT r.restaurant_id, r.name, r.address, r.phone_number,"
                 +
                         " r.rating, r.user_id, image_data,"
                         +
-                        " AVG(price) as price, COALESCE(q,0) as hotness, COALESCE(l, 0) as likes"
+                        " AVG(price) as price, COALESCE(q,0) as hot, COALESCE(l, 0) as likes"
                 +
                 " FROM ("
                     +
@@ -509,7 +493,7 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 " AND price BETWEEN ? AND ?"
                 +
                 " GROUP BY r.restaurant_id, r.name, r.phone_number, r.rating,"
-                        + " r.address, r.user_id, image_data, hotness, likes"
+                        + " r.address, r.user_id, image_data, hot, likes"
                 +
                 " ORDER BY " + orderBy+ " " + order 
                 +
