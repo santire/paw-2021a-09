@@ -4,6 +4,7 @@ import ar.edu.itba.paw.model.Image;
 import ar.edu.itba.paw.model.Reservation;
 import ar.edu.itba.paw.model.User;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +12,7 @@ import java.util.Optional;
 public interface ReservationDao {
 
     // CREATE
-    public Reservation addReservation(long userId, long restaurantId, Date date, long quantity);
+    public Reservation addReservation(long userId, long restaurantId, LocalDateTime date, long quantity);
 
     // READ
     public List<Reservation> findByUser(long userId);

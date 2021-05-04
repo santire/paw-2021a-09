@@ -9,12 +9,13 @@ import org.hibernate.validator.constraints.Email;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.NumberFormat;
 
+import java.time.LocalTime;
+
 public class ReservationForm {
 
 
-/*    @Min(1)
-    @Max(23)*/
-    private String time;
+    @DateTimeFormat(pattern = "HH:mm")
+    private LocalTime time;
 
     @Size(min=1, max=15)
     @NumberFormat
@@ -35,11 +36,11 @@ public class ReservationForm {
         this.quantity = quantity;
     }
 
-    public String getTime() {
+    public LocalTime getTime() {
         return this.time;
     }
 
-    public void setTime(String time) {
+    public void setTime(LocalTime time) {
         this.time = time;
     }
 

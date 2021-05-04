@@ -10,6 +10,8 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +25,7 @@ public class ReservationDaoImpl implements ReservationDao{
             rs.getLong("reservation_id"),
             rs.getLong("user_id"),
             rs.getLong("restaurant_id"),
-            rs.getDate("date"),
+            rs.getTimestamp("date"),
             rs.getLong("quantity"),
             rs.getBoolean("confirmed")
     );
@@ -134,12 +136,12 @@ public class ReservationDaoImpl implements ReservationDao{
     }
 
     @Override
-    public Reservation addReservation(long userId, long restaurantId, Date date, long quantity) {
+    public Reservation addReservation(long userId, long restaurantId, LocalDateTime date, long quantity) {
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("user_id", userId);
         params.addValue("restaurant_id", restaurantId);
-        params.addValue("date", date);
+        params.addValue("date", Timestamp.valueOf(date));
         params.addValue("quantity", quantity);
         params.addValue("confirmed", false);
 

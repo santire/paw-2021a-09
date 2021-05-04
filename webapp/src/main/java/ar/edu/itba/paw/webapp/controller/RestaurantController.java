@@ -116,7 +116,8 @@ public class RestaurantController {
 
         LocalTime time;
         if (form != null && errors != null) {
-            time = LocalTime.parse(form.getTime());
+            /*time = LocalTime.parse(form.getTime());*/
+            time = form.getTime();
             int currentHours = LocalTime.now().getHour();
             if (time.getHour() <= currentHours) {
                 errors.rejectValue("time",
@@ -129,10 +130,11 @@ public class RestaurantController {
         }
 
         if (loggedUser != null) {
-            time = LocalTime.parse(form.getTime());
+            /*time = LocalTime.parse(form.getTime());*/
+            time = form.getTime();
             LocalDateTime todayAtDate = LocalDate.now().atTime(time.getHour(), time.getMinute());
-            Date date = Date.from(todayAtDate.atZone(ZoneId.systemDefault()).toInstant());
-            reservationService.addReservation(loggedUser.getId(), restaurantId, date, Long.parseLong(form.getQuantity()));
+            /*Date date = Date.from(todayAtDate.atZone(ZoneId.systemDefault()).toInstant());*/
+            reservationService.addReservation(loggedUser.getId(), restaurantId, todayAtDate, Long.parseLong(form.getQuantity()));
             redirectAttributes.addFlashAttribute("madeReservation", true);
         } else {
             return new ModelAndView("redirect:/register");

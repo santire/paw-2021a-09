@@ -34,7 +34,8 @@
                 <p class="p-2">${reservation.getUser().getFirstName()} ${reservation.getUser().getLastName()} - ${reservation.getUser().getPhone()}</p>
                 <div class="p-2 bd-highlight text-muted"><spring:message code="reservation.card.reservationFor"/> ${reservation.getQuantity()}
                     <spring:message code="reservation.card.people"/></div>
-                <div class="p-2 bd-highlight text-muted"><spring:message code="reservation.card.date"/>: ${reservation.getDate()}</div>
+                <div class="p-2 bd-highlight text-muted"><spring:message code="reservation.card.date"/>: ${reservation.getDate().toLocalDate()}</div>
+                <div class="p-2 bd-highlight text-muted"><spring:message code="reservation.card.time"/>: ${reservation.getDate().toLocalTime()}</div>
             </span>
         </div>
 

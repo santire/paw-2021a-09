@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -25,7 +26,7 @@ public class ReservationServiceImpl implements ReservationService{
 
     // CREATE
     @Override
-    public Reservation addReservation(long userId, long restaurantId, Date date, long quantity) {
+    public Reservation addReservation(long userId, long restaurantId, LocalDateTime date, long quantity) {
         User user = userService.findById(userId).orElseThrow(() -> new IllegalStateException("Reservation: User doesnt exist"));
         Reservation reservation = reservationDao.addReservation(user.getId(),restaurantId,date,quantity);
 

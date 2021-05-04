@@ -2,6 +2,7 @@ package ar.edu.itba.paw.service;
 
 import ar.edu.itba.paw.model.Reservation;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.Optional;
 public interface ReservationService {
 
     // CREATE
-    public Reservation addReservation(long userId, long restaurantId, Date date, long quantity);
+    public Reservation addReservation(long userId, long restaurantId, LocalDateTime date, long quantity);
 
     // READ
     public List<Reservation> findByUser(long userId);
