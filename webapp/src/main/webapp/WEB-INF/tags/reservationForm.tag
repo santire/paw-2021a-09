@@ -3,7 +3,9 @@
 <%@ taglib prefix ="fmt" uri ="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
+<%@attribute name="times" required="true" type="java.util.List"%>
 <c:url value="/restaurant/${restaurantId}" var="postFormUrl" />
+
 
 <div class="card border-0 pl-2 mx-auto w-75">
   <div class="card-body">
@@ -38,26 +40,27 @@
 
       <div class="row row-cols-1 row-cols-lg-2">
         <div class="col-lg-7 mx-0 px-0 pr-1">
-          <form:label path="date">
+          <form:label path="time">
             <div class="input-group mb-3">
               <div class="input-group-prepend">
                 <span class="input-group-text"><i class="fa fa-clock-o"></i></span>
               </div>
-              <form:input
-                type="number"
-                min="0"
-                max="23"
-                path="date"
-                value="18"
-                cssClass="form-control text-right"
-                aria-label="Seleccione horario para su reserva"
+              <form:select cssClass="browser-default custom-select" path="time" items="${times}"/>
+               <%--  <form:input
+                      type="number"
+                      min="0"
+                      max="23"
+                      path="date"
+                      value="18"
+                      cssClass="form-control text-right"
+                      aria-label="Seleccione horario para su reserva"
               />
               <div class="input-group-append">
                 <span class="input-group-text">:00</span>
-              </div>
+              </div>--%>
             </div>
           </form:label>
-          <form:errors path="date" class="px-3 text-danger" element="p"/>
+          <form:errors path="time" class="px-3 text-danger" element="p"/>
         </div>
         <div class="col-lg-5 mx-0 px-0">
           <form:label path="quantity">

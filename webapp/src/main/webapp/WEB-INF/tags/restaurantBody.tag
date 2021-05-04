@@ -5,6 +5,7 @@
 <%@ taglib prefix="sc" tagdir="/WEB-INF/tags" %>
 
 <%@attribute name="restaurant" required="true" type="ar.edu.itba.paw.model.Restaurant"%>
+<%@attribute name="times" required="true" type="java.util.List"%>
 
 <div class="container">
   <div class="mb-5 my-2" style="max-height: 450px;">
@@ -80,7 +81,9 @@
         </h3>
         <c:choose>
           <c:when test="${not empty loggedUser}">
-            <sc:reservationForm/>
+            <sc:reservationForm
+              times="${times}"
+            />
           </c:when>
           <c:otherwise>
             <h5 class="text-center mt-5">

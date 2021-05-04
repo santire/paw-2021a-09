@@ -36,6 +36,7 @@
                 <div class="p-2 bd-highlight"><spring:message code="reservation.card.reservationFor"/> ${reservation.getQuantity()}
                     <spring:message code="reservation.card.people"/></div>
                 <div class="p-2 bd-highlight"><spring:message code="reservation.card.date"/>: ${reservation.getDate()}</div>
+                <%--<div class="p-2 bd-highlight">Time: ${reservation.getDate()}</div>--%>
             </span>
         </div>
 

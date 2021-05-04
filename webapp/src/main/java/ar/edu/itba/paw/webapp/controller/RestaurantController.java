@@ -94,6 +94,8 @@ public class RestaurantController {
                 mav.addObject("userRatingToRestaurant", userRating.get().getRating());
             }
             mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
+            List<String> times = Arrays.asList("19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30");
+            mav.addObject("times", times);
         }
 
         LOGGER.error("page value: {}", page);
@@ -112,11 +114,13 @@ public class RestaurantController {
             @PathVariable("restaurantId") final long restaurantId,
             RedirectAttributes redirectAttributes) {
 
+        LocalTime time;
         if (form != null && errors != null) {
+            time = LocalTime.parse(form.getTime());
             int currentHours = LocalTime.now().getHour();
-            if (form.getDate() <= currentHours) {
-                errors.rejectValue("date",
-                                    "reservationForm.date",
+            if (time.getHour() <= currentHours) {
+                errors.rejectValue("time",
+                                    "reservationForm.time",
                                     "Date is before current time");
             }
         }
@@ -125,7 +129,8 @@ public class RestaurantController {
         }
 
         if (loggedUser != null) {
-            LocalDateTime todayAtDate = LocalDate.now().atTime(form.getDate(), 0);
+            time = LocalTime.parse(form.getTime());
+            LocalDateTime todayAtDate = LocalDate.now().atTime(time.getHour(), time.getMinute());
             Date date = Date.from(todayAtDate.atZone(ZoneId.systemDefault()).toInstant());
             reservationService.addReservation(loggedUser.getId(), restaurantId, date, Long.parseLong(form.getQuantity()));
             redirectAttributes.addFlashAttribute("madeReservation", true);

@@ -12,9 +12,9 @@ import org.springframework.format.annotation.NumberFormat;
 public class ReservationForm {
 
 
-    @Min(1)
-    @Max(23)
-    private int date;
+/*    @Min(1)
+    @Max(23)*/
+    private String time;
 
     @Size(min=1, max=15)
     @NumberFormat
@@ -35,12 +35,12 @@ public class ReservationForm {
         this.quantity = quantity;
     }
 
-    public int getDate() {
-        return this.date;
+    public String getTime() {
+        return this.time;
     }
 
-    public void setDate(int date) {
-        this.date = date;
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public String getEmail() {
