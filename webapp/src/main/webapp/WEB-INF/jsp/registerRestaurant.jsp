@@ -41,6 +41,27 @@
                 </form:label>
                 <form:input class="px-3 mx-auto w-100" type="file" path="profileImage"/>
                 <form:errors path="profileImage" class="px-3 text-danger" element="p"/>
+
+
+                  <div class="container">
+                      <spring:message code="restaurant.edit.tags" />
+                      <form:errors path="tags" class="px-3 text-danger" element="p"/>
+                      <div class="row">
+                          <c:forEach var="id" items="${tags.keySet()}" >
+                                      <div class="col-md-4">
+                                          <div class="form-check">
+                                              <form:checkbox path="tags" class="form-check-input" name="tags" value="${id}" id="flexCheckDefault"/>
+                                              <label class="form-check-label" for="flexCheckDefault">
+                                                  <spring:message code="restaurant.tag.${id}"/>
+                                              </label>
+                                          </div>
+                                      </div>
+                          </c:forEach>
+                      </div>
+                  </div>
+
+
+
               </div>
           </div>
           <div>

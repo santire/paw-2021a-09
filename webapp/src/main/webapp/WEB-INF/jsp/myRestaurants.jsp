@@ -22,7 +22,7 @@
                             </div>
                             <c:url value="/restaurants/user/${userId}" var="url"/>
                             <div class="mx-auto">
-                                <sc:pagination baseUrl="${url}" pages="${maxPages}"/>
+                                <sc:pagination baseUrl="/restaurants/user/${userId}" pages="${maxPages}"/>
                             </div>
                         </c:when>
                         <c:otherwise>

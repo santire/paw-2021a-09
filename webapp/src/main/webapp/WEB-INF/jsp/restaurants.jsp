@@ -28,6 +28,9 @@
                   <h2 class="display-5 mt-5"><spring:message code="restaurants.allRestaurants"/></h2>
                 </c:otherwise>
               </c:choose>
+            </c:otherwise>
+          </c:choose>
+
               <div class="row row-cols-1 row-cols-md-3">
                 <div class="col-md-3">
                   <sc:filter />
@@ -41,13 +44,10 @@
                     </div>
                   </c:forEach>
                 </div>
-                  <c:url value="/restaurants" var="url"/>
                   <div class="mx-auto">
                     <sc:pagination baseUrl="/restaurants" pages="${maxPages}"/>
                   </div>
              </div>
-            </c:otherwise>
-          </c:choose>
         </div>
       </section>
     </main>

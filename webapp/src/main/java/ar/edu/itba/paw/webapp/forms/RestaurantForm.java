@@ -10,9 +10,10 @@ import ar.edu.itba.paw.webapp.validators.ValidImage;
 
 public class RestaurantForm {
     @Size(min = 6, max = 100)
-    @Pattern(regexp = "[a-zA-Z0-9 ()'´¨!]+")
+    @Pattern(regexp = "[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ()'´¨!&.\\s]+")
     private String name;
 
+    @Pattern(regexp = "[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ&()'´¨!.\\s]+")
     @Size(min = 6, max = 100)
     private String address;
 
@@ -23,6 +24,15 @@ public class RestaurantForm {
     @ValidImage
     @MultipartFileSizeValid
     private MultipartFile profileImage;
+
+    private Integer[] tags;
+
+    public Integer[] getTags() {
+        return tags;
+    }
+    public void setTags(Integer[] tags) {
+        this.tags = tags;
+    }
 
     public void setName(String name) { this.name = name; }
     public void setAddress(String address) { this.address = address; }

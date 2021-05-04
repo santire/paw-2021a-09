@@ -64,6 +64,25 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+    @Async
+    public void sendEmail(Email mail, String plainText){
+        MimeMessage mimeMessage = emailSender.createMimeMessage();
+        try {
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+            mimeMessageHelper.setSubject(mail.getMailSubject());
+            mimeMessageHelper.setFrom(new InternetAddress("gourmetablewebapp@gmail.com", "Gourmetable"));
+            mimeMessageHelper.setTo(mail.getMailTo());
+            mimeMessageHelper.setText(plainText,mail.getMailContent());
+            emailSender.send(mimeMessageHelper.getMimeMessage());
+
+        } catch (MessagingException e) {
+            // e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            // e.printStackTrace();
+        }
+
+    }
+
 /*    @Async
     @Override
     public void sendEmail(String to) {

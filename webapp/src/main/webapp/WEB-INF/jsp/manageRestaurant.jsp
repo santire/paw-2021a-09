@@ -32,7 +32,7 @@
                                     </c:forEach>
                                     <c:url value="/restaurant/${restaurantId}/manage" var="url"/>
                                     <div class="mx-auto">
-                                        <sc:pagination baseUrl="${url}" pages="${maxPages}"/>
+                                        <sc:pagination baseUrl="/restaurant/${restaurantId}/manage" pages="${maxPages}"/>
                                     </div>
                                 </c:when>
                                 <c:otherwise>

@@ -12,7 +12,7 @@ public enum Tags {
     BODEGON(6),
     CHINO(7),
     COCINACASERA(8),
-    COCINACONTEMPORANEA(9),
+    CONTEMPORANEA(9),
     DEAUTOR(10),
     DEFUSION(11),
     ESPAÑOL(12),
