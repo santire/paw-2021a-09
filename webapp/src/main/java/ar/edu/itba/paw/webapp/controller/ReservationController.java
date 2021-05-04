@@ -129,8 +129,8 @@ public class ReservationController {
                 if(userToCancel.isPresent()){
                     Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
                     if(restaurant.isPresent()){
-                        reservationService.cancelReservation(reservationId);
-                        emailService.sendRejectionEmail(userToCancel.get().getEmail(), restaurant.get());
+                        reservationService.cancelReservation(reservationId, "Your reservation has been rejected by the restaurant");
+                        //emailService.sendRejectionEmail(userToCancel.get().getEmail(), restaurant.get());
                         return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage");
                     }
                 }
@@ -151,7 +151,7 @@ public class ReservationController {
                 if(restaurant.isPresent()){
                     if(restaurant.get().getUserId() == loggedUser.getId()){
                         reservationService.confirmReservation(reservationId);
-                        emailService.sendConfirmationEmail(reservation.get());
+                        /*emailService.sendConfirmationEmail(reservation.get());*/
                         return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage");
                     }
                     return new ModelAndView("redirect:/403");
