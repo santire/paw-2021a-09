@@ -64,6 +64,7 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+    @Async
     public void sendEmail(Email mail, String plainText){
         MimeMessage mimeMessage = emailSender.createMimeMessage();
         try {

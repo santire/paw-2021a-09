@@ -117,12 +117,13 @@
                   </c:forEach>
                 </div>
 
-                  <c:url value="/restaurants" var="url"/>
-                  <div class="mx-auto">
-                    <sc:pagination baseUrl="/restaurants" pages="${maxPages}"/>
-                  </div>
+                <c:url value="/restaurants" var="url"/>
+                <div class="mx-auto">
+                  <sc:pagination baseUrl="${url}" pages="${maxPages}"/>
+                </div>
 
               </div>
+            </div>
 
         </div>
       </section>
