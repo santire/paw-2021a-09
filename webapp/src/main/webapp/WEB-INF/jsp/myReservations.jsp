@@ -11,20 +11,16 @@
                     <c:choose>
                         <c:when test="${userHasReservations}">
                             <h2 class="display-5"><spring:message code="myReservations.title" /></h2>
-                          <%--  <div class="row row-cols-1 row-cols-md-4 row-cols-lg-5 mt-5">--%>
                                 <c:forEach var="reservation" items="${reservations}">
                                     <div class="row mt-5">
-                                        <sc:reservationCard
-                                                reservation="${reservation}"
-                                                isOwner="${isOwner}"
-                                        />
+                                        <sc:userReservationCard
+                                                reservation="${reservation}"/>
                                     </div>
                                 </c:forEach>
                                 <c:url value="/reservations" var="url"/>
                                 <div class="mx-auto">
                                     <sc:pagination baseUrl="/reservations" pages="${maxPages}"/>
                                 </div>
-                            <%--</div>--%>
                         </c:when>
                         <c:otherwise>
                             <h2 class="display-5 text-center mt-5"><spring:message code="myReservations.noReservations" /></h2>

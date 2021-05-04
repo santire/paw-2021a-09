@@ -4,6 +4,7 @@ import ar.edu.itba.paw.model.Image;
 import ar.edu.itba.paw.model.Reservation;
 import ar.edu.itba.paw.model.User;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +12,7 @@ import java.util.Optional;
 public interface ReservationDao {
 
     // CREATE
-    public Reservation addReservation(long userId, long restaurantId, Date date, long quantity);
+    public Reservation addReservation(long userId, long restaurantId, LocalDateTime date, long quantity);
 
     // READ
     public List<Reservation> findByUser(long userId);
@@ -20,12 +21,15 @@ public interface ReservationDao {
 
     public List<Reservation> findByRestaurant(long restaurantId);
     public List<Reservation> findByRestaurant(int page, int amountOnPage, long restaurantId);
+    public List<Reservation> findConfirmedByRestaurant(int page, int amountOnPage, long restaurantId);
+    public List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId);
     public int findByRestaurantPageCount(int amountOnPage, long restaurantId);
 
     public Optional<Reservation> findById(int id);
 
     // UPDATE
     public Optional<Reservation> modifyReservation(int reservationId, Date date, long quantity);
+    public boolean confirmReservation(int reservationId);
 
     // DESTROY
     public boolean cancelReservation(int id);

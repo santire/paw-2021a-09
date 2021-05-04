@@ -29,7 +29,8 @@ CREATE TABLE IF NOT EXISTS reservations(
   user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
   restaurant_id INTEGER REFERENCES restaurants(restaurant_id) ON DELETE CASCADE,
   date TIMESTAMP,
-  quantity INTEGER
+  quantity INTEGER,
+  confirmed BOOLEAN
 );
 
 CREATE TABLE IF NOT EXISTS menu_items(

@@ -10,6 +10,8 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -23,8 +25,9 @@ public class ReservationDaoImpl implements ReservationDao{
             rs.getLong("reservation_id"),
             rs.getLong("user_id"),
             rs.getLong("restaurant_id"),
-            rs.getDate("date"),
-            rs.getLong("quantity")
+            rs.getTimestamp("date"),
+            rs.getLong("quantity"),
+            rs.getBoolean("confirmed")
     );
 
     private JdbcTemplate jdbcTemplate;
@@ -37,7 +40,7 @@ public class ReservationDaoImpl implements ReservationDao{
         jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("reservations")
                 .usingGeneratedKeyColumns("reservation_id")
-                .usingColumns("user_id", "restaurant_id", "date", "quantity");
+                .usingColumns("user_id", "restaurant_id", "date", "quantity", "confirmed");
     }
 
 
@@ -90,6 +93,30 @@ public class ReservationDaoImpl implements ReservationDao{
     }
 
     @Override
+    public List<Reservation> findConfirmedByRestaurant(int page, int amountOnPage, long restaurantId) {
+        return jdbcTemplate.query(
+                "SELECT * FROM reservations"
+                        +
+                        " WHERE restaurant_id = ? and confirmed = true"
+                        +
+                        " OFFSET ? FETCH NEXT ? ROWS ONLY"
+                , RESERVATION_ROW_MAPPER, restaurantId, (page-1)*amountOnPage, amountOnPage)
+                .stream().collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId) {
+        return jdbcTemplate.query(
+                "SELECT * FROM reservations"
+                        +
+                        " WHERE restaurant_id = ? AND confirmed = false"
+                        +
+                        " OFFSET ? FETCH NEXT ? ROWS ONLY"
+                , RESERVATION_ROW_MAPPER, restaurantId, (page-1)*amountOnPage, amountOnPage)
+                .stream().collect(Collectors.toList());
+    }
+
+    @Override
     public int findByRestaurantPageCount(int amountOnPage, long restaurantId) {
         int amount =  jdbcTemplate.query(
                 "SELECT CEILING(COUNT(*)::numeric/?) as c"
@@ -109,13 +136,14 @@ public class ReservationDaoImpl implements ReservationDao{
     }
 
     @Override
-    public Reservation addReservation(long userId, long restaurantId, Date date, long quantity) {
+    public Reservation addReservation(long userId, long restaurantId, LocalDateTime date, long quantity) {
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("user_id", userId);
         params.addValue("restaurant_id", restaurantId);
-        params.addValue("date", date);
+        params.addValue("date", Timestamp.valueOf(date));
         params.addValue("quantity", quantity);
+        params.addValue("confirmed", false);
 
         final Number reservationId = jdbcInsert.executeAndReturnKey(params);
 
@@ -134,5 +162,11 @@ public class ReservationDaoImpl implements ReservationDao{
     public Optional<Reservation> modifyReservation(int reservationId, Date date, long quantity){
         jdbcTemplate.update("UPDATE reservations SET date = ?, quantity = ? WHERE reservation_id = ?", date, quantity, reservationId);
         return findById(reservationId);
+    }
+
+    @Override
+    public boolean confirmReservation(int reservationId){
+        jdbcTemplate.update("UPDATE reservations SET confirmed = true WHERE reservation_id = ?", reservationId);
+        return true;
     }
 }

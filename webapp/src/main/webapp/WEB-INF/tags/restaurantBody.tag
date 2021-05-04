@@ -5,6 +5,7 @@
 <%@ taglib prefix="sc" tagdir="/WEB-INF/tags" %>
 
 <%@attribute name="restaurant" required="true" type="ar.edu.itba.paw.model.Restaurant"%>
+<%@attribute name="times" required="true" type="java.util.List"%>
 
 <div class="container">
   <div class="mb-5 my-2" style="max-height: 450px;">
@@ -37,6 +38,9 @@
                     <spring:message code="restaurant.editButton"/><i class="col-9 m-0 p-1 text-muted fa fa-edit" aria-hidden="true"></i>
                   </p>
                 </a>
+              </div>
+              <div>
+                <a href="<c:url value="/restaurant/${restaurant.getId()}/manage"/>" class="btn btn-outline-warning btn-block mt-4"><spring:message code="restaurant.reservation.button" /></a>
               </div>
             </c:if>
           </div>
@@ -77,7 +81,9 @@
         </h3>
         <c:choose>
           <c:when test="${not empty loggedUser}">
-            <sc:reservationForm/>
+            <sc:reservationForm
+              times="${times}"
+            />
           </c:when>
           <c:otherwise>
             <h5 class="text-center mt-5">

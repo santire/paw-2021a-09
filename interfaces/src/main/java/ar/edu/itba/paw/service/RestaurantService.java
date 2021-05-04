@@ -2,6 +2,7 @@ package ar.edu.itba.paw.service;
 
 import ar.edu.itba.paw.model.*;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,7 +53,10 @@ public interface RestaurantService {
 
     public List<Tags> tagsInRestaurant(long restaurantId);
     public List<Restaurant> getRestaurantsWithTags(List<Tags> tags);
-    public List<Restaurant> getRestaurantsFilteredBy(String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays);
+    public List<Restaurant> getRestaurantsFilteredBy(int page, int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays);
+    public int getRestaurantsFilteredByPageCount(int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice);
 
 
+    public List<LocalTime> availableTime(long restaurantId);
+    public List<String> availableStringTime(long restaurantId);
 }

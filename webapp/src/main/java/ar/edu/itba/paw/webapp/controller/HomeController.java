@@ -44,6 +44,8 @@ public class HomeController {
     private static final int AMOUNT_OF_RESTAURANTS = 6;
     private static final int AMOUNT_OF_POPULAR_RESTAURANTS = 10;
     private static final int POPULAR_MIN_RATING = 8;
+    private static Sorting DEFAULT_SORT = Sorting.NAME;
+    private static String DEFAULT_ORDER = "asc";
 
     @Autowired
     private UserService userService;
@@ -91,7 +93,8 @@ public class HomeController {
     public ModelAndView restaurants(@RequestParam(defaultValue = "1") Integer page,
                                     @RequestParam(required = false) String search, @RequestParam(required = false) int[] tags,
                                     @RequestParam(defaultValue = "1") int min, @RequestParam(defaultValue = "10000") int max,
-                                    @RequestParam(defaultValue = "namedesc") String sortby)
+                                    @RequestParam(defaultValue = "name") String sortBy,
+                                    @RequestParam(defaultValue = "asc") String order)
                                     {
 
         final ModelAndView mav = new ModelAndView("restaurants");
@@ -118,54 +121,45 @@ public class HomeController {
         mav.addObject("tagsChecked", tagsChecked);
 
         Sorting sort = Sorting.NAME;
-        boolean desc = true;
-        switch (sortby) {
-            case ("nameasc"):
-                sort = Sorting.NAME;
-                desc = false;
-                break;
-            case ("populardesc"):
-                sort = Sorting.RATING;
-                desc = true;
-                break;
-            case ("popularasc"):
-                sort = Sorting.RATING;
-                desc = false;
-                break;
-            case ("reservationsdesc"):
-                sort = Sorting.RESERVATIONS;
-                desc = true;
-                break;
-            case ("reservationsasc"):
-                sort = Sorting.RESERVATIONS;
-                desc = false;
-                break;
-            case ("pricedesc"):
-                sort = Sorting.PRICE;
-                desc = true;
-                break;
-            case ("priceasc"):
-                sort = Sorting.PRICE;
-                desc = false;
-                break;
+        try {
+            sort = Sorting.valueOf(sortBy.toUpperCase());
+        } catch (Exception e) {
+            LOGGER.warn("Caught illegal sorting option {}, defaulting to NAME", sortBy);
         }
+        boolean desc = false;
+        if(order != null && order.equals("DESC"))
+            desc = true;
 
+        order = desc ? "DESC" : "ASC";
         // Catching invalid page value and setting it at max or min
         // depending on the overflow direction
-        int maxPages = restaurantService.getAllRestaurantPagesCount(AMOUNT_OF_RESTAURANTS, search);
+        int maxPages = restaurantService.getRestaurantsFilteredByPageCount(AMOUNT_OF_RESTAURANTS, search, tagsSelected, min, max);
         if(page == null || page <1) {
             page=1;
         }else if (page > maxPages) {
             page = maxPages;
         }
 
+        if(min < 0) {
+            min = 0;
+        }
+        if(max < 0) {
+            max = 0;
+        }
+
         mav.addObject("userIsSearching", !search.isEmpty());
         mav.addObject("searchString", search);
         mav.addObject("maxPages", maxPages);
+        mav.addObject("sortTypes", Sorting.getSortTypes());
+        mav.addObject("defaultSortType", DEFAULT_SORT);
+        mav.addObject("defaultOrder", DEFAULT_ORDER);
 
-        mav.addObject("restaurants", restaurantService.getRestaurantsFilteredBy(search, tagsSelected,min,max, sort, desc, 7));
+        mav.addObject("restaurants", restaurantService.getRestaurantsFilteredBy(page, AMOUNT_OF_RESTAURANTS, search, tagsSelected,min,max, sort, desc, 7));
         //mav.addObject("restaurants", restaurantService.getAllRestaurants(page, AMOUNT_OF_RESTAURANTS, search));
         mav.addObject("page", page);
+        mav.addObject("sortBy", sortBy);
+        mav.addObject("order", order);
+        mav.addObject("desc", desc);
         return mav;
     }
 
