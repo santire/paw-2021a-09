@@ -158,9 +158,13 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     @Override
-    public List<Restaurant> getRestaurantsFilteredBy(String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays) {
-        return restaurantDao.getRestaurantsFilteredBy(name,tags,minAvgPrice,maxAvgPrice,sort,desc,lastDays);
+    public List<Restaurant> getRestaurantsFilteredBy(int page, int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays) {
+        return restaurantDao.getRestaurantsFilteredBy(page, amountOnPage, name,tags,minAvgPrice,maxAvgPrice,sort,desc,lastDays);
     }
+    public int getRestaurantsFilteredByPageCount(int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice) {
+        return restaurantDao.getRestaurantsFilteredByPageCount(amountOnPage, name, tags, minAvgPrice, maxAvgPrice);
+    }
+
 
 
 }

@@ -374,9 +374,55 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 , RESTAURANT_ROW_MAPPER).stream()
                 .collect(Collectors.toList());
     }
+    @Override
+    public int getRestaurantsFilteredByPageCount(int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice) {
+
+        String TAG_CHECK_QUERY = " ";
+        if(!tags.isEmpty()){
+            TAG_CHECK_QUERY += " WHERE tag_id IN (";
+            for(int i=0; i<tags.size(); i++){
+                TAG_CHECK_QUERY += tags.get(i).getValue();
+                if(i!=tags.size()-1)
+                    TAG_CHECK_QUERY += ", ";
+            }
+            TAG_CHECK_QUERY+=")";
+        }
+
+        int amount = jdbcTemplate.query(
+                "SELECT CEILING(COUNT(r2.restaurant_id)::numeric/?) as c"
+                +
+                " FROM ("
+                +
+                " SELECT r.restaurant_id, AVG(price) as price"
+                +
+                " FROM ("
+                        +
+                        // left join to get restaurants with no tag too
+                        " SELECT r1.* FROM restaurants r1 LEFT JOIN restaurant_tags rt"
+                        +
+                        " ON r1.restaurant_id = rt.restaurant_id"
+                        +
+                        TAG_CHECK_QUERY
+                        +
+                        ") AS r"
+                    +
+                    " LEFT JOIN menu_items m ON r.restaurant_id = m.restaurant_id"
+                    +
+                    " WHERE r.name ILIKE ?"
+                    +
+                    " AND price BETWEEN ? AND ?"
+                    +
+                    " GROUP BY r.restaurant_id"
+                    +
+                ") AS r2"
+                , (r, n) -> r.getInt("c"), amountOnPage, "%"+name+"%", minAvgPrice, maxAvgPrice)
+                .stream()
+                .findFirst().orElse(0);
+        return amount <= 0 ? 1 : amount;
+    }
 
     @Override
-    public List<Restaurant> getRestaurantsFilteredBy(String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays) {
+    public List<Restaurant> getRestaurantsFilteredBy(int page, int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays) {
         String TAG_CHECK_QUERY = " ";
         if(!tags.isEmpty()){
             TAG_CHECK_QUERY += " WHERE tag_id IN (";
@@ -394,6 +440,9 @@ public class RestaurantDaoImpl implements RestaurantDao {
             order="ASC";
 
         switch (sort){
+            case NAME:
+                orderBy = "name";
+                break;
             case RESERVATIONS:
                 orderBy = "hotness";
                 break;
@@ -417,7 +466,6 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 +
                 " FROM ("
                     +
-                    // left join to get restaurants with no tag too
                     " SELECT r1.* FROM restaurants r1 LEFT JOIN restaurant_tags rt"
                     +
                     " ON r1.restaurant_id = rt.restaurant_id"
@@ -432,7 +480,7 @@ public class RestaurantDaoImpl implements RestaurantDao {
                     +
                     " FROM reservations"
                     +
-                    " WHERE date > 'now'::timestamp - '1 week'::interval"
+                    " WHERE date > 'now'::timestamp - '"+lastDays+" day'::interval"
                     +
                     " GROUP BY restaurant_id"
                     +
@@ -464,7 +512,9 @@ public class RestaurantDaoImpl implements RestaurantDao {
                         + " r.address, r.user_id, image_data, hotness, likes"
                 +
                 " ORDER BY " + orderBy+ " " + order 
-                , RESTAURANT_ROW_MAPPER, "%"+name+"%", minAvgPrice, maxAvgPrice).stream()
+                +
+                " OFFSET ? FETCH NEXT ? ROWS ONLY"
+                , RESTAURANT_ROW_MAPPER, "%"+name+"%", minAvgPrice, maxAvgPrice, (page-1)*amountOnPage, amountOnPage).stream()
                 .collect(Collectors.toList());
 
         return restaurants;

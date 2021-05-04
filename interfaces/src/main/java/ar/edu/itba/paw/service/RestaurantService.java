@@ -52,7 +52,8 @@ public interface RestaurantService {
 
     public List<Tags> tagsInRestaurant(long restaurantId);
     public List<Restaurant> getRestaurantsWithTags(List<Tags> tags);
-    public List<Restaurant> getRestaurantsFilteredBy(String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays);
+    public List<Restaurant> getRestaurantsFilteredBy(int page, int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays);
+    public int getRestaurantsFilteredByPageCount(int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice);
 
 
 }

@@ -61,7 +61,7 @@ OFFSET ? FETCH NEXT ? ROWS ONLY
       
 
 
-SELECT r.name, COALESCE(q, 0) as hotness
+SELECT r.restaurant_id, r.name, COALESCE(q, 0) as hotness
 FROM (
       SELECT r1.* FROM restaurants r1 LEFT JOIN restaurant_tags rt
       ON r1.restaurant_id = rt.restaurant_id
@@ -69,5 +69,21 @@ FROM (
 LEFT JOIN (
       SELECT restaurant_id, COUNT(reservation_id)
       FROM reservations
+      WHERE date > 'now'::timestamp - '1 week'::interval
       GROUP BY restaurant_id
 ) AS hot(rid, q)
+ON r.restaurant_id = hot.rid;
+
+SELECT CEILING(COUNT(r2.name)::numeric/6) as c
+FROM (
+      SELECT r.name, AVG(price) as price
+      FROM (
+         SELECT r1.* FROM restaurants r1 LEFT JOIN restaurant_tags rt
+         ON r1.restaurant_id = rt.restaurant_id
+        ) AS r
+      LEFT JOIN menu_items m ON r.restaurant_id = m.restaurant_id
+      WHERE r.name ILIKE '%tu%'
+      AND price BETWEEN 0 AND 10000
+      GROUP BY r.restaurant_id, r.name
+) AS r2;
+

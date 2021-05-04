@@ -152,7 +152,7 @@ public class HomeController {
 
         // Catching invalid page value and setting it at max or min
         // depending on the overflow direction
-        int maxPages = restaurantService.getAllRestaurantPagesCount(AMOUNT_OF_RESTAURANTS, search);
+        int maxPages = restaurantService.getRestaurantsFilteredByPageCount(AMOUNT_OF_RESTAURANTS, search, tagsSelected, min, max);
         if(page == null || page <1) {
             page=1;
         }else if (page > maxPages) {
@@ -163,7 +163,7 @@ public class HomeController {
         mav.addObject("searchString", search);
         mav.addObject("maxPages", maxPages);
 
-        mav.addObject("restaurants", restaurantService.getRestaurantsFilteredBy(search, tagsSelected,min,max, sort, desc, 7));
+        mav.addObject("restaurants", restaurantService.getRestaurantsFilteredBy(page, AMOUNT_OF_RESTAURANTS, search, tagsSelected,min,max, sort, desc, 7));
         //mav.addObject("restaurants", restaurantService.getAllRestaurants(page, AMOUNT_OF_RESTAURANTS, search));
         mav.addObject("page", page);
         return mav;
