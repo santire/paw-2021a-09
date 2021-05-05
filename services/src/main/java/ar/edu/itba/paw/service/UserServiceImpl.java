@@ -62,7 +62,6 @@ public class UserServiceImpl implements UserService {
       String url = "http://pawserver.it.itba.edu.ar/paw-2021a-09/activate?token=";
 
       String token = UUID.randomUUID().toString();
-      // LocalDateTime createdAt = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.systemDefault());
       LocalDateTime createdAt = LocalDateTime.now();
 
       userDao.assignTokenToUser(token, createdAt, user.getId());
@@ -83,7 +82,6 @@ public class UserServiceImpl implements UserService {
         myemail.setMailContent(emailContent);
         emailService.sendEmail(myemail,plainText);
     
-      //emailService.sendRegistrationEmail(email, url+token);
     return  user;
   }
 
@@ -115,7 +113,6 @@ public class UserServiceImpl implements UserService {
     myemail.setMailContent(emailContent);
     emailService.sendEmail(myemail,plainText);
     
-    //emailService.sendResetPasswordEmail(email, url+token);
       
   }
 

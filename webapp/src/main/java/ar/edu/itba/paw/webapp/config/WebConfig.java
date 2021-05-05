@@ -52,14 +52,14 @@ public class WebConfig {
 
     final SimpleDriverDataSource ds = new SimpleDriverDataSource();
     ds.setDriverClass(org.postgresql.Driver.class);
-    ds.setUrl("jdbc:postgresql://localhost/paw");
-    ds.setUsername("root");
-    ds.setPassword("root");
+    // ds.setUrl("jdbc:postgresql://localhost/paw");
+    // ds.setUsername("root");
+    // ds.setPassword("root");
 
     // paw server
-    // ds.setUrl("jdbc:postgresql://10.16.1.110/paw-2021a-09");
-    // ds.setUsername("paw-2021a-09");
-    // ds.setPassword("6jnqLFj1g");
+    ds.setUrl("jdbc:postgresql://10.16.1.110/paw-2021a-09");
+    ds.setUsername("paw-2021a-09");
+    ds.setPassword("6jnqLFj1g");
 
     // remote testing database (very slow)
 
@@ -114,7 +114,7 @@ public class WebConfig {
     props.put("mail.transport.protocol", "smtp");
     props.put("mail.smtp.auth", "true");
     props.put("mail.smtp.starttls.enable", "true");
-    props.put("mail.debug", "true");
+    props.put("mail.debug", "false");
 
     return mailSender;
   }

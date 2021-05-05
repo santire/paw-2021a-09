@@ -9,12 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.MessageSource;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -241,7 +239,6 @@ public class ReservationServiceImpl implements ReservationService{
         +body
         +"</td>     </tr>    </table>     </td>    </tr>    <tr></tr>   </table>    </td>   </tr>  </table>   </td>  </tr> </table>  </td> </tr></table></td></tr></table></td>        </tr>        <tr></custom></body></html>"
         ;
-        //emailService.sendConfirmationEmail(reservation,LocaleContextHolder.getLocale());
         Email email = new Email();
         email.setMailTo(user.getEmail());
         email.setMailSubject(messageSource.getMessage("mail.newReservation.subject",null,locale));
@@ -283,7 +280,6 @@ public class ReservationServiceImpl implements ReservationService{
     Locale locale = LocaleContextHolder.getLocale();
     Optional<Reservation> reservation = findById(id);
     Optional<Restaurant> restaurant = restaurantService.findById(reservation.get().getRestaurantId());
-    // Optional<User> owner = userService.findById(restaurant.get().getUserId());
     Optional<User> user = userService.findById(reservation.get().getUserId());
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");

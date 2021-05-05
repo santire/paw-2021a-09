@@ -19,10 +19,8 @@ import org.springframework.context.i18n.LocaleContextHolder;
 
 
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Locale;
@@ -41,14 +39,12 @@ public class ReservationController {
     @Autowired
     private ReservationService reservationService;
 
-    @Autowired
-    private EmailService emailService;
 
     @Autowired
     private MessageSource messageSource;
 
 
-    @RequestMapping("/reservations")
+    @RequestMapping(path = { "/reservations" }, method = RequestMethod.GET)
     public ModelAndView userReservations(
             @ModelAttribute("loggedUser") final User loggedUser,
             @RequestParam(defaultValue="1") Integer page){
@@ -84,19 +80,6 @@ public class ReservationController {
         else return new ModelAndView("redirect:/login");
     }
 
-    @RequestMapping(path = "/reservations/{reservationId}/modify", method = RequestMethod.POST)
-    public ModelAndView modifyReservation(@ModelAttribute("loggedUser") final User loggedUser,
-                                          @PathVariable("reservationId") final int reservationId,
-                                          @RequestParam("quantity") final int quantity){
-        SimpleDateFormat dateformat2 = new SimpleDateFormat("yyyy-M-dd HH:mm:ss");
-        String date = "2021-05-20 11:35:42";
-        if(loggedUser != null){
-            LocalDateTime newDate = LocalDateTime.parse(date);
-            reservationService.modifyReservation(reservationId, newDate, quantity);
-            return new ModelAndView("redirect:/reservations");
-        }
-        return new ModelAndView("redirect:/login");
-    }
 
     @RequestMapping(path = "/reservations/{restaurantId}/{reservationId}/cancel", method = RequestMethod.POST)
     public ModelAndView cancelReservationFromOwner(@ModelAttribute("loggedUser") final User loggedUser,
@@ -112,12 +95,11 @@ public class ReservationController {
                     if(restaurant.isPresent()){
                         reservationService.ownerCancelReservation(reservationId, cancellationMessage);
                        
-                        //emailService.sendCancellationEmail(userToCancel.get().getEmail(), restaurant.get(), cancellationMessage);
                         return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/confirmed");
                     }
                 }
             }
-            return new ModelAndView("redirect:/400");
+            return new ModelAndView("redirect:/403");
         }
         return new ModelAndView("redirect:/login");
     }
@@ -135,12 +117,11 @@ public class ReservationController {
                     if(restaurant.isPresent()){
                         Locale locale = LocaleContextHolder.getLocale();
                         reservationService.ownerCancelReservation(reservationId, messageSource.getMessage("mail.rejection",null,locale));
-                        //emailService.sendRejectionEmail(userToCancel.get().getEmail(), restaurant.get());
                         return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/pending");
                     }
                 }
             }
-            return new ModelAndView("redirect:/400");
+            return new ModelAndView("redirect:/403");
         }
         return new ModelAndView("redirect:/login");
     }
@@ -156,13 +137,12 @@ public class ReservationController {
                 if(restaurant.isPresent()){
                     if(restaurant.get().getUserId() == loggedUser.getId()){
                         reservationService.confirmReservation(reservationId);
-                        /*emailService.sendConfirmationEmail(reservation.get());*/
                         return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/pending");
                     }
                     return new ModelAndView("redirect:/403");
                 }
             }
-            return new ModelAndView("redirect:/400");
+            return new ModelAndView("redirect:/403");
         }
         return new ModelAndView("redirect:/login");
     }

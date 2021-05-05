@@ -54,12 +54,14 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .and().authorizeRequests()
                 .antMatchers("/login", "/register").anonymous()
                 .antMatchers("/user/*", "/user/edit", "/register/restaurant", "/restaurants/user/*").hasRole("USER")
-                .antMatchers("/reservations/*","/reservations/*/*").hasRole("USER")
+                .antMatchers("/reservations","/reservations/*/*/cancel" ,"/reservations/*","/reservations/*/*").hasRole("USER")
                 .antMatchers("/restaurant/*/edit",
                              "/restaurant/*/delete",
                              "/restaurant/*/menu",
                              "/restaurant/*/menu/delete",
                              "/restaurant/*/manage/confirmed",
+                             "/reservations/*/*/reject",
+                             "/reservations/*/*/confirm",
                              "/restaurant/*/manage/pending").hasRole("RESTAURANTOWNER")
                 .and().formLogin()
                 .loginPage("/login")

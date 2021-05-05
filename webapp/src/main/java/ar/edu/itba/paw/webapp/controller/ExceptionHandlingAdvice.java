@@ -17,17 +17,6 @@ import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
 @ControllerAdvice
 public class ExceptionHandlingAdvice  {
 
-    /*
-    @ExceptionHandler(NoHandlerFoundException.class)
-    public ModelAndView ex(NoHandlerFoundException exception) {
-        final ModelAndView mav = new ModelAndView("home");
-
-        return mav;
-    }
-     */
-
-
-
     @ExceptionHandler(value = { NoHandlerFoundException.class})
     public ModelAndView notFound(Exception e)
     {
