@@ -14,6 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+
+
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -21,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Locale;
 
 @Controller
 public class ReservationController {
@@ -38,6 +43,9 @@ public class ReservationController {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private MessageSource messageSource;
 
 
     @RequestMapping("/reservations")
@@ -70,7 +78,7 @@ public class ReservationController {
     public ModelAndView cancelReservation(@ModelAttribute("loggedUser") final User loggedUser,
                                           @PathVariable("reservationId") final int reservationId){
         if(loggedUser != null){
-            reservationService.cancelReservation(reservationId,"");
+            reservationService.userCancelReservation(reservationId);
             return new ModelAndView("redirect:/reservations");
         }
         else return new ModelAndView("redirect:/login");
@@ -102,7 +110,7 @@ public class ReservationController {
                 if(userToCancel.isPresent()){
                     Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
                     if(restaurant.isPresent()){
-                        reservationService.cancelReservation(reservationId, cancellationMessage);
+                        reservationService.ownerCancelReservation(reservationId, cancellationMessage);
                        
                         //emailService.sendCancellationEmail(userToCancel.get().getEmail(), restaurant.get(), cancellationMessage);
                         return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage");
@@ -125,7 +133,8 @@ public class ReservationController {
                 if(userToCancel.isPresent()){
                     Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
                     if(restaurant.isPresent()){
-                        reservationService.cancelReservation(reservationId, "Your reservation has been rejected by the restaurant");
+                        Locale locale = LocaleContextHolder.getLocale();
+                        reservationService.ownerCancelReservation(reservationId, messageSource.getMessage("mail.rejection",null,locale));
                         //emailService.sendRejectionEmail(userToCancel.get().getEmail(), restaurant.get());
                         return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage");
                     }

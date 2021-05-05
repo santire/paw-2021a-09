@@ -32,6 +32,8 @@ public interface ReservationService {
     public boolean confirmReservation(int reservationId);
 
     //DESTROY
-    public boolean cancelReservation(int id, String message);
+    public boolean ownerCancelReservation(int id, String message);
+    public boolean userCancelReservation(int id);
+
 
 }
