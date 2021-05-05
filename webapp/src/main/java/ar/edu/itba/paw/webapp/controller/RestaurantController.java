@@ -95,7 +95,6 @@ public class RestaurantController {
             }
             mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
             List<String> times = restaurantService.availableStringTime(restaurantId);
-            /*List<String> times = Arrays.asList("19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30");*/
             mav.addObject("times", times);
         }
 
@@ -117,7 +116,6 @@ public class RestaurantController {
 
         LocalTime time;
         if (form != null && errors != null) {
-            /*time = LocalTime.parse(form.getTime());*/
             time = form.getTime();
             int currentHours = LocalTime.now().getHour();
             if (time.getHour() <= currentHours) {
@@ -137,10 +135,8 @@ public class RestaurantController {
         }
 
         if (loggedUser != null) {
-            /*time = LocalTime.parse(form.getTime());*/
             time = form.getTime();
             LocalDateTime todayAtDate = LocalDate.now().atTime(time.getHour(), time.getMinute());
-            /*Date date = Date.from(todayAtDate.atZone(ZoneId.systemDefault()).toInstant());*/
             reservationService.addReservation(loggedUser.getId(), restaurantId, todayAtDate, Long.parseLong(form.getQuantity()));
             redirectAttributes.addFlashAttribute("madeReservation", true);
         } else {
