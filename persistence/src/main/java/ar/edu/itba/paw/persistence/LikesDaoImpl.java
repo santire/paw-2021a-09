@@ -53,4 +53,16 @@ public class LikesDaoImpl implements LikesDao {
         return jdbcTemplate.query("SELECT * FROM likes WHERE user_id =? AND restaurant_id = ?", new Object[]{userId, restaurantId},(rs, rowNum) ->
                 Boolean.TRUE).stream().findFirst().orElse(false);
     }
+
+    @Override
+    public int getLikesByRestaurantId(long restaurantId) {
+        return jdbcTemplate.query(
+                "SELECT COUNT(like_id) as c"
+                +
+                " FROM likes WHERE restaurant_id = ?"
+                +
+                " GROUP BY restaurant_id"
+                ,(r,n)->r.getInt("c"), restaurantId)
+                .stream().findFirst().orElse(0);
+    }
 }

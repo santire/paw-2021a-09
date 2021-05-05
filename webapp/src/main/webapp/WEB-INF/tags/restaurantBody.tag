@@ -29,8 +29,15 @@
           </div>
           <p class="card-text"><medium class="text-muted">${restaurant.getAddress()}</medium></p>
           <p class="card-text"><medium class="text-muted">${restaurant.getPhoneNumber()}</medium></p>
+          <div class="row row-cols-3 mb-3 text-center">
+            <c:forEach var="tag" items="${restaurant.getTags()}">
+              <div class="card-text"><medium class="text-muted">
+                <spring:message code="restaurant.tag.${tag.getValue()}"/>
+              </medium></div>
+            </c:forEach>
+          </div>
           <div class="row row-cols-2 m-0 p-0">
-            <p class="col-3 m-0 p-0 text-secondary">${restaurant.getRating()}/10 <i class="fa fa-cutlery" aria-hidden="true"></i></p>
+            <p class="col-3 m-0 p-0 text-secondary">${restaurant.getLikes()} <i class="fa fa-cutlery" aria-hidden="true"></i></p>
             <c:if test="${not empty isTheOwner}">
               <div>
                 <a href="<c:url value="/restaurant/${restaurantId}/edit"/>">

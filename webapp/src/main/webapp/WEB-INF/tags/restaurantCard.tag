@@ -28,7 +28,7 @@
     <div class="mt-auto">
       <h6 class="card-title text-break text-center" style="min-height: 70px;">${restaurant.getName()}</h6>
       <%-- <p class="card-text">${restaurant.getDescription()}</p> --%>
-      <p class="text-secondary text-center">${restaurant.getRating()}/10 <i class="fa fa-cutlery" aria-hidden="true"></i></p>
+      <%-- <p class="text-secondary text-center">${restaurant.getRating()}/10 <i class="fa fa-cutlery" aria-hidden="true"></i></p> --%>
       <a href="<c:url value="/restaurant/${restaurant.getId()}"/>" class="btn btn-outline-secondary btn-block"><spring:message code="restaurants.seeMore" /></a>
     </div>
   </div>
