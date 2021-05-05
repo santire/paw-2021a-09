@@ -12,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.print.attribute.standard.MediaSize;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RestaurantServiceImplTest {

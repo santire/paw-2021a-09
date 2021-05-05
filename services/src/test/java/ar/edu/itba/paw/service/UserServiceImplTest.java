@@ -1,12 +1,7 @@
 package ar.edu.itba.paw.service;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.doNothing;
 
-import java.util.Optional;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
