@@ -11,15 +11,15 @@
 <sc:templateLayout simpleTopBar="true">
   <jsp:body>
 
-    <h2 class="text-center mt-4"><spring:message code="user.updatePassword.title" /></h2>
-    <div class="card border-0 mx-auto w-75">
+    <h2 class="text-center mt-5"><spring:message code="user.updatePassword.title" /></h2>
+    <div class="card border-0 mx-auto w-50 mt-4">
       <div class="card body border-0">
         <form:form
            modelAttribute="passwordForm"
            action="${postFormUrl}"
            method="post"
         >
-           <div class="row row-cols-1 row-cols-lg-2 justify-content-center">
+           <div class="row row-cols-1 row-cols-lg-1 justify-content-center">
               <div>
                   <form:label class="px-3 mx-auto w-100" path="password">
                     <spring:message code="Password" />:
