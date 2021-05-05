@@ -32,6 +32,12 @@
                             <spring:message code="error.400.details" />
                         </div>
                     </c:if>
+                    <c:if test= "${code == '405'}">
+                        <h2><spring:message code="error.405.title" /></h2>
+                        <div class="error-details">
+                            <spring:message code="error.405.details" />
+                        </div>
+                    </c:if>
                     <c:if test= "${code == '498'}">
                         <div class="error-details">
                             <spring:message code="error.498.details" />
