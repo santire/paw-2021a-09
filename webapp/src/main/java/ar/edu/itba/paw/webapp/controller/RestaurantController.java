@@ -45,7 +45,6 @@ public class RestaurantController {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
     private static final int AMOUNT_OF_MENU_ITEMS = 8;
     private static final int AMOUNT_OF_RESTAURANTS = 10;
-    private static final int AMOUNT_OF_RESERVATIONS = 2;
 
     @Autowired
     private UserService userService;
@@ -104,7 +103,7 @@ public class RestaurantController {
     }
 
     @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.POST)
-    public ModelAndView register(@ModelAttribute("loggedUser") final User loggedUser,
+    public ModelAndView reservationAndMenu(@ModelAttribute("loggedUser") final User loggedUser,
             @Valid @ModelAttribute("reservationForm") final ReservationForm form,
             final BindingResult errors,
              @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
@@ -220,26 +219,6 @@ public class RestaurantController {
         return new ModelAndView("redirect:/login");
     }
 
-
-
-    @RequestMapping(path = {"/restaurant/{restaurantId}/rate"}, method = RequestMethod.POST)
-    public ModelAndView setRating(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId, @RequestParam("rating") int rating){
-        if(loggedUser != null){
-            long userId = loggedUser.getId();
-            ratingService.rateRestaurant(userId, restaurantId, rating);
-        }
-        return new ModelAndView("redirect:/restaurant/" + restaurantId);
-    }
-
-    @RequestMapping(path = {"/restaurant/{restaurantId}/rate"}, method = RequestMethod.PUT)
-    public ModelAndView updateRating(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId, @RequestParam("rating") int rating){
-        if(loggedUser != null){
-            long userId = loggedUser.getId();
-            ratingService.modifyRestaurantRating(userId, restaurantId, rating);
-        }
-        return new ModelAndView("redirect:/restaurant/" + restaurantId);
-    }
-
     @RequestMapping(path = {"restaurant/{restaurantId}/like"}, method = RequestMethod.POST)
     public ModelAndView like(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId){
         if(loggedUser != null){
@@ -260,159 +239,6 @@ public class RestaurantController {
         return new ModelAndView("redirect:/login");
     }
 
-
-
-    @RequestMapping(path = { "/restaurant/{restaurantId}/delete" })
-    public ModelAndView deleteRestaurant(@ModelAttribute("loggedUser") final User loggedUser, 
-            @PathVariable("restaurantId") final long restaurantId) {
-
-        if (loggedUser != null) {
-            if(userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId)){
-                restaurantService.deleteRestaurantById(restaurantId);
-                if(userService.isRestaurantOwner(loggedUser.getId())){
-                    updateAuthorities(loggedUser);
-                }
-                return new ModelAndView("redirect:/restaurants/user/" + loggedUser.getId());
-            }
-        }
-        return new ModelAndView("redirect:/403");
-
-    }
-
-
-
-    @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.GET)
-    public ModelAndView editRestaurant(
-            @ModelAttribute("loggedUser") final User loggedUser, 
-            @PathVariable("restaurantId") final long restaurantId, 
-            @ModelAttribute("RestaurantForm") final RestaurantForm form) {
-
-            if (loggedUser != null) {
-                Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
-                if(userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId)){
-                    final ModelAndView mav = new ModelAndView("editRestaurant");
-                    if(form.getName() != null && !form.getName().isEmpty()) {
-                        restaurant.setName(form.getName());
-                    }
-                    if(form.getAddress() != null && !form.getAddress().isEmpty()) {
-                        restaurant.setAddress(form.getAddress());
-                    }
-                    if(form.getPhoneNumber() != null && !form.getPhoneNumber().isEmpty()) {
-                        restaurant.setPhoneNumber(form.getPhoneNumber());
-                    }
-                    mav.addObject("restaurant", restaurant);
-
-                    mav.addObject("tags", Tags.allTags());
-                    List<Integer> tagsChecked = new ArrayList();
-                    for( Tags t :restaurantService.tagsInRestaurant(restaurantId)){
-                        tagsChecked.add(t.getValue());
-                    }
-                    mav.addObject("tagsChecked", tagsChecked);
-
-
-                    return mav;
-                }
-            }
-
-        return new ModelAndView("redirect:/403");
-    }
-
-    @RequestMapping(path={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST)
-    public ModelAndView editRestaurant(@ModelAttribute("loggedUser") final User loggedUser, 
-            @PathVariable("restaurantId") final long restaurantId, 
-            @Valid @ModelAttribute("RestaurantForm") final RestaurantForm form,
-            final BindingResult errors) {
-
-
-        if (form.getTags().length>3) {
-            errors.rejectValue("tags", "restaurant.edit.tagsLimit");
-        }
-
-
-        if (errors.hasErrors()) {
-            LOGGER.debug("Form has errors at /restaurant/{}/edit", restaurantId);
-            return editRestaurant(loggedUser, restaurantId, form);
-        }
-        // Should be if it got here, 
-        // but it doesn't hurt to escape a potential null pointer exception
-        if (loggedUser != null) {
-            LOGGER.debug("Updating restaurant for user {}", loggedUser.getName());
-            final Restaurant restaurant = restaurantService
-                .updateRestaurant(restaurantId, form.getName(), form.getAddress(), form.getPhoneNumber())
-                .orElseThrow(RestaurantNotFoundException::new);
-
-            if (form.getProfileImage() != null && !form.getProfileImage().isEmpty()) {
-                try {
-                Image image = new Image(form.getProfileImage().getBytes());
-                restaurantService.setImageByRestaurantId(image, restaurant.getId());
-                } catch (IOException e) {
-                    LOGGER.error("error while setting restaurant profile image");
-                }
-            }
-
-            for( Tags t :restaurantService.tagsInRestaurant(restaurantId)){
-                restaurantService.removeTag(restaurantId,t);
-            }
-            for( Integer i :form.getTags()){
-                restaurantService.addTag(restaurantId,Tags.valueOf(i));
-            }
-
-
-            return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
-        }
-        return new ModelAndView("redirect:/403");
-    }
-
-    @RequestMapping(path={"/restaurant/{restaurantId}/manage"})
-    public ModelAndView manageRestaurant(
-            @ModelAttribute("loggedUser") final User loggedUser,
-            @PathVariable("restaurantId") final long restaurantId,
-            @RequestParam(defaultValue = "1") Integer page) {
-
-        if (loggedUser != null) {
-            final ModelAndView mav =  new ModelAndView("manageConfirmedReservations");
-            Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
-            if(restaurant.isPresent()){
-                if(restaurant.get().getUserId() != loggedUser.getId()){
-                    return new ModelAndView("redirect:/403");
-                }
-                int maxPages = reservationService.findByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
-                if(page == null || page <1) {
-                    page=1;
-                }else if (page > maxPages) {
-                    page = maxPages;
-                }
-                mav.addObject("restaurant", restaurant.get());
-
-                // With Pagination
-                /*List<Reservation> confirmedReservations = reservationService.findConfirmedByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
-                List<Reservation> pendingReservations = reservationService.findPendingByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);*/
-
-                // Without pagination
-                HashMap<String, List<Reservation>> reservations = reservationService.findByRestaurantByConfirmation(restaurantId);
-                List<Reservation> confirmedReservations = reservations.get("confirmed");
-                List<Reservation> pendingReservations = reservations.get("pending");
-
-                //List<Reservation> reservations = reservationService.findByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
-                if(confirmedReservations.isEmpty()){ mav.addObject("restaurantHasConfirmedReservations", false); }
-                else { mav.addObject("restaurantHasConfirmedReservations", true); }
-
-                if(pendingReservations.isEmpty()){ mav.addObject("restaurantHasPendingReservations", false); }
-                else { mav.addObject("restaurantHasPendingReservations", true); }
-
-                mav.addObject("maxPages", maxPages);
-                mav.addObject("confirmedReservations", confirmedReservations);
-                mav.addObject("pendingReservations", pendingReservations);
-
-                return mav;
-            }
-            else{
-                return new ModelAndView("redirect:/404");
-            }
-        }
-        return new ModelAndView("redirect:/403");
-    }
-
     @RequestMapping(path ={  "/restaurant/{restaurantId}/delete/{menuId}" }, method=RequestMethod.POST)
     public ModelAndView deleteMenuItem(
             @ModelAttribute("loggedUser") final User loggedUser,
@@ -431,84 +257,8 @@ public class RestaurantController {
         return new ModelAndView("redirect:/403");
     }
 
-                
-    @RequestMapping(path={"/restaurant/{restaurantId}/manage/confirmed"})
-    public ModelAndView manageRestaurantConfirmed(
-            @ModelAttribute("loggedUser") final User loggedUser,
-            @PathVariable("restaurantId") final long restaurantId,
-            @RequestParam(defaultValue = "1") Integer page) {
-        if (loggedUser != null) {
-            final ModelAndView mav =  new ModelAndView("manageConfirmedReservations");
-            Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
-            if(restaurant.isPresent()){
-                if(restaurant.get().getUserId() != loggedUser.getId()){
-                    return new ModelAndView("redirect:/403");
-                }
-                int maxPages = reservationService.findConfirmedByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
-                if(page == null || page <1) {
-                    page=1;
-                }else if (page > maxPages) {
-                    page = maxPages;
-                }
-                mav.addObject("restaurant", restaurant.get());
 
-                // With Pagination
-                List<Reservation> confirmedReservations = reservationService.findConfirmedByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
-
-                if(confirmedReservations.isEmpty()){ mav.addObject("restaurantHasConfirmedReservations", false); }
-                else { mav.addObject("restaurantHasConfirmedReservations", true); }
-
-                mav.addObject("maxPages", maxPages);
-                mav.addObject("confirmedReservations", confirmedReservations);
-
-                return mav;
-            }
-            else{
-                return new ModelAndView("redirect:/404");
-            }
-        }
-        return new ModelAndView("redirect:/403");
-    }
-
-    @RequestMapping(path={"/restaurant/{restaurantId}/manage/pending"})
-    public ModelAndView manageRestaurantPending(
-            @ModelAttribute("loggedUser") final User loggedUser,
-            @PathVariable("restaurantId") final long restaurantId,
-            @RequestParam(defaultValue = "1") Integer page) {
-
-        if (loggedUser != null) {
-            final ModelAndView mav =  new ModelAndView("managePendingReservations");
-            Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
-            if(restaurant.isPresent()){
-                if(restaurant.get().getUserId() != loggedUser.getId()){
-                    return new ModelAndView("redirect:/403");
-                }
-                int maxPages = reservationService.findPendingByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
-                if(page == null || page <1) {
-                    page=1;
-                }else if (page > maxPages) {
-                    page = maxPages;
-                }
-                mav.addObject("restaurant", restaurant.get());
-
-                List<Reservation> pendingReservations = reservationService.findPendingByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
-                if(pendingReservations.isEmpty()){ mav.addObject("restaurantHasPendingReservations", false); }
-                else { mav.addObject("restaurantHasPendingReservations", true); }
-
-                mav.addObject("maxPages", maxPages);
-                mav.addObject("pendingReservations", pendingReservations);
-
-                return mav;
-            }
-            else{
-                return new ModelAndView("redirect:/404");
-            }
-        }
-        return new ModelAndView("redirect:/403");
-    }
-
-
-    @RequestMapping("/restaurants/user/{userId}")
+    @RequestMapping(path={ "/restaurants/user/{userId}" }, method=RequestMethod.GET)
     public ModelAndView userRestaurants(
             @ModelAttribute("loggedUser") final User loggedUser,
             @PathVariable("userId") final long userId,

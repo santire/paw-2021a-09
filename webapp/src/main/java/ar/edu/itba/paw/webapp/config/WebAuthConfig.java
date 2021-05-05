@@ -53,9 +53,14 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .invalidSessionUrl("/")
                 .and().authorizeRequests()
                 .antMatchers("/login", "/register").anonymous()
-                .antMatchers("/user/*", "/user/edit", "/register/restaurant").hasRole("USER")
-                .antMatchers("/reservations/*/*, ").hasRole("USER")
-                .antMatchers("/restaurant/*/edit", "/restaurant/*/delete", "/restaurant/*/manage").hasRole("RESTAURANTOWNER")
+                .antMatchers("/user/*", "/user/edit", "/register/restaurant", "/restaurants/user/*").hasRole("USER")
+                .antMatchers("/reservations/*","/reservations/*/*").hasRole("USER")
+                .antMatchers("/restaurant/*/edit",
+                             "/restaurant/*/delete",
+                             "/restaurant/*/menu",
+                             "/restaurant/*/menu/delete",
+                             "/restaurant/*/manage/confirmed",
+                             "/restaurant/*/manage/pending").hasRole("RESTAURANTOWNER")
                 .and().formLogin()
                 .loginPage("/login")
                 .usernameParameter("email")
@@ -90,6 +95,5 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
         }
         return text;
     }
-
 
 }
