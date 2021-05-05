@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS restaurants_tags(
 );
 */
 CREATE TABLE IF NOT EXISTS restaurant_tags(
-    restaurant_id INTEGER REFERENCES restaurants(restaurant_id),
+    restaurant_id INTEGER REFERENCES restaurants(restaurant_id) ON DELETE CASCADE,
     tag_id INTEGER,
     CONSTRAINT restaurants_tags_pkey PRIMARY KEY (restaurant_id, tag_id)
     );
