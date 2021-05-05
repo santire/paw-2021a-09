@@ -46,7 +46,7 @@ public class ReservationDaoImpl implements ReservationDao{
 
     @Override
     public List<Reservation> findByUser(long userId) {
-        return jdbcTemplate.query("SELECT * FROM reservations WHERE user_id = ?", RESERVATION_ROW_MAPPER, userId).stream().collect(Collectors.toList());
+        return jdbcTemplate.query("SELECT * FROM reservations WHERE user_id = ? ORDER BY date ASC", RESERVATION_ROW_MAPPER, userId).stream().collect(Collectors.toList());
     }
 
     @Override
@@ -54,7 +54,7 @@ public class ReservationDaoImpl implements ReservationDao{
         return jdbcTemplate.query(
                 "SELECT * FROM reservations"
                 +
-                " WHERE user_id = ?"
+                " WHERE user_id = ? ORDER BY date ASC"
                 +
                 " OFFSET ? FETCH NEXT ? ROWS ONLY"
                 , RESERVATION_ROW_MAPPER, userId, (page-1)*amountOnPage, amountOnPage)
@@ -77,7 +77,7 @@ public class ReservationDaoImpl implements ReservationDao{
 
     @Override
     public List<Reservation> findByRestaurant(long restaurantId) {
-        return jdbcTemplate.query("SELECT * FROM reservations WHERE restaurant_id = ?", RESERVATION_ROW_MAPPER, restaurantId).stream().collect(Collectors.toList());
+        return jdbcTemplate.query("SELECT * FROM reservations WHERE restaurant_id = ? ORDER BY date ASC", RESERVATION_ROW_MAPPER, restaurantId).stream().collect(Collectors.toList());
     }
 
     @Override
@@ -85,7 +85,7 @@ public class ReservationDaoImpl implements ReservationDao{
         return jdbcTemplate.query(
                 "SELECT * FROM reservations"
                 +
-                " WHERE restaurant_id = ?"
+                " WHERE restaurant_id = ? ORDER BY date ASC"
                 +
                 " OFFSET ? FETCH NEXT ? ROWS ONLY"
                 , RESERVATION_ROW_MAPPER, restaurantId, (page-1)*amountOnPage, amountOnPage)
@@ -97,7 +97,7 @@ public class ReservationDaoImpl implements ReservationDao{
         return jdbcTemplate.query(
                 "SELECT * FROM reservations"
                         +
-                        " WHERE restaurant_id = ? and confirmed = true"
+                        " WHERE restaurant_id = ? and confirmed = true ORDER BY date ASC"
                         +
                         " OFFSET ? FETCH NEXT ? ROWS ONLY"
                 , RESERVATION_ROW_MAPPER, restaurantId, (page-1)*amountOnPage, amountOnPage)
@@ -109,7 +109,7 @@ public class ReservationDaoImpl implements ReservationDao{
         return jdbcTemplate.query(
                 "SELECT * FROM reservations"
                         +
-                        " WHERE restaurant_id = ? AND confirmed = false"
+                        " WHERE restaurant_id = ? AND confirmed = false ORDER BY date ASC"
                         +
                         " OFFSET ? FETCH NEXT ? ROWS ONLY"
                 , RESERVATION_ROW_MAPPER, restaurantId, (page-1)*amountOnPage, amountOnPage)
@@ -159,8 +159,8 @@ public class ReservationDaoImpl implements ReservationDao{
     }
 
     @Override
-    public Optional<Reservation> modifyReservation(int reservationId, Date date, long quantity){
-        jdbcTemplate.update("UPDATE reservations SET date = ?, quantity = ? WHERE reservation_id = ?", date, quantity, reservationId);
+    public Optional<Reservation> modifyReservation(int reservationId, LocalDateTime date, long quantity){
+        jdbcTemplate.update("UPDATE reservations SET date = ?, quantity = ? WHERE reservation_id = ?", Timestamp.valueOf(date), quantity, reservationId);
         return findById(reservationId);
     }
 

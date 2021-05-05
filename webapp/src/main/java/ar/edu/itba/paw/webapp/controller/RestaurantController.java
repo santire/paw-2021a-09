@@ -387,8 +387,15 @@ public class RestaurantController {
                     page = maxPages;
                 }
                 mav.addObject("restaurant", restaurant.get());
-                List<Reservation> confirmedReservations = reservationService.findConfirmedByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
-                List<Reservation> pendingReservations = reservationService.findPendingByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
+
+                // With Pagination
+                /*List<Reservation> confirmedReservations = reservationService.findConfirmedByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
+                List<Reservation> pendingReservations = reservationService.findPendingByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);*/
+
+                // Without pagination
+                HashMap<String, List<Reservation>> reservations = reservationService.findByRestaurantByConfirmation(restaurantId);
+                List<Reservation> confirmedReservations = reservations.get("confirmed");
+                List<Reservation> pendingReservations = reservations.get("pending");
 
                 //List<Reservation> reservations = reservationService.findByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
                 if(confirmedReservations.isEmpty()){ mav.addObject("restaurantHasConfirmedReservations", false); }

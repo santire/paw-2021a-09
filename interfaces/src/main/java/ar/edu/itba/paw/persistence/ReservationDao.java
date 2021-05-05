@@ -28,7 +28,7 @@ public interface ReservationDao {
     public Optional<Reservation> findById(int id);
 
     // UPDATE
-    public Optional<Reservation> modifyReservation(int reservationId, Date date, long quantity);
+    public Optional<Reservation> modifyReservation(int reservationId, LocalDateTime date, long quantity);
     public boolean confirmReservation(int reservationId);
 
     // DESTROY
