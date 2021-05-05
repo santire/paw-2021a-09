@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 import ar.edu.itba.paw.model.MenuItem;
 import ar.edu.itba.paw.persistence.MenuDao;
 
-// TODO: Find out if this should be its own service
-// or be returned as a Restaurant property
 @Service
 public class MenuServiceImpl implements MenuService {
 
@@ -24,6 +22,18 @@ public class MenuServiceImpl implements MenuService {
 	@Override
 	public void addItemToRestaurant(long restaurantId, MenuItem item) {
 		menuDao.addItemToRestaurant(restaurantId, item);
+	}
+
+	@Override
+	public void deleteItemById(long menuId) {
+		menuDao.deleteItemById(menuId);
+	}
+
+	@Override
+	public boolean menuBelongsToRestaurant(long menuId, long restaurantId) {
+		return findMenuByRestaurantId(restaurantId)
+					.stream()
+					.anyMatch(m -> menuId == m.getId());
 	}
     
 }

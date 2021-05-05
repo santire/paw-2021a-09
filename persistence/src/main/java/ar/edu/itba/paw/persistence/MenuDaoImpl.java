@@ -37,14 +37,19 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public void addItemToRestaurant(long restaurant_id, MenuItem item) {
+    public void addItemToRestaurant(long restaurantId, MenuItem item) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("name", item.getName().trim());
         params.addValue("description", item.getDescription().trim());
         params.addValue("price", item.getPrice());
-        params.addValue("restaurant_id", restaurant_id);
+        params.addValue("restaurant_id", restaurantId);
 
         jdbcInsert.execute(params);
+    }
+
+    @Override
+    public void deleteItemById(long menuId) {
+        jdbcTemplate.update("DELETE FROM menu_items where menu_item_id = ?", menuId);
     }
 
 }

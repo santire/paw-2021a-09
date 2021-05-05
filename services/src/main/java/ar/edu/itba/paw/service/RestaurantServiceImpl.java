@@ -1,8 +1,10 @@
 package ar.edu.itba.paw.service;
 
 import ar.edu.itba.paw.model.*;
+import ar.edu.itba.paw.persistence.LikesDao;
 import ar.edu.itba.paw.persistence.RestaurantDao;
-import jdk.vm.ci.meta.Local;
+import ar.edu.itba.paw.persistence.TagDao;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,12 @@ import java.util.Optional;
 public class RestaurantServiceImpl implements RestaurantService{
     @Autowired
     private RestaurantDao restaurantDao;
+
+    @Autowired
+    private LikesDao likeDao;
+
+    @Autowired
+    private TagDao tagDao;
 
     // CREATE
 
@@ -50,7 +58,16 @@ public class RestaurantServiceImpl implements RestaurantService{
 
     @Override
     public Optional<Restaurant> findByIdWithMenu(long id, int menuPage, int amountOnMenuPage){
-        return restaurantDao.findByIdWithMenu(id, menuPage, amountOnMenuPage);
+        Optional<Restaurant> maybeRestaurant = restaurantDao.findByIdWithMenu(id, menuPage, amountOnMenuPage);
+        if (maybeRestaurant.isPresent()) {
+            Restaurant restaurant = maybeRestaurant.get();
+            int likes = likeDao.getLikesByRestaurantId(restaurant.getId());
+            List<Tags> tags = tagDao.getTagsByRestaurantId(restaurant.getId());
+            restaurant.setLikes(likes);
+            restaurant.setTags(tags);
+            return Optional.of(restaurant);
+        }
+        return Optional.empty();
     }
     
     @Override
