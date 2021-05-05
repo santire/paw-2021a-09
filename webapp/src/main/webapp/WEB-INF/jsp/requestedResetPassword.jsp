@@ -13,7 +13,7 @@
             <strong><spring:message code="errors.invalidToken"></spring:message></strong>
         </div>
     </c:if>
-    <h2 class="text-center mt-4"><spring:message code="user.requestPassword.title" /></h2>
+    <h2 class="text-center mt-5"><spring:message code="user.requestPassword.title" /></h2>
     <h3 class="text-center mt-4"><spring:message code="user.requestPassword.content" /></h3>
   </jsp:body>
 </sc:templateLayout>

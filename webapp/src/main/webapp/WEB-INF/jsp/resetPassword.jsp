@@ -15,7 +15,7 @@
             <strong><spring:message code="errors.expiredToken"></spring:message></strong>
         </div>
     </c:if>
-    <h2 class="text-center mt-4"><spring:message code="user.forgotPassword.title" /></h2>
+    <h2 class="text-center mt-5"><spring:message code="user.forgotPassword.title" /></h2>
     <div class="card border-0 mx-auto w-75">
       <div class="card body border-0">
         <form:form
@@ -38,10 +38,10 @@
             class="btn btn-outline-secondary btn-block w-50 mt-3 px-0 mx-auto"
             value='<spring:message code="user.forgotPassword.button" />'/>
           </div>
+            <div class="text-center mt-3">
+                <spring:message code="register.alreadyHaveAnAccountQuestion"/> <a href="<c:url value="/login"/>"><spring:message code="register.clickHere"/></a>
+            </div>
         </form:form>
-        <div>
-          <spring:message code="register.alreadyHaveAnAccountQuestion"/> <a href="<c:url value="/login"/>"><spring:message code="register.clickHere"/></a>
-        </div>
       </div>
     </div>
 
