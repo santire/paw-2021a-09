@@ -2,6 +2,7 @@ package ar.edu.itba.paw.webapp.controller;
 
 
 
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -25,11 +26,21 @@ public class ExceptionHandlingAdvice  {
     }
      */
 
+
+
     @ExceptionHandler(value = { NoHandlerFoundException.class})
     public ModelAndView notFound(Exception e)
     {
         final ModelAndView mav = new ModelAndView("error");
         mav.addObject("code", 404);
+        return mav;
+    }
+
+    @ExceptionHandler(value = { HttpRequestMethodNotSupportedException.class})
+    public ModelAndView notAllowed(Exception e)
+    {
+        final ModelAndView mav = new ModelAndView("error");
+        mav.addObject("code", 405);
         return mav;
     }
 

@@ -184,11 +184,6 @@ public class UserServiceImpl implements UserService {
 
 
     Optional<User> maybeUser = userDao.findById(verificationToken.getUserId());
-    return maybeUser.orElseThrow(() -> {
-      // If the data source is configured properly there shouldn't be an invalid user id
-      // assigned to a verification token. If this happens something's wrong...
-      LOGGER.error("id {} associated to token {} is not valid.");
-      throw new RuntimeException("Invalid user id");
-    });
+    return maybeUser.orElseThrow(()-> new RuntimeException("Invalid user id"));
   }
 }
