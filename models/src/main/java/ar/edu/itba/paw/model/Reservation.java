@@ -2,8 +2,6 @@ package ar.edu.itba.paw.model;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.Optional;
 
 public class Reservation {
 

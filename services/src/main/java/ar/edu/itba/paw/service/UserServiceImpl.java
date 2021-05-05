@@ -1,6 +1,5 @@
 package ar.edu.itba.paw.service;
 
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -66,7 +65,8 @@ public class UserServiceImpl implements UserService {
       String url = "http://pawserver.it.itba.edu.ar/paw-2021a-09/activate?token=";
 
       String token = UUID.randomUUID().toString();
-      LocalDateTime createdAt = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.systemDefault());
+      // LocalDateTime createdAt = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.systemDefault());
+      LocalDateTime createdAt = LocalDateTime.now();
 
       userDao.assignTokenToUser(token, createdAt, user.getId());
         String plainText = messageSource.getMessage("mail.register.plain",new Object[]{user.getFirstName()},locale)+"\n"+url+token+"\n";
@@ -127,8 +127,11 @@ public class UserServiceImpl implements UserService {
 
 
     Optional<VerificationToken> maybeToken = userDao.getToken(token);
+    LOGGER.debug("GOT TOKEN {}", maybeToken.get().getToken());
+    LOGGER.debug("WITH UID {}", maybeToken.get().getUserId());
     User user = getUserFromMaybeToken(maybeToken);
 
+    LOGGER.debug("Activating user {}", user.getId());
     user = userDao.activateUserById(user.getId()).orElseThrow(() -> new RuntimeException("Couldn't activate user"));
     userDao.deleteToken(token);
     return user;
@@ -140,7 +143,6 @@ public class UserServiceImpl implements UserService {
     Optional<VerificationToken> maybeToken = userDao.getPasswordToken(token);
     User user = getUserFromMaybeToken(maybeToken);
 
-    user = userDao.activateUserById(user.getId()).orElseThrow(() -> new RuntimeException("Couldn't activate user"));
     updateUser(user.getId(), 
                 user.getName(),
                 encoder.encode(password),
@@ -151,14 +153,6 @@ public class UserServiceImpl implements UserService {
 
     userDao.deleteAssociatedPasswordTokens(token);
     return user;
-  }
-
-  @Override
-  public User register(String email) {
-    // User user = userDao.register("dummy","dummy","dummy","dummy", email,"dummy");
-    //emailService.sendRegistrationEmail(email);
-    // return user;
-    return null;
   }
 
   @Override
@@ -184,24 +178,20 @@ public class UserServiceImpl implements UserService {
 
   private User getUserFromMaybeToken(Optional<VerificationToken> maybeToken) throws TokenExpiredException {
     VerificationToken verificationToken = maybeToken.orElseThrow(TokenDoesNotExistException::new);
-    Instant expiryDate = Instant.from(verificationToken.getCreatedAt().toInstant()).plus(24, ChronoUnit.HOURS);
+    LocalDateTime expiryDate = verificationToken.getCreatedAt().plusDays(1);
 
-    if(Instant.now().isAfter(expiryDate)) {
+    if(LocalDateTime.now().isAfter(expiryDate)) {
       LOGGER.warn("verificationToken {} is expired", verificationToken.getToken());
       throw new TokenExpiredException();
     }
 
-    /*Optional<User> maybeUser = userDao.findById(verificationToken.getUserId());
+
+    Optional<User> maybeUser = userDao.findById(verificationToken.getUserId());
     return maybeUser.orElseThrow(() -> {
       // If the data source is configured properly there shouldn't be an invalid user id
       // assigned to a verification token. If this happens something's wrong...
       LOGGER.error("id {} associated to token {} is not valid.");
       throw new RuntimeException("Invalid user id");
     });
-
-     */
-    Optional<User> maybeUser = userDao.findById(verificationToken.getUserId());
-    User user = maybeUser.orElseThrow(() -> new RuntimeException("Invalid user id"));
-    return user;
   }
 }
