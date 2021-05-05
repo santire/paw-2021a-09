@@ -17,11 +17,11 @@ public class UserForm {
   private String repeatPassword;
 
 
-  @Pattern(regexp = "[a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]+")
+  @Pattern(regexp = "[a-zA-ZñÑáéíóúÁÉÍÓÚ]+[a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]*")
   @Size(min = 2, max = 100)
   private String firstName;
 
-  @Pattern(regexp = "[a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]+")
+  @Pattern(regexp = "[a-zA-ZñÑáéíóúÁÉÍÓÚ]+[a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]*")
   @Size(min = 2, max = 100)
   private String lastName;
 
