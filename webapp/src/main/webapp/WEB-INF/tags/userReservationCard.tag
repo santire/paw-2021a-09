@@ -3,7 +3,7 @@
 
 <%@attribute name="reservation" required="true" type="ar.edu.itba.paw.model.Reservation"%>
 
-<div class="card border-0" style="width: 100%">
+<div class="card border-0 mx-auto" style="width: 100%">
     <div class="row">
         <div class="col-md-4 border align-items-center justify-content-center border-0" style="width: 100%">
 
