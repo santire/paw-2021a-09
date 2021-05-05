@@ -1,7 +1,10 @@
 package ar.edu.itba.paw.service;
 
 import ar.edu.itba.paw.model.*;
+import ar.edu.itba.paw.persistence.LikesDao;
 import ar.edu.itba.paw.persistence.RestaurantDao;
+import ar.edu.itba.paw.persistence.TagDao;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +18,12 @@ import java.util.Optional;
 public class RestaurantServiceImpl implements RestaurantService{
     @Autowired
     private RestaurantDao restaurantDao;
+
+    @Autowired
+    private LikesDao likeDao;
+
+    @Autowired
+    private TagDao tagDao;
 
     // CREATE
 
@@ -49,7 +58,16 @@ public class RestaurantServiceImpl implements RestaurantService{
 
     @Override
     public Optional<Restaurant> findByIdWithMenu(long id, int menuPage, int amountOnMenuPage){
-        return restaurantDao.findByIdWithMenu(id, menuPage, amountOnMenuPage);
+        Optional<Restaurant> maybeRestaurant = restaurantDao.findByIdWithMenu(id, menuPage, amountOnMenuPage);
+        if (maybeRestaurant.isPresent()) {
+            Restaurant restaurant = maybeRestaurant.get();
+            int likes = likeDao.getLikesByRestaurantId(restaurant.getId());
+            List<Tags> tags = tagDao.getTagsByRestaurantId(restaurant.getId());
+            restaurant.setLikes(likes);
+            restaurant.setTags(tags);
+            return Optional.of(restaurant);
+        }
+        return Optional.empty();
     }
     
     @Override
@@ -140,8 +158,17 @@ public class RestaurantServiceImpl implements RestaurantService{
     // For now, returns default available hours.
     @Override
     public List<String> availableStringTime(long restaurantId){
+        LocalTime time;
         List<String> times = Arrays.asList("19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30");
-        return times;
+        List<String> afterLocalTime = new ArrayList<>();
+        LocalTime localTime = LocalTime.now();
+        for(String str : times){
+            time = LocalTime.parse(str);
+            if(time.isAfter(localTime)){
+                afterLocalTime.add(str);
+            }
+        }
+        return afterLocalTime;
     }
 
     @Override

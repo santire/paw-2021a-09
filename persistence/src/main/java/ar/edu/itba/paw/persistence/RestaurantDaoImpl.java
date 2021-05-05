@@ -251,11 +251,21 @@ public class RestaurantDaoImpl implements RestaurantDao {
     @Override
     public List<Restaurant> getPopularRestaurants(int limit, int minValue) {
         return jdbcTemplate.query(
-                "SELECT * FROM restaurants r"
+                "SELECT * FROM ("
+                    +
+                    " SELECT r.*, COUNT(like_id) as likes FROM restaurants r"
+                    +
+                    " LEFT JOIN likes l ON r.restaurant_id=l.restaurant_id"
+                    +
+                    " GROUP BY r.restaurant_id"
+                    +
+                ") AS r"
                 +
-                " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id WHERE rating >= ?"
+                " LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id"
                 +
-                " ORDER BY rating DESC"
+                " WHERE likes >= ?"
+                +
+                " ORDER BY likes DESC"
                 +
                 " FETCH NEXT ? ROWS ONLY"
                 , RESTAURANT_ROW_MAPPER, minValue, limit).stream()

@@ -161,6 +161,14 @@ public class ReservationServiceImpl implements ReservationService{
         List<Reservation> confirmedReservations = new ArrayList<>();
         List<Reservation> pendingReservations = new ArrayList<>();
         for(Reservation reservation : allReservations){
+            Optional<Restaurant> restaurant = restaurantService.findById(reservation.getRestaurantId());
+            Optional<User> user = userService.findById(reservation.getUserId());
+            if(restaurant.isPresent()){
+                reservation.setRestaurant(restaurant.get());
+            }
+            if(user.isPresent()){
+                reservation.setUser(user.get());
+            }
             if(reservation.isConfirmed()){
                 confirmedReservations.add(reservation);
             }
@@ -176,7 +184,7 @@ public class ReservationServiceImpl implements ReservationService{
 
     // UPDATE
     @Override
-    public Optional<Reservation> modifyReservation(int reservationId, Date date, long quantity){
+    public Optional<Reservation> modifyReservation(int reservationId, LocalDateTime date, long quantity){
         return reservationDao.modifyReservation(reservationId, date, quantity);
     }
 

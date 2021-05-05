@@ -88,7 +88,7 @@ public class UserController {
             @Valid @ModelAttribute("emailForm") final EmailForm form,
             final BindingResult errors) {
         if (form.getEmail() != null 
-                && userService.findByEmail(form.getEmail()).toString().isEmpty()) {
+                && !userService.findByEmail(form.getEmail()).isPresent()) {
             errors.rejectValue("email", 
                     "emailForm.emailNotInUse", 
                     "Email is not associated to a valid user");

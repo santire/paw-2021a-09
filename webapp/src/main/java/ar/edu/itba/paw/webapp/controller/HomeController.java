@@ -43,7 +43,7 @@ public class HomeController {
     private static final Logger LOGGER = LoggerFactory.getLogger(HomeController.class);
     private static final int AMOUNT_OF_RESTAURANTS = 6;
     private static final int AMOUNT_OF_POPULAR_RESTAURANTS = 10;
-    private static final int POPULAR_MIN_RATING = 8;
+    private static final int POPULAR_MIN_RATING = 1;
     private static Sorting DEFAULT_SORT = Sorting.NAME;
     private static String DEFAULT_ORDER = "asc";
 

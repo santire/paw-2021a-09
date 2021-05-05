@@ -95,7 +95,6 @@ public class RestaurantController {
             }
             mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
             List<String> times = restaurantService.availableStringTime(restaurantId);
-            /*List<String> times = Arrays.asList("19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30");*/
             mav.addObject("times", times);
         }
 
@@ -117,7 +116,6 @@ public class RestaurantController {
 
         LocalTime time;
         if (form != null && errors != null) {
-            /*time = LocalTime.parse(form.getTime());*/
             time = form.getTime();
             int currentHours = LocalTime.now().getHour();
             if (time.getHour() <= currentHours) {
@@ -137,10 +135,8 @@ public class RestaurantController {
         }
 
         if (loggedUser != null) {
-            /*time = LocalTime.parse(form.getTime());*/
             time = form.getTime();
             LocalDateTime todayAtDate = LocalDate.now().atTime(time.getHour(), time.getMinute());
-            /*Date date = Date.from(todayAtDate.atZone(ZoneId.systemDefault()).toInstant());*/
             reservationService.addReservation(loggedUser.getId(), restaurantId, todayAtDate, Long.parseLong(form.getQuantity()));
             redirectAttributes.addFlashAttribute("madeReservation", true);
         } else {
@@ -387,8 +383,15 @@ public class RestaurantController {
                     page = maxPages;
                 }
                 mav.addObject("restaurant", restaurant.get());
-                List<Reservation> confirmedReservations = reservationService.findConfirmedByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
-                List<Reservation> pendingReservations = reservationService.findPendingByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
+
+                // With Pagination
+                /*List<Reservation> confirmedReservations = reservationService.findConfirmedByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
+                List<Reservation> pendingReservations = reservationService.findPendingByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);*/
+
+                // Without pagination
+                HashMap<String, List<Reservation>> reservations = reservationService.findByRestaurantByConfirmation(restaurantId);
+                List<Reservation> confirmedReservations = reservations.get("confirmed");
+                List<Reservation> pendingReservations = reservations.get("pending");
 
                 //List<Reservation> reservations = reservationService.findByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
                 if(confirmedReservations.isEmpty()){ mav.addObject("restaurantHasConfirmedReservations", false); }
@@ -405,6 +408,24 @@ public class RestaurantController {
             }
             else{
                 return new ModelAndView("redirect:/404");
+            }
+        }
+        return new ModelAndView("redirect:/403");
+    }
+
+    @RequestMapping(path ={  "/restaurant/{restaurantId}/delete/{menuId}" }, method=RequestMethod.POST)
+    public ModelAndView deleteMenuItem(
+            @ModelAttribute("loggedUser") final User loggedUser,
+            @PathVariable("restaurantId") final long restaurantId,
+            @PathVariable("menuId") final long menuId
+            ) {
+
+        if(loggedUser != null){
+            boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
+            boolean menuBelongsToRestaurant = menuService.menuBelongsToRestaurant(menuId, restaurantId);
+            if(isTheRestaurantOwner && menuBelongsToRestaurant) {
+                menuService.deleteItemById(menuId);
+                return new ModelAndView("redirect:/restaurant/" + restaurantId);
             }
         }
         return new ModelAndView("redirect:/403");

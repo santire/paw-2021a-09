@@ -2,11 +2,10 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <%@attribute name="reservation" required="true" type="ar.edu.itba.paw.model.Reservation"%>
-<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
 
-<div class="card border-0">
-    <div class="row row-cols-1 row-cols-md-3">
-        <div class="col border d-flex align-items-center justify-content-center border-0">
+<div class="card border-0" style="width: 100%">
+    <div class="row">
+        <div class="col-md-4 border align-items-center justify-content-center border-0" style="width: 100%">
 
             <%--IMAGE COLUMN --%>
             <c:choose>
@@ -21,14 +20,14 @@
             <a href="${restaurantPage}">
                 <img
                         src="${imgUrl}"
-                        class="restaurant-img card-img img-fluid img-thumbnail rounded card-img-top"
+                        class="restaurant-img img-fluid img-thumbnail"
                         alt="..."
                 />
             </a>
         </div>
 
         <%-- RESTAURANT INFORMATION --%>
-        <div class="col border d-flex align-items-center justify-content-center border-0">
+        <div class="col-md-4 border align-items-center justify-content-center border-0">
             <span class="block">
                 <div class="p-2 bd-highlight text-muted">${reservation.getRestaurant().getName()}</div>
                 <div class="p-2 bd-highlight text-muted">${reservation.getRestaurant().getAddress()}</div>
@@ -42,7 +41,7 @@
 
         <%-- RESERVATION COLUMN --%>
         <c:url value="/reservations/${reservation.getId()}/cancel" var="cancelReservationPath"/>
-        <div class="col border d-flex align-items-center justify-content-center border-0">
+        <div class="col-md-4 border align-items-center justify-content-center border-0">
             <span class="block">
                 <c:choose>
                     <c:when test="${reservation.isConfirmed()}">

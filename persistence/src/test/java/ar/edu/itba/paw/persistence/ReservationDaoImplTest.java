@@ -15,6 +15,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.sql.DataSource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Optional;
 
@@ -41,19 +43,14 @@ public class ReservationDaoImplTest {
 
     @Test
     public void modifyReservation(){
-        /*SimpleDateFormat dateformat2 = new SimpleDateFormat("yyyy-M-dd hh:mm:ss");
-        String date = "2021-05-20 11:35:42";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String date = "2021-05-20 11:35";
         int newQuantity = 5;
 
-        try {
-            Date newDate = dateformat2.parse(date);
-            Optional<Reservation> newReservation = reservationDao.modifyReservation(1, newDate, newQuantity);
-            assertTrue(newReservation.isPresent());
-            assertEquals("2021-05-20", String.valueOf(newReservation.get().getDate()));
-            assertEquals(newQuantity, newReservation.get().getQuantity());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }*/
-        assertEquals(1, 1);
+        LocalDateTime newDate = LocalDateTime.parse(date, formatter);
+        Optional<Reservation> newReservation = reservationDao.modifyReservation(1, newDate, newQuantity);
+        assertTrue(newReservation.isPresent());
+        assertEquals("2021-05-20", String.valueOf(newReservation.get().getDate().toLocalDate()));
+        assertEquals(newQuantity, newReservation.get().getQuantity());
     }
 }
