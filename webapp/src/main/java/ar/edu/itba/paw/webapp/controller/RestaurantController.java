@@ -410,6 +410,24 @@ public class RestaurantController {
         return new ModelAndView("redirect:/403");
     }
 
+    @RequestMapping(path ={  "/restaurant/{restaurantId}/delete/{menuId}" }, method=RequestMethod.POST)
+    public ModelAndView deleteMenuItem(
+            @ModelAttribute("loggedUser") final User loggedUser,
+            @PathVariable("restaurantId") final long restaurantId,
+            @PathVariable("menuId") final long menuId
+            ) {
+
+        if(loggedUser != null){
+            boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
+            boolean menuBelongsToRestaurant = menuService.menuBelongsToRestaurant(menuId, restaurantId);
+            if(isTheRestaurantOwner && menuBelongsToRestaurant) {
+                menuService.deleteItemById(menuId);
+                return new ModelAndView("redirect:/restaurant/" + restaurantId);
+            }
+        }
+        return new ModelAndView("redirect:/403");
+    }
+
 
     @RequestMapping("/restaurants/user/{userId}")
     public ModelAndView userRestaurants(

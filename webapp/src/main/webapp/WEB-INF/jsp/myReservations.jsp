@@ -17,7 +17,6 @@
                                                 reservation="${reservation}"/>
                                     </div>
                                 </c:forEach>
-                                <c:url value="/reservations" var="url"/>
                                 <div class="mx-auto">
                                     <sc:pagination baseUrl="/reservations" pages="${maxPages}"/>
                                 </div>
