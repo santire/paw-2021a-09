@@ -20,7 +20,7 @@
                             <a class="nav-link active"  href="#"><spring:message code="restaurant.manage.confirmedTab"/></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="${pageContext.request.contextPath}/restaurant/${restaurantId}/manage/pending"><spring:message code="restaurant.manage.pendingTab"/></a>
+                            <a class="nav-link" href="<c:url value="/restaurant/${restaurantId}/manage/pending"/>"> <spring:message code="restaurant.manage.pendingTab"/></a>
                         </li>
                     </ul>
                     <div class="tab-content mt-5">
@@ -32,14 +32,14 @@
                                                 reservation="${reservation}"/>
                                     </div>
                                 </c:forEach>
+                                <div class="mx-auto">
+                                    <sc:pagination baseUrl="/restaurant/${restaurant.getId()}/manage/confirmed" pages="${maxPages}"/>
+                                </div>
                             </c:when>
                             <c:otherwise>
                                 <h2 class="display-5 text-center mt-5"><spring:message code="restaurant.manage.noReservations" /></h2>
                             </c:otherwise>
                         </c:choose>
-                    </div>
-                    <div class="mx-auto">
-                        <sc:pagination baseUrl="/restaurant/${restaurant.getId()/manage/confirmed}" pages="${maxPages}"/>
                     </div>
                 </div>
             </section>

@@ -32,14 +32,14 @@
                                                 reservation="${reservation}"/>
                                     </div>
                                 </c:forEach>
+                                <div class="mx-auto">
+                                    <sc:pagination baseUrl="/restaurant/${restaurant.getId()}/manage/pending" pages="${maxPages}"/>
+                                </div>
                             </c:when>
                             <c:otherwise>
                                 <h2 class="display-5 text-center mt-5"><spring:message code="restaurant.manage.noPendingReservations" /></h2>
                             </c:otherwise>
                         </c:choose>
-                    </div>
-                    <div class="mx-auto">
-                        <sc:pagination baseUrl="/restaurant/${restaurant.getId()/manage/pending}" pages="${maxPages}"/>
                     </div>
                 </div>
             </section>

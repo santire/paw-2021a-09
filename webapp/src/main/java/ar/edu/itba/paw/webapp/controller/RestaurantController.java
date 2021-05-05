@@ -117,8 +117,8 @@ public class RestaurantController {
         LocalTime time;
         if (form != null && errors != null) {
             time = form.getTime();
-            int currentHours = LocalTime.now().getHour();
-            if (time.getHour() <= currentHours) {
+            LocalTime currentTime = LocalTime.now();
+            if (time.isBefore(currentTime)) {
                 errors.rejectValue("time",
                                     "reservationForm.time",
                                     "Selected hour has already passed");
@@ -426,7 +426,7 @@ public class RestaurantController {
                 if(restaurant.get().getUserId() != loggedUser.getId()){
                     return new ModelAndView("redirect:/403");
                 }
-                int maxPages = reservationService.findByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
+                int maxPages = reservationService.findConfirmedByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
                 if(page == null || page <1) {
                     page=1;
                 }else if (page > maxPages) {
@@ -465,7 +465,7 @@ public class RestaurantController {
                 if(restaurant.get().getUserId() != loggedUser.getId()){
                     return new ModelAndView("redirect:/403");
                 }
-                int maxPages = reservationService.findByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
+                int maxPages = reservationService.findPendingByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
                 if(page == null || page <1) {
                     page=1;
                 }else if (page > maxPages) {

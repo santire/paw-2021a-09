@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.webapp.forms;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -17,6 +18,7 @@ public class MenuItemForm {
     private String description;
 
     @Min(0)
+    @Max(100000)
     private float price;
 
     public long getId() {
