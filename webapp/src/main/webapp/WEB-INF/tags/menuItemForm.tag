@@ -14,6 +14,7 @@
     >
        <div class="row row-cols-1 px-4 justify-content-center">
           <div class="w-100 mx-auto">
+              <input type="hidden" name="page" value="${param.page}">
               <form:label class="w-100 mx-auto" path="name">
                 <spring:message code="register.restaurant.MenuName" />:
                 <form:input 

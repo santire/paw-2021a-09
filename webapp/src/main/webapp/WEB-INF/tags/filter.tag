@@ -51,7 +51,7 @@
         </label>
         <select 
           name="sortBy"
-          class="my-select selectpicker" 
+          class="my-select selectpicker show-tick" 
           title="<spring:message code="restaurant.filters.${defaultSortType.getSortType()}"/>"
           data-live-search="true"
           >
@@ -78,7 +78,7 @@
         </label>
         <select
             name="order"
-            class="my-select selectpicker" 
+            class="my-select selectpicker show-tick" 
             title="<spring:message code="restaurant.filters.${defaultOrder}"/>"
             >
             <c:choose>

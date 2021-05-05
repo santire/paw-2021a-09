@@ -2,7 +2,6 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <%@attribute name="reservation" required="true" type="ar.edu.itba.paw.model.Reservation"%>
-<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
 
 <div class="card border-0">
     <div class="row row-cols-1 row-cols-md-3">

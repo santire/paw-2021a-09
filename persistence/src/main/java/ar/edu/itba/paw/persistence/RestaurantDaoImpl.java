@@ -144,7 +144,7 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 +
                 "  WHERE r.restaurant_id = ?"
                 +
-                " ORDER BY menu_item_id DESC"
+                " ORDER BY menu_item_id ASC"
                 +
                 " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"
                 ,RESTAURANT_NESTED_MAPPER, id, (menuPage-1)*amountOnMenuPage, amountOnMenuPage)
@@ -514,23 +514,6 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 .collect(Collectors.toList());
 
         return restaurants;
-        // return jdbcTemplate.query(
-                // "SELECT r.restaurant_id, r.name, r.address, r.phone_number, r.rating, r.user_id, image_data, AVG(price) as price, COALESCE(q,0) as reservations  FROM" +
-                        // "(SELECT * FROM restaurants r LEFT JOIN restaurant_tags rt ON r.restaurant_id = rt.restaurant_id "+ t +" )AS r " +
-                        // "LEFT JOIN restaurant_images i ON r.restaurant_id = i.restaurant_id " +
-                        // "RIGHT JOIN menu_items m ON r.restaurant_id = m.restaurant_id " +
-                        // "LEFT JOIN (select r.restaurant_id, COUNT(quantity) from restaurants r left JOIN reservations b ON r.restaurant_id = b.restaurant_id " +
-                        // "WHERE date- interval '"+lastDays+" DAYS' < CURRENT_TIMESTAMP " +
-                        // "GROUP BY r.restaurant_id)as hot(rid,q) on r.restaurant_id = hot.rid " +
-                        // "WHERE r.name ILIKE '%"+name+"%'" +
-                        // "GROUP BY r.restaurant_id, r.name, r.address, r.phone_number, r.rating, r.user_id, image_data, q " +
-                        // "HAVING AVG(price) >"+minAvgPrice+" AND AVG(price) <"+maxAvgPrice+" " +
-                        // "ORDER BY "+orderby+" "+order
-
-                // , RESTAURANT_ROW_MAPPER).stream()
-                // .collect(Collectors.toList());
-        
-
     }
 
 

@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum Sorting {
-    RATING("rating"),
     HOT("hot"),
     PRICE("price"),
     LIKES("likes"),
