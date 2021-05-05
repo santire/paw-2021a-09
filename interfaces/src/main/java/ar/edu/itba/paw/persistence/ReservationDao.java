@@ -4,6 +4,7 @@ import ar.edu.itba.paw.model.Image;
 import ar.edu.itba.paw.model.Reservation;
 import ar.edu.itba.paw.model.User;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -16,16 +17,16 @@ public interface ReservationDao {
 
     // READ
     public List<Reservation> findByUser(long userId);
-    public List<Reservation> findByUser(int page, int amountOnPage, long userId);
-    public int findByUserPageCount(int amountOnPage, long userId);
+    public List<Reservation> findByUser(int page, int amountOnPage, long userId, Timestamp currentTime);
+    public int findByUserPageCount(int amountOnPage, long userId, Timestamp currentTime);
 
     public List<Reservation> findByRestaurant(long restaurantId);
     public List<Reservation> findByRestaurant(int page, int amountOnPage, long restaurantId);
-    public List<Reservation> findConfirmedByRestaurant(int page, int amountOnPage, long restaurantId);
-    public List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId);
+    public List<Reservation> findConfirmedByRestaurant(int page, int amountOnPage, long restaurantId, Timestamp currentTime);
+    public List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId, Timestamp currentTime);
     public int findByRestaurantPageCount(int amountOnPage, long restaurantId);
-    public int findConfirmedByRestaurantPageCount(int amountOnPage, long restaurantId);
-    public int findPendingByRestaurantPageCount(int amountOnPage, long restaurantId);
+    public int findConfirmedByRestaurantPageCount(int amountOnPage, long restaurantId, Timestamp currentTime);
+    public int findPendingByRestaurantPageCount(int amountOnPage, long restaurantId, Timestamp currentTime);
 
     public Optional<Reservation> findById(int id);
 

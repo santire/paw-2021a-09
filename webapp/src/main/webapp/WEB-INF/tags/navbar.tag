@@ -94,11 +94,11 @@
                       <c:out value="${loggedUser.getName()}"/>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                      <h6 class="dropdown-header">Restaurants</h6>
+                      <h6 class="dropdown-header"><spring:message code="navbar.restaurants"/></h6>
                       <a class="dropdown-item" href="<c:url value="/register/restaurant"/>"><spring:message code="navbar.registerRestaurant" /></a>
                       <a class="dropdown-item" href="<c:url value="/restaurants/user/${loggedUser.getId()}"/>"><spring:message code="navbar.myRestaurants" /></a>
                       <div class="dropdown-divider"></div>
-                      <h6 class="dropdown-header">Account</h6>
+                      <h6 class="dropdown-header"><spring:message code="navbar.account"/></h6>
                       <a class="dropdown-item" href="<c:url value="/user/edit"/>"><spring:message code="navbar.updateInfo" /></a>
                       <div class="dropdown-divider"></div>
                       <a class="dropdown-item" href="<c:url value="/logout"/>"><spring:message code="navbar.logout" /></a>

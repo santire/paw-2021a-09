@@ -21,7 +21,7 @@
             <a href="${restaurantPage}">
                 <img
                         src="${imgUrl}"
-                        class="restaurant-img card-img img-fluid img-thumbnail rounded card-img-top"
+                        class="restaurant-img img-fluid img-thumbnail"
                         alt="..."
                 />
             </a>

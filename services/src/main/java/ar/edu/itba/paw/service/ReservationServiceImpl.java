@@ -10,6 +10,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.MessageSource;
 
 import javax.swing.text.html.Option;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -70,7 +71,8 @@ public class ReservationServiceImpl implements ReservationService{
 
     @Override
     public List<Reservation> findByUser(int page, int amountOnPage, long userId) {
-        List<Reservation> reservations = reservationDao.findByUser(page, amountOnPage, userId);
+        Timestamp currentTime = Timestamp.valueOf(LocalDateTime.now());
+        List<Reservation> reservations = reservationDao.findByUser(page, amountOnPage, userId, currentTime);
         reservations.stream().forEach((r) -> {
             Optional<Restaurant> restaurant = restaurantService.findById(r.getRestaurantId());
             if(restaurant.isPresent()) {
@@ -82,7 +84,8 @@ public class ReservationServiceImpl implements ReservationService{
 
     @Override
     public int findByUserPageCount(int amountOnPage, long userId) {
-        return reservationDao.findByUserPageCount(amountOnPage, userId);
+        Timestamp currentTime = Timestamp.valueOf(LocalDateTime.now());
+        return reservationDao.findByUserPageCount(amountOnPage, userId, currentTime);
     }
 
     @Override
@@ -120,7 +123,8 @@ public class ReservationServiceImpl implements ReservationService{
 
     @Override
     public List<Reservation> findConfirmedByRestaurant(int page, int amountOnPage, long restaurantId) {
-        List<Reservation> reservations =  reservationDao.findConfirmedByRestaurant(page, amountOnPage, restaurantId);
+        Timestamp currentTime = Timestamp.valueOf(LocalDateTime.now());
+        List<Reservation> reservations =  reservationDao.findConfirmedByRestaurant(page, amountOnPage, restaurantId, currentTime);
         reservations.stream().forEach(r -> {
             Optional<Restaurant> restaurant = restaurantService.findById(r.getRestaurantId());
             Optional<User> user = userService.findById(r.getUserId());
@@ -136,12 +140,14 @@ public class ReservationServiceImpl implements ReservationService{
 
     @Override
     public int findConfirmedByRestaurantPageCount(int amountOnPage, long restaurantId) {
-        return reservationDao.findConfirmedByRestaurantPageCount(amountOnPage, restaurantId);
+        Timestamp currentTime = Timestamp.valueOf(LocalDateTime.now());
+        return reservationDao.findConfirmedByRestaurantPageCount(amountOnPage, restaurantId, currentTime);
     }
 
     @Override
     public List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId) {
-        List<Reservation> reservations =  reservationDao.findPendingByRestaurant(page, amountOnPage, restaurantId);
+        Timestamp currentTime = Timestamp.valueOf(LocalDateTime.now());
+        List<Reservation> reservations =  reservationDao.findPendingByRestaurant(page, amountOnPage, restaurantId, currentTime);
         reservations.stream().forEach(r -> {
             Optional<Restaurant> restaurant = restaurantService.findById(r.getRestaurantId());
             Optional<User> user = userService.findById(r.getUserId());
@@ -157,7 +163,8 @@ public class ReservationServiceImpl implements ReservationService{
 
     @Override
     public int findPendingByRestaurantPageCount(int amountOnPage, long restaurantId) {
-        return reservationDao.findPendingByRestaurantPageCount(amountOnPage, restaurantId);
+        Timestamp currentTime = Timestamp.valueOf(LocalDateTime.now());
+        return reservationDao.findPendingByRestaurantPageCount(amountOnPage, restaurantId, currentTime);
     }
 
 	  @Override

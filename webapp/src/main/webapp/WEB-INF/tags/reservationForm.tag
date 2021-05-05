@@ -40,24 +40,12 @@
 
       <div class="row row-cols-1 row-cols-lg-2">
         <div class="col-lg-7 mx-0 px-0 pr-1">
-          <form:label path="time">
+          <form:label path="time" >
             <div class="input-group mb-3">
               <div class="input-group-prepend">
                 <span class="input-group-text"><i class="fa fa-clock-o"></i></span>
               </div>
               <form:select cssClass="browser-default custom-select" path="time" items="${times}"/>
-               <%--  <form:input
-                      type="number"
-                      min="0"
-                      max="23"
-                      path="date"
-                      value="18"
-                      cssClass="form-control text-right"
-                      aria-label="Seleccione horario para su reserva"
-              />
-              <div class="input-group-append">
-                <span class="input-group-text">:00</span>
-              </div>--%>
             </div>
           </form:label>
           <form:errors path="time" class="px-3 text-danger" element="p"/>

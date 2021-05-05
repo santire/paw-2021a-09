@@ -143,7 +143,7 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     // For now, returns default available hours.
-    @Override
+/*    @Override
     public List<LocalTime> availableTime(long restaurantId){
         LocalTime time;
         List<String> times = Arrays.asList("19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30");
@@ -153,16 +153,65 @@ public class RestaurantServiceImpl implements RestaurantService{
             availableHours.add(time);
         }
         return availableHours;
+    }*/
+
+    @Override
+    public List<LocalTime> availableTime(long restaurantId){
+        LocalTime time;
+        LocalTime currentTime = LocalTime.now();
+        List<String> times = new ArrayList<>();
+        int min = 12;
+        int max = 23;
+        List<LocalTime> availableHours = new ArrayList<>();
+        String str;
+        for(int i = min; i <= max; i++){
+            str = String.valueOf(i) + ':' + "00";
+            time = LocalTime.parse(str);
+            if(time.isAfter(currentTime)){
+                availableHours.add(time);
+            }
+            str = String.valueOf(i) + ':' + "30";
+            time = LocalTime.parse(str);
+            if(time.isAfter(currentTime)){
+                availableHours.add(time);
+            }
+        }
+        return availableHours;
     }
 
     // For now, returns default available hours.
-    @Override
+/*    @Override
     public List<String> availableStringTime(long restaurantId){
         LocalTime time;
         List<String> times = Arrays.asList("19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30");
         List<String> afterLocalTime = new ArrayList<>();
         LocalTime localTime = LocalTime.now();
         for(String str : times){
+            time = LocalTime.parse(str);
+            if(time.isAfter(localTime)){
+                afterLocalTime.add(str);
+            }
+        }
+        return afterLocalTime;
+    }*/
+
+    // For now, returns default available hours.
+    @Override
+    public List<String> availableStringTime(long restaurantId){
+        LocalTime time;
+        int min = 12;
+        int max = 23;
+        List<String> times = new ArrayList<>();
+        List<String> afterLocalTime = new ArrayList<>();
+        LocalTime localTime = LocalTime.now();
+        String str;
+        for(int i = min; i <= max; i++){
+            str = String.valueOf(i) + ':' + "00";
+            time = LocalTime.parse(str);
+            if(time.isAfter(localTime)){
+                afterLocalTime.add(str);
+            }
+            str = String.valueOf(i) + ':' + "30";
             time = LocalTime.parse(str);
             if(time.isAfter(localTime)){
                 afterLocalTime.add(str);
