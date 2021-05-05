@@ -106,11 +106,10 @@ public class RestaurantDaoImplTest {
         Restaurant kfc = maybeRestaurant.get();
         List<MenuItem> menuActual = kfc.getMenu();
 
-        // Menu items are ordered by last added by default
         List<MenuItem> menuExpected = Arrays.asList(
-            new MenuItem(3, "Vegan Friendly Option", "It's literally just water", 10.99f),
+            new MenuItem(1, "Fried Chicken Original", "Delicious fried chicken", 3.99f),
             new MenuItem(2, "Fried Chicken Crispy", "Delicious fried chicken but crispy", 4.99f),
-            new MenuItem(1, "Fried Chicken Original", "Delicious fried chicken", 3.99f)
+            new MenuItem(3, "Vegan Friendly Option", "It's literally just water", 10.99f)
             );
 
         assertEquals(menuExpected.get(0).getName(), menuActual.get(0).getName());
@@ -135,9 +134,9 @@ public class RestaurantDaoImplTest {
         Restaurant kfc = maybeRestaurant.get();
         List<MenuItem> menuActual = kfc.getMenu();
         List<MenuItem> menuExpected = Arrays.asList(
-            new MenuItem(3, "Vegan Friendly Option", "It's literally just water", 10.99f),
+            new MenuItem(1, "Fried Chicken Original", "Delicious fried chicken", 3.99f),
             new MenuItem(2, "Fried Chicken Crispy", "Delicious fried chicken but crispy", 4.99f),
-            new MenuItem(1, "Fried Chicken Original", "Delicious fried chicken", 3.99f)
+            new MenuItem(3, "Vegan Friendly Option", "It's literally just water", 10.99f)
             );
 
         //Should only have 2 menu items because of page size

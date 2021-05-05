@@ -1,14 +1,15 @@
 package ar.edu.itba.paw.model;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 public class VerificationToken {
 
     private String token;
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
     private long userId;
 
-    public Timestamp getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
@@ -20,7 +21,7 @@ public class VerificationToken {
         this.token = token;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -32,9 +33,15 @@ public class VerificationToken {
         this.userId = userId;
     }
 
-    public VerificationToken(String token, Timestamp timestamp, long userId) {
+    public VerificationToken(String token, LocalDateTime timestamp, long userId) {
         this.setToken(token);
         this.setCreatedAt(timestamp);
+        this.userId = userId;
+    }
+
+    public VerificationToken(String token, Timestamp timestamp, long userId) {
+        this.setToken(token);
+        this.setCreatedAt(timestamp.toLocalDateTime());
         this.userId = userId;
     }
 }

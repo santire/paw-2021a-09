@@ -50,26 +50,28 @@ public class ReservationDaoImpl implements ReservationDao{
     }
 
     @Override
-    public List<Reservation> findByUser(int page, int amountOnPage, long userId, Timestamp currentTime) {
+    public List<Reservation> findByUser(int page, int amountOnPage, long userId, LocalDateTime currentTime) {
+        Timestamp currentTimestamp = Timestamp.valueOf(currentTime);
         return jdbcTemplate.query(
                 "SELECT * FROM reservations"
                 +
                 " WHERE user_id = ? and date >= ? ORDER BY date ASC"
                 +
                 " OFFSET ? FETCH NEXT ? ROWS ONLY"
-                , RESERVATION_ROW_MAPPER, userId, currentTime,  (page-1)*amountOnPage, amountOnPage)
+                , RESERVATION_ROW_MAPPER, userId, currentTimestamp,  (page-1)*amountOnPage, amountOnPage)
                 .stream().collect(Collectors.toList());
     }
 
     @Override
-    public int findByUserPageCount(int amountOnPage, long userId, Timestamp currentTime) {
+    public int findByUserPageCount(int amountOnPage, long userId, LocalDateTime currentTime) {
+        Timestamp currentTimestamp = Timestamp.valueOf(currentTime);
         int amount = jdbcTemplate.query(
                 "SELECT CEILING(COUNT(*)::numeric/?) as c"
                 +
                 " FROM reservations"
                 +
                 " WHERE user_id = ? and date >= ?"
-                ,(r,n) -> r.getInt("c"), amountOnPage, userId, currentTime)
+                ,(r,n) -> r.getInt("c"), amountOnPage, userId, currentTimestamp)
                 .stream().findFirst().orElse(0);
         return amount <=0 ? 1 : amount;
 
@@ -93,7 +95,7 @@ public class ReservationDaoImpl implements ReservationDao{
     }
 
     @Override
-    public List<Reservation> findConfirmedByRestaurant(int page, int amountOnPage, long restaurantId, Timestamp currentTime) {
+    public List<Reservation> findConfirmedByRestaurant(int page, int amountOnPage, long restaurantId, LocalDateTime currentTime) {
         return jdbcTemplate.query(
                 "SELECT * FROM reservations"
                         +
@@ -105,39 +107,42 @@ public class ReservationDaoImpl implements ReservationDao{
     }
 
     @Override
-    public int findConfirmedByRestaurantPageCount(int amountOnPage, long restaurantId, Timestamp currentTime) {
+    public int findConfirmedByRestaurantPageCount(int amountOnPage, long restaurantId, LocalDateTime currentTime) {
+        Timestamp currentTimestamp = Timestamp.valueOf(currentTime);
         int amount =  jdbcTemplate.query(
                 "SELECT CEILING(COUNT(*)::numeric/?) as c"
                         +
                         " FROM reservations"
                         +
                         " WHERE restaurant_id = ? and confirmed = true and date >= ?"
-                ,(r,n) -> r.getInt("c"), amountOnPage, restaurantId, currentTime)
+                ,(r,n) -> r.getInt("c"), amountOnPage, restaurantId, currentTimestamp)
                 .stream().findFirst().orElse(0);
         return amount <= 0 ? 1 : amount;
     }
 
     @Override
-    public List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId, Timestamp currentTime) {
+    public List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId, LocalDateTime currentTime) {
+        Timestamp currentTimestamp = Timestamp.valueOf(currentTime);
         return jdbcTemplate.query(
                 "SELECT * FROM reservations"
                         +
                         " WHERE restaurant_id = ? AND confirmed = false and date >= ? ORDER BY date ASC"
                         +
                         " OFFSET ? FETCH NEXT ? ROWS ONLY"
-                , RESERVATION_ROW_MAPPER, restaurantId, currentTime, (page-1)*amountOnPage, amountOnPage)
+                , RESERVATION_ROW_MAPPER, restaurantId, currentTimestamp, (page-1)*amountOnPage, amountOnPage)
                 .stream().collect(Collectors.toList());
     }
 
     @Override
-    public int findPendingByRestaurantPageCount(int amountOnPage, long restaurantId, Timestamp currentTime) {
+    public int findPendingByRestaurantPageCount(int amountOnPage, long restaurantId, LocalDateTime currentTime) {
+        Timestamp currentTimestamp = Timestamp.valueOf(currentTime);
         int amount =  jdbcTemplate.query(
                 "SELECT CEILING(COUNT(*)::numeric/?) as c"
                         +
                         " FROM reservations"
                         +
                         " WHERE restaurant_id = ? and confirmed = false and date >= ?"
-                ,(r,n) -> r.getInt("c"), amountOnPage, restaurantId, currentTime)
+                ,(r,n) -> r.getInt("c"), amountOnPage, restaurantId, currentTimestamp)
                 .stream().findFirst().orElse(0);
         return amount <= 0 ? 1 : amount;
     }

@@ -16,7 +16,6 @@ public interface UserService {
       final String lastName,
       final String email, 
       final String phone) throws EmailInUseException, TokenCreationException;
-  public User register(final String email);
 
   // READ
   public Optional<User> findById(long id);
