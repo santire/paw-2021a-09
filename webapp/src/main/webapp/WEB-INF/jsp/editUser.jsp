@@ -6,7 +6,7 @@
 
 <c:url value="/user/edit" var="postFormUrl"/>
 
-<sc:templateLayout simpleTopBar="true">
+<sc:templateLayout>
   <jsp:body>
 
   <spring:message code="user.edit.errorMessage" var="errorMessage"/>

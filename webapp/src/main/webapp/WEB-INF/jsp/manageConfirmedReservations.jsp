@@ -14,7 +14,7 @@
                         </svg>
                         <p class="d-inline">${restaurant.getName()}</p>
                     </a>
-                    <h2 class="display-5 mt-5"><spring:message code="restaurant.manage.title"/> ${restaurant.getName()} reservations</h2>
+                    <h2 class="display-5 mt-5"><spring:message code="restaurant.manage.title"/> ${restaurant.getName()}</h2>
                     <ul class="nav nav-pills nav-fill navtop mt-5">
                         <li class="nav-item">
                             <a class="nav-link active"  href="#"><spring:message code="restaurant.manage.confirmedTab"/></a>
