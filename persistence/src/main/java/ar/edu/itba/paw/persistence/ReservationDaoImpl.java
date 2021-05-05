@@ -105,6 +105,19 @@ public class ReservationDaoImpl implements ReservationDao{
     }
 
     @Override
+    public int findConfirmedByRestaurantPageCount(int amountOnPage, long restaurantId) {
+        int amount =  jdbcTemplate.query(
+                "SELECT CEILING(COUNT(*)::numeric/?) as c"
+                        +
+                        " FROM reservations"
+                        +
+                        " WHERE restaurant_id = ? and confirmed = true"
+                ,(r,n) -> r.getInt("c"), amountOnPage, restaurantId)
+                .stream().findFirst().orElse(0);
+        return amount <= 0 ? 1 : amount;
+    }
+
+    @Override
     public List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId) {
         return jdbcTemplate.query(
                 "SELECT * FROM reservations"
@@ -114,6 +127,19 @@ public class ReservationDaoImpl implements ReservationDao{
                         " OFFSET ? FETCH NEXT ? ROWS ONLY"
                 , RESERVATION_ROW_MAPPER, restaurantId, (page-1)*amountOnPage, amountOnPage)
                 .stream().collect(Collectors.toList());
+    }
+
+    @Override
+    public int findPendingByRestaurantPageCount(int amountOnPage, long restaurantId) {
+        int amount =  jdbcTemplate.query(
+                "SELECT CEILING(COUNT(*)::numeric/?) as c"
+                        +
+                        " FROM reservations"
+                        +
+                        " WHERE restaurant_id = ? and confirmed = false"
+                ,(r,n) -> r.getInt("c"), amountOnPage, restaurantId)
+                .stream().findFirst().orElse(0);
+        return amount <= 0 ? 1 : amount;
     }
 
     @Override
@@ -128,6 +154,8 @@ public class ReservationDaoImpl implements ReservationDao{
                 .stream().findFirst().orElse(0);
         return amount <= 0 ? 1 : amount;
     }
+
+
 
     @Override
     public Optional<Reservation> findById(int id) {

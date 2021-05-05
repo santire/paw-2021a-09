@@ -113,7 +113,7 @@ public class ReservationController {
                         reservationService.ownerCancelReservation(reservationId, cancellationMessage);
                        
                         //emailService.sendCancellationEmail(userToCancel.get().getEmail(), restaurant.get(), cancellationMessage);
-                        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage");
+                        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/confirmed");
                     }
                 }
             }
@@ -136,7 +136,7 @@ public class ReservationController {
                         Locale locale = LocaleContextHolder.getLocale();
                         reservationService.ownerCancelReservation(reservationId, messageSource.getMessage("mail.rejection",null,locale));
                         //emailService.sendRejectionEmail(userToCancel.get().getEmail(), restaurant.get());
-                        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage");
+                        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/pending");
                     }
                 }
             }
@@ -157,7 +157,7 @@ public class ReservationController {
                     if(restaurant.get().getUserId() == loggedUser.getId()){
                         reservationService.confirmReservation(reservationId);
                         /*emailService.sendConfirmationEmail(reservation.get());*/
-                        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage");
+                        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/pending");
                     }
                     return new ModelAndView("redirect:/403");
                 }

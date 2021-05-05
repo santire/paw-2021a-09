@@ -117,8 +117,8 @@ public class RestaurantController {
         LocalTime time;
         if (form != null && errors != null) {
             time = form.getTime();
-            int currentHours = LocalTime.now().getHour();
-            if (time.getHour() <= currentHours) {
+            LocalTime currentTime = LocalTime.now();
+            if (time.isBefore(currentTime)) {
                 errors.rejectValue("time",
                                     "reservationForm.time",
                                     "Selected hour has already passed");
@@ -370,7 +370,7 @@ public class RestaurantController {
             @RequestParam(defaultValue = "1") Integer page) {
 
         if (loggedUser != null) {
-            final ModelAndView mav =  new ModelAndView("manageRestaurant");
+            final ModelAndView mav =  new ModelAndView("manageConfirmedReservations");
             Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
             if(restaurant.isPresent()){
                 if(restaurant.get().getUserId() != loggedUser.getId()){
@@ -413,19 +413,77 @@ public class RestaurantController {
         return new ModelAndView("redirect:/403");
     }
 
-    @RequestMapping(path ={  "/restaurant/{restaurantId}/delete/{menuId}" }, method=RequestMethod.POST)
-    public ModelAndView deleteMenuItem(
+                
+    @RequestMapping(path={"/restaurant/{restaurantId}/manage/confirmed"})
+    public ModelAndView manageRestaurantConfirmed(
             @ModelAttribute("loggedUser") final User loggedUser,
             @PathVariable("restaurantId") final long restaurantId,
-            @PathVariable("menuId") final long menuId
-            ) {
+            @RequestParam(defaultValue = "1") Integer page) {
+        if (loggedUser != null) {
+            final ModelAndView mav =  new ModelAndView("manageConfirmedReservations");
+            Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
+            if(restaurant.isPresent()){
+                if(restaurant.get().getUserId() != loggedUser.getId()){
+                    return new ModelAndView("redirect:/403");
+                }
+                int maxPages = reservationService.findConfirmedByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
+                if(page == null || page <1) {
+                    page=1;
+                }else if (page > maxPages) {
+                    page = maxPages;
+                }
+                mav.addObject("restaurant", restaurant.get());
 
-        if(loggedUser != null){
-            boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
-            boolean menuBelongsToRestaurant = menuService.menuBelongsToRestaurant(menuId, restaurantId);
-            if(isTheRestaurantOwner && menuBelongsToRestaurant) {
-                menuService.deleteItemById(menuId);
-                return new ModelAndView("redirect:/restaurant/" + restaurantId);
+                // With Pagination
+                List<Reservation> confirmedReservations = reservationService.findConfirmedByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
+
+                if(confirmedReservations.isEmpty()){ mav.addObject("restaurantHasConfirmedReservations", false); }
+                else { mav.addObject("restaurantHasConfirmedReservations", true); }
+
+                mav.addObject("maxPages", maxPages);
+                mav.addObject("confirmedReservations", confirmedReservations);
+
+                return mav;
+            }
+            else{
+                return new ModelAndView("redirect:/404");
+            }
+        }
+        return new ModelAndView("redirect:/403");
+    }
+
+    @RequestMapping(path={"/restaurant/{restaurantId}/manage/pending"})
+    public ModelAndView manageRestaurantPending(
+            @ModelAttribute("loggedUser") final User loggedUser,
+            @PathVariable("restaurantId") final long restaurantId,
+            @RequestParam(defaultValue = "1") Integer page) {
+
+        if (loggedUser != null) {
+            final ModelAndView mav =  new ModelAndView("managePendingReservations");
+            Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
+            if(restaurant.isPresent()){
+                if(restaurant.get().getUserId() != loggedUser.getId()){
+                    return new ModelAndView("redirect:/403");
+                }
+                int maxPages = reservationService.findPendingByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
+                if(page == null || page <1) {
+                    page=1;
+                }else if (page > maxPages) {
+                    page = maxPages;
+                }
+                mav.addObject("restaurant", restaurant.get());
+
+                List<Reservation> pendingReservations = reservationService.findPendingByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
+                if(pendingReservations.isEmpty()){ mav.addObject("restaurantHasPendingReservations", false); }
+                else { mav.addObject("restaurantHasPendingReservations", true); }
+
+                mav.addObject("maxPages", maxPages);
+                mav.addObject("pendingReservations", pendingReservations);
+
+                return mav;
+            }
+            else{
+                return new ModelAndView("redirect:/404");
             }
         }
         return new ModelAndView("redirect:/403");

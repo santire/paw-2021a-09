@@ -134,6 +134,11 @@ public class ReservationServiceImpl implements ReservationService{
     }
 
     @Override
+    public int findConfirmedByRestaurantPageCount(int amountOnPage, long restaurantId) {
+        return reservationDao.findConfirmedByRestaurantPageCount(amountOnPage, restaurantId);
+    }
+
+    @Override
     public List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId) {
         List<Reservation> reservations =  reservationDao.findPendingByRestaurant(page, amountOnPage, restaurantId);
         reservations.stream().forEach(r -> {
@@ -147,6 +152,11 @@ public class ReservationServiceImpl implements ReservationService{
             }
         });
         return reservations;
+    }
+
+    @Override
+    public int findPendingByRestaurantPageCount(int amountOnPage, long restaurantId) {
+        return reservationDao.findPendingByRestaurantPageCount(amountOnPage, restaurantId);
     }
 
 	  @Override

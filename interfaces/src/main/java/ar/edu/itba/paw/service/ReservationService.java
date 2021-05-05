@@ -23,6 +23,8 @@ public interface ReservationService {
     public List<Reservation> findConfirmedByRestaurant(int page, int amountOnPage, long restaurantId);
     public List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId);
     public int findByRestaurantPageCount(int amountOnPage, long restaurantId);
+    public int findConfirmedByRestaurantPageCount(int amountOnPage, long restaurantId);
+    public int findPendingByRestaurantPageCount(int amountOnPage, long restaurantId);
     public HashMap<String, List<Reservation>> findByRestaurantByConfirmation(long restaurantId);
 
     public Optional<Reservation> findById(int id);
