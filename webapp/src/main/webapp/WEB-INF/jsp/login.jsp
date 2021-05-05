@@ -16,10 +16,10 @@
             </div>
         </c:if>
 
-        <h2 class="text-center mt-4"><spring:message code="hello.login.signin" /></h2>
+        <h2 class="text-center mt-5"><spring:message code="hello.login.signin" /></h2>
 
 
-            <div class="card border-0 mx-auto w-75">
+            <div class="card border-0 mx-auto w-75 mt-4">
               <div class="card body border-0">
               <div class="row">
               <div class="col-md-3"></div>
@@ -61,7 +61,7 @@
                   </div>
                 </form>
                 <div>
-                  <spring:message code="login.needAnAccount"/> <a href="<c:url value="/register"/>"><spring:message code="register.clickHere"/></a>
+                  <spring:message code="login.needAnAccount"/> <a href="<c:url value="/register"/>"><spring:message code="login.createAnAccount"/></a>
                 </div>
               </div>
 

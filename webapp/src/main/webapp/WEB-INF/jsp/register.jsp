@@ -15,8 +15,8 @@
         </div>
     </c:if>
 
-    <h2 class="text-center mt-4"><spring:message code="hello.register.title" /></h2>
-    <div class="card border-0 mx-auto w-75">
+    <h2 class="text-center mt-5"><spring:message code="hello.register.title" /></h2>
+    <div class="card border-0 mx-auto w-75 mt-4">
       <div class="card body border-0">
         <form:form
            modelAttribute="userForm"
