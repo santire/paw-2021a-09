@@ -94,11 +94,11 @@
           </c:when>
           <c:otherwise>
             <h5 class="text-center mt-5">
-              <a href="/login">
+              <a href="<c:url value="/login"/>">
                 <spring:message code="general.toUser.login"></spring:message>
               </a>
               <spring:message code="general.or"/>
-              <a href="/register">
+              <a href="<c:url value="/register"/>">
                 <spring:message code="general.toUser.register"></spring:message>
               </a>
               <spring:message code="general.toMakeReservations"/>.
