@@ -9,7 +9,7 @@ import ar.edu.itba.paw.webapp.validators.MultipartFileSizeValid;
 import ar.edu.itba.paw.webapp.validators.ValidImage;
 
 public class RestaurantForm {
-    @Size(min = 6, max = 100)
+    @Size(min = 2, max = 100)
     @Pattern(regexp = "[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ()'°´¨!&.\\s]+")
     private String name;
 
