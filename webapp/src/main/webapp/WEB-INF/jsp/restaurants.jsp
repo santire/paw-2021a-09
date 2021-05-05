@@ -10,14 +10,21 @@
         <div class="container mt-4">
           <c:choose>
             <c:when test="${empty restaurants}">
-              <c:choose>
-                <c:when test="${userIsSearching}">
-                <h2 class="display-5"><spring:message code="restaurants.search.noRestaurantsFound"/>'<c:out value="${searchString}"/>'</h2>
-                </c:when>
-                <c:otherwise>
-                  <h2 class="display-5"><spring:message code="restaurants.noRestaurantsFound" /></h2>
-                </c:otherwise>
-              </c:choose>
+              <div class="row row-cols-1 row-cols-md-3">
+                <div class="col-md-3">
+                  <sc:filter />
+                </div>
+                <div class="row col-md-9 mx-auto my-auto text-center">
+                  <c:choose>
+                    <c:when test="${userIsSearching}">
+                    <h2 class="display-5 w-100 p-0"><spring:message code="restaurants.search.noRestaurantsFound"/>'<c:out value="${searchString}"/>'</h2>
+                    </c:when>
+                    <c:otherwise>
+                      <h2 class="display-5 w-100 p-0"><spring:message code="restaurants.noRestaurantsFound" /></h2>
+                    </c:otherwise>
+                  </c:choose>
+                </div>
+              </div>
             </c:when>
             <c:otherwise>
               <c:choose>
@@ -28,9 +35,6 @@
                   <h2 class="display-5 mt-5"><spring:message code="restaurants.allRestaurants"/></h2>
                 </c:otherwise>
               </c:choose>
-            </c:otherwise>
-          </c:choose>
-
               <div class="row row-cols-1 row-cols-md-3">
                 <div class="col-md-3">
                   <sc:filter />
@@ -44,10 +48,14 @@
                     </div>
                   </c:forEach>
                 </div>
-                  <div class="mx-auto">
-                    <sc:pagination baseUrl="/restaurants" pages="${maxPages}"/>
-                  </div>
+                <div class="mx-auto">
+                  <sc:pagination baseUrl="/restaurants" pages="${maxPages}"/>
+                </div>
              </div>
+
+            </c:otherwise>
+          </c:choose>
+
         </div>
       </section>
     </main>

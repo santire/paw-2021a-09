@@ -16,11 +16,13 @@
             <c:url value="/resources/images/noimage.jpg" var="imgUrl"/>
         </c:otherwise>
     </c:choose>
+  <div class="embed-responsive embed-responsive-16by9">
     <img
             src="${imgUrl}"
-            class="restaurant-img card-img img-fluid img-thumbnail rounded card-img-top"
+            class="embed-responsive-item restaurant-img card-img img-fluid img-thumbnail rounded card-img-top"
             alt="..."
     />
+  </div>
     <div class="card-body d-flex flex-column">
         <div class="mt-auto">
             <h6 class="card-title text-break text-center mb-5">${restaurant.getName()}</h6>

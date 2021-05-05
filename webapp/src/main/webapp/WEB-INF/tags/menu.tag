@@ -14,7 +14,7 @@
         <c:choose>
           <c:when test="${not empty isTheOwner}">
             <form action="${deletePath}" method="post">
-              <button class="btn b-0 text-danger"type="submit" ><span class="fa fa-trash"/></button> <c:out value="${item.getName()}"/>
+              <button class="ml-0 pl-0 btn b-0 text-danger"type="submit" ><span class="fa fa-trash"/></button> <c:out value="${item.getName()}"/>
             </form>
           </c:when>
           <c:otherwise>

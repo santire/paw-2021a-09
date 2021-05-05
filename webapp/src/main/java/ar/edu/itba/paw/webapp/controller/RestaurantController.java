@@ -37,14 +37,13 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
 
 @Controller
 public class RestaurantController {
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
-    private static final int AMOUNT_OF_MENU_ITEMS = 5;
+    private static final int AMOUNT_OF_MENU_ITEMS = 8;
     private static final int AMOUNT_OF_RESTAURANTS = 10;
     private static final int AMOUNT_OF_RESERVATIONS = 2;
 

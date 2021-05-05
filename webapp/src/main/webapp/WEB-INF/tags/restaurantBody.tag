@@ -25,7 +25,18 @@
         <div class="card-body px-auto mb-auto">
           <div class="d-inline">
           <h5 class="d-inline card-title">${restaurant.getName()}</h5>
-          <h5 class="float-right"><sc:like/></h5>
+          <c:if test="${not empty isTheOwner}">
+            <h5 class="float-right">
+                <div>
+                  <a href="<c:url value="/restaurant/${restaurantId}/edit"/>">
+                    <p class="col-9 m-0 p-0 text-secondary">
+                      <i class="col-9 ml-3 p-1 text-muted fa fa-edit fa-2x" aria-hidden="true"></i>
+                    </p>
+                  </a>
+                </div>
+            </h5>
+          </c:if>
+
           </div>
           <p class="card-text"><medium class="text-muted">${restaurant.getAddress()}</medium></p>
           <p class="card-text"><medium class="text-muted">${restaurant.getPhoneNumber()}</medium></p>
@@ -37,20 +48,13 @@
             </c:forEach>
           </div>
           <div class="row row-cols-2 m-0 p-0">
-            <p class="col-3 m-0 p-0 text-secondary">${restaurant.getLikes()} <i class="fa fa-heart" aria-hidden="true"></i></p>
+              <sc:like likeCount="${restaurant.getLikes()}"/>
+          </div>
             <c:if test="${not empty isTheOwner}">
-              <div>
-                <a href="<c:url value="/restaurant/${restaurantId}/edit"/>">
-                  <p class="col-9 m-0 p-0 text-secondary">
-                    <spring:message code="restaurant.editButton"/><i class="col-9 m-0 p-1 text-muted fa fa-edit" aria-hidden="true"></i>
-                  </p>
-                </a>
-              </div>
-              <div>
-                <a href="<c:url value="/restaurant/${restaurant.getId()}/manage/confirmed"/>" class="btn btn-outline-warning btn-block mt-4"><spring:message code="restaurant.reservation.button" /></a>
+              <div class="mt-4">
+                <a href="<c:url value="/restaurant/${restaurant.getId()}/manage/confirmed"/>" class="btn btn-outline-secondary btn-block mt-4"><spring:message code="restaurant.reservation.button" /></a>
               </div>
             </c:if>
-          </div>
         </div>
       </div>
     </div>

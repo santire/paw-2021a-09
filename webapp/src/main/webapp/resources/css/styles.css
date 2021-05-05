@@ -28,9 +28,25 @@ body {
 #burgundy {
   color: rgb(153, 40, 59);
 }
+.btn > div {
+  color: black;
+}
+
+button.btn.dropdown-toggle {
+  padding-bottom: 1em;
+}
+
+div.filter-option,
+div.dropdown.bootstrap-select {
+  color: black;
+}
+
+a.dropdown-item.selected.active {
+  background-color: lightgrey;
+  color: black;
+}
 
 #orange,
-select,
 .btn {
   color: orange;
 }
