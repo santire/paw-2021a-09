@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import ar.edu.itba.paw.model.User;
@@ -44,10 +45,13 @@ public class UserServiceImplTest {
   @Mock
   private PasswordEncoder encoder;
 
+  @Mock
+  private MessageSource messageSource;
+
   @Test
   public void testRegister() throws EmailInUseException, TokenCreationException {
 
-/*    Mockito.when(mockDao.register(
+    Mockito.when(mockDao.register(
     Mockito.eq(USERNAME),
     Mockito.eq(PASSWORD),
     Mockito.eq(FIRST_NAME),
@@ -68,9 +72,7 @@ public class UserServiceImplTest {
     assertEquals(FIRST_NAME, user.getFirstName());
     assertEquals(LAST_NAME, user.getLastName());
     assertEquals(EMAIL, user.getEmail());
-    assertEquals(PHONE, user.getPhone());*/
-    assertEquals(1, 1);
+    assertEquals(PHONE, user.getPhone());
   }
 
-  // TODO: Test many cases, for example: testRegisterEmptyPassword, testRegisterAlreadyExists, ...
 }
