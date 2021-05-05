@@ -10,11 +10,11 @@ public class MenuItemForm {
     private long id;
 
     @Size(min = 4, max = 100)
-    @Pattern(regexp = "[a-zA-Z0-9 ()'´¨!]+")
+    @Pattern(regexp = "[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ ()'´¨!]+")
     private String name;
 
     @Size(min = 0, max = 100)
-    @Pattern(regexp = "[a-zA-Z0-9 ()'´¨!]+|^$")
+    @Pattern(regexp = "[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ ()'´¨!]+|^$")
     private String description;
 
     @Min(0)
