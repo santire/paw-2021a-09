@@ -12,6 +12,10 @@ import org.springframework.jdbc.datasource.init.DatabasePopulator;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.JpaVendorAdapter;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -21,6 +25,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import java.nio.charset.StandardCharsets;
@@ -52,14 +57,14 @@ public class WebConfig {
 
     final SimpleDriverDataSource ds = new SimpleDriverDataSource();
     ds.setDriverClass(org.postgresql.Driver.class);
-    // ds.setUrl("jdbc:postgresql://localhost/paw");
-    // ds.setUsername("root");
-    // ds.setPassword("root");
+    ds.setUrl("jdbc:postgresql://localhost/paw");
+    ds.setUsername("root");
+    ds.setPassword("root");
 
     // paw server
-    ds.setUrl("jdbc:postgresql://10.16.1.110/paw-2021a-09");
-    ds.setUsername("paw-2021a-09");
-    ds.setPassword("6jnqLFj1g");
+    // ds.setUrl("jdbc:postgresql://10.16.1.110/paw-2021a-09");
+    // ds.setUsername("paw-2021a-09");
+    // ds.setPassword("6jnqLFj1g");
 
     // remote testing database (very slow)
 
@@ -97,8 +102,8 @@ public class WebConfig {
   }
 
   @Bean
-  public PlatformTransactionManager transactionManager(final DataSource ds) {
-    return new DataSourceTransactionManager(ds);
+  public PlatformTransactionManager transactionManager(final EntityManagerFactory emf) {
+    return new JpaTransactionManager(emf);
   }
 
   @Bean
@@ -114,6 +119,8 @@ public class WebConfig {
     props.put("mail.transport.protocol", "smtp");
     props.put("mail.smtp.auth", "true");
     props.put("mail.smtp.starttls.enable", "true");
+    
+    // Local Machine only, don't deploy!
     props.put("mail.debug", "false");
 
     return mailSender;
@@ -124,6 +131,28 @@ public class WebConfig {
     CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
     multipartResolver.setMaxUploadSize(-1);
     return multipartResolver;
+  }
+
+  @Bean
+  public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+    final  LocalContainerEntityManagerFactoryBean entityFactory = new LocalContainerEntityManagerFactoryBean();
+
+    entityFactory.setPackagesToScan("ar.edu.itba.paw.model");
+    entityFactory.setDataSource(dataSource());
+
+    JpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
+    entityFactory.setJpaVendorAdapter(jpaVendorAdapter);
+
+    final Properties jpaProperties = new Properties();
+    jpaProperties.setProperty("hibernate.hbm2ddl.auto", "update");
+    jpaProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQL92Dialect");
+
+    // Local Machine only, don't deploy!
+    jpaProperties.setProperty("hibernate.show_sql", "true");
+    jpaProperties.setProperty("format_sql", "true");
+
+    entityFactory.setJpaProperties(jpaProperties);
+    return entityFactory;
   }
 
 }
