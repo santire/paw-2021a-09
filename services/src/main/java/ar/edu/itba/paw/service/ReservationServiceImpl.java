@@ -255,7 +255,7 @@ public class ReservationServiceImpl implements ReservationService{
     Optional<Reservation> reservation = findById(id);
     Optional<Restaurant> restaurant = restaurantService.findById(reservation.get().getRestaurantId());
     Optional<User> owner = userService.findById(restaurant.get().getUserId());
-    Optional<User> user = userService.findById(restaurant.get().getUserId());
+    Optional<User> user = userService.findById(reservation.get().getUserId());
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
     String body = messageSource.getMessage("mail.userCancelReservation.body",new Object[]{owner.get().getFirstName(),user.get().getName(),restaurant.get().getName(),reservation.get().getDate().format(formatter),reservation.get().getQuantity()},locale);
