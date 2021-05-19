@@ -16,12 +16,12 @@ body {
 }
 #body {
   overflow: auto;
-  padding-bottom: 210px;
+  padding-bottom: 240px;
 } /* must be same height as the footer */
 #footer {
   position: relative;
-  margin-top: -210px; /* negative value of footer height */
-  height: 210px;
+  margin-top: -240px; /* negative value of footer height */
+  height: 240px;
   clear: both;
 }
 
