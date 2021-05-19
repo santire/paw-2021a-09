@@ -6,7 +6,7 @@
 
 <c:url value="/user/edit" var="postFormUrl"/>
 
-<sc:templateLayout  simpleTopBar="true">
+<sc:templateLayout>
   <jsp:body>
 
   <spring:message code="user.edit.errorMessage" var="errorMessage"/>
@@ -32,6 +32,7 @@
                           class="form-control mx-auto w-100 px-1 mx-auto w-100 input-group-text text-left"
                           type="text" 
                           value="${loggedUser.getName()}"
+                          required="true"
                           path="username"/>
                     </form:label>
                     <form:errors path="username" class="px-3 text-danger" element="p"/>
@@ -43,6 +44,7 @@
                           class="px-1 mx-auto w-100 input-group-text text-left"
                           value="${loggedUser.getFirstName()}"
                           type="text"
+                          required="true"
                           path="firstName"/>
                     </form:label>
                     <form:errors path="firstName" class="px-3 text-danger" element="p"/>
@@ -54,6 +56,7 @@
                           class="px-1 mx-auto w-100 input-group-text text-left"
                           type="text"
                           value="${loggedUser.getLastName()}"
+                          required="true"
                           path="lastName"/>
                     </form:label>
                     <form:errors path="lastName" class="px-3 text-danger" element="p"/>
@@ -66,6 +69,7 @@
                           class="px-1 mx-auto w-100 input-group-text text-left"
                           type="text"
                           value="${loggedUser.getPhone()}"
+                          required="true"
                           path="phone"/>
                     </form:label>
                     <form:errors path="phone" class="px-3 text-danger" element="p"/>

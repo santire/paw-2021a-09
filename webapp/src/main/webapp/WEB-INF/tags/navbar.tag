@@ -101,7 +101,11 @@
                       <h6 class="dropdown-header"><spring:message code="navbar.account"/></h6>
                       <a class="dropdown-item" href="<c:url value="/user/edit"/>"><spring:message code="navbar.updateInfo" /></a>
                       <div class="dropdown-divider"></div>
-                      <a class="dropdown-item" href="<c:url value="/logout"/>"><spring:message code="navbar.logout" /></a>
+                      <a class="dropdown-item" href="<c:url value="/logout"/>">
+                        <spring:message code="navbar.logout" />
+                      </a>
+                    </div>
+                  </li>
                 </ul>
 
             </c:otherwise>

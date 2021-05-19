@@ -20,19 +20,19 @@
               <div>
                   <form:label class="px-3 mx-auto w-100" path="name">
                     <spring:message code="register.restaurant.RestaurantName" />:
-                    <form:input class=" form-control mx-auto w-100 px-1 mx-auto w-100 input-group-text text-left" type="text" path="name"/>
+                    <form:input class=" form-control mx-auto w-100 px-1 mx-auto w-100 input-group-text text-left" type="text" required="true"  path="name"/>
                   </form:label>
                   <form:errors path="name" class="px-3 text-danger" element="p"/>
 
                   <form:label class="px-3 mx-auto w-100" path="address">
                     <spring:message code="Address" />:
-                    <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="text" path="address"/>
+                    <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="text" required="true" path="address"/>
                   </form:label>
                   <form:errors path="address" class="px-3 text-danger" element="p"/>
 
                 <form:label class="px-3 mx-auto w-100" path="phoneNumber">
                   <spring:message code="PhoneNumber" />:
-                  <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="text" path="phoneNumber"/>
+                  <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="text" required="true" minlength="8" path="phoneNumber"/>
                 </form:label>
                 <form:errors path="phoneNumber" class="px-3 text-danger" element="p"/>
 
