@@ -46,7 +46,7 @@
                           <form:input class="px-3 mx-auto w-100 align-self-center" type="file" path="profileImage" id="image"/>
                       </div>
                       <div class="col-md-6">
-                          <form:button  id="reset" type="reset" class="align-self-center">
+                          <form:button  id="reset" type="button" class="align-self-center">
                               <spring:message code="general.cancel"/>
                           </form:button>
                       </div>
@@ -71,13 +71,6 @@
                           </c:forEach>
                       </div>
                   </div>
-
-      <%--            <script type="text/javascript">
-                      document.getElementById('reset').onclick= function() {
-                          document.getElementById('image').value = '';
-                      };
-                  </script>--%>
-
               </div>
           </div>
           <div>

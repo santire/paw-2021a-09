@@ -20,6 +20,14 @@
               <div class="col-md-6 item text ml-auto">
                 <h3><spring:message code="footer.ContactUs" /></h3>
                 <p><a href="mailto:gourmetablewebapp@gmail.com" style="color:aliceblue">gourmetablewebapp@gmail.com</a></p>
+
+                <h3 class="mt-4"><spring:message code="footer.language" /></h3>
+                <form>
+                  <div class="btn-group">
+                    <button class="btn btn-secondary text-white" type="submit" name="lang" value="en"> En</button>
+                    <button class="btn btn-secondary text-white" type="submit" name="lang" value="es"> Es</button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
