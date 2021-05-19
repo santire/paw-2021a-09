@@ -45,17 +45,52 @@
             <span class="block">
                 <c:choose>
                     <c:when test="${reservation.isConfirmed()}">
-                        <h5 class="mb-5 mx-auto" style="color: darkgreen"><spring:message code="reservation.card.confirmed"/></h5>
+                        <h5 class="mb-5 mx-auto" style="color: darkgreen">
+                            <spring:message code="reservation.card.confirmed"/>
+                            <i class="fa fa-question-circle" style="color: #282d32; margin-left: 1em" data-toggle="tooltip" data-placement="top" title="<spring:message code="reservation.card.confirmed.tooltip"/>" ></i>
+                        </h5>
                     </c:when>
                     <c:otherwise>
-                        <h5 class="mb-5" style="color: goldenrod"><spring:message code="reservation.card.pending"/></h5>
+                        <h5 class="mb-5" style="color: goldenrod">
+                           <%-- <i class="bi bi-question-circle" data-toggle="tooltip" data-placement="top" title="Tooltip on top"></i>--%>
+                            <spring:message code="reservation.card.pending"/>
+                        <i class="fa fa-question-circle" style="color: #282d32; margin-left: 1em" data-toggle="tooltip" data-placement="top" title="<spring:message code="reservation.card.pending.tooltip"/>" ></i>
+                        </h5>
                     </c:otherwise>
                 </c:choose>
-                 <form class="mt-4" action="${cancelReservationPath}" method="post">
+              <%--   <form class="mt-4" action="${cancelReservationPath}" method="post">
                     <input type="submit" class="btn btn-danger text-white" value="<spring:message code="myReservations.cancelReservation"/>" >
-                </form>
+                </form>--%>
+                <button type="button" class="btn btn-danger text-white" data-toggle="modal" data-target="#cancellationModal${reservation.getId()}">
+                    <spring:message code="myReservations.cancelReservation"/>
+                </button>
             </span>
         </div>
     </div>
     <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="cancellationModal${reservation.getId()}" tabindex="-1" role="dialog" aria-labelledby="cancellationModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancellation"><spring:message code="restaurant.manage.confirmation"/></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <c:url value="/reservations/${reservation.getId()}/cancel" var="cancelReservationPath"/>
+            <form action="${cancelReservationPath}" method="post">
+                <div class="modal-body">
+                    <p><spring:message code="reservation.modal.confirmCancellation"/></p>
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" class="btn btn-danger text-white" value="<spring:message code="restaurant.manage.confirmCancellation"/> ">
+                    <button type="button" class="btn btn-secondary text-white" data-dismiss="modal"><spring:message code="restaurant.manage.modal.goBack"/></button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>

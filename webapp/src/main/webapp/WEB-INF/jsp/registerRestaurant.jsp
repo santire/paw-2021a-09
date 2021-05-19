@@ -7,7 +7,7 @@
 <c:url value="/register/restaurant" var="postFormUrl"/>
 <sc:templateLayout >
   <jsp:body>
-    <h2 class="text-center mt-4"><spring:message code="hello.register.restaurant.title" /></h2>
+    <h2 class="text-center mt-4 mb-4"><spring:message code="hello.register.restaurant.title" /></h2>
     <div class="card border-0 mx-auto w-75">
       <div class="card body border-0">
         <form:form
@@ -20,28 +20,40 @@
               <div>
                   <form:label class="px-3 mx-auto w-100" path="name">
                     <spring:message code="register.restaurant.RestaurantName" />:
-                    <form:input class=" form-control mx-auto w-100 px-1 mx-auto w-100 input-group-text text-left" type="text" path="name"/>
+                    <form:input class=" form-control mx-auto w-100 px-1 mx-auto w-100 input-group-text text-left" type="text" required="true"  path="name"/>
                   </form:label>
                   <form:errors path="name" class="px-3 text-danger" element="p"/>
 
                   <form:label class="px-3 mx-auto w-100" path="address">
                     <spring:message code="Address" />:
-                    <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="text" path="address"/>
+                    <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="text" required="true" path="address"/>
                   </form:label>
                   <form:errors path="address" class="px-3 text-danger" element="p"/>
 
                 <form:label class="px-3 mx-auto w-100" path="phoneNumber">
                   <spring:message code="PhoneNumber" />:
-                  <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="text" path="phoneNumber"/>
+                  <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="text" required="true" minlength="8" path="phoneNumber"/>
                 </form:label>
                 <form:errors path="phoneNumber" class="px-3 text-danger" element="p"/>
+
+                  <hr style="height:2px;border-width:0;color:gray;background-color:gray">
 
                 <form:label class="px-3 mx-auto w-100" path="profileImage">
                     <spring:message code="restaurant.register.profileImage"/>
                 </form:label>
-                <form:input class="px-3 mx-auto w-100" type="file" path="profileImage"/>
-                <form:errors path="profileImage" class="px-3 text-danger" element="p"/>
+                  <div class="input-group">
+                      <div class="col-md-6">
+                          <form:input class="px-3 mx-auto w-100 align-self-center" type="file" path="profileImage" id="image"/>
+                      </div>
+                      <div class="col-md-6">
+                          <form:button  id="reset" type="reset" class="align-self-center">
+                              <spring:message code="general.cancel"/>
+                          </form:button>
+                      </div>
+                  </div>
+                  <form:errors path="profileImage" class="px-3 text-danger" element="p"/>
 
+                  <hr style="height:2px;border-width:0;color:gray;background-color:gray">
 
                   <div class="container">
                       <spring:message code="restaurant.edit.tags" />
@@ -60,12 +72,16 @@
                       </div>
                   </div>
 
-
+      <%--            <script type="text/javascript">
+                      document.getElementById('reset').onclick= function() {
+                          document.getElementById('image').value = '';
+                      };
+                  </script>--%>
 
               </div>
           </div>
           <div>
-            <input type="submit" class="btn btn-outline-secondary btn-block w-50 mt-3 px-0 mx-auto" value='<spring:message code="hello.register.restaurant.submit" />'>
+            <input type="submit" class="btn btn-outline-secondary btn-block w-50 mt-3 px-0 mx-auto mb-4 mt-4" value='<spring:message code="hello.register.restaurant.submit" />'>
           </div>
         </form:form>
       </div>
