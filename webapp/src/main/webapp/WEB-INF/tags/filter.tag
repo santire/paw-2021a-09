@@ -18,6 +18,7 @@
           name="tags"
           class="my-select selectpicker" 
           title="<spring:message code="restaurant.filters.allTags"/>"
+          data-actions-box="true"
           multiple
           data-live-search="true"
           >

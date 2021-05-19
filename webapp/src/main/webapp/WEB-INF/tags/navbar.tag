@@ -106,6 +106,15 @@
 
             </c:otherwise>
         </c:choose>
+
+        <form>
+        <div class="btn-group">
+          <button class="btn btn-secondary" type="submit" name="lang" value="en"> En</button>
+          <button class="btn btn-secondary" type="submit" name="lang" value="es"> Es</button>
+        </div>
+        </form>
+
+
       </div>
     </div>
   </nav>
