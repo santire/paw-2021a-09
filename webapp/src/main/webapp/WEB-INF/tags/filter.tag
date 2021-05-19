@@ -19,6 +19,8 @@
           class="my-select selectpicker" 
           title="<spring:message code="restaurant.filters.allTags"/>"
           data-actions-box="true"
+          data-select-all-text=<spring:message code="restaurant.filters.allTags"/>
+          data-deselect-all-text=<spring:message code="restaurant.filters.noneTags"/>
           multiple
           data-live-search="true"
           >
