@@ -3,16 +3,41 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
+
+@Entity
+@Table(name = "restaurant_images")
 public class Image {
 
 
-    private final long imageId;
-    private final byte[] data;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "restaurant_images_image_id_seq")
+    @SequenceGenerator(sequenceName = "restaurant_images_image_id_seq", name = "restaurant_images_image_id_seq", allocationSize = 1)
+    private Long imageId;
 
+    @Column(name="image_data")
+    private byte[] data;
+
+    @OneToOne
+    @PrimaryKeyJoinColumn(name = "restaurant_id")
+    private Restaurant restaurant;
+
+
+    Image(){
+        // Just for hibernate
+    }
 
     public Image(byte[] data) {
-        this.imageId = 0;
+        this.imageId = null;
         this.data = data;
     }
 
@@ -21,11 +46,17 @@ public class Image {
         this.data = data;
     }
 
-    public long getImageId(){ return this.imageId; }
+    public Long getImageId(){ return this.imageId; }
     public byte[] getData(){ return this.data; }
     public String getImageEnconded() throws IOException{
         byte[] encodeBase64 = Base64.getEncoder().encode(this.data);
         String base64Encoded = new String(encodeBase64, StandardCharsets.UTF_8);
         return base64Encoded;
     }
+    public Restaurant getRestaurant() { return restaurant; }
+
+    public void setImageId(Long imageId) { this.imageId = imageId; }
+    public void setData(byte[] data) { this.data = data; }
+    public void setRestaurant(Restaurant restaurant) { this.restaurant = restaurant; }
+
 }

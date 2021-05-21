@@ -1,35 +1,63 @@
 package ar.edu.itba.paw.model;
 
+import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+@Table(name = "menu_items")
 public class MenuItem {
 
-    private final long id;
-    private String name;
-    private String description;
-    private float price;
-    private long restaurantId;
 
-    public MenuItem(long id, String name, String description, float price, long restaurantId) {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "menu_items_menu_item_id_seq")
+    @SequenceGenerator(sequenceName = "menu_items_menu_item_id_seq", name = "menu_items_menu_item_id_seq", allocationSize = 1)
+    private  Long id;
+
+    @Column(length = 100)
+    private String name;
+
+    @Column(length = 300)
+    private String description;
+
+    @Column
+    private float price;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "restaurant_id")
+    private Restaurant restaurant;
+
+    MenuItem() {
+        //Just for hibernate
+    }
+
+    public MenuItem(Long id, String name, String description, float price, Restaurant restaurant) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
-        this.restaurantId = restaurantId;
+        this.restaurant = restaurant;
     }
     
-    public MenuItem(long id, String name, String description, float price) {
+    public MenuItem(Long id, String name, String description, float price) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
     }
     public MenuItem(String name, String description, float price) {
-        this.id = 0;
+        this.id = null;
         this.name = name;
         this.description = description;
         this.price = price;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -45,8 +73,8 @@ public class MenuItem {
         return price;
     }
 
-    public long getRestaurantId() {
-        return restaurantId;
+    public Restaurant getRestaurant() {
+        return restaurant;
     }
 
     public void setName(String name) {
@@ -61,8 +89,8 @@ public class MenuItem {
         this.price = price;
     }
 
-    public void setRestaurantId(long restaurantId) {
-        this.restaurantId = restaurantId;
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
     }
 
 }
