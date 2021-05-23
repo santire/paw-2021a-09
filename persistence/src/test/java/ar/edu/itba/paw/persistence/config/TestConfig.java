@@ -72,7 +72,7 @@ public class TestConfig {
 
     final Properties jpaProperties = new Properties();
     jpaProperties.setProperty("hibernate.hbm2ddl.auto", "update");
-    jpaProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQL92Dialect");
+    jpaProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
 
     // Local Machine only, don't deploy!
     jpaProperties.setProperty("hibernate.show_sql", "true");

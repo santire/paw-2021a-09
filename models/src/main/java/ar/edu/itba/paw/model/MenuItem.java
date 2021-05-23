@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.model;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -10,6 +11,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+@Entity
 @Table(name = "menu_items")
 public class MenuItem {
 
@@ -17,6 +19,7 @@ public class MenuItem {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "menu_items_menu_item_id_seq")
     @SequenceGenerator(sequenceName = "menu_items_menu_item_id_seq", name = "menu_items_menu_item_id_seq", allocationSize = 1)
+    @Column(name = "menu_item_id")
     private  Long id;
 
     @Column(length = 100)

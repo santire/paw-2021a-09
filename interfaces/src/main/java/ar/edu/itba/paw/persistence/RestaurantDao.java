@@ -8,7 +8,10 @@ import java.util.Optional;
 public interface RestaurantDao {
 
     // CREATE
+    @Deprecated
     public Restaurant registerRestaurant(String name, String address, String phoneNumber, float rating, long userId);
+
+    public Restaurant registerRestaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner);
     public boolean setImageByRestaurantId(Image image, long restaurantId);
 
     // READ
