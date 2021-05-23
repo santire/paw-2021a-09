@@ -1,10 +1,14 @@
 package ar.edu.itba.paw.persistence;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import org.springframework.stereotype.Repository;
 
@@ -19,12 +23,7 @@ public class RestaurantJpaDao implements RestaurantDao {
     @PersistenceContext
     private EntityManager em;
 
-    @Override
-    @Deprecated
-    public Restaurant registerRestaurant(String name, String address, String phoneNumber, float rating, long userId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+    // CREATE
 
     @Override
     public Restaurant registerRestaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner) {
@@ -35,38 +34,70 @@ public class RestaurantJpaDao implements RestaurantDao {
 
     @Override
     public boolean setImageByRestaurantId(Image image, long restaurantId) {
-        // TODO Auto-generated method stub
-        return false;
+        final Optional<Restaurant> maybeRestaurant = findById(restaurantId);
+        if (!maybeRestaurant.isPresent()) {
+            return false;
+        }
+        Restaurant restaurant = maybeRestaurant.get();
+        restaurant.setProfileImage(image);
+        em.persist(restaurant);
+
+        return true;
     }
+
+    @Deprecated
+    @Override
+    public Restaurant registerRestaurant(String name, String address, String phoneNumber, float rating, long userId) {
+        return null;
+    }
+
+    // READ
 
     @Override
     public Optional<Restaurant> findById(long id) {
-        // TODO Auto-generated method stub
         return Optional.ofNullable(em.find(Restaurant.class, id));
     }
 
     @Override
+    @Deprecated
     public Optional<Restaurant> findByIdWithMenu(long id, int menuPage, int amountOnMenuPage) {
-        // TODO Auto-generated method stub
-        return null;
+        return Optional.ofNullable(em.find(Restaurant.class, id));
     }
 
     @Override
     public int findByIdWithMenuPagesCount(int amountOnMenuPage, long id) {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public List<Restaurant> getAllRestaurants(int page, int amountOnPage, String searchTerm) {
-        // TODO Auto-generated method stub
-        return null;
+        Query nativeQuery = em.createNativeQuery("SELECT restaurant_id FROM restaurants WHERE lower(name) LIKE ?1");
+                nativeQuery.setParameter(1, "%"+searchTerm.trim().toLowerCase()+"%");
+        nativeQuery.setFirstResult((page - 1) * amountOnPage);
+        nativeQuery.setMaxResults(amountOnPage);
+        @SuppressWarnings("unchecked")
+        List<Long> filteredIds = (List<Long>) nativeQuery.getResultList().stream().map(e -> Long.valueOf(e.toString()))
+                .collect(Collectors.toList());
+
+        if (filteredIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        final TypedQuery<Restaurant> query = em.createQuery("from Restaurant where id IN :filteredIds",
+                Restaurant.class);
+        query.setParameter("filteredIds", filteredIds);
+        return query.getResultList();
     }
 
     @Override
     public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm) {
-        // TODO Auto-generated method stub
-        return 0;
+        Query nativeQuery = em.createNativeQuery("SELECT restaurant_id FROM restaurants WHERE lower(name) LIKE ?1");
+                nativeQuery.setParameter(1, "%"+searchTerm.trim().toLowerCase()+"%");
+
+        int amountOfRestaurants =  nativeQuery.getResultList().size();
+        int pageAmount = (int) Math.ceil((double)amountOfRestaurants / amountOnPage);
+
+        return pageAmount <= 0 ? 1 : pageAmount;
     }
 
     @Override
@@ -94,51 +125,9 @@ public class RestaurantJpaDao implements RestaurantDao {
     }
 
     @Override
+    @Deprecated
     public List<Restaurant> findByName(String name) {
-        // TODO Auto-generated method stub
         return null;
-    }
-
-    @Override
-    public void updateName(long id, String name) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void updateAddress(long id, String address) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void updatePhoneNumber(long id, String phoneNumber) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void updateRating(long id, int rating) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public boolean deleteRestaurantById(long id) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean deleteRestaurantByName(String name) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     @Override
@@ -149,30 +138,6 @@ public class RestaurantJpaDao implements RestaurantDao {
 
     @Override
     public List<Restaurant> getHotRestaurants(int lastDays) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean addTag(long restaurantId, int tagId) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean removeTag(long restaurantId, int tagId) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public List<Tags> tagsInRestaurant(long restaurantId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<Restaurant> getRestaurantsWithTags(List<Tags> tags) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -189,5 +154,83 @@ public class RestaurantJpaDao implements RestaurantDao {
             double maxAvgPrice) {
         // TODO Auto-generated method stub
         return 0;
+    }
+
+    @Override
+    public List<Restaurant> getRestaurantsWithTags(List<Tags> tags) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    @Deprecated
+    // Comes from the model
+    public List<Tags> tagsInRestaurant(long restaurantId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    // UPDATE
+    // These should be done from the service by modifying the instance (i think)
+
+    @Override
+    @Deprecated
+    public void updateName(long id, String name) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    @Deprecated
+    public void updateAddress(long id, String address) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    @Deprecated
+    public void updatePhoneNumber(long id, String phoneNumber) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    @Deprecated
+    public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber) {
+
+        return null;
+    }
+
+    @Override
+    @Deprecated
+    public void updateRating(long id, int rating) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    @Deprecated
+    public boolean addTag(long restaurantId, int tagId) {
+        return false;
+    }
+
+    // DELETE
+
+    @Override
+    public boolean removeTag(long restaurantId, int tagId) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean deleteRestaurantById(long id) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean deleteRestaurantByName(String name) {
+        // TODO Auto-generated method stub
+        return false;
     }
 }
