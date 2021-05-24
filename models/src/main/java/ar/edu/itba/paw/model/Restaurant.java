@@ -64,6 +64,8 @@ public class Restaurant {
     @OneToOne(mappedBy = "restaurant")
     private Image profileImage;
 
+    // private List<Reservation> reservations; ?
+
     Restaurant() {
         // Just for hibernate
     }

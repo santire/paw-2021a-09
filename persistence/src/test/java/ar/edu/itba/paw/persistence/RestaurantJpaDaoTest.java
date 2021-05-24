@@ -84,7 +84,7 @@ public class RestaurantJpaDaoTest {
         assertEquals(NAME, restaurant.getName());
         assertEquals(ADDRESS, restaurant.getAddress());
         assertEquals(PHONE_NUMBER, restaurant.getPhoneNumber());
-        assertEquals(1, restaurant.getOwner().getId());
+        assertEquals(Long.valueOf(1), restaurant.getOwner().getId());
 
         // assertEquals(INSERTED_SIZE + 1, JdbcTestUtils.countRowsInTable(jdbcTemplate,
         // "restaurants"));
@@ -107,7 +107,7 @@ public class RestaurantJpaDaoTest {
         assertEquals("KFC", restaurant.getName());
         assertEquals("La Pampa 319", restaurant.getAddress());
         assertEquals("1121146545", restaurant.getPhoneNumber());
-        assertEquals(999, restaurant.getOwner().getId());
+        assertEquals(Long.valueOf(999), restaurant.getOwner().getId());
 
         assertEquals(menuExpected.get(0).getName(), menuActual.get(0).getName());
         assertEquals(menuExpected.get(0).getDescription(), menuActual.get(0).getDescription());
@@ -164,7 +164,7 @@ public class RestaurantJpaDaoTest {
         assertEquals("KFC", restaurant.getName());
         assertEquals("La Pampa 319", restaurant.getAddress());
         assertEquals("1121146545", restaurant.getPhoneNumber());
-        assertEquals(999, restaurant.getOwner().getId());
+        assertEquals(Long.valueOf(999), restaurant.getOwner().getId());
     }
 
     @Test

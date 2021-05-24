@@ -1,10 +1,13 @@
 package ar.edu.itba.paw.model;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -18,17 +21,16 @@ public class User {
   @SequenceGenerator(sequenceName = "users_user_id_seq", name = "users_user_id_seq", allocationSize = 1)
   private Long id;
 
-
   @Column(length = 100)
   private String username;
 
   @Column(length = 100)
   private String password;
-  
-  @Column(length = 100, name = "first_name" )
+
+  @Column(length = 100, name = "first_name")
   private String firstName;
 
-  @Column(length = 100, name = "last_name" )
+  @Column(length = 100, name = "last_name")
   private String lastName;
 
   @Column(length = 100, unique = true)
@@ -37,10 +39,13 @@ public class User {
   @Column(length = 100)
   private String phone;
 
-  @Column(name = "is_active")
+  @Column(name = "is_active", columnDefinition = "boolean default false")
   private Boolean active;
 
-  // private List<Restaurant> ownedRestaurants;
+  @OneToMany(orphanRemoval = true, mappedBy = "owner")
+  private List<Restaurant> ownedRestaurants;
+
+  // private List<Reservation> reservations; ?
 
   User() {
     // Just for hibernate
@@ -70,7 +75,7 @@ public class User {
     this.active = false;
   }
 
-  public boolean isActive() {
+  public Boolean isActive() {
     return active;
   }
 
@@ -78,7 +83,7 @@ public class User {
     this.active = active;
   }
 
-  public long getId() {
+  public Long getId() {
     return this.id;
   }
 
@@ -136,6 +141,14 @@ public class User {
 
   public void setPhone(String phone) {
     this.phone = phone;
+  }
+
+  public List<Restaurant> getOwnedRestaurants() {
+    return ownedRestaurants;
+  }
+
+  public void setOwnedRestaurants(List<Restaurant> ownedRestaurants) {
+    this.ownedRestaurants = ownedRestaurants;
   }
 
 }
