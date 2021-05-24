@@ -40,6 +40,8 @@ public class User {
   @Column(name = "is_active")
   private Boolean active;
 
+  // private List<Restaurant> ownedRestaurants;
+
   User() {
     // Just for hibernate
   }

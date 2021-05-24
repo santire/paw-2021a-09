@@ -45,12 +45,6 @@ public class RestaurantJpaDao implements RestaurantDao {
         return true;
     }
 
-    @Deprecated
-    @Override
-    public Restaurant registerRestaurant(String name, String address, String phoneNumber, float rating, long userId) {
-        return null;
-    }
-
     // READ
 
     @Override
@@ -59,20 +53,9 @@ public class RestaurantJpaDao implements RestaurantDao {
     }
 
     @Override
-    @Deprecated
-    public Optional<Restaurant> findByIdWithMenu(long id, int menuPage, int amountOnMenuPage) {
-        return Optional.ofNullable(em.find(Restaurant.class, id));
-    }
-
-    @Override
-    public int findByIdWithMenuPagesCount(int amountOnMenuPage, long id) {
-        return 0;
-    }
-
-    @Override
     public List<Restaurant> getAllRestaurants(int page, int amountOnPage, String searchTerm) {
         Query nativeQuery = em.createNativeQuery("SELECT restaurant_id FROM restaurants WHERE lower(name) LIKE ?1");
-                nativeQuery.setParameter(1, "%"+searchTerm.trim().toLowerCase()+"%");
+        nativeQuery.setParameter(1, "%" + searchTerm.trim().toLowerCase() + "%");
         nativeQuery.setFirstResult((page - 1) * amountOnPage);
         nativeQuery.setMaxResults(amountOnPage);
         @SuppressWarnings("unchecked")
@@ -92,107 +75,61 @@ public class RestaurantJpaDao implements RestaurantDao {
     @Override
     public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm) {
         Query nativeQuery = em.createNativeQuery("SELECT restaurant_id FROM restaurants WHERE lower(name) LIKE ?1");
-                nativeQuery.setParameter(1, "%"+searchTerm.trim().toLowerCase()+"%");
+        nativeQuery.setParameter(1, "%" + searchTerm.trim().toLowerCase() + "%");
 
-        int amountOfRestaurants =  nativeQuery.getResultList().size();
-        int pageAmount = (int) Math.ceil((double)amountOfRestaurants / amountOnPage);
+        int amountOfRestaurants = nativeQuery.getResultList().size();
+        int pageAmount = (int) Math.ceil((double) amountOfRestaurants / amountOnPage);
 
         return pageAmount <= 0 ? 1 : pageAmount;
     }
 
     @Override
-    public List<Restaurant> getRestaurantsFromOwner(int page, int amountOnPage, long userId) {
-        // TODO Auto-generated method stub
+    public List<Restaurant> getHotRestaurants(int limit, int lastDays) {
+        // This one needs reservation
         return null;
-    }
-
-    @Override
-    public int getRestaurantsFromOwnerPagesCount(int amountOnPage, long userId) {
-        // TODO Auto-generated method stub
-        return 0;
     }
 
     @Override
     public List<Restaurant> getPopularRestaurants(int limit, int minValue) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<Restaurant> getAllRestaurants(int page, int amountOnPage) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public List<Restaurant> findByName(String name) {
-        return null;
-    }
-
-    @Override
-    public Optional<User> findRestaurantOwner(long id) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<Restaurant> getHotRestaurants(int lastDays) {
-        // TODO Auto-generated method stub
+        // This one needs likes
         return null;
     }
 
     @Override
     public List<Restaurant> getRestaurantsFilteredBy(int page, int amountOnPage, String name, List<Tags> tags,
             double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays) {
-        // TODO Auto-generated method stub
+        // This one needs reservations
         return null;
     }
 
     @Override
     public int getRestaurantsFilteredByPageCount(int amountOnPage, String name, List<Tags> tags, double minAvgPrice,
             double maxAvgPrice) {
-        // TODO Auto-generated method stub
+        // This one needs reservations
         return 0;
     }
 
+
     @Override
-    public List<Restaurant> getRestaurantsWithTags(List<Tags> tags) {
+    public List<Restaurant> getAllLikedRestaurants(int page, int amountOnPage) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    @Deprecated
-    // Comes from the model
-    public List<Tags> tagsInRestaurant(long restaurantId) {
+    public List<Restaurant> getAllLikedRestaurantsPagesCount(int amountOnPage) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<Restaurant> getLikedRestaurantsPreview(int limit) {
         // TODO Auto-generated method stub
         return null;
     }
 
     // UPDATE
     // These should be done from the service by modifying the instance (i think)
-
-    @Override
-    @Deprecated
-    public void updateName(long id, String name) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    @Deprecated
-    public void updateAddress(long id, String address) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    @Deprecated
-    public void updatePhoneNumber(long id, String phoneNumber) {
-        // TODO Auto-generated method stub
-
-    }
 
     @Override
     @Deprecated
@@ -216,21 +153,15 @@ public class RestaurantJpaDao implements RestaurantDao {
 
     // DELETE
 
-    @Override
-    public boolean removeTag(long restaurantId, int tagId) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
+    // TODO: refactor this to receive Restaurant entity not id
     @Override
     public boolean deleteRestaurantById(long id) {
-        // TODO Auto-generated method stub
+        Optional<Restaurant> maybeRestaurant = findById(id);
+        if (maybeRestaurant.isPresent()) {
+            em.remove(maybeRestaurant.get());
+            return true;
+        }
         return false;
     }
 
-    @Override
-    public boolean deleteRestaurantByName(String name) {
-        // TODO Auto-generated method stub
-        return false;
-    }
 }
