@@ -2,10 +2,12 @@ package ar.edu.itba.paw.webapp.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -37,123 +39,116 @@ import ar.edu.itba.paw.service.RestaurantService;
 import ar.edu.itba.paw.service.UserService;
 import ar.edu.itba.paw.webapp.forms.RestaurantForm;
 
-// @Controller
-// public class RestaurantManagmentController {
+@Controller
+public class RestaurantManagmentController {
 
-    // private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantManagmentController.class);
-    // private static final int AMOUNT_OF_RESERVATIONS = 2;
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantManagmentController.class);
+    private static final int AMOUNT_OF_RESERVATIONS = 2;
 
-    // @Autowired
-    // private UserService userService;
+    @Autowired
+    private UserService userService;
 
     // @Autowired
     // private ReservationService reservationService;
 
-    // @Autowired
-    // private RestaurantService restaurantService;
+    @Autowired
+    private RestaurantService restaurantService;
 
 
     // Edit restaurant
-    // @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.GET)
-    // public ModelAndView editRestaurant(
-            // @ModelAttribute("loggedUser") final User loggedUser, 
-            // @PathVariable("restaurantId") final long restaurantId, 
-            // @ModelAttribute("RestaurantForm") final RestaurantForm form) {
+    @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.GET)
+    public ModelAndView editRestaurant(
+            @ModelAttribute("loggedUser") final User loggedUser, 
+            @PathVariable("restaurantId") final long restaurantId, 
+            @ModelAttribute("RestaurantForm") final RestaurantForm form) {
 
-            // if (loggedUser != null) {
-                // Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
-                // if(userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId)){
-                    // final ModelAndView mav = new ModelAndView("editRestaurant");
-                    // if(form.getName() != null && !form.getName().isEmpty()) {
-                        // restaurant.setName(form.getName());
-                    // }
-                    // if(form.getAddress() != null && !form.getAddress().isEmpty()) {
-                        // restaurant.setAddress(form.getAddress());
-                    // }
-                    // if(form.getPhoneNumber() != null && !form.getPhoneNumber().isEmpty()) {
-                        // restaurant.setPhoneNumber(form.getPhoneNumber());
-                    // }
-                    // mav.addObject("restaurant", restaurant);
+            if (loggedUser != null) {
+                Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
+                if(userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId)){
+                    final ModelAndView mav = new ModelAndView("editRestaurant");
+                    if(form.getName() != null && !form.getName().isEmpty()) {
+                        restaurant.setName(form.getName());
+                    }
+                    if(form.getAddress() != null && !form.getAddress().isEmpty()) {
+                        restaurant.setAddress(form.getAddress());
+                    }
+                    if(form.getPhoneNumber() != null && !form.getPhoneNumber().isEmpty()) {
+                        restaurant.setPhoneNumber(form.getPhoneNumber());
+                    }
+                    mav.addObject("restaurant", restaurant);
 
-                    // mav.addObject("tags", Tags.allTags());
+                    mav.addObject("tags", Tags.allTags());
                     // List<Integer> tagsChecked = new ArrayList<>();
-                    // for( Tags t :restaurantService.tagsInRestaurant(restaurantId)){
-                        // tagsChecked.add(t.getValue());
-                    // }
-                    // mav.addObject("tagsChecked", tagsChecked);
+                    List<Integer> tagsChecked = restaurant.getTags().stream().map(t -> t.getValue()).collect(Collectors.toList());
+                    mav.addObject("tagsChecked", tagsChecked);
 
 
-                    // return mav;
-                // }
-            // }
+                    return mav;
+                }
+            }
 
-        // return new ModelAndView("redirect:/403");
-    // }
+        return new ModelAndView("redirect:/403");
+    }
 
-    // @RequestMapping(path={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST)
-    // public ModelAndView editRestaurant(@ModelAttribute("loggedUser") final User loggedUser, 
-            // @PathVariable("restaurantId") final long restaurantId, 
-            // @Valid @ModelAttribute("RestaurantForm") final RestaurantForm form,
-            // final BindingResult errors) {
-
-
-        // if (form.getTags().length>3) {
-            // errors.rejectValue("tags", "restaurant.edit.tagsLimit");
-        // }
+    @RequestMapping(path={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST)
+    public ModelAndView editRestaurant(@ModelAttribute("loggedUser") final User loggedUser, 
+            @PathVariable("restaurantId") final long restaurantId, 
+            @Valid @ModelAttribute("RestaurantForm") final RestaurantForm form,
+            final BindingResult errors) {
 
 
-        // if (errors.hasErrors()) {
-            // LOGGER.debug("Form has errors at /restaurant/{}/edit", restaurantId);
-            // return editRestaurant(loggedUser, restaurantId, form);
-        // }
+        if (form.getTags().length>3) {
+            errors.rejectValue("tags", "restaurant.edit.tagsLimit");
+        }
+
+
+        if (errors.hasErrors()) {
+            LOGGER.debug("Form has errors at /restaurant/{}/edit", restaurantId);
+            return editRestaurant(loggedUser, restaurantId, form);
+        }
         // Should be if it got here, 
         // but it doesn't hurt to escape a potential null pointer exception
-        // if (loggedUser != null) {
-            // LOGGER.debug("Updating restaurant for user {}", loggedUser.getName());
-            // final Restaurant restaurant = restaurantService
-                // .updateRestaurant(restaurantId, form.getName(), form.getAddress(), form.getPhoneNumber())
-                // .orElseThrow(RestaurantNotFoundException::new);
+        if (loggedUser != null) {
+            LOGGER.debug("Updating restaurant for user {}", loggedUser.getName());
+            List<Tags> tagList = Arrays.asList(form.getTags()).stream().map((i) -> Tags.valueOf(i)).collect(Collectors.toList());
+            LOGGER.debug("tags: {}", tagList);
 
-            // if (form.getProfileImage() != null && !form.getProfileImage().isEmpty()) {
-                // try {
-                // Image image = new Image(form.getProfileImage().getBytes());
-                // restaurantService.setImageByRestaurantId(image, restaurant.getId());
-                // } catch (IOException e) {
-                    // LOGGER.error("error while setting restaurant profile image");
-                // }
-            // }
+            final Restaurant restaurant = restaurantService
+                .updateRestaurant(restaurantId, form.getName(), form.getAddress(), form.getPhoneNumber(), tagList)
+                .orElseThrow(RestaurantNotFoundException::new);
 
-            // for( Tags t :restaurantService.tagsInRestaurant(restaurantId)){
-                // restaurantService.removeTag(restaurantId,t);
-            // }
-            // for( Integer i :form.getTags()){
-                // restaurantService.addTag(restaurantId,Tags.valueOf(i));
-            // }
+            if (form.getProfileImage() != null && !form.getProfileImage().isEmpty()) {
+                try {
+                Image image = new Image(form.getProfileImage().getBytes());
+                restaurantService.setImageByRestaurantId(image, restaurant.getId());
+                } catch (IOException e) {
+                    LOGGER.error("error while setting restaurant profile image");
+                }
+            }
 
-
-            // return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
-        // }
-        // return new ModelAndView("redirect:/403");
-    // }
+            return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
+        }
+        return new ModelAndView("redirect:/403");
+    }
 
     // Delete restaurant
         
-    // @RequestMapping(path = { "/restaurant/{restaurantId}/delete" }, method = RequestMethod.POST)
-    // public ModelAndView deleteRestaurant(@ModelAttribute("loggedUser") final User loggedUser, 
-            // @PathVariable("restaurantId") final long restaurantId) {
+    @RequestMapping(path = { "/restaurant/{restaurantId}/delete" }, method = RequestMethod.POST)
+    public ModelAndView deleteRestaurant(@ModelAttribute("loggedUser") final User loggedUser, 
+            @PathVariable("restaurantId") final long restaurantId) {
 
-        // if (loggedUser != null) {
-            // if(userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId)){
-                // restaurantService.deleteRestaurantById(restaurantId);
-                // if(userService.isRestaurantOwner(loggedUser.getId())){
-                    // updateAuthorities(loggedUser);
-                // }
-                // return new ModelAndView("redirect:/restaurants/user/" + loggedUser.getId());
-            // }
-        // }
-        // return new ModelAndView("redirect:/403");
+        if (loggedUser != null) {
+            if(userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId)){
+                restaurantService.deleteRestaurantById(restaurantId);
+                if(userService.isRestaurantOwner(loggedUser.getId())){
+                    updateAuthorities(loggedUser);
+                }
+                return new ModelAndView("redirect:/restaurants/user/" + loggedUser.getId());
+            }
+        }
+        return new ModelAndView("redirect:/403");
 
-    // }
+    }
 
     // Manage Reservations
 
@@ -234,17 +229,17 @@ import ar.edu.itba.paw.webapp.forms.RestaurantForm;
 
 
 
-    // public void updateAuthorities(@ModelAttribute("loggedUser") final User loggedUser) {
-        // if(loggedUser!=null){
-            // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            // Collection<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
-            // authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-            // if(userService.isRestaurantOwner(loggedUser.getId())){
-                // authorities.add(new SimpleGrantedAuthority("ROLE_RESTAURANTOWNER"));
-            // }
-            // Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
-            // SecurityContextHolder.getContext().setAuthentication(newAuth);
-        // }
-    // }
+    public void updateAuthorities(@ModelAttribute("loggedUser") final User loggedUser) {
+        if(loggedUser!=null){
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            Collection<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
+            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+            if(userService.isRestaurantOwner(loggedUser.getId())){
+                authorities.add(new SimpleGrantedAuthority("ROLE_RESTAURANTOWNER"));
+            }
+            Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
+            SecurityContextHolder.getContext().setAuthentication(newAuth);
+        }
+    }
 
-// }
+}

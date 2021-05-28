@@ -38,7 +38,12 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     @Override
+    @Transactional
+    // TODO: move to object instead of id?
     public boolean setImageByRestaurantId(Image image, long restaurantId) {
+        Restaurant restaurant = findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
+        image.setRestaurant(restaurant);
+        restaurant.setProfileImage(image);
         // return restaurantDao.setImageByRestaurantId(image, restaurantId);
         return true;
     }
@@ -147,11 +152,12 @@ public class RestaurantServiceImpl implements RestaurantService{
     @Override
     @Transactional
     //TODO: No longer optional
-    public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber) {
+    public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber, List<Tags> tags) {
         Restaurant restaurant = findById(id).orElseThrow(RestaurantNotFoundException::new);
         restaurant.setName(name);
         restaurant.setAddress(address);
         restaurant.setPhoneNumber(phoneNumber);
+        restaurant.setTags(tags);
 
        // return restaurantDao.updateRestaurant(id, name, address ,phoneNumber);
         return Optional.of(restaurant);

@@ -200,6 +200,7 @@ public class RestaurantController {
         if(loggedUser != null){
             LOGGER.debug("Creating restaurant for user {}", loggedUser.getName());
             List<Tags> tagList = Arrays.asList(form.getTags()).stream().map((i) -> Tags.valueOf(i)).collect(Collectors.toList());
+            LOGGER.debug("tags: {}", tagList);
             final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
                     form.getPhoneNumber(), tagList, loggedUser);
             updateAuthorities(loggedUser);
