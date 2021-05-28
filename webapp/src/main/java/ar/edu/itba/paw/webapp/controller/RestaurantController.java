@@ -33,6 +33,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -49,20 +50,20 @@ public class RestaurantController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private ReservationService reservationService;
+    // @Autowired
+    // private ReservationService reservationService;
 
     @Autowired
     private RestaurantService restaurantService;
 
-    @Autowired
-    private RatingService ratingService;
+    // @Autowired
+    // private RatingService ratingService;
 
-    @Autowired
-    private LikesService likesService;
+    // @Autowired
+    // private LikesService likesService;
 
-    @Autowired
-    private MenuService menuService;
+    // @Autowired
+    // private MenuService menuService;
 
     @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.GET)
     public ModelAndView restaurant(@ModelAttribute("loggedUser") final User loggedUser,
@@ -82,16 +83,16 @@ public class RestaurantController {
         mav.addObject("maxPages", maxPages);
 
         if(loggedUser != null){
-            Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
+            // Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
             boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
             if (isTheRestaurantOwner) {
                 mav.addObject("isTheOwner", true);
             }
-            if(userRating.isPresent()){
-                mav.addObject("rated", true);
-                mav.addObject("userRatingToRestaurant", userRating.get().getRating());
-            }
-            mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
+            // if(userRating.isPresent()){
+                // mav.addObject("rated", true);
+                // mav.addObject("userRatingToRestaurant", userRating.get().getRating());
+            // }
+            // mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
             List<String> times = restaurantService.availableStringTime(restaurantId);
             mav.addObject("times", times);
         }
@@ -136,7 +137,7 @@ public class RestaurantController {
         if (loggedUser != null) {
             time = form.getTime();
             LocalDateTime todayAtDate = LocalDate.now().atTime(time.getHour(), time.getMinute());
-            reservationService.addReservation(loggedUser.getId(), restaurantId, todayAtDate, Long.parseLong(form.getQuantity()));
+            // reservationService.addReservation(loggedUser.getId(), restaurantId, todayAtDate, Long.parseLong(form.getQuantity()));
             redirectAttributes.addFlashAttribute("madeReservation", true);
         } else {
             return new ModelAndView("redirect:/register");
@@ -165,7 +166,7 @@ public class RestaurantController {
                         menuForm.getName(),
                         menuForm.getDescription(),
                         menuForm.getPrice());
-                menuService.addItemToRestaurant(restaurantId, item);
+                // menuService.addItemToRestaurant(restaurantId, item);
                 LOGGER.debug("Owner added restaurant");
             return new ModelAndView("redirect:/restaurant/" + restaurantId);
             }
@@ -198,8 +199,9 @@ public class RestaurantController {
         }
         if(loggedUser != null){
             LOGGER.debug("Creating restaurant for user {}", loggedUser.getName());
+            List<Tags> tagList = Arrays.asList(form.getTags()).stream().map((i) -> Tags.valueOf(i)).collect(Collectors.toList());
             final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
-                    form.getPhoneNumber(), 0, loggedUser.getId());
+                    form.getPhoneNumber(), tagList, loggedUser);
             updateAuthorities(loggedUser);
             if (form.getProfileImage() != null && !form.getProfileImage().isEmpty()) {
                 try {
@@ -208,9 +210,6 @@ public class RestaurantController {
                 } catch (IOException e) {
                     LOGGER.error("error while setting restaurant profile image");
                 }
-            }
-            for( Integer i :form.getTags()){
-                restaurantService.addTag(restaurant.getId(),Tags.valueOf(i));
             }
 
 
@@ -223,7 +222,7 @@ public class RestaurantController {
     public ModelAndView like(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId){
         if(loggedUser != null){
             long userId = loggedUser.getId();
-            likesService.like(userId, restaurantId);
+            // likesService.like(userId, restaurantId);
             return new ModelAndView("redirect:/restaurant/" + restaurantId);
         }
         return new ModelAndView("redirect:/login");
@@ -233,7 +232,7 @@ public class RestaurantController {
     public ModelAndView dislike(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId){
         if(loggedUser != null){
             long userId = loggedUser.getId();
-            likesService.dislike(userId, restaurantId);
+            // likesService.dislike(userId, restaurantId);
             return new ModelAndView("redirect:/restaurant/" + restaurantId);
         }
         return new ModelAndView("redirect:/login");
@@ -248,11 +247,11 @@ public class RestaurantController {
 
         if(loggedUser != null){
             boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
-            boolean menuBelongsToRestaurant = menuService.menuBelongsToRestaurant(menuId, restaurantId);
-            if(isTheRestaurantOwner && menuBelongsToRestaurant) {
-                menuService.deleteItemById(menuId);
-                return new ModelAndView("redirect:/restaurant/" + restaurantId);
-            }
+            // boolean menuBelongsToRestaurant = menuService.menuBelongsToRestaurant(menuId, restaurantId);
+            // if(isTheRestaurantOwner && menuBelongsToRestaurant) {
+                // menuService.deleteItemById(menuId);
+                // return new ModelAndView("redirect:/restaurant/" + restaurantId);
+            // }
         }
         return new ModelAndView("redirect:/403");
     }

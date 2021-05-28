@@ -53,7 +53,7 @@ public class Restaurant {
     private int likes;
 
     @ElementCollection(targetClass = Tags.class)
-    @CollectionTable(name = "restaurrant_tags",
+    @CollectionTable(name = "restaurant_tags",
             joinColumns = @JoinColumn(name = "restaurant_id"))
     @Column(name = "tag_id")
     private List<Tags> tags;
@@ -61,7 +61,7 @@ public class Restaurant {
     @OneToMany(orphanRemoval = true, mappedBy = "restaurant")
     private List<MenuItem> menu;
 
-    @OneToOne(mappedBy = "restaurant")
+    @OneToOne(mappedBy = "restaurant", cascade = CascadeType.ALL)
     private Image profileImage;
 
     // private List<Reservation> reservations; ?
@@ -122,7 +122,7 @@ public class Restaurant {
     public int getLikes() { return likes; }
     public List<MenuItem> getMenu() { return this.menu; }
     public List<Tags> getTags() {return this.tags;}
-    public Image getMaybeProfileImage() { return this.profileImage; }
+    public Image getProfileImage() { return this.profileImage; }
 
     public void setId(Long id) { this.id = id; }
     public void setName(String name) { this.name = name; }

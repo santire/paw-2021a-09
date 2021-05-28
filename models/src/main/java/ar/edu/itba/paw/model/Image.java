@@ -8,6 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SequenceGenerator;
@@ -22,13 +24,15 @@ public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "restaurant_images_image_id_seq")
     @SequenceGenerator(sequenceName = "restaurant_images_image_id_seq", name = "restaurant_images_image_id_seq", allocationSize = 1)
+    @Column(name = "image_id")
     private Long imageId;
 
     @Column(name="image_data")
     private byte[] data;
 
     @OneToOne
-    @PrimaryKeyJoinColumn(name = "restaurant_id")
+    @MapsId
+    @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
 

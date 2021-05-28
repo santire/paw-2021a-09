@@ -51,6 +51,16 @@ public class User {
     // Just for hibernate
   }
 
+  public User(String username, String password, String firstName, String lastName, String email, String phone) {
+    this.username = username;
+    this.password = password;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.phone = phone;
+    this.active = false;
+  }
+
   public User(Long id, String username, String password, String firstName, String lastName, String email, String phone,
       Boolean active) {
     this.id = id;

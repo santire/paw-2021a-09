@@ -9,8 +9,8 @@
      style="cursor: pointer;"
 >
   <c:choose>
-    <c:when test="${restaurant.getMaybeProfileImage().isPresent()}" >
-      <c:url value="data:image/jpg;base64,${restaurant.getMaybeProfileImage().get().getImageEnconded()}" var="imgUrl"/>
+    <c:when test="${not empty restaurant.getProfileImage()}" >
+      <c:url value="data:image/jpg;base64,${restaurant.getProfileImage().getImageEnconded()}" var="imgUrl"/>
     </c:when>
     <c:otherwise>
       <c:url value="/resources/images/noimage.jpg" var="imgUrl"/>
