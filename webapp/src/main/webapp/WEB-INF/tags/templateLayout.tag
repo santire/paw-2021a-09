@@ -61,19 +61,39 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
 
+    <script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
+    <link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+
     <script src="<c:url value="/resources/js/selectConfig.js"/>"></script>
     <script type="text/javascript">
       document.getElementById('reset').onclick= function() {
         document.getElementById('image').value = '';
       };
     </script>
-  <script>
-    $(function () {
-      $('.datepicker').datepicker({
-        format: 'mm/dd/yyyy',
+
+    <script>
+      $('#datepicker').datepicker({
+        uiLibrary: 'bootstrap4',
+        format: "dd/mm/yyyy",
+        maxDate: function() {
+          var date = new Date();
+          date.setDate(date.getDate()+7);
+          return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        },
+        minDate: function() {
+          var date = new Date();
+          date.setDate(date.getDate());
+          return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        },
+        showOtherMonths: false
       });
-    });
-  </script>
+    </script>
+    <style>
+      span.input-group-append {
+        display: none;
+      }
+    </style>
+
 
   </body>
 </html>

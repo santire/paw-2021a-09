@@ -40,16 +40,25 @@
       <div class="row row-cols-1 row-cols-lg-2">
 
         <div class="col-lg-5 mx-0 px-0 pr-5">
-          <div class="input-group date" data-provide="datepicker">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><i class="fa fa-calendar-o"></i></span>
-            </div>
-            <input type="text" placeholder='<spring:message code="restaurant.date.placeholder"/>' class="form-control">
-            <div class="input-group-addon">
-              <span class="glyphicon glyphicon-th"></span>
-            </div>
-          </div>
+            <form:label path="date">
+              <spring:message code="restaurant.date.placeholder" var="datePlaceholder"/>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="fa fa-calendar-o"></i></span>
+                  <form:input
+                          id="datepicker"
+                          type="text"
+                          placeholder='${datePlaceholder}'
+                          class="form-control"
+                          path="date"
+                          autocomplete="off"
+                  />
+                </div>
+                </div>
+            </form:label>
+            <form:errors path="date" class="px-3 text-danger" element="p"/>
         </div>
+
 
         <div class="col-lg-4 mx-0 px-0 pr-1">
           <form:label path="time" >

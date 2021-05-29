@@ -11,5 +11,14 @@
         times="${times}"
         />
     </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $("#dateInput").datepicker({
+          "format": "dd-mm-yyyy",
+        });
+      });
+    </script>
   </jsp:body>
 </sc:templateLayout>
