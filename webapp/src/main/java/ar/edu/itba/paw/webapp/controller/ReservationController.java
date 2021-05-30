@@ -70,6 +70,33 @@ public class ReservationController {
         else return new ModelAndView("redirect:/login");
     }
 
+    @RequestMapping(path = { "/reservations/history" }, method = RequestMethod.GET)
+    public ModelAndView userReservationsHistory(
+            @ModelAttribute("loggedUser") final User loggedUser,
+            @RequestParam(defaultValue="1") Integer page){
+
+        final ModelAndView mav = new ModelAndView("myReservationsHistory");
+
+        // Shouldn't get here unless logged in, but just in case
+        if(loggedUser != null){
+            long userId = loggedUser.getId();
+            int maxPages = reservationService.findByUserPageCount(AMOUNT_OF_RESERVATIONS, userId);
+            if(page == null || page <1) {
+                page=1;
+            }else if (page > maxPages) {
+                page = maxPages;
+            }
+            mav.addObject("maxPages", maxPages);
+
+            List<Reservation> reservations = reservationService.findByUser(page, AMOUNT_OF_RESERVATIONS, userId);
+            mav.addObject("userHasReservations", !reservations.isEmpty());
+            mav.addObject("reservations", reservations);
+            return mav;
+        }
+        else return new ModelAndView("redirect:/login");
+    }
+
+
     @RequestMapping(path = "/reservations/{reservationId}/cancel", method = RequestMethod.POST)
     public ModelAndView cancelReservation(@ModelAttribute("loggedUser") final User loggedUser,
                                           @PathVariable("reservationId") final int reservationId){

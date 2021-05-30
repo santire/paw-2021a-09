@@ -10,7 +10,15 @@
                 <div class="container mt-4">
                     <c:choose>
                         <c:when test="${userHasReservations}">
-                            <h2 class="display-5"><spring:message code="myReservations.title" /></h2>
+                            <div class="row row-cols-1 row-cols-lg-2">
+                                <div class="col-lg-10 mx-0 px-0 pr-5">
+                                    <h2 class="display-5"><spring:message code="myReservations.title" /></h2>
+                                </div>
+                                <div class="col-lg-2 mx-0 px-0 pr-5 align-middle">
+                                    <a class="btn btn-info text-white align-middle" href="<c:url value="/reservations/history"/>" role="button"><spring:message code="myReservations.history.button"/></a>
+                                </div>
+
+                            </div>
                                 <c:forEach var="reservation" items="${reservations}">
                                     <div class="row mt-5">
                                         <sc:userReservationCard
