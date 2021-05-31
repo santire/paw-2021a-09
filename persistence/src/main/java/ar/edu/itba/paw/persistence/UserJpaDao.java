@@ -41,14 +41,13 @@ public class UserJpaDao implements UserDao {
         return user;
     }
 
-    @Override
-    public void assignTokenToUser(String token, LocalDateTime createdAt, long userId) throws TokenCreationException {
-        em.createNativeQuery("INSERT INTO verification_tokens(token, created_at, user_id) VALUES(?, ?, ?)")
-            .setParameter(1, token)
-            .setParameter(2, createdAt)
-            .setParameter(3, userId)
-            .executeUpdate();
 
+    @Override
+    // TODO: move to user reference
+    public void assignTokenToUser(String token, LocalDateTime createdAt, long userId) throws TokenCreationException {
+        User user = findById(userId).orElseThrow(UserNotFoundException::new);
+        VerificationToken verificationToken = new VerificationToken(token, createdAt, user);
+        em.persist(verificationToken);
     }
 
     @Override
@@ -105,6 +104,7 @@ public class UserJpaDao implements UserDao {
     }
 
     @Override
+    @Deprecated
     public Optional<User> activateUserById(long userId) {
         User user = findById(userId).orElseThrow(UserNotFoundException::new);
         user.setActive(true);

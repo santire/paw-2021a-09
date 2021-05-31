@@ -117,6 +117,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  @Transactional
   public User activateUserByToken(String token) throws TokenExpiredException {
 
 
@@ -126,7 +127,7 @@ public class UserServiceImpl implements UserService {
     User user = getUserFromMaybeToken(maybeToken);
 
     LOGGER.debug("Activating user {}", user.getId());
-    user = userDao.activateUserById(user.getId()).orElseThrow(() -> new RuntimeException("Couldn't activate user"));
+    user.setActive(true);
     // userDao.deleteToken(token);
     return user;
   }
