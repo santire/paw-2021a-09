@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 
+import ar.edu.itba.paw.model.PasswordToken;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.VerificationToken;
 import ar.edu.itba.paw.model.exceptions.EmailInUseException;
@@ -43,7 +45,6 @@ public class UserJpaDao implements UserDao {
 
 
     @Override
-    // TODO: move to user reference
     public void assignTokenToUser(String token, LocalDateTime createdAt, long userId) throws TokenCreationException {
         User user = findById(userId).orElseThrow(UserNotFoundException::new);
         VerificationToken verificationToken = new VerificationToken(token, createdAt, user);
@@ -51,10 +52,11 @@ public class UserJpaDao implements UserDao {
     }
 
     @Override
-    @Deprecated
-    // Can be done from service?
     public void assignPasswordTokenToUser(String token, LocalDateTime createdAt, long userId)
             throws TokenCreationException {
+        User user = findById(userId).orElseThrow(UserNotFoundException::new);
+        PasswordToken passwordToken = new PasswordToken(token, createdAt, user);
+        em.persist(passwordToken);
     }
 
     // READ
@@ -78,14 +80,14 @@ public class UserJpaDao implements UserDao {
     public Optional<VerificationToken> getToken(String token) {
         final TypedQuery<VerificationToken> query = em.createQuery("from VerificationToken v where v.token = :token", VerificationToken.class);
         query.setParameter("token", token);
-        final List<VerificationToken> list = query.getResultList();
-        return Optional.ofNullable(list.isEmpty() ? null : list.get(0));
+        return query.getResultList().stream().findFirst();
     }
 
     @Override
-    public Optional<VerificationToken> getPasswordToken(String token) {
-        // TODO Auto-generated method stub
-        return null;
+    public Optional<PasswordToken> getPasswordToken(String token) {
+        final TypedQuery<PasswordToken> query = em.createQuery("from PasswordToken v where v.token = :token", PasswordToken.class);
+        query.setParameter("token", token);
+        return query.getResultList().stream().findFirst();
     }
 
     @Override
@@ -103,26 +105,9 @@ public class UserJpaDao implements UserDao {
         return false;
     }
 
-    @Override
-    @Deprecated
-    public Optional<User> activateUserById(long userId) {
-        User user = findById(userId).orElseThrow(UserNotFoundException::new);
-        user.setActive(true);
-        // em.persist(user); is this necessary?
-        return Optional.of(user);
-    }
+
 
     @Override
-    @Deprecated
-    // Gets done automatically when edited
-    public void updateUser(long id, String username, String password, String firstName, String lastName, String email,
-            String phone) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    @Deprecated
     public void deleteToken(String token) {
         Optional<VerificationToken> maybeToken = getToken(token);
         if (maybeToken.isPresent()) {
@@ -131,9 +116,10 @@ public class UserJpaDao implements UserDao {
     }
 
     @Override
-    public void deleteAssociatedPasswordTokens(String token) {
-        // TODO Auto-generated method stub
-
+    public void deleteAssociatedPasswordTokens(User user) {
+        final Query nativeQuery = em.createNativeQuery("DELETE FROM password_tokens WHERE user_id = ?1");
+        nativeQuery.setParameter(1, user.getId());
+        nativeQuery.executeUpdate();
     }
 
     @Override
