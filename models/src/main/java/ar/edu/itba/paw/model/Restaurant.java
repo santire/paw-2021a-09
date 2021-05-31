@@ -21,8 +21,10 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Formula;
+
 @Entity
-@Table(name = "Restaurants")
+@Table(name = "restaurants")
 public class Restaurant {
 
     @Id
@@ -49,8 +51,9 @@ public class Restaurant {
     @JoinColumn(name = "user_id")
     private User owner;
 
-    @Transient
-    private int likes;
+    // @Formula("select count(*) from Like l where l.restaurantId = id")
+    // @Transient
+    // private int likes;
 
     @ElementCollection(targetClass = Tags.class)
     @CollectionTable(name = "restaurant_tags",
@@ -64,6 +67,9 @@ public class Restaurant {
     @OneToOne(mappedBy = "restaurant", cascade = CascadeType.ALL)
     private Image profileImage;
 
+    @OneToMany(orphanRemoval = true, mappedBy = "restaurant")
+    private List<Like> likeList;
+
     // private List<Reservation> reservations; ?
 
     Restaurant() {
@@ -76,7 +82,7 @@ public class Restaurant {
         this.phoneNumber = phoneNumber;
         this.tags = tags;
         this.owner = owner;
-        this.likes = 0;
+        // this.likes = 0;
         this.rating = 0;
         this.menu = new ArrayList<>();
     }
@@ -88,7 +94,7 @@ public class Restaurant {
         this.phoneNumber = phoneNumber;
         this.rating = rating;
         this.owner = owner;
-        this.likes = 0;
+        // this.likes = 0;
         this.menu = new ArrayList<>();
     }
 
@@ -99,7 +105,7 @@ public class Restaurant {
         this.phoneNumber = phoneNumber;
         this.rating = rating;
         this.owner = owner;
-        this.likes = likes;
+        // this.likes = likes;
         this.menu = new ArrayList<>();
     }
 
@@ -109,7 +115,7 @@ public class Restaurant {
         this.address = address;
         this.phoneNumber = phoneNumber;
         this.owner = owner;
-        this.likes=0;
+        // this.likes=0;
         this.menu = new ArrayList<>();
     }
 
@@ -119,7 +125,7 @@ public class Restaurant {
     public String getPhoneNumber(){ return this.phoneNumber; }
     public float getRating() { return rating; }
     public User getOwner() { return owner; }
-    public int getLikes() { return likes; }
+    public int getLikes() { return likeList.size(); }
     public List<MenuItem> getMenu() { return this.menu; }
     public List<Tags> getTags() {return this.tags;}
     public Image getProfileImage() { return this.profileImage; }
@@ -130,7 +136,7 @@ public class Restaurant {
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
     public void setRating(float rating) { this.rating = rating; }
     public void setOwner(User owner) { this.owner = owner; }
-    public void setLikes(int likes) { this.likes = likes; }
+    // public void setLikes(int likes) { this.likes = likes; }
     public void setTags(List<Tags> tags) { this.tags = tags; }
     public void addMenuItem(MenuItem menuItem) { this.menu.add(menuItem); }
     public void setProfileImage(Image profileImage) { this.profileImage = profileImage; }
