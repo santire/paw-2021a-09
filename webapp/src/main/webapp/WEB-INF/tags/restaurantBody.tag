@@ -38,8 +38,6 @@
           </c:if>
           </div>
 
-
-
           <div class="row row-cols-6 m-0 p-0">
             <p class="card-text"><medium class="text-muted">${restaurant.getRating()}<i class="text-muted fa fa-star checked pl-1"></i></medium></p>
 
@@ -47,12 +45,8 @@
           </div>
 
 
-
           <p class="card-text"><medium class="text-muted">${restaurant.getAddress()}</medium></p>
           <p class="card-text"><medium class="text-muted">${restaurant.getPhoneNumber()}</medium></p>
-
-
-
 
 
           <div class="row row-cols-3 mb-3 text-center">
@@ -67,7 +61,6 @@
           <c:if test="${not empty loggedUser}">
             <c:if test="${not isTheOwner}">
               <p class="card-text"><medium class="text-muted"><spring:message code="restaurant.rateTheRestaurant" /></medium></p>
-
 
               <c:url value="/restaurant/${restaurantId}/rate" var="restUrl"/>
               <form:form
@@ -89,12 +82,6 @@
 
             </c:if>
           </c:if>
-
-
-
-
-
-
 
 
           <c:if test="${not empty isTheOwner}">
