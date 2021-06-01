@@ -82,8 +82,8 @@
                             </div>
 
 
-                            <form:label class="px-3 mx-auto w-100" path="profileImage">
-                                <spring:message code="restaurant.edit.profileImage"/>
+                            <form:label class="px-3 mx-auto w-100 mt-3" path="profileImage">
+                                <b><spring:message code="restaurant.edit.profileImage"/></b>
                             </form:label>
                             <form:input class="px-3 mx-auto w-100" type="file" path="profileImage"/>
                             <form:errors path="profileImage" class="px-3 text-danger" element="p"/>

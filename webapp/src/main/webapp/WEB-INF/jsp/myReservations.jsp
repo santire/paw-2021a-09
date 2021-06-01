@@ -35,6 +35,9 @@
                                 <a class="text-decoration-none" href="<c:url value="/restaurants"/>">
                                     <input type="submit" class="btn btn-outline-secondary btn-block w-50 mt-3 px-0 mx-auto" value='<spring:message code="navbar.browse" />'>
                                 </a>
+                                <p class="w-50 mt-3 px-0 mx-auto d-flex justify-content-center"><spring:message code="myReservations.noReservations.history.1"/>&nbsp;
+                                    <a href="<c:url value="/reservations/history"/>"><spring:message code="myReservations.noReservations.history.2"/></a>
+                                </p>
                             </div>
                         </c:otherwise>
                     </c:choose>
