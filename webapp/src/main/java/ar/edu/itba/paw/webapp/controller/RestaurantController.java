@@ -62,8 +62,8 @@ public class RestaurantController {
     @Autowired
     private LikesService likesService;
 
-    // @Autowired
-    // private MenuService menuService;
+    @Autowired
+    private MenuService menuService;
 
     @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.GET)
     public ModelAndView restaurant(@ModelAttribute("loggedUser") final User loggedUser,
@@ -166,7 +166,7 @@ public class RestaurantController {
                         menuForm.getName(),
                         menuForm.getDescription(),
                         menuForm.getPrice());
-                // menuService.addItemToRestaurant(restaurantId, item);
+                menuService.addItemToRestaurant(restaurantId, item);
                 LOGGER.debug("Owner added restaurant");
             return new ModelAndView("redirect:/restaurant/" + restaurantId);
             }
@@ -248,11 +248,11 @@ public class RestaurantController {
 
         if(loggedUser != null){
             boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
-            // boolean menuBelongsToRestaurant = menuService.menuBelongsToRestaurant(menuId, restaurantId);
-            // if(isTheRestaurantOwner && menuBelongsToRestaurant) {
-                // menuService.deleteItemById(menuId);
-                // return new ModelAndView("redirect:/restaurant/" + restaurantId);
-            // }
+            boolean menuBelongsToRestaurant = menuService.menuBelongsToRestaurant(menuId, restaurantId);
+            if(isTheRestaurantOwner && menuBelongsToRestaurant) {
+                menuService.deleteItemById(menuId);
+                return new ModelAndView("redirect:/restaurant/" + restaurantId);
+            }
         }
         return new ModelAndView("redirect:/403");
     }

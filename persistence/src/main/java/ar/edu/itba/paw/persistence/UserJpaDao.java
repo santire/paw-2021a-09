@@ -70,8 +70,7 @@ public class UserJpaDao implements UserDao {
     public Optional<User> findByEmail(String email) {
         final TypedQuery<User> query = em.createQuery("from User u where u.email = :email", User.class);
         query.setParameter("email", email);
-        final List<User> list = query.getResultList();
-        return Optional.ofNullable(list.isEmpty() ? null : list.get(0));
+        return query.getResultList().stream().findFirst();
     }
 
     // VerificationToken and PasswordToken should be two different entities

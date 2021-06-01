@@ -65,10 +65,9 @@ public class RestaurantServiceImpl implements RestaurantService{
 
     @Override
     @Transactional
-    // TODO: Implement
     public List<Restaurant> getPopularRestaurants(int limit, int minValue){
-        // return restaurantDao.getPopularRestaurants(limit,  minValue);
         return Collections.emptyList();
+        // return restaurantDao.getPopularRestaurants(limit,  minValue);
     }
 
     @Override

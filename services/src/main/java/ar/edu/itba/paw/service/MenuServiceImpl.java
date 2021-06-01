@@ -1,39 +1,47 @@
 package ar.edu.itba.paw.service;
 
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import ar.edu.itba.paw.model.MenuItem;
+import ar.edu.itba.paw.model.Restaurant;
+import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
 import ar.edu.itba.paw.persistence.MenuDao;
+import ar.edu.itba.paw.persistence.RestaurantDao;
 
-// @Service
-// public class MenuServiceImpl implements MenuService {
+@Service
+public class MenuServiceImpl implements MenuService {
 
-    // @Autowired
-    // private MenuDao menuDao;
+    @Autowired
+    private MenuDao menuDao;
 
-	// @Override
-	// public List<MenuItem> findMenuByRestaurantId(long id) {
-		// return menuDao.findMenuByRestaurantId(id);
-	// }
+		@Autowired
+		private RestaurantDao restaurantDao;
 
-	// @Override
-	// public void addItemToRestaurant(long restaurantId, MenuItem item) {
-		// menuDao.addItemToRestaurant(restaurantId, item);
-	// }
+	@Override
+	@Transactional
+	public void addItemToRestaurant(long restaurantId, MenuItem item) {
+		Restaurant restaurant = restaurantDao.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
+		menuDao.addItemToRestaurant(restaurant, item);
+	}
 
-	// @Override
-	// public void deleteItemById(long menuId) {
-		// menuDao.deleteItemById(menuId);
-	// }
+	@Override
+	@Transactional
+	public void deleteItemById(long menuId) {
+		menuDao.deleteItemById(menuId);
+	}
 
-	// @Override
-	// public boolean menuBelongsToRestaurant(long menuId, long restaurantId) {
-		// return findMenuByRestaurantId(restaurantId)
-					// .stream()
-					// .anyMatch(m -> menuId == m.getId());
-	// }
-    
-// }
+	@Override
+	public boolean menuBelongsToRestaurant(long menuId, long restaurantId) {
+		Restaurant restaurant = restaurantDao.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
+		return restaurant.getMenu()
+					.stream()
+					.anyMatch(m -> menuId == m.getId());
+
+		// return menuDao.findById(menuId).getRestaurant().getId() == restaurantId
+	}
+}

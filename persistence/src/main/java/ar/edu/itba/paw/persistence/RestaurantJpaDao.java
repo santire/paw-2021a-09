@@ -10,6 +10,8 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import ar.edu.itba.paw.model.Image;
@@ -20,6 +22,8 @@ import ar.edu.itba.paw.model.User;
 
 @Repository
 public class RestaurantJpaDao implements RestaurantDao {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantJpaDao.class);
+
     @PersistenceContext
     private EntityManager em;
 
@@ -91,8 +95,39 @@ public class RestaurantJpaDao implements RestaurantDao {
 
     @Override
     public List<Restaurant> getPopularRestaurants(int limit, int minValue) {
-        // This one needs likes
-        return null;
+        Query nativeQuery = em.createNativeQuery(
+                "SELECT rest.restaurant_id FROM ("
+                    +
+                    " SELECT r.restaurant_id, COUNT(like_id) as likes FROM restaurants r"
+                    +
+                    " RIGHT JOIN likes l ON r.restaurant_id = l.restaurant_id"
+                    +
+                    " GROUP BY r.restaurant_id"
+                    +
+                    ") AS rest"
+                +
+                " WHERE likes >= ?1"
+                +
+                " ORDER BY rest.likes DESC"
+                +
+                " FETCH NEXT ?2 ROWS ONLY");
+        nativeQuery.setParameter(1, minValue);
+        nativeQuery.setParameter(2, limit);
+
+        @SuppressWarnings("unchecked")
+        List<Long> filteredIds = (List<Long>) nativeQuery.getResultList().stream().map(e -> Long.valueOf(e.toString()))
+                .collect(Collectors.toList());
+
+        if (filteredIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        LOGGER.debug("list: {}", filteredIds.toString());
+
+        final TypedQuery<Restaurant> query = em.createQuery("from Restaurant where id IN :filteredIds",
+                Restaurant.class);
+        query.setParameter("filteredIds", filteredIds);
+
+        return query.getResultList();
     }
 
     @Override

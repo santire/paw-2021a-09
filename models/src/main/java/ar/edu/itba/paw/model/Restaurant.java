@@ -22,6 +22,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.Formula;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
 @Table(name = "restaurants")
@@ -51,7 +53,7 @@ public class Restaurant {
     @JoinColumn(name = "user_id")
     private User owner;
 
-    // @Formula("select count(*) from Like l where l.restaurantId = id")
+    // @Formula("(SELECT COUNT(l.like_id) from likes l where l.restaurant_id = id)")
     // @Transient
     // private int likes;
 
@@ -67,8 +69,9 @@ public class Restaurant {
     @OneToOne(mappedBy = "restaurant", cascade = CascadeType.ALL)
     private Image profileImage;
 
+    @LazyCollection(LazyCollectionOption.EXTRA)
     @OneToMany(orphanRemoval = true, mappedBy = "restaurant")
-    private List<Like> likeList;
+    private List<Like> likes;
 
     // private List<Reservation> reservations; ?
 
@@ -125,7 +128,8 @@ public class Restaurant {
     public String getPhoneNumber(){ return this.phoneNumber; }
     public float getRating() { return rating; }
     public User getOwner() { return owner; }
-    public int getLikes() { return likeList.size(); }
+    public int getLikes() { return likes.size(); }
+    // public int getLikes() { return likes; }
     public List<MenuItem> getMenu() { return this.menu; }
     public List<Tags> getTags() {return this.tags;}
     public Image getProfileImage() { return this.profileImage; }
