@@ -11,6 +11,7 @@ import ar.edu.itba.paw.service.ReservationService;
 
 import ar.edu.itba.paw.service.*;
 import ar.edu.itba.paw.webapp.forms.MenuItemForm;
+import ar.edu.itba.paw.webapp.forms.RatingForm;
 import ar.edu.itba.paw.webapp.forms.ReservationForm;
 import ar.edu.itba.paw.webapp.forms.RestaurantForm;
 
@@ -64,10 +65,16 @@ public class RestaurantController {
     @Autowired
     private MenuService menuService;
 
+
+
+
+
+
     @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.GET)
     public ModelAndView restaurant(@ModelAttribute("loggedUser") final User loggedUser,
             @ModelAttribute("reservationForm") final ReservationForm form,
             @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
+            @ModelAttribute("ratingForm") final RatingForm ratingForm,
             @RequestParam(defaultValue="1") Integer page,
             @PathVariable("restaurantId") final long restaurantId) {
         final ModelAndView mav = new ModelAndView("restaurant");
@@ -87,6 +94,9 @@ public class RestaurantController {
             if (isTheRestaurantOwner) {
                 mav.addObject("isTheOwner", true);
             }
+
+            mav.addObject("userRatingToRestaurant", 0);
+
             if(userRating.isPresent()){
                 mav.addObject("rated", true);
                 mav.addObject("userRatingToRestaurant", userRating.get().getRating());
@@ -107,7 +117,9 @@ public class RestaurantController {
             @Valid @ModelAttribute("reservationForm") final ReservationForm form,
             final BindingResult errors,
              @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
-            final BindingResult menuErrors, 
+            final BindingResult menuErrors,
+            @ModelAttribute("ratingForm") final RatingForm ratingForm,
+            final BindingResult ratingError,
             @RequestParam(defaultValue="1") Integer page,
             @PathVariable("restaurantId") final long restaurantId,
             RedirectAttributes redirectAttributes) {
@@ -142,7 +154,7 @@ public class RestaurantController {
             }
         }
         if (errors.hasErrors()) {
-            return restaurant(loggedUser, form, menuForm,page, restaurantId);
+            return restaurant(loggedUser, form, menuForm, ratingForm, page, restaurantId);
         }
 
         if (loggedUser != null) {
@@ -162,13 +174,15 @@ public class RestaurantController {
     public ModelAndView addMenu(@ModelAttribute("loggedUser") final User loggedUser,
              @ModelAttribute("reservationForm") final ReservationForm form,
              @Valid @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
-             final BindingResult errors, 
+             final BindingResult errors,
+             @ModelAttribute("ratingForm") final RatingForm ratingForm,
+             final BindingResult ratingErrors,
              @RequestParam(defaultValue="1") Integer page,
              @PathVariable("restaurantId") final long restaurantId,
              RedirectAttributes redirectAttributes) {
 
         if(errors.hasErrors()) {
-            return restaurant(loggedUser, form, menuForm, page, restaurantId);
+            return restaurant(loggedUser, form, menuForm, ratingForm, page, restaurantId);
         }
         if (loggedUser != null) {
             boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
@@ -295,6 +309,33 @@ public class RestaurantController {
         }
         return new ModelAndView("redirect:/403");
     }
+
+
+
+
+    @RequestMapping(path = { "/restaurant/{restaurantId}/rate" }, method = RequestMethod.POST)
+    public ModelAndView rateRestaurant( @ModelAttribute("loggedUser") final User loggedUser,
+                                        @PathVariable("restaurantId") final long restaurantId,
+                                        @Valid @ModelAttribute("ratingForm") final RatingForm ratingForm,
+                                        final BindingResult errors) {
+        if(errors.hasErrors()) {
+            return new ModelAndView("redirect:/restaurant/" + restaurantId);
+        }
+
+
+        Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
+        if(userRating.isPresent()){
+            ratingService.modifyRestaurantRating(loggedUser.getId(),restaurantId,(int)ratingForm.getRating());
+        }
+        else{
+            ratingService.rateRestaurant(loggedUser.getId(),restaurantId,(int)ratingForm.getRating());
+        }
+
+
+        return new ModelAndView("redirect:/restaurant/" + restaurantId);
+    }
+
+
 
 
 

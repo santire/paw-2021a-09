@@ -24,7 +24,7 @@
       <div class="card border-0 col-md-5 my-auto mx-auto" style="">
         <div class="card-body px-auto mb-auto">
           <div class="d-inline">
-          <h5 class="d-inline card-title">${restaurant.getName()}</h5>
+          <h3 class="d-inline card-title">${restaurant.getName()}</h3>
           <c:if test="${not empty isTheOwner}">
             <h5 class="float-right">
                 <div>
@@ -36,10 +36,25 @@
                 </div>
             </h5>
           </c:if>
-
           </div>
+
+
+
+          <div class="row row-cols-6 m-0 p-0">
+            <p class="card-text"><medium class="text-muted">${restaurant.getRating()}<i class="text-muted fa fa-star checked pl-1"></i></medium></p>
+
+            <sc:like likeCount="${restaurant.getLikes()}"/>
+          </div>
+
+
+
           <p class="card-text"><medium class="text-muted">${restaurant.getAddress()}</medium></p>
           <p class="card-text"><medium class="text-muted">${restaurant.getPhoneNumber()}</medium></p>
+
+
+
+
+
           <div class="row row-cols-3 mb-3 text-center">
             <c:forEach var="tag" items="${restaurant.getTags()}">
               <div class="card-text border border rounded mr-2 mb-2"><medium class="text-muted">
@@ -47,10 +62,42 @@
               </medium></div>
             </c:forEach>
           </div>
-          <div class="row row-cols-2 m-0 p-0">
-              <sc:like likeCount="${restaurant.getLikes()}"/>
-          </div>
-            <c:if test="${not empty isTheOwner}">
+
+
+          <c:if test="${not empty loggedUser}">
+            <c:if test="${not isTheOwner}">
+              <p class="card-text"><medium class="text-muted"><spring:message code="restaurant.rateTheRestaurant" /></medium></p>
+
+
+              <c:url value="/restaurant/${restaurantId}/rate" var="restUrl"/>
+              <form:form
+                      modelAttribute="ratingForm"
+                      action="${restUrl}"
+                      method="post"
+                      id="ratingForm">
+
+                <div id="rateYo"></div>
+                <form:input
+                        type="hidden"
+                        min="0"
+                        max="5"
+                        value="${userRatingToRestaurant}"
+                        path="rating"
+                        id="rating"
+                />
+              </form:form>
+
+            </c:if>
+          </c:if>
+
+
+
+
+
+
+
+
+          <c:if test="${not empty isTheOwner}">
               <div class="mt-4">
                 <a href="<c:url value="/restaurant/${restaurant.getId()}/manage/confirmed"/>" class="btn btn-outline-secondary btn-block mt-4"><spring:message code="restaurant.reservation.button" /></a>
               </div>
@@ -113,5 +160,9 @@
     </c:choose>
     </div>
   </div>
+
+
+
+
 </div>
 
