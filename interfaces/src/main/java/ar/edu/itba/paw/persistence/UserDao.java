@@ -3,6 +3,7 @@ package ar.edu.itba.paw.persistence;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import ar.edu.itba.paw.model.PasswordToken;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.VerificationToken;
 import ar.edu.itba.paw.model.exceptions.EmailInUseException;
@@ -19,18 +20,16 @@ public interface UserDao {
   public Optional<User> findById(long id);
   public Optional<User> findByEmail(String email);
   public Optional<VerificationToken> getToken(String token);
-  public Optional<VerificationToken> getPasswordToken(String token);
+  public Optional<PasswordToken> getPasswordToken(String token);
 
   public boolean isTheRestaurantOwner(long userId, long restaurantId);
   public boolean isRestaurantOwner(long userId);
 
   // UPDATE
-  public Optional<User> activateUserById(long userId);
-  public void updateUser(long id, String username, String password, String firstName, String lastName, String email, String phone);
 
   // DESTROY
   public void deleteToken(String token);
-  public void deleteAssociatedPasswordTokens(String token);
+  public void deleteAssociatedPasswordTokens(User user);
   public void purgeAllExpiredTokensSince(LocalDateTime expiredCreatedAt);
 
 }

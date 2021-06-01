@@ -59,8 +59,8 @@ public class RestaurantController {
     // @Autowired
     // private RatingService ratingService;
 
-    // @Autowired
-    // private LikesService likesService;
+    @Autowired
+    private LikesService likesService;
 
     // @Autowired
     // private MenuService menuService;
@@ -92,7 +92,7 @@ public class RestaurantController {
                 // mav.addObject("rated", true);
                 // mav.addObject("userRatingToRestaurant", userRating.get().getRating());
             // }
-            // mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
+            mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
             List<String> times = restaurantService.availableStringTime(restaurantId);
             mav.addObject("times", times);
         }
@@ -223,7 +223,7 @@ public class RestaurantController {
     public ModelAndView like(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId){
         if(loggedUser != null){
             long userId = loggedUser.getId();
-            // likesService.like(userId, restaurantId);
+            likesService.like(userId, restaurantId);
             return new ModelAndView("redirect:/restaurant/" + restaurantId);
         }
         return new ModelAndView("redirect:/login");
@@ -233,7 +233,7 @@ public class RestaurantController {
     public ModelAndView dislike(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId){
         if(loggedUser != null){
             long userId = loggedUser.getId();
-            // likesService.dislike(userId, restaurantId);
+            likesService.dislike(userId, restaurantId);
             return new ModelAndView("redirect:/restaurant/" + restaurantId);
         }
         return new ModelAndView("redirect:/login");
