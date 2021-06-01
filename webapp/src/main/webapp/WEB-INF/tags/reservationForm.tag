@@ -52,6 +52,7 @@
                           class="form-control"
                           path="date"
                           autocomplete="off"
+                          required="true"
                   />
                 </div>
                 </div>
