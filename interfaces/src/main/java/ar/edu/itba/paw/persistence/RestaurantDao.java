@@ -26,7 +26,11 @@ public interface RestaurantDao {
 
     public List<Restaurant> getPopularRestaurants(int limit, int minValue);
     public List<Restaurant> getHotRestaurants(int limit, int lastDays);
-    public List<Restaurant> getLikedRestaurantsPreview(int limit);
+    public List<Restaurant> getLikedRestaurantsPreview(int limit, long userId);
+
+    public List<Restaurant> getRestaurantsFromOwner(int page, int amountOnPage, long userId);
+    public int getRestaurantsFromOwnerPagesCount(int amountOnPage, long userId);
+
 
 
 

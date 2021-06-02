@@ -72,14 +72,14 @@ public class HomeController {
         mav.addObject("popularRestaurants", popularRestaurants);
         LOGGER.debug("Amount of popular restaurants: {}", popularRestaurants.size());
 
-        List<Restaurant> hotRestaurants = restaurantService.getHotRestaurants(7);
+        List<Restaurant> hotRestaurants = restaurantService.getHotRestaurants(AMOUNT_OF_POPULAR_RESTAURANTS, 7);
         mav.addObject("hotRestaurants", hotRestaurants);
         LOGGER.debug("Amount of hot restaurants: {}", hotRestaurants.size());
 
-        // if(loggedUser != null){
-            // List<Restaurant> likedRestaurants = likesService.getLikedRestaurants(loggedUser.getId());
-            // mav.addObject("likedRestaurants", likedRestaurants);
-        // }
+        if(loggedUser != null){
+            List<Restaurant> likedRestaurants = restaurantService.getLikedRestaurantsPreview(AMOUNT_OF_POPULAR_RESTAURANTS, loggedUser.getId());
+            mav.addObject("likedRestaurants", likedRestaurants);
+        }
         return mav;
     }
 
@@ -132,8 +132,8 @@ public class HomeController {
         order = desc ? "DESC" : "ASC";
         // Catching invalid page value and setting it at max or min
         // depending on the overflow direction
-        // int maxPages = restaurantService.getRestaurantsFilteredByPageCount(AMOUNT_OF_RESTAURANTS, search, tagsSelected, min, max);
-        int maxPages = restaurantService.getAllRestaurantPagesCount(AMOUNT_OF_RESTAURANTS, search);
+        int maxPages = restaurantService.getRestaurantsFilteredByPageCount(AMOUNT_OF_RESTAURANTS, search, tagsSelected, min, max);
+        // int maxPages = restaurantService.getAllRestaurantPagesCount(AMOUNT_OF_RESTAURANTS, search);
         if(page == null || page <1) {
             page=1;
         }else if (page > maxPages) {
@@ -154,8 +154,8 @@ public class HomeController {
         mav.addObject("defaultSortType", DEFAULT_SORT);
         mav.addObject("defaultOrder", DEFAULT_ORDER);
 
-        // mav.addObject("restaurants", restaurantService.getRestaurantsFilteredBy(page, AMOUNT_OF_RESTAURANTS, search, tagsSelected,min,max, sort, desc, 7));
-        mav.addObject("restaurants", restaurantService.getAllRestaurants(page, AMOUNT_OF_RESTAURANTS, search));
+        mav.addObject("restaurants", restaurantService.getRestaurantsFilteredBy(page, AMOUNT_OF_RESTAURANTS, search, tagsSelected,min,max, sort, desc, 7));
+        // mav.addObject("restaurants", restaurantService.getAllRestaurants(page, AMOUNT_OF_RESTAURANTS, search));
         mav.addObject("page", page);
         mav.addObject("sortBy", sortBy);
         mav.addObject("order", order);

@@ -25,13 +25,14 @@ public interface RestaurantService {
     public int getRestaurantsFromOwnerPagesCount(int amountOnPage, long userId);
 
     public List<Restaurant> getPopularRestaurants(int limit, int minValue);
+    public List<Restaurant> getLikedRestaurantsPreview(int limit, long userId);
 
     public List<Restaurant> getAllRestaurants(int page, int amountOnPage);
     public List<Restaurant> findByName(String name);
 
 
 
-    public List<Restaurant> getHotRestaurants(int lastDays);
+    public List<Restaurant> getHotRestaurants(int limit, int lastDays);
 
 
     // UPDATE
