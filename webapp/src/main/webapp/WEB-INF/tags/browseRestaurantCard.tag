@@ -37,7 +37,10 @@
                     </div>
                 </c:forEach>
             </div>
-            <p class="bt-0 mt-0 text-secondary text-center">${restaurant.getLikes()} <i class="fa fa-heart" aria-hidden="true"></i></p>
+            <div class="d-flex justify-content-center">
+                <p class="bt-0 mt-0 text-secondary text-center mx-auto">${restaurant.getLikes()} <i class="fa fa-heart" aria-hidden="true"></i></p>
+                <p class="m-0 b-0 card-text mx-auto"><medium class="text-muted">${restaurant.getRating()}<i class="text-muted fa fa-star checked pl-1"></i></medium></p>
+            </div>
 
             <a href="<c:url value="/restaurant/${restaurant.getId()}"/>" class="btn btn-outline-secondary btn-block mt-3"><spring:message code="restaurants.seeMore" /></a>
         </div>
