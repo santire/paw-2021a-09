@@ -7,7 +7,7 @@
   <jsp:body>
     <main>
       <section>
-        <div class="container mt-4">
+        <div class="mx-auto mt-4 w-75">
           <c:choose>
             <c:when test="${empty restaurants}">
               <div class="row row-cols-1 row-cols-md-3">
@@ -42,7 +42,7 @@
                 <div class="row row-cols-1 row-cols-md-3 col-md-9 ">
                   <c:forEach var="restaurant" items="${restaurants}" >
                     <div class="p-2 mb-4">
-                      <sc:restaurantCard
+                      <sc:browseRestaurantCard
                               restaurant="${restaurant}"
                       />
                     </div>

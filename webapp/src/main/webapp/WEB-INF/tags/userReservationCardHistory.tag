@@ -9,8 +9,8 @@
 
       <%--IMAGE COLUMN --%>
       <c:choose>
-        <c:when test="${reservation.getRestaurant().getMaybeProfileImage().isPresent()}">
-          <c:url value="data:image/jpg;base64,${reservation.getRestaurant().getMaybeProfileImage().get().getImageEnconded()}" var="imgUrl"/>
+        <c:when test="${not empty reservation.getRestaurant().getProfileImage()}">
+          <c:url value="data:image/jpg;base64,${reservation.getRestaurant().getProfileImage().getImageEnconded()}" var="imgUrl"/>
         </c:when>
         <c:otherwise>
           <c:url value="/resources/images/noimage.jpg" var="imgUrl"/>

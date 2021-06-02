@@ -80,7 +80,7 @@ public class ReservationController {
         // Shouldn't get here unless logged in, but just in case
         if(loggedUser != null){
             long userId = loggedUser.getId();
-            int maxPages = reservationService.findByUserPageCount(AMOUNT_OF_RESERVATIONS, userId);
+            int maxPages = reservationService.findByUserHistoryPageCount(AMOUNT_OF_RESERVATIONS, userId);
             if(page == null || page <1) {
                 page=1;
             }else if (page > maxPages) {
@@ -88,7 +88,7 @@ public class ReservationController {
             }
             mav.addObject("maxPages", maxPages);
 
-            List<Reservation> reservations = reservationService.findByUser(page, AMOUNT_OF_RESERVATIONS, userId);
+            List<Reservation> reservations = reservationService.findByUserHistory(page, AMOUNT_OF_RESERVATIONS, userId);
             mav.addObject("userHasReservations", !reservations.isEmpty());
             mav.addObject("reservations", reservations);
             return mav;

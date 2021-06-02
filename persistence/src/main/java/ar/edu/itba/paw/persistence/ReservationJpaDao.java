@@ -155,6 +155,54 @@ public class ReservationJpaDao implements ReservationDao {
         return pageAmount <= 0 ? 1 : pageAmount;
 	}
 
+    @Override
+    public List<Reservation> findByUserHistory(int page, int amountOnPage, long userId, LocalDateTime currentTime) {
+        Timestamp currentTimestamp = Timestamp.valueOf(currentTime);
+        Query nativeQuery = em.createNativeQuery(
+                "SELECT reservation_id FROM reservations"
+                        +
+                        " WHERE user_id = :userId and date < :currTimestamp"
+                        +
+                        " ORDER BY date ASC"
+        );
+
+        nativeQuery.setParameter("userId", userId);
+        nativeQuery.setParameter("currTimestamp", currentTimestamp);
+        nativeQuery.setFirstResult((page - 1) * amountOnPage);
+        nativeQuery.setMaxResults(amountOnPage);
+        @SuppressWarnings("unchecked")
+        List<Long> filteredIds = (List<Long>) nativeQuery.getResultList().stream().map(e -> Long.valueOf(e.toString()))
+                .collect(Collectors.toList());
+
+        if (filteredIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        final TypedQuery<Reservation> query = em.createQuery("from Reservation where id IN :filteredIds",
+                Reservation.class);
+        query.setParameter("filteredIds", filteredIds);
+
+        return query.getResultList().stream().sorted(Comparator.comparing(v->filteredIds.indexOf(v.getId()))).collect(Collectors.toList());
+    }
+
+
+    @Override
+    public int findByUserHistoryPageCount(int amountOnPage, long userId, LocalDateTime currentTime) {
+        Timestamp currentTimestamp = Timestamp.valueOf(currentTime);
+        Query nativeQuery = em.createNativeQuery(
+                "SELECT reservation_id FROM reservations"
+                        +
+                        " WHERE user_id = :userId AND date < :currentTimestamp"
+        );
+        nativeQuery.setParameter("userId", userId);
+        nativeQuery.setParameter("currentTimestamp", currentTimestamp);
+
+        int amountOfRestaurants = nativeQuery.getResultList().size();
+        int pageAmount = (int) Math.ceil((double) amountOfRestaurants / amountOnPage);
+
+        return pageAmount <= 0 ? 1 : pageAmount;
+    }
+
 
 	@Override
   @Deprecated
