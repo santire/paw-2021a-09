@@ -1,5 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix ="fmt" uri ="http://java.sun.com/jsp/jstl/fmt" %>
+
 
 <%@attribute name="restaurant" required="true" type="ar.edu.itba.paw.model.Restaurant"%>
 
@@ -26,10 +28,24 @@
     </div>
     <div class="card-body d-flex flex-column">
         <div class="mt-auto">
-            <h6 class="card-title text-break text-center" style="min-height: 70px;">${restaurant.getName()}</h6>
+            <h6 class="card-title text-break text-center" style="min-height: 35px;">${restaurant.getName()}</h6>
             <%-- <p class="card-text">${restaurant.getDescription()}</p> --%>
             <%-- <p class="text-secondary text-center">${restaurant.getRating()}/10 <i class="fa fa-cutlery" aria-hidden="true"></i></p> --%>
-            <a href="<c:url value="/restaurant/${restaurant.getId()}"/>" class="btn btn-outline-secondary btn-block"><spring:message code="restaurants.seeMore" /></a>
+            <div class="card-text d-inline-flex flex-wrap justify-content-center align-items-center">
+                <div class=" border border rounded mr-2 mb-2 text-muted">
+                    &nbsp;<spring:message code="restaurant.tag.1"/>&nbsp;
+                </div>
+                <div class=" border border rounded mr-2 mb-2 text-muted">
+                    &nbsp;<spring:message code="restaurant.tag.3"/>&nbsp;
+                </div>
+                <div class=" border border rounded mr-2 mb-2 text-muted">
+                    &nbsp;<spring:message code="restaurant.tag.3"/>&nbsp;
+                </div>
+                <div class=" border border rounded mr-2 mb-2 text-muted">
+                    &nbsp;<spring:message code="restaurant.tag.4"/>&nbsp;
+                </div>
+            </div>
+            <a href="<c:url value="/restaurant/${restaurant.getId()}"/>" class="btn btn-outline-secondary btn-block mt-3"><spring:message code="restaurants.seeMore" /></a>
         </div>
     </div>
 </div>
