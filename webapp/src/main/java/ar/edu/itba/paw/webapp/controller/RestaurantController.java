@@ -57,8 +57,8 @@ public class RestaurantController {
     @Autowired
     private RestaurantService restaurantService;
 
-    // @Autowired
-    // private RatingService ratingService;
+    @Autowired
+    private RatingService ratingService;
 
     @Autowired
     private LikesService likesService;
@@ -90,7 +90,7 @@ public class RestaurantController {
         mav.addObject("maxPages", maxPages);
 
         if(loggedUser != null){
-            // Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
+            Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
             boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
             if (isTheRestaurantOwner) {
                 mav.addObject("isTheOwner", true);
@@ -101,10 +101,10 @@ public class RestaurantController {
             mav.addObject("userRatingToRestaurant", 0);
 
 
-            // if(userRating.isPresent()){
-                // mav.addObject("rated", true);
-                // mav.addObject("userRatingToRestaurant", userRating.get().getRating());
-            // }
+            if(userRating.isPresent()){
+                mav.addObject("rated", true);
+                mav.addObject("userRatingToRestaurant", userRating.get().getRating());
+            }
 
             mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
             List<String> times = restaurantService.availableStringTime(restaurantId);
@@ -326,18 +326,7 @@ public class RestaurantController {
         if(errors.hasErrors()) {
             return new ModelAndView("redirect:/restaurant/" + restaurantId);
         }
-
-
-        /*
-        Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
-        if(userRating.isPresent()){
-            ratingService.modifyRestaurantRating(loggedUser.getId(),restaurantId,(int)ratingForm.getRating());
-        }
-        else{
-            ratingService.rateRestaurant(loggedUser.getId(),restaurantId,(int)ratingForm.getRating());
-        }
-         */
-
+        ratingService.rateRestaurant(loggedUser.getId(), restaurantId, ratingForm.getRating());
 
 
         return new ModelAndView("redirect:/restaurant/" + restaurantId);

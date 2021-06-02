@@ -1,6 +1,5 @@
 package ar.edu.itba.paw.persistence;
 
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -12,15 +11,15 @@ import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
 
 @Repository
-public class LikeJpaDao implements LikesDao{
+public class LikeJpaDao implements LikesDao {
 
-    @PersistenceContext
-    private EntityManager em;
+	@PersistenceContext
+	private EntityManager em;
 
 	@Override
 	public boolean like(User user, Restaurant restaurant) {
-      Like like = new Like(user, restaurant);
-			em.persist(like);
+		Like like = new Like(user, restaurant);
+		em.persist(like);
 		return true;
 	}
 

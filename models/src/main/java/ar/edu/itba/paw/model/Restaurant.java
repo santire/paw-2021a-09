@@ -70,6 +70,9 @@ public class Restaurant {
     @OneToMany(orphanRemoval = true, mappedBy = "restaurant")
     private List<Like> likes;
 
+    @OneToMany(orphanRemoval = true, mappedBy = "restaurant")
+    private List<Rating> ratings;
+
     // private List<Reservation> reservations; ?
 
     Restaurant() {
@@ -123,7 +126,12 @@ public class Restaurant {
     public String getName(){ return this.name; }
     public String getAddress(){ return this.address; }
     public String getPhoneNumber(){ return this.phoneNumber; }
-    public float getRating() { return rating; }
+    public List<Rating> getRatings(){ return this.ratings; }
+    public double getRating() { 
+        return ratings
+            .stream()
+            .mapToDouble(r -> r.getRating()).average().orElse(0);
+    }
     public User getOwner() { return owner; }
     public int getLikes() { return likes.size(); }
     // public int getLikes() { return likes; }
@@ -135,7 +143,7 @@ public class Restaurant {
     public void setName(String name) { this.name = name; }
     public void setAddress(String address) { this.address = address; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
-    public void setRating(float rating) { this.rating = rating; }
+    // public void setRating(float rating) { this.rating = rating; }
     public void setOwner(User owner) { this.owner = owner; }
     // public void setLikes(int likes) { this.likes = likes; }
     public void setTags(List<Tags> tags) { this.tags = tags; }

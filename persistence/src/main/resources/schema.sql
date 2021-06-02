@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS menu_items(
 
 CREATE TABLE IF NOT EXISTS ratings(
   rating_id SERIAL PRIMARY KEY,
-  rating INTEGER,
+  rating FLOAT,
   user_comment TEXT,
   user_id INTEGER,
   restaurant_id INTEGER,
@@ -51,6 +51,8 @@ CREATE TABLE IF NOT EXISTS ratings(
   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE,
   FOREIGN KEY(restaurant_id) REFERENCES restaurants(restaurant_id) ON DELETE CASCADE
 );
+
+/* ALTER TABLE IF EXISTS ratings ALTER COLUMN rating TYPE FLOAT; */
 
 CREATE TABLE IF NOT EXISTS likes(
   like_id SERIAL PRIMARY KEY,
