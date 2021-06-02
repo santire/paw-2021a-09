@@ -87,17 +87,21 @@ public class ReservationController {
                                                    @PathVariable("reservationId") final int reservationId,
                                                    @RequestParam("cancellationMessage") final String cancellationMessage){
         if(loggedUser != null){
-            Optional<Reservation> reservation = reservationService.findById(reservationId);
-            if(reservation.isPresent()){
-                Optional<User> userToCancel = userService.findById(reservation.get().getUserId());
-                if(userToCancel.isPresent()){
-                    Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
-                    if(restaurant.isPresent()){
-                        reservationService.ownerCancelReservation(reservationId, cancellationMessage);
-                       
-                        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/confirmed");
-                    }
-                }
+            Optional<Reservation> maybeReservation = reservationService.findById(reservationId);
+            if(maybeReservation.isPresent()){
+                // Reservation reservation = maybeReservation.get();
+
+                // Optional<User> userToCancel = userService.findById(reservation.get().getUserId());
+                // User userToCancel = reservation.getUser();
+                // Restaurant restaurant = reservation.getRestaurant();
+                reservationService.ownerCancelReservation(reservationId, cancellationMessage);
+                return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/confirmed");
+
+                // if(userToCancel.isPresent()){
+                    // Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
+                    // if(restaurant.isPresent()){
+                    // }
+                // }
              }
              return new ModelAndView("redirect:/403");
          }
@@ -111,15 +115,15 @@ public class ReservationController {
          if(loggedUser != null){
             Optional<Reservation> reservation = reservationService.findById(reservationId);
             if(reservation.isPresent()){
-                Optional<User> userToCancel = userService.findById(reservation.get().getUserId());
-                if(userToCancel.isPresent()){
-                    Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
-                    if(restaurant.isPresent()){
-                        Locale locale = LocaleContextHolder.getLocale();
-                        reservationService.ownerCancelReservation(reservationId, messageSource.getMessage("mail.rejection",null,locale));
-                        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/pending");
-                    }
-                }
+                Locale locale = LocaleContextHolder.getLocale();
+                reservationService.ownerCancelReservation(reservationId, messageSource.getMessage("mail.rejection",null,locale));
+                return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/pending");
+                // Optional<User> userToCancel = userService.findById(reservation.get().getUserId());
+                // if(userToCancel.isPresent()){
+                    // Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
+                    // if(restaurant.isPresent()){
+                    // }
+                // }
              }
             return new ModelAndView("redirect:/403");
         }
@@ -133,14 +137,17 @@ public class ReservationController {
          if(loggedUser != null){
              Optional<Reservation> reservation = reservationService.findById(reservationId);
                 if(reservation.isPresent()){
-                 Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
-                 if(restaurant.isPresent()){
-                     if(restaurant.get().getUserId() == loggedUser.getId()){
-                         reservationService.confirmReservation(reservation.get());
-                         return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/pending");
-                     }
-                     return new ModelAndView("redirect:/403");
-                 }
+                 // Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
+                    Restaurant restaurant = reservation.get().getRestaurant();
+                    if (restaurant.getOwner().getId() == loggedUser.getId()) {
+                     reservationService.confirmReservation(reservation.get());
+                     return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/pending");
+                    }
+                 // if(restaurant.isPresent()){
+                     // if(restaurant.get().getUserId() == loggedUser.getId()){
+                     // }
+                     // return new ModelAndView("redirect:/403");
+                 // }
              }
              return new ModelAndView("redirect:/403");
          }

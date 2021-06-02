@@ -1,25 +1,30 @@
 package ar.edu.itba.paw.model;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistance.GeneratedValue;
-import javax.persistance.GeneratedType;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistance.SequenceGenerator;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
-
+@Entity
+@Table(name = "reservations")
 public class Reservation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "reservations_reservation_id_seq")
     @SequenceGenerator(allocationSize = 1, sequenceName = "reservations_reservation_id_seq", name = "reservations_reservation_id_seq")
+    @Column(name = "reservation_id")
     private Long id;
 
     @Column
-    private LocalDateTime date
+    private LocalDateTime date;
 
     @Column
     private long quantity;
@@ -34,6 +39,15 @@ public class Reservation {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
+
+    Reservation() {
+        // Just for hibernate
+    }
+    public Reservation(LocalDateTime date, long quantity) {
+        this.date = date;
+        this.quantity = quantity;
+        this.confirmed = false;
+    }
 
     public Reservation(Long id, long quantity, boolean confirmed, User user, Restaurant restaurant) {
         this.id = id;
@@ -54,6 +68,7 @@ public class Reservation {
         this.quantity = quantity;
         this.user = user;
         this.restaurant = restaurant;
+    }
 
     public Long getId() {
         return this.id;
@@ -98,9 +113,11 @@ public class Reservation {
     public void setRestaurant(Restaurant restaurant) {
         this.restaurant = restaurant;
     }
+    public LocalDateTime getDate() {
+        return date;
     }
-
-
-
+    public void setDate(LocalDateTime date) {
+        this.date = date;
+    }
 
 }

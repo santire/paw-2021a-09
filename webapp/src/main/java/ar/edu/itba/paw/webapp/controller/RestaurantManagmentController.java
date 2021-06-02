@@ -48,8 +48,8 @@ public class RestaurantManagmentController {
     @Autowired
     private UserService userService;
 
-    // @Autowired
-    // private ReservationService reservationService;
+    @Autowired
+    private ReservationService reservationService;
 
     @Autowired
     private RestaurantService restaurantService;
@@ -152,80 +152,80 @@ public class RestaurantManagmentController {
 
     // Manage Reservations
 
-    // @RequestMapping(path={"/restaurant/{restaurantId}/manage/pending"}, method = RequestMethod.GET)
-    // public ModelAndView manageRestaurantPending(
-            // @ModelAttribute("loggedUser") final User loggedUser,
-            // @PathVariable("restaurantId") final long restaurantId,
-            // @RequestParam(defaultValue = "1") Integer page) {
+    @RequestMapping(path={"/restaurant/{restaurantId}/manage/pending"}, method = RequestMethod.GET)
+    public ModelAndView manageRestaurantPending(
+            @ModelAttribute("loggedUser") final User loggedUser,
+            @PathVariable("restaurantId") final long restaurantId,
+            @RequestParam(defaultValue = "1") Integer page) {
 
-        // if (loggedUser != null) {
-            // final ModelAndView mav =  new ModelAndView("managePendingReservations");
-            // Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
-            // if(restaurant.isPresent()){
-                // if(restaurant.get().getUserId() != loggedUser.getId()){
-                    // return new ModelAndView("redirect:/403");
-                // }
-                // int maxPages = reservationService.findPendingByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
-                // if(page == null || page <1) {
-                    // page=1;
-                // }else if (page > maxPages) {
-                    // page = maxPages;
-                // }
-                // mav.addObject("restaurant", restaurant.get());
+        if (loggedUser != null) {
+            final ModelAndView mav =  new ModelAndView("managePendingReservations");
+            Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
+            if(restaurant.isPresent()){
+                if(restaurant.get().getOwner().getId() != loggedUser.getId()){
+                    return new ModelAndView("redirect:/403");
+                }
+                int maxPages = reservationService.findPendingByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
+                if(page == null || page <1) {
+                    page=1;
+                }else if (page > maxPages) {
+                    page = maxPages;
+                }
+                mav.addObject("restaurant", restaurant.get());
 
-                // List<Reservation> pendingReservations = reservationService.findPendingByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
-                // if(pendingReservations.isEmpty()){ mav.addObject("restaurantHasPendingReservations", false); }
-                // else { mav.addObject("restaurantHasPendingReservations", true); }
+                List<Reservation> pendingReservations = reservationService.findPendingByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
+                if(pendingReservations.isEmpty()){ mav.addObject("restaurantHasPendingReservations", false); }
+                else { mav.addObject("restaurantHasPendingReservations", true); }
 
-                // mav.addObject("maxPages", maxPages);
-                // mav.addObject("pendingReservations", pendingReservations);
+                mav.addObject("maxPages", maxPages);
+                mav.addObject("pendingReservations", pendingReservations);
 
-                // return mav;
-            // }
-            // else{
-                // return new ModelAndView("redirect:/404");
-            // }
-        // }
-        // return new ModelAndView("redirect:/403");
-    // }
+                return mav;
+            }
+            else{
+                return new ModelAndView("redirect:/404");
+            }
+        }
+        return new ModelAndView("redirect:/403");
+    }
 
-    // @RequestMapping(path={"/restaurant/{restaurantId}/manage/confirmed"}, method = RequestMethod.GET)
-    // public ModelAndView manageRestaurantConfirmed(
-            // @ModelAttribute("loggedUser") final User loggedUser,
-            // @PathVariable("restaurantId") final long restaurantId,
-            // @RequestParam(defaultValue = "1") Integer page) {
-        // if (loggedUser != null) {
-            // final ModelAndView mav =  new ModelAndView("manageConfirmedReservations");
-            // Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
-            // if(restaurant.isPresent()){
-                // if(restaurant.get().getUserId() != loggedUser.getId()){
-                    // return new ModelAndView("redirect:/403");
-                // }
-                // int maxPages = reservationService.findConfirmedByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
-                // if(page == null || page <1) {
-                    // page=1;
-                // }else if (page > maxPages) {
-                    // page = maxPages;
-                // }
-                // mav.addObject("restaurant", restaurant.get());
+    @RequestMapping(path={"/restaurant/{restaurantId}/manage/confirmed"}, method = RequestMethod.GET)
+    public ModelAndView manageRestaurantConfirmed(
+            @ModelAttribute("loggedUser") final User loggedUser,
+            @PathVariable("restaurantId") final long restaurantId,
+            @RequestParam(defaultValue = "1") Integer page) {
+        if (loggedUser != null) {
+            final ModelAndView mav =  new ModelAndView("manageConfirmedReservations");
+            Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
+            if(restaurant.isPresent()){
+                if(restaurant.get().getOwner().getId() != loggedUser.getId()){
+                    return new ModelAndView("redirect:/403");
+                }
+                int maxPages = reservationService.findConfirmedByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
+                if(page == null || page <1) {
+                    page=1;
+                }else if (page > maxPages) {
+                    page = maxPages;
+                }
+                mav.addObject("restaurant", restaurant.get());
 
                 // With Pagination
-                // List<Reservation> confirmedReservations = reservationService.findConfirmedByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
+                List<Reservation> confirmedReservations = reservationService.findConfirmedByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId);
 
-                // if(confirmedReservations.isEmpty()){ mav.addObject("restaurantHasConfirmedReservations", false); }
-                // else { mav.addObject("restaurantHasConfirmedReservations", true); }
+                if(confirmedReservations.isEmpty()){ mav.addObject("restaurantHasConfirmedReservations", false); }
+                else { mav.addObject("restaurantHasConfirmedReservations", true); }
 
-                // mav.addObject("maxPages", maxPages);
-                // mav.addObject("confirmedReservations", confirmedReservations);
+                mav.addObject("maxPages", maxPages);
+                mav.addObject("confirmedReservations", confirmedReservations);
 
-                // return mav;
-            // }
-            // else{
-                // return new ModelAndView("redirect:/404");
-            // }
-        // }
-        // return new ModelAndView("redirect:/403");
-    // }
+                return mav;
+            }
+            else{
+                return new ModelAndView("redirect:/404");
+            }
+        }
+        return new ModelAndView("redirect:/403");
+    }
 
 
 

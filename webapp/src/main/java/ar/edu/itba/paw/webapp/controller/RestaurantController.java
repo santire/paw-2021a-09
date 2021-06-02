@@ -50,8 +50,8 @@ public class RestaurantController {
     @Autowired
     private UserService userService;
 
-    // @Autowired
-    // private ReservationService reservationService;
+    @Autowired
+    private ReservationService reservationService;
 
     @Autowired
     private RestaurantService restaurantService;
@@ -137,7 +137,7 @@ public class RestaurantController {
         if (loggedUser != null) {
             time = form.getTime();
             LocalDateTime todayAtDate = LocalDate.now().atTime(time.getHour(), time.getMinute());
-            // reservationService.addReservation(loggedUser.getId(), restaurantId, todayAtDate, Long.parseLong(form.getQuantity()));
+            reservationService.addReservation(loggedUser.getId(), restaurantId, todayAtDate, Long.parseLong(form.getQuantity()));
             redirectAttributes.addFlashAttribute("madeReservation", true);
         } else {
             return new ModelAndView("redirect:/register");
