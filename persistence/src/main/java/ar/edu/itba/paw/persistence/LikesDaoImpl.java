@@ -13,56 +13,56 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Repository
-public class LikesDaoImpl implements LikesDao {
-    private static final RowMapper<Long> LIKES_ROW_MAPPER = (rs, rowNum) -> rs.getLong("restaurant_id");
+// @Repository
+// public class LikesDaoImpl implements LikesDao {
+    // private static final RowMapper<Long> LIKES_ROW_MAPPER = (rs, rowNum) -> rs.getLong("restaurant_id");
 
-    private JdbcTemplate jdbcTemplate;
-    private final SimpleJdbcInsert jdbcInsert;
+    // private JdbcTemplate jdbcTemplate;
+    // private final SimpleJdbcInsert jdbcInsert;
 
-    @Autowired
-    public LikesDaoImpl(final DataSource ds){
-        jdbcTemplate = new JdbcTemplate(ds);
-        jdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("likes").usingGeneratedKeyColumns("like_id");
-    }
+    // @Autowired
+    // public LikesDaoImpl(final DataSource ds){
+        // jdbcTemplate = new JdbcTemplate(ds);
+        // jdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("likes").usingGeneratedKeyColumns("like_id");
+    // }
 
-    @Override
-    public boolean like(long userId, long restaurantId){
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("user_id", userId);
-        params.addValue("restaurant_id", restaurantId);
-        jdbcInsert.execute(params);
-        return true;
-    }
+    // @Override
+    // public boolean like(long userId, long restaurantId){
+        // MapSqlParameterSource params = new MapSqlParameterSource();
+        // params.addValue("user_id", userId);
+        // params.addValue("restaurant_id", restaurantId);
+        // jdbcInsert.execute(params);
+        // return true;
+    // }
 
-    @Override
-    public boolean dislike(long userId, long restaurantId){
-        String sql = "DELETE FROM likes WHERE user_id = ? AND restaurant_id = ?";
-        Object[] args = new Object[] {userId, restaurantId};
+    // @Override
+    // public boolean dislike(long userId, long restaurantId){
+        // String sql = "DELETE FROM likes WHERE user_id = ? AND restaurant_id = ?";
+        // Object[] args = new Object[] {userId, restaurantId};
 
-        return jdbcTemplate.update(sql, args) == 1;
-    }
+        // return jdbcTemplate.update(sql, args) == 1;
+    // }
 
-    @Override
-    public List<Long> getLikedRestaurantsId(long userId){
-        return new ArrayList<>(jdbcTemplate.query("SELECT * FROM likes WHERE user_id = ?", LIKES_ROW_MAPPER, userId));
-    }
+    // @Override
+    // public List<Long> getLikedRestaurantsId(long userId){
+        // return new ArrayList<>(jdbcTemplate.query("SELECT * FROM likes WHERE user_id = ?", LIKES_ROW_MAPPER, userId));
+    // }
 
-    @Override
-    public boolean userLikesRestaurant(long userId, long restaurantId){
-        return jdbcTemplate.query("SELECT * FROM likes WHERE user_id =? AND restaurant_id = ?", new Object[]{userId, restaurantId},(rs, rowNum) ->
-                Boolean.TRUE).stream().findFirst().orElse(false);
-    }
+    // @Override
+    // public boolean userLikesRestaurant(long userId, long restaurantId){
+        // return jdbcTemplate.query("SELECT * FROM likes WHERE user_id =? AND restaurant_id = ?", new Object[]{userId, restaurantId},(rs, rowNum) ->
+                // Boolean.TRUE).stream().findFirst().orElse(false);
+    // }
 
-    @Override
-    public int getLikesByRestaurantId(long restaurantId) {
-        return jdbcTemplate.query(
-                "SELECT COUNT(like_id) as c"
-                +
-                " FROM likes WHERE restaurant_id = ?"
-                +
-                " GROUP BY restaurant_id"
-                ,(r,n)->r.getInt("c"), restaurantId)
-                .stream().findFirst().orElse(0);
-    }
-}
+    // @Override
+    // public int getLikesByRestaurantId(long restaurantId) {
+        // return jdbcTemplate.query(
+                // "SELECT COUNT(like_id) as c"
+                // +
+                // " FROM likes WHERE restaurant_id = ?"
+                // +
+                // " GROUP BY restaurant_id"
+                // ,(r,n)->r.getInt("c"), restaurantId)
+                // .stream().findFirst().orElse(0);
+    // }
+// }

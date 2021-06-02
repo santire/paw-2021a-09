@@ -1,6 +1,5 @@
 package ar.edu.itba.paw.model;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
@@ -15,14 +14,14 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "verification_tokens")
-public class VerificationToken {
+@Table(name = "password_tokens")
+public class PasswordToken {
 
     @Id
     @Column(name = "token_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "verification_tokens_token_id_seq")
-    @SequenceGenerator(sequenceName = "verification_tokens_token_id_seq", name = "verification_tokens_token_id_seq", allocationSize = 1)
-    Long id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "password_tokens_token_id_seq")
+    @SequenceGenerator(sequenceName = "password_tokens_token_id_seq", name = "password_tokens_token_id_seq", allocationSize = 1)
+    private Long id;
 
     @Column(length = 36, unique = true)
     private String token;
@@ -30,17 +29,20 @@ public class VerificationToken {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     private User user;
 
-    VerificationToken() {
+    PasswordToken() {
         // Just for hibernate
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getToken() {
@@ -49,6 +51,10 @@ public class VerificationToken {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
@@ -63,15 +69,10 @@ public class VerificationToken {
         this.user = user;
     }
 
-    public VerificationToken(String token, LocalDateTime timestamp, User user) {
-        this.setToken(token);
-        this.setCreatedAt(timestamp);
+    public PasswordToken(String token, LocalDateTime createdAt, User user) {
+        this.token = token;
+        this.createdAt = createdAt;
         this.user = user;
     }
 
-    public VerificationToken(String token, Timestamp timestamp, User user) {
-        this.setToken(token);
-        this.setCreatedAt(timestamp.toLocalDateTime());
-        this.user = user;
-    }
 }

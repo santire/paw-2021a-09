@@ -18,6 +18,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.Email;
+import ar.edu.itba.paw.model.PasswordToken;
 import ar.edu.itba.paw.model.VerificationToken;
 import ar.edu.itba.paw.model.exceptions.EmailInUseException;
 import ar.edu.itba.paw.model.exceptions.TokenCreationException;
@@ -49,7 +50,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public Optional<User> findById(long id) {
-    return this.userDao.findById(id);
+    return userDao.findById(id);
   }
 
   @Transactional
@@ -112,30 +113,48 @@ public class UserServiceImpl implements UserService {
     myemail.setMailSubject(messageSource.getMessage("mail.forgot.subject",null,locale));
     myemail.setMailContent(emailContent);
     emailService.sendEmail(myemail,plainText);
-    
-      
   }
 
   @Override
+  @Transactional
   public User activateUserByToken(String token) throws TokenExpiredException {
 
 
     Optional<VerificationToken> maybeToken = userDao.getToken(token);
     LOGGER.debug("GOT TOKEN {}", maybeToken.get().getToken());
-    LOGGER.debug("WITH UID {}", maybeToken.get().getUserId());
-    User user = getUserFromMaybeToken(maybeToken);
+    LOGGER.debug("WITH UID {}", maybeToken.get().getUser().getId());
+    VerificationToken verificationToken = maybeToken.orElseThrow(TokenDoesNotExistException::new);
+    LocalDateTime expiryDate = verificationToken.getCreatedAt().plusDays(1);
+
+    if(LocalDateTime.now().isAfter(expiryDate)) {
+      LOGGER.warn("verificationToken {} is expired", verificationToken.getToken());
+      throw new TokenExpiredException();
+    }
+
+    User user = verificationToken.getUser();
 
     LOGGER.debug("Activating user {}", user.getId());
-    user = userDao.activateUserById(user.getId()).orElseThrow(() -> new RuntimeException("Couldn't activate user"));
+    user.setActive(true);
     userDao.deleteToken(token);
     return user;
   }
 
   @Override
+  @Transactional
   public User updatePasswordByToken(String token, String password) throws TokenExpiredException {
 
-    Optional<VerificationToken> maybeToken = userDao.getPasswordToken(token);
-    User user = getUserFromMaybeToken(maybeToken);
+    Optional<PasswordToken> maybeToken = userDao.getPasswordToken(token);
+    LOGGER.debug("GOT TOKEN {}", maybeToken.get().getToken());
+    LOGGER.debug("WITH UID {}", maybeToken.get().getUser().getId());
+    PasswordToken passwordToken = maybeToken.orElseThrow(TokenDoesNotExistException::new);
+    LocalDateTime expiryDate = passwordToken.getCreatedAt().plusDays(1);
+
+    if(LocalDateTime.now().isAfter(expiryDate)) {
+      LOGGER.warn("verificationToken {} is expired", passwordToken.getToken());
+      throw new TokenExpiredException();
+    }
+
+    User user = passwordToken.getUser();
 
     updateUser(user.getId(), 
                 user.getName(),
@@ -145,7 +164,7 @@ public class UserServiceImpl implements UserService {
                 user.getEmail(),
                 user.getPhone());
 
-    userDao.deleteAssociatedPasswordTokens(token);
+    userDao.deleteAssociatedPasswordTokens(user);
     return user;
   }
 
@@ -156,31 +175,32 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public boolean isTheRestaurantOwner(long userId, long restaurantId) {
-    return userDao.isTheRestaurantOwner(userId, restaurantId);
+    User user = userDao.findById(userId).orElseThrow(UserNotFoundException::new);
+    return user
+      .getOwnedRestaurants()
+      .stream()
+      .filter((r) -> r.getId().equals(restaurantId))
+      .findFirst()
+      .isPresent();
   }
 
   @Override
   public boolean isRestaurantOwner(long userId) {
-     return userDao.isRestaurantOwner(userId);
+    User user = userDao.findById(userId).orElseThrow(UserNotFoundException::new);
+     return user.getOwnedRestaurants().size() > 0;
   }
 
 
   @Override
+  @Transactional
   public void updateUser(long id, String username, String password, String firstName, String lastName, String email, String phone) {
-    userDao.updateUser(id, username, password, firstName, lastName, email, phone);
+    User user = userDao.findById(id).orElseThrow(UserNotFoundException::new);
+    user.setUsername(username);
+    user.setPassword(password);
+    user.setFirstName(firstName);
+    user.setLastName(lastName);
+    user.setEmail(email);
+    user.setPhone(phone);
   }
 
-  private User getUserFromMaybeToken(Optional<VerificationToken> maybeToken) throws TokenExpiredException {
-    VerificationToken verificationToken = maybeToken.orElseThrow(TokenDoesNotExistException::new);
-    LocalDateTime expiryDate = verificationToken.getCreatedAt().plusDays(1);
-
-    if(LocalDateTime.now().isAfter(expiryDate)) {
-      LOGGER.warn("verificationToken {} is expired", verificationToken.getToken());
-      throw new TokenExpiredException();
-    }
-
-
-    Optional<User> maybeUser = userDao.findById(verificationToken.getUserId());
-    return maybeUser.orElseThrow(()-> new RuntimeException("Invalid user id"));
-  }
 }
