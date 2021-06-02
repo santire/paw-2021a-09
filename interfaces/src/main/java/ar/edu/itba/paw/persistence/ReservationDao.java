@@ -1,6 +1,8 @@
 package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.model.Reservation;
+import ar.edu.itba.paw.model.Restaurant;
+import ar.edu.itba.paw.model.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,7 +11,7 @@ import java.util.Optional;
 public interface ReservationDao {
 
     // CREATE
-    public Reservation addReservation(long userId, long restaurantId, LocalDateTime date, long quantity);
+    public Reservation addReservation(User user, Restaurant restaurant, LocalDateTime date, long quantity);
 
     // READ
     public List<Reservation> findByUser(long userId);
@@ -24,13 +26,13 @@ public interface ReservationDao {
     public int findConfirmedByRestaurantPageCount(int amountOnPage, long restaurantId, LocalDateTime currentTime);
     public int findPendingByRestaurantPageCount(int amountOnPage, long restaurantId, LocalDateTime currentTime);
 
-    public Optional<Reservation> findById(int id);
+    public Optional<Reservation> findById(long id);
 
     // UPDATE
-    public Optional<Reservation> modifyReservation(int reservationId, LocalDateTime date, long quantity);
-    public boolean confirmReservation(int reservationId);
+    public Optional<Reservation> modifyReservation(long reservationId, LocalDateTime date, long quantity);
+    public boolean confirmReservation(long reservationId);
 
     // DESTROY
-    public boolean cancelReservation(int id);
+    public boolean cancelReservation(long id);
 
 }

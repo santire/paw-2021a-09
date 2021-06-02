@@ -46,6 +46,10 @@
       <artifactId>spring-jdbc</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-orm</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
     </dependency>
@@ -83,26 +87,26 @@
     <dependency>
       <groupId>ar.edu.itba.paw</groupId>
       <artifactId>interfaces</artifactId>
-      <version>${parent.version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
       <groupId>ar.edu.itba.paw</groupId>
       <artifactId>services</artifactId>
-      <version>${parent.version}</version>
+      <version>${project.parent.version}</version>
       <scope>runtime</scope>
     </dependency>
     <!-- this is for missing libraries in Java 9+ -->
     <!-- API, java.xml.bind module -->
     <dependency>
-      <groupId>jakarta.xml.bind</groupId>
-      <artifactId>jakarta.xml.bind-api</artifactId>
+      <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-api</artifactId>
     </dependency>
 
     <!-- Runtime, com.sun.xml.bind module -->
-    <dependency>
-      <groupId>org.glassfish.jaxb</groupId>
-      <artifactId>jaxb-runtime</artifactId>
-    </dependency>
+    <!-- <dependency> -->
+      <!-- <groupId>org.glassfish.jaxb</groupId> -->
+      <!-- <artifactId>jaxb-runtime</artifactId> -->
+    <!-- </dependency> -->
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>

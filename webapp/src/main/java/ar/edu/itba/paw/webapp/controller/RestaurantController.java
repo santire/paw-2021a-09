@@ -34,6 +34,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -56,8 +57,8 @@ public class RestaurantController {
     @Autowired
     private RestaurantService restaurantService;
 
-    @Autowired
-    private RatingService ratingService;
+    // @Autowired
+    // private RatingService ratingService;
 
     @Autowired
     private LikesService likesService;
@@ -89,18 +90,22 @@ public class RestaurantController {
         mav.addObject("maxPages", maxPages);
 
         if(loggedUser != null){
-            Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
+            // Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
             boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
             if (isTheRestaurantOwner) {
                 mav.addObject("isTheOwner", true);
             }
 
+
+
             mav.addObject("userRatingToRestaurant", 0);
 
-            if(userRating.isPresent()){
-                mav.addObject("rated", true);
-                mav.addObject("userRatingToRestaurant", userRating.get().getRating());
-            }
+
+            // if(userRating.isPresent()){
+                // mav.addObject("rated", true);
+                // mav.addObject("userRatingToRestaurant", userRating.get().getRating());
+            // }
+
             mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
             List<String> times = restaurantService.availableStringTime(restaurantId);
             mav.addObject("times", times);
@@ -225,8 +230,10 @@ public class RestaurantController {
         }
         if(loggedUser != null){
             LOGGER.debug("Creating restaurant for user {}", loggedUser.getName());
+            List<Tags> tagList = Arrays.asList(form.getTags()).stream().map((i) -> Tags.valueOf(i)).collect(Collectors.toList());
+            LOGGER.debug("tags: {}", tagList);
             final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
-                    form.getPhoneNumber(), 0, loggedUser.getId());
+                    form.getPhoneNumber(), tagList, loggedUser);
             updateAuthorities(loggedUser);
             if (form.getProfileImage() != null && !form.getProfileImage().isEmpty()) {
                 try {
@@ -235,9 +242,6 @@ public class RestaurantController {
                 } catch (IOException e) {
                     LOGGER.error("error while setting restaurant profile image");
                 }
-            }
-            for( Integer i :form.getTags()){
-                restaurantService.addTag(restaurant.getId(),Tags.valueOf(i));
             }
 
 
@@ -323,6 +327,7 @@ public class RestaurantController {
         }
 
 
+        /*
         Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
         if(userRating.isPresent()){
             ratingService.modifyRestaurantRating(loggedUser.getId(),restaurantId,(int)ratingForm.getRating());
@@ -330,6 +335,8 @@ public class RestaurantController {
         else{
             ratingService.rateRestaurant(loggedUser.getId(),restaurantId,(int)ratingForm.getRating());
         }
+         */
+
 
 
         return new ModelAndView("redirect:/restaurant/" + restaurantId);

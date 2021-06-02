@@ -8,5 +8,4 @@ public interface LikesService {
     public boolean like(long userId, long restaurantId);
     public boolean dislike(long userId, long restaurantId);
     public boolean userLikesRestaurant(long userId, long restaurantId);
-    public List<Restaurant> getLikedRestaurants(long userId);
 }

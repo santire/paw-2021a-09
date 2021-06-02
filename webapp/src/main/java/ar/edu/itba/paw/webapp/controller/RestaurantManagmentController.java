@@ -2,10 +2,12 @@ package ar.edu.itba.paw.webapp.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -76,10 +78,8 @@ public class RestaurantManagmentController {
                     mav.addObject("restaurant", restaurant);
 
                     mav.addObject("tags", Tags.allTags());
-                    List<Integer> tagsChecked = new ArrayList<>();
-                    for( Tags t :restaurantService.tagsInRestaurant(restaurantId)){
-                        tagsChecked.add(t.getValue());
-                    }
+                    // List<Integer> tagsChecked = new ArrayList<>();
+                    List<Integer> tagsChecked = restaurant.getTags().stream().map(t -> t.getValue()).collect(Collectors.toList());
                     mav.addObject("tagsChecked", tagsChecked);
 
 
@@ -110,8 +110,11 @@ public class RestaurantManagmentController {
         // but it doesn't hurt to escape a potential null pointer exception
         if (loggedUser != null) {
             LOGGER.debug("Updating restaurant for user {}", loggedUser.getName());
+            List<Tags> tagList = Arrays.asList(form.getTags()).stream().map((i) -> Tags.valueOf(i)).collect(Collectors.toList());
+            LOGGER.debug("tags: {}", tagList);
+
             final Restaurant restaurant = restaurantService
-                .updateRestaurant(restaurantId, form.getName(), form.getAddress(), form.getPhoneNumber())
+                .updateRestaurant(restaurantId, form.getName(), form.getAddress(), form.getPhoneNumber(), tagList)
                 .orElseThrow(RestaurantNotFoundException::new);
 
             if (form.getProfileImage() != null && !form.getProfileImage().isEmpty()) {
@@ -122,14 +125,6 @@ public class RestaurantManagmentController {
                     LOGGER.error("error while setting restaurant profile image");
                 }
             }
-
-            for( Tags t :restaurantService.tagsInRestaurant(restaurantId)){
-                restaurantService.removeTag(restaurantId,t);
-            }
-            for( Integer i :form.getTags()){
-                restaurantService.addTag(restaurantId,Tags.valueOf(i));
-            }
-
 
             return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
         }
@@ -167,7 +162,7 @@ public class RestaurantManagmentController {
             final ModelAndView mav =  new ModelAndView("managePendingReservations");
             Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
             if(restaurant.isPresent()){
-                if(restaurant.get().getUserId() != loggedUser.getId()){
+                if(restaurant.get().getOwner().getId() != loggedUser.getId()){
                     return new ModelAndView("redirect:/403");
                 }
                 int maxPages = reservationService.findPendingByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
@@ -203,7 +198,7 @@ public class RestaurantManagmentController {
             final ModelAndView mav =  new ModelAndView("manageConfirmedReservations");
             Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
             if(restaurant.isPresent()){
-                if(restaurant.get().getUserId() != loggedUser.getId()){
+                if(restaurant.get().getOwner().getId() != loggedUser.getId()){
                     return new ModelAndView("redirect:/403");
                 }
                 int maxPages = reservationService.findConfirmedByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);

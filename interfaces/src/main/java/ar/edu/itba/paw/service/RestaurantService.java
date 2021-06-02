@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface RestaurantService {
 
     // CREATE
-    public Restaurant registerRestaurant(String name, String address, String phoneNumber, float rating, long userId);
+    public Restaurant registerRestaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner);
     public boolean setImageByRestaurantId(Image image, long restaurantId);
 
     // READ
@@ -25,20 +25,21 @@ public interface RestaurantService {
     public int getRestaurantsFromOwnerPagesCount(int amountOnPage, long userId);
 
     public List<Restaurant> getPopularRestaurants(int limit, int minValue);
+    public List<Restaurant> getLikedRestaurantsPreview(int limit, long userId);
 
     public List<Restaurant> getAllRestaurants(int page, int amountOnPage);
     public List<Restaurant> findByName(String name);
 
 
 
-    public List<Restaurant> getHotRestaurants(int lastDays);
+    public List<Restaurant> getHotRestaurants(int limit, int lastDays);
 
 
     // UPDATE
-    public void updateName(long id, String name);
-    public void updateAddress(long id, String address);
-    public void updatePhoneNumber(long id, String phoneNumber);
-    public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber);
+    // public void updateName(long id, String name);
+    // public void updateAddress(long id, String address);
+    // public void updatePhoneNumber(long id, String phoneNumber);
+    public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber, List<Tags> tags);
 
     // DESTROY
     public boolean deleteRestaurantById(long id);
