@@ -32,26 +32,6 @@ public class ReservationJpaDao implements ReservationDao {
         return reservation;
     }
 
-    /*
-    @Override
-    public boolean setImageByRestaurantId(Image image, long restaurantId) {
-        final Optional<Restaurant> maybeRestaurant = findById(restaurantId);
-        if (!maybeRestaurant.isPresent()) {
-            return false;
-        }
-        Restaurant restaurant = maybeRestaurant.get();
-        restaurant.setProfileImage(image);
-        em.persist(restaurant);
-
-        return true;
-    }
-*/
-    // READ
-
-    @Override
-    public Optional<Reservation> findById(long id) {
-        return Optional.ofNullable(em.find(Reservation.class, id));
-    }
 
     @Override
     public List<Reservation> findConfirmedByRestaurant(int page, int amountOnPage, Restaurant restaurant) {
@@ -74,7 +54,7 @@ public class ReservationJpaDao implements ReservationDao {
     }
 
     @Override
-    public int findConfirmedByRestaurant(int amountOnPage, Restarurant restaurant {
+    public int findConfirmedByRestaurantPagesCount(int amountOnPage, Restarurant restaurant {
         Query nativeQuery = em.createNativeQuery("SELECT reservation_id FROM reservations WHERE restaurant_id LIKE ?1");
         nativeQuery.setParameter(1, "%" + restaurant.getId() + "%");
 
@@ -84,78 +64,26 @@ public class ReservationJpaDao implements ReservationDao {
         return pageAmount <= 0 ? 1 : pageAmount;
     }
 
-
-    
-
+    public Optional<Reservation> modifyReservation(Reservation reservation, LocalDateTime date, long quantity);
    
 
-    @Override
-    public List<Restaurant> getRestaurantsFilteredBy(int page, int amountOnPage, String name, List<Tags> tags,
-            double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays) {
-        // This one needs reservations
-        return null;
-    }
-
-    @Override
-    public int getRestaurantsFilteredByPageCount(int amountOnPage, String name, List<Tags> tags, double minAvgPrice,
-            double maxAvgPrice) {
-        // This one needs reservations
-        return 0;
-    }
-
-
-    @Override
-    public List<Restaurant> getAllLikedRestaurants(int page, int amountOnPage) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<Restaurant> getAllLikedRestaurantsPagesCount(int amountOnPage) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<Restaurant> getLikedRestaurantsPreview(int limit) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    // UPDATE
-    // These should be done from the service by modifying the instance (i think)
-
-    @Override
-    @Deprecated
-    public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber) {
-
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public void updateRating(long id, int rating) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    @Deprecated
-    public boolean addTag(long restaurantId, int tagId) {
-        return false;
-    }
-
-    // DELETE
 
     // TODO: refactor this to receive Restaurant entity not id
     @Override
-    public boolean deleteRestaurantById(long id) {
-        Optional<Restaurant> maybeRestaurant = findById(id);
+    public boolean cancelReservation(Reservation reservation) {
+        Optional<Restaurant> maybeRestaurant = reservation.getRestaurant();
         if (maybeRestaurant.isPresent()) {
             em.remove(maybeRestaurant.get());
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Reservation (User user, Restaurant restaurant, LocalDateTime date, long quantity){
+        final Reservaton reservation = new Reservation(user,restaurant,date,quantity);
+        em.persist(reservation);
+        return reservation;
     }
 
 }
