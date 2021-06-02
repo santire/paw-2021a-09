@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface ReservationService {
 
     // CREATE
-    public Reservation addReservation(long userId, long restaurantId, LocalDateTime date, long quantity);
+    public Reservation addReservation(long userId, Restaurant restaurant, LocalDateTime date, long quantity);
 
     // READ
     public List<Reservation> findByUser(User user);
