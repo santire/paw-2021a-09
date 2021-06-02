@@ -8,7 +8,7 @@
 <c:url value="/restaurant/${restaurant.getId()}/edit" var="postFormUrl"/>
 <sc:templateLayout >
   <jsp:body>
-        <div class="card border-0 mx-auto w-75">
+        <div class="card mx-auto w-50 mt-4 mb-4">
             <h2 class="text-center mt-4"><spring:message code="hello.restaurant.edit.title" /></h2>
             <div class="card body border-0">
                 <form:form
@@ -82,8 +82,8 @@
                             </div>
 
 
-                            <form:label class="px-3 mx-auto w-100" path="profileImage">
-                                <spring:message code="restaurant.edit.profileImage"/>
+                            <form:label class="px-3 mx-auto w-100 mt-3" path="profileImage">
+                                <b><spring:message code="restaurant.edit.profileImage"/></b>
                             </form:label>
                             <form:input class="px-3 mx-auto w-100" type="file" path="profileImage"/>
                             <form:errors path="profileImage" class="px-3 text-danger" element="p"/>

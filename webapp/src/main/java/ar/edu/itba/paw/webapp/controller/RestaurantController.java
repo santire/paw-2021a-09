@@ -114,6 +114,7 @@ public class RestaurantController {
             RedirectAttributes redirectAttributes) {
 
         LocalTime time;
+        LocalDate date;
         if (form != null && errors != null) {
             time = form.getTime();
             LocalTime currentTime = LocalTime.now();
@@ -129,6 +130,17 @@ public class RestaurantController {
                         "reservationForm.time",
                         "Select an hour from list");
             }
+
+            // Date validator
+            date = form.getDate();
+            LocalDate currentDate = LocalDate.now();
+            LocalDate yesterday = currentDate.minusDays(1);
+            LocalDate dateInAWeek = currentDate.plusDays(7);
+            if(date.isAfter(dateInAWeek) || date.isBefore(yesterday)){
+                errors.rejectValue("date",
+                        "reservationForm.date",
+                        "Select a valid date");
+            }
         }
         if (errors.hasErrors()) {
             return restaurant(loggedUser, form, menuForm,page, restaurantId);
@@ -136,6 +148,7 @@ public class RestaurantController {
 
         if (loggedUser != null) {
             time = form.getTime();
+            date = form.getDate();
             LocalDateTime todayAtDate = LocalDate.now().atTime(time.getHour(), time.getMinute());
             reservationService.addReservation(loggedUser.getId(), restaurantId, todayAtDate, Long.parseLong(form.getQuantity()));
             redirectAttributes.addFlashAttribute("madeReservation", true);

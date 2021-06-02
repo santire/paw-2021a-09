@@ -7,10 +7,11 @@
 <c:url value="/register/restaurant" var="postFormUrl"/>
 <sc:templateLayout >
   <jsp:body>
-    <h2 class="text-center mt-4 mb-4"><spring:message code="hello.register.restaurant.title" /></h2>
-    <div class="card border-0 mx-auto w-75">
-      <div class="card body border-0">
-        <form:form
+    <div class="card mx-auto w-50 mt-4 mb-4">
+        <div class="card body">
+            <h2 class="text-center mt-4 mb-4 card-title"><spring:message code="hello.register.restaurant.title" /></h2>
+
+            <form:form
            modelAttribute="RestaurantForm"
            action="${postFormUrl}"
            method="post"

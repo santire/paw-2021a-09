@@ -28,6 +28,7 @@
             <h6 class="card-title text-break text-center mb-5">${restaurant.getName()}</h6>
   <%--          <p class="text-secondary text-center">${restaurant.getLikes()} <i class="fa fa-cutlery" aria-hidden="true"></i></p>--%>
             <a href="<c:url value="/restaurant/${restaurant.getId()}"/>" class="btn btn-outline-secondary btn-block"><spring:message code="restaurants.seeMore" /></a>
+            <a href="<c:url value="/restaurant/${restaurant.getId()}/manage/pending"/>" class="btn btn-outline-warning btn-block"><spring:message code="myRestaurants.button.reservations" /></a>
         </div>
     </div>
 </div>
