@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum Tags {
+    ARABE(0),
     AMERICANO(1),
     ARGENTINO(2),
     ARMENIO(3),
@@ -29,8 +30,7 @@ public enum Tags {
     PESCADOSYMARISCOS(23),
     PICADAS(24),
     PIZZERIA(25),
-    VEGETARIANO(26),
-    ARABE(27);
+    VEGETARIANO(26);
 
     private int value;
     private static Map<Integer, Tags> map = new HashMap<>();

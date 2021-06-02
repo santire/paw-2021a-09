@@ -11,7 +11,7 @@
     <form>
       <input type="hidden" id="seatchinput" name="search" value="${searchString}">
       <div class="form-group">
-        <label for="tags">
+        <label class="w-100" for="tags">
           <spring:message code="restaurant.filters.tags"/>
         </label>
         <select 
@@ -49,10 +49,10 @@
       </div>
 
       <div class="form-group">
-        <label for="sortBy">
+        <label class="w-100" for="sortBy">
           <spring:message code="restaurant.filters.sortBy"/>
         </label>
-        <select 
+        <select
           name="sortBy"
           class="my-select selectpicker show-tick" 
           title="<spring:message code="restaurant.filters.${defaultSortType.getSortType()}"/>"
@@ -76,7 +76,7 @@
       </div>
 
       <div class="form-group">
-        <label for"order">
+        <label class="w-100" for="order">
           <spring:message code="restaurant.filters.orderBy"/>
         </label>
         <select

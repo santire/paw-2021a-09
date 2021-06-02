@@ -81,12 +81,21 @@
                                 </div>
                             </div>
 
-
                             <form:label class="px-3 mx-auto w-100 mt-3" path="profileImage">
                                 <b><spring:message code="restaurant.edit.profileImage"/></b>
                             </form:label>
-                            <form:input class="px-3 mx-auto w-100" type="file" path="profileImage"/>
+                            <div class="input-group">
+                                <div class="col-md-6">
+                                    <form:input class="px-3 mx-auto w-100" type="file" path="profileImage" id="image"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <form:button  id="reset" type="button" class="align-self-center">
+                                        <spring:message code="general.cancel"/>
+                                    </form:button>
+                                </div>
+                            </div>
                             <form:errors path="profileImage" class="px-3 text-danger" element="p"/>
+
                         </div>
                     </div>
                     <div>
