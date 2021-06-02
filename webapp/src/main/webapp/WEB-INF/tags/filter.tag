@@ -8,9 +8,9 @@
         <spring:message code="restaurant.filters"/>
       </h4>
     </div>
-    <form>
-      <input type="hidden" id="seatchinput" name="search" value="${searchString}">
-      <div class="form-group">
+    <form id="filter-form">
+      <input type="hidden" id="searchinput" name="search" value="${searchString}">
+      <div class="form-group" id="select-filter">
         <label class="w-100" for="tags">
           <spring:message code="restaurant.filters.tags"/>
         </label>
@@ -43,12 +43,12 @@
 
       <div class="form-group">
         <label for="minprice"><spring:message code="restaurant.filters.minPrice"/></label>
-        <input value="${minPrice}" type="number" id="minprice" name="min" min="0">
+        <input value="${minPrice}" type="number" id="minprice" name="min" min="0" max="10000">
         <label for="maxprice"><spring:message code="restaurant.filters.maxPrice"/></label>
-        <input value="${maxPrice}" type="number" id="maxprice" name="max" min="0">
+        <input value="${maxPrice}" type="number" id="maxprice" name="max" min="0" max="10000">
       </div>
 
-      <div class="form-group">
+      <div class="form-group" id="sort-filter">
         <label class="w-100" for="sortBy">
           <spring:message code="restaurant.filters.sortBy"/>
         </label>
@@ -75,7 +75,7 @@
         </select>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" id="order-filter">
         <label class="w-100" for="order">
           <spring:message code="restaurant.filters.orderBy"/>
         </label>

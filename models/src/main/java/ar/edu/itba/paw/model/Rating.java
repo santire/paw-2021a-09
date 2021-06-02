@@ -1,25 +1,74 @@
 package ar.edu.itba.paw.model;
 
-public class Rating {
-    private long userId;
-    private long restaurantId;
-    private int rating;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
-    public Rating(long userId, long restaurantId, int rating){
-        this.userId = userId;
-        this.restaurantId = restaurantId;
+@Entity
+@Table(name = "ratings")
+public class Rating {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ratings_rating_id_seq")
+    @SequenceGenerator(sequenceName = "ratings_rating_id_seq", name = "ratings_rating_id_seq", allocationSize = 1)
+    @Column(name = "rating_id")
+    private Long id;
+
+    @Column
+    private Double rating;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "restaurant_id")
+    private Restaurant restaurant;
+
+    Rating() {
+        // Just for hibernate
+    }
+
+    public Rating(double rating) {
         this.rating = rating;
     }
 
-    public int getRating() { return rating; }
+    public Long getId() {
+        return id;
+    }
 
-    public long getRestaurantId() { return restaurantId; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public long getUserId() { return userId; }
+    public Double getRating() {
+        return rating;
+    }
 
-    public void setRating(int rating) { this.rating = rating; }
+    public void setRating(Double rating) {
+        this.rating = rating;
+    }
 
-    public void setRestaurantId(long restaurantId) { this.restaurantId = restaurantId; }
+    public User getUser() {
+        return user;
+    }
 
-    public void setUserId(long userId) { this.userId = userId; }
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Restaurant getRestaurant() {
+        return restaurant;
+    }
+
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
+    }
+
 }

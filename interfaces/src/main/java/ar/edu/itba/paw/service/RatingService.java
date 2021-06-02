@@ -8,8 +8,8 @@ import java.util.Optional;
 
 public interface RatingService {
     public Optional<Rating> getRating(long userId, long restaurantId);
-    public List<Rating> getRatedRestaurantsByUserId(long userId);
-    public Rating rateRestaurant(long userId, long restaurantId, int rating);
-    public boolean modifyRestaurantRating(long userId, long restaurantId, int rating);
-    public boolean updateAvgRating(long restaurantId, int rating);
+    // public List<Rating> getRatedRestaurantsByUserId(long userId);
+    public Rating rateRestaurant(long userId, long restaurantId, double rating);
+    // public boolean modifyRestaurantRating(long userId, long restaurantId, double rating);
+    // public boolean updateAvgRating(long restaurantId, double rating);
 }

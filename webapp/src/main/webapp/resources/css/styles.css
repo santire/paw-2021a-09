@@ -246,3 +246,10 @@ a.dropdown-item.selected.active {
   flex: 50%;
   padding: 10px;
 }
+
+#rateYo {
+  height: 40px;
+}
+#select-filter,#sort-filter, #order-filter{
+  height: 60px;
+}
