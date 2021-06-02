@@ -25,8 +25,15 @@
   </div>
     <div class="card-body d-flex flex-column">
         <div class="mt-auto">
-            <h6 class="card-title text-break text-center mb-5">${restaurant.getName()}</h6>
-  <%--          <p class="text-secondary text-center">${restaurant.getLikes()} <i class="fa fa-cutlery" aria-hidden="true"></i></p>--%>
+            <h6 class="card-title text-break text-center mb-5" style="min-height: 35px;">${restaurant.getName()}</h6>
+            <div class="card-text d-flex flex-wrap justify-content-center align-items-center text-center mx-auto " style="min-height: 50px;">
+                <c:forEach items="${restaurant.getTags()}" var="tag">
+                    <div class=" border border rounded mr-2 mb-2 text-muted">
+                        &nbsp;<spring:message code="restaurant.tag.${tag.getValue()}"/>&nbsp;
+                    </div>
+                </c:forEach>
+            </div>
+            <p class="bt-0 mt-0 text-secondary text-center">${restaurant.getLikes()} <i class="fa fa-heart" aria-hidden="true"></i></p>
             <a href="<c:url value="/restaurant/${restaurant.getId()}"/>" class="btn btn-outline-secondary btn-block"><spring:message code="restaurants.seeMore" /></a>
             <a href="<c:url value="/restaurant/${restaurant.getId()}/manage/pending"/>" class="btn btn-outline-warning btn-block"><spring:message code="myRestaurants.button.reservations" /></a>
         </div>

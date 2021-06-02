@@ -30,7 +30,7 @@
             <img class="card-img-top img-fluid pull-right mr-5 pr-5" style="max-height: 380px; width: auto;" src="<c:url value="/resources/images/home_image.png"/>" alt="">
           </div>
         </div>
-        <div class="container my-2 mt-5">
+        <div class="mx-auto my-2 mt-5 w-75">
 
           <c:choose>
             <c:when test="${empty likedRestaurants}">
