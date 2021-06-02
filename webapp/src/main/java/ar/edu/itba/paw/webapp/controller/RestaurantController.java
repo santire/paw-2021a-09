@@ -150,7 +150,8 @@ public class RestaurantController {
             time = form.getTime();
             date = form.getDate();
             LocalDateTime todayAtDate = LocalDate.now().atTime(time.getHour(), time.getMinute());
-            reservationService.addReservation(loggedUser.getId(), restaurantId, todayAtDate, Long.parseLong(form.getQuantity()));
+            LocalDateTime dateAt = date.atTime(time.getHour(), time.getMinute());
+            reservationService.addReservation(loggedUser.getId(), restaurantId, dateAt, Long.parseLong(form.getQuantity()));
             redirectAttributes.addFlashAttribute("madeReservation", true);
         } else {
             return new ModelAndView("redirect:/register");

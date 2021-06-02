@@ -33,6 +33,25 @@
         <div class="container my-2 mt-5">
 
           <c:choose>
+            <c:when test="${empty likedRestaurants}">
+              <%--<h2 class="display-5"><spring:message code="home.noLikedRestaurantsFound" /></h2>--%>
+            </c:when>
+            <c:otherwise>
+              <h2 class="display-5" ><spring:message code="home.likedRestaurants" /></h2>
+              <div class="row mb-5">
+                <div class="owl-carousel owl-theme">
+                  <c:forEach var="restaurant" items="${likedRestaurants}" >
+                    <c:url value="/resources/images/resto1.jpg" var="restaurantImageUrl" />
+                    <sc:browseRestaurantCard
+                            restaurant="${restaurant}"
+                    />
+                  </c:forEach>
+                </div>
+              </div>
+            </c:otherwise>
+          </c:choose>
+
+          <c:choose>
             <c:when test="${empty hotRestaurants}">
               <%--<h2 class="display-5"><spring:message code="home.noLikedRestaurantsFound" /></h2>--%>
             </c:when>
@@ -42,7 +61,7 @@
                 <div class="owl-carousel owl-theme">
                   <c:forEach var="restaurant" items="${hotRestaurants}" >
                     <c:url value="/resources/images/resto1.jpg" var="restaurantImageUrl" />
-                    <sc:restaurantCard
+                    <sc:browseRestaurantCard
                             restaurant="${restaurant}"
                     />
                   </c:forEach>
@@ -61,7 +80,7 @@
                 <div class="owl-carousel owl-theme">
                   <c:forEach var="restaurant" items="${popularRestaurants}" >
                     <c:url value="/resources/images/resto1.jpg" var="restaurantImageUrl" />
-                    <sc:restaurantCard
+                    <sc:browseRestaurantCard
                       restaurant="${restaurant}"
                     />
                   </c:forEach>
@@ -70,25 +89,6 @@
             </c:otherwise>
           </c:choose>
 
-
-          <c:choose>
-            <c:when test="${empty likedRestaurants}">
-              <%--<h2 class="display-5"><spring:message code="home.noLikedRestaurantsFound" /></h2>--%>
-            </c:when>
-            <c:otherwise>
-              <h2 class="display-5" ><spring:message code="home.likedRestaurants" /></h2>
-              <div class="row mb-5">
-                <div class="owl-carousel owl-theme">
-                  <c:forEach var="restaurant" items="${likedRestaurants}" >
-                    <c:url value="/resources/images/resto1.jpg" var="restaurantImageUrl" />
-                    <sc:restaurantCard
-                            restaurant="${restaurant}"
-                    />
-                  </c:forEach>
-                </div>
-              </div>
-            </c:otherwise>
-          </c:choose>
         </div>
       </section>
     </main>

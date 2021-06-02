@@ -16,7 +16,9 @@ public interface ReservationDao {
     // READ
     public List<Reservation> findByUser(long userId);
     public List<Reservation> findByUser(int page, int amountOnPage, long userId, LocalDateTime currentTime);
+    public List<Reservation> findByUserHistory(int page, int amountOnPage, long userId, LocalDateTime currentTime);
     public int findByUserPageCount(int amountOnPage, long userId, LocalDateTime currentTime);
+    public int findByUserHistoryPageCount(int amountOnPage, long userId, LocalDateTime currentTime);
 
     public List<Reservation> findByRestaurant(long restaurantId);
     public List<Reservation> findByRestaurant(int page, int amountOnPage, long restaurantId);

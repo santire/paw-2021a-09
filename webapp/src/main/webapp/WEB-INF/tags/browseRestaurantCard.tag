@@ -11,8 +11,8 @@
      style="cursor: pointer;"
 >
     <c:choose>
-        <c:when test="${restaurant.getMaybeProfileImage().isPresent()}" >
-            <c:url value="data:image/jpg;base64,${restaurant.getMaybeProfileImage().get().getImageEnconded()}" var="imgUrl"/>
+        <c:when test="${not empty restaurant.getProfileImage()}" >
+            <c:url value="data:image/jpg;base64,${restaurant.getProfileImage().getImageEnconded()}" var="imgUrl"/>
         </c:when>
         <c:otherwise>
             <c:url value="/resources/images/noimage.jpg" var="imgUrl"/>
@@ -27,24 +27,18 @@
         />
     </div>
     <div class="card-body d-flex flex-column">
-        <div class="mt-auto">
+        <div class="mt-auto justify-content-center">
             <h6 class="card-title text-break text-center" style="min-height: 35px;">${restaurant.getName()}</h6>
-            <%-- <p class="card-text">${restaurant.getDescription()}</p> --%>
-            <%-- <p class="text-secondary text-center">${restaurant.getRating()}/10 <i class="fa fa-cutlery" aria-hidden="true"></i></p> --%>
-            <div class="card-text d-inline-flex flex-wrap justify-content-center align-items-center">
-                <div class=" border border rounded mr-2 mb-2 text-muted">
-                    &nbsp;<spring:message code="restaurant.tag.1"/>&nbsp;
-                </div>
-                <div class=" border border rounded mr-2 mb-2 text-muted">
-                    &nbsp;<spring:message code="restaurant.tag.3"/>&nbsp;
-                </div>
-                <div class=" border border rounded mr-2 mb-2 text-muted">
-                    &nbsp;<spring:message code="restaurant.tag.3"/>&nbsp;
-                </div>
-                <div class=" border border rounded mr-2 mb-2 text-muted">
-                    &nbsp;<spring:message code="restaurant.tag.4"/>&nbsp;
-                </div>
+
+            <div class="card-text d-inline-flex flex-wrap justify-content-center align-items-center text-center mx-auto" style="min-height: 70px;">
+                <c:forEach items="${restaurant.getTags()}" var="tag">
+                    <div class=" border border rounded mr-2 mb-2 text-muted">
+                        &nbsp;<spring:message code="restaurant.tag.${tag.getValue()}"/>&nbsp;
+                    </div>
+                </c:forEach>
             </div>
+            <p class="bt-0 mt-0 text-secondary text-center">${restaurant.getLikes()} <i class="fa fa-heart" aria-hidden="true"></i></p>
+
             <a href="<c:url value="/restaurant/${restaurant.getId()}"/>" class="btn btn-outline-secondary btn-block mt-3"><spring:message code="restaurants.seeMore" /></a>
         </div>
     </div>
