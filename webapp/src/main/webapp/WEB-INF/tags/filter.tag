@@ -42,9 +42,9 @@
       </div>
 
       <div class="form-group">
-        <label for="minprice"><spring:message code="restaurant.filters.minPrice"/></label>
+        <label class="w-100" for="minprice"><spring:message code="restaurant.filters.minPrice"/></label>
         <input value="${minPrice}" type="number" id="minprice" name="min" min="0" max="10000">
-        <label for="maxprice"><spring:message code="restaurant.filters.maxPrice"/></label>
+        <label class="w-100" for="maxprice"><spring:message code="restaurant.filters.maxPrice"/></label>
         <input value="${maxPrice}" type="number" id="maxprice" name="max" min="0" max="10000">
       </div>
 
