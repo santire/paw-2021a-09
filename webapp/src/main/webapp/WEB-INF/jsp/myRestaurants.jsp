@@ -7,7 +7,7 @@
     <jsp:body>
         <main>
             <section>
-                <div class="container mt-4">
+                <div class="mx-auto w-75 mt-4">
                     <c:choose>
                         <c:when test="${userHasRestaurants}">
                             <h2 class="display-5"><spring:message code="myRestaurants.title" /></h2>
