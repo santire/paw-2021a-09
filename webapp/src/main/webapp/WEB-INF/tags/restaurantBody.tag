@@ -38,9 +38,8 @@
           </c:if>
           </div>
 
-          <div class="row row-cols-6 m-0 p-0">
-            <p class="card-text"><medium class="text-muted">${restaurant.getRating()}<i class="text-muted fa fa-star checked pl-1"></i></medium></p>
-
+          <div class="row row-cols-6 mt-3 m-0 p-0">
+            <p class="m-0 b-0 card-text"><medium class="text-muted">${restaurant.getRating()}<i class="text-muted fa fa-star checked pl-1"></i></medium></p>
             <sc:like likeCount="${restaurant.getLikes()}"/>
           </div>
 
