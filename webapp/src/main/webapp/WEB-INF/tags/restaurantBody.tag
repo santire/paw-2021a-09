@@ -69,7 +69,11 @@
                       method="post"
                       id="ratingForm">
 
-                <div id="rateYo"></div>
+
+
+                  <div id="rateYo"></div>
+
+
                 <form:input
                         type="hidden"
                         min="0"

@@ -9,8 +9,8 @@
       </h4>
     </div>
     <form>
-      <input type="hidden" id="seatchinput" name="search" value="${searchString}">
-      <div class="form-group">
+      <input type="hidden" id="searchinput" name="search" value="${searchString}">
+      <div class="form-group" id="select-filter">
         <label for="tags">
           <spring:message code="restaurant.filters.tags"/>
         </label>
@@ -48,7 +48,7 @@
         <input value="${maxPrice}" type="number" id="maxprice" name="max" min="0">
       </div>
 
-      <div class="form-group">
+      <div class="form-group" id="sort-filter">
         <label for="sortBy">
           <spring:message code="restaurant.filters.sortBy"/>
         </label>
@@ -75,7 +75,7 @@
         </select>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" id="order-filter">
         <label for"order">
           <spring:message code="restaurant.filters.orderBy"/>
         </label>
@@ -118,7 +118,7 @@
                 value='<spring:message code="restaurant.filters.search"/>'
         />
       </div>
-
+      
     </form>
   </div>
 </div>
