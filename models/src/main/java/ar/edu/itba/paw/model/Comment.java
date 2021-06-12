@@ -34,6 +34,10 @@ public class Comment {
         this.userComment = userComment;
     }
 
+    public Comment(String userComment){
+        this.userComment = userComment;
+    }
+
     public Long getId() { return id; }
 
     public void setId(Long id) { this.id = id; }

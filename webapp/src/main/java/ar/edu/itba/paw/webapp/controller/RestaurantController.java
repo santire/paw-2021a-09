@@ -47,6 +47,7 @@ public class RestaurantController {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
     private static final int AMOUNT_OF_MENU_ITEMS = 8;
     private static final int AMOUNT_OF_RESTAURANTS = 10;
+    private static final int AMOUNT_OF_REVIEWS = 4;
 
     @Autowired
     private UserService userService;
@@ -65,6 +66,9 @@ public class RestaurantController {
 
     @Autowired
     private MenuService menuService;
+
+    @Autowired
+    private CommentService commentService;
 
 
 
@@ -114,6 +118,54 @@ public class RestaurantController {
         LOGGER.error("page value: {}", page);
         mav.addObject("restaurant",
                 restaurantService.findByIdWithMenu(restaurantId, page, AMOUNT_OF_MENU_ITEMS).orElseThrow(RestaurantNotFoundException::new));
+        return mav;
+    }
+
+    @RequestMapping(path = { "/restaurant/{restaurantId}/reviews" }, method = RequestMethod.GET)
+    public ModelAndView restaurantReviews(@ModelAttribute("loggedUser") final User loggedUser,
+                                   @ModelAttribute("reservationForm") final ReservationForm form,
+                                   @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
+                                   @ModelAttribute("ratingForm") final RatingForm ratingForm,
+                                   @RequestParam(defaultValue="1") Integer page,
+                                   @PathVariable("restaurantId") final long restaurantId) {
+        final ModelAndView mav = new ModelAndView("restaurantReviews");
+
+        //int maxPages = restaurantService.findByIdWithMenuPagesCount(AMOUNT_OF_MENU_ITEMS, restaurantId);
+        int maxPages = commentService.findByRestaurantPageCount(AMOUNT_OF_REVIEWS, restaurantId);
+
+        if(page == null || page <1) {
+            page=1;
+        }else if (page > maxPages) {
+            page = maxPages;
+        }
+        mav.addObject("maxPages", maxPages);
+
+        if(loggedUser != null){
+            Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
+            boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
+            if (isTheRestaurantOwner) {
+                mav.addObject("isTheOwner", true);
+            }
+
+
+
+            mav.addObject("userRatingToRestaurant", 0);
+
+
+            if(userRating.isPresent()){
+                mav.addObject("rated", true);
+                mav.addObject("userRatingToRestaurant", userRating.get().getRating());
+            }
+
+            mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
+            List<String> times = restaurantService.availableStringTime(restaurantId);
+            mav.addObject("times", times);
+        }
+
+        LOGGER.error("page value: {}", page);
+        mav.addObject("restaurant",
+                restaurantService.findByIdWithMenu(restaurantId, page, AMOUNT_OF_MENU_ITEMS).orElseThrow(RestaurantNotFoundException::new));
+        mav.addObject("reviews", commentService.findByRestaurant(page, AMOUNT_OF_REVIEWS, restaurantId));
         return mav;
     }
 
