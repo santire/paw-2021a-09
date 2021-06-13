@@ -72,7 +72,6 @@
 
                   <div id="rateYo"></div>
 
-
                 <form:input
                         type="hidden"
                         min="0"
@@ -86,6 +85,10 @@
             </c:if>
           </c:if>
 
+
+          <c:if test="${facebook}"><i id="linkFacebook" onclick="javascript:openFacebook()" value="${restaurant.facebook}" class="fa fa-facebook"></i></c:if>
+          <c:if test="${twitter}"><i id="linkTwitter" onclick="javascript:openTwitter()" value="${restaurant.twitter}" class="fa fa-twitter"></i></c:if>
+          <c:if test="${instagram}"><i id="linkInstagram" onclick="javascript:openInstagram()" value="${restaurant.instagram}" class="fa fa-instagram"></i></c:if>
 
           <c:if test="${not empty isTheOwner}">
               <div class="mt-4">

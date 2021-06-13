@@ -27,6 +27,14 @@ public class RestaurantForm {
 
     private Integer[] tags;
 
+    @Pattern(regexp = "(^((ftp|http|https):\\/\\/)?(www.)?(?!.*(ftp|http|https|www.))facebook+\\.com+(\\/[a-zA-Z0-9#]+\\/?)$)|(^$)")
+    private String facebook;
+    @Pattern(regexp = "(^((ftp|http|https):\\/\\/)?(www.)?(?!.*(ftp|http|https|www.))instagram+\\.com+(\\/[a-zA-Z0-9#]+\\/?)$)|(^$)")
+    private String instagram;
+    @Pattern(regexp = "(^((ftp|http|https):\\/\\/)?(www.)?(?!.*(ftp|http|https|www.))twitter+\\.com+(\\/[a-zA-Z0-9#]+\\/?)$)|(^$)")
+    private String twitter;
+
+
     public Integer[] getTags() {
         return tags;
     }
@@ -39,8 +47,16 @@ public class RestaurantForm {
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
     public void setProfileImage(MultipartFile profileImage) { this.profileImage = profileImage; }
 
+    public void setFacebook(String facebook) { this.facebook = facebook; }
+    public void setInstagram(String instagram) { this.instagram = instagram; }
+    public void setTwitter(String twitter) { this.twitter = twitter; }
+
     public String getName() { return name; }
     public String getAddress() { return address; }
     public String getPhoneNumber() { return phoneNumber; }
     public MultipartFile getProfileImage() { return profileImage; }
+
+    public String getFacebook() { return facebook; }
+    public String getInstagram() { return instagram; }
+    public String getTwitter() { return twitter; }
 }

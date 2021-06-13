@@ -66,8 +66,8 @@ public class RestaurantController {
     @Autowired
     private MenuService menuService;
 
-
-
+    @Autowired
+    private SocialMediaService socialMediaService;
 
 
 
@@ -89,14 +89,31 @@ public class RestaurantController {
         }
         mav.addObject("maxPages", maxPages);
 
+
+        Restaurant restaurant = restaurantService.findByIdWithMenu(restaurantId, page, AMOUNT_OF_MENU_ITEMS).orElseThrow(RestaurantNotFoundException::new);
+
+        mav.addObject("facebook", false);
+        mav.addObject("instagram", false);
+        mav.addObject("twitter", false);
+
+
+        if(restaurant.getFacebook() != null && !restaurant.getFacebook().isEmpty()){
+            mav.addObject("facebook", true);
+        }
+        if(restaurant.getInstagram() != null && !restaurant.getInstagram().isEmpty()){
+            mav.addObject("instagram", true);
+        }
+        if(restaurant.getTwitter() != null && !restaurant.getTwitter().isEmpty()){
+            mav.addObject("twitter", true);
+        }
+
+
         if(loggedUser != null){
             Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
             boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
             if (isTheRestaurantOwner) {
                 mav.addObject("isTheOwner", true);
             }
-
-
 
             mav.addObject("userRatingToRestaurant", 0);
 
@@ -112,8 +129,7 @@ public class RestaurantController {
         }
 
         LOGGER.error("page value: {}", page);
-        mav.addObject("restaurant",
-                restaurantService.findByIdWithMenu(restaurantId, page, AMOUNT_OF_MENU_ITEMS).orElseThrow(RestaurantNotFoundException::new));
+        mav.addObject("restaurant", restaurant);
         return mav;
     }
 
@@ -236,6 +252,19 @@ public class RestaurantController {
             final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
                     form.getPhoneNumber(), tagList, loggedUser);
             updateAuthorities(loggedUser);
+
+            if (form.getFacebook() != null){
+                socialMediaService.updateFacebook(form.getFacebook(), restaurant.getId());
+            }
+            if (form.getInstagram() != null){
+                socialMediaService.updateInstagram(form.getInstagram(), restaurant.getId());
+            }
+            if (form.getTwitter() != null){
+                socialMediaService.updateTwitter(form.getTwitter(), restaurant.getId());
+            }
+
+
+
             if (form.getProfileImage() != null && !form.getProfileImage().isEmpty()) {
                 try {
                 Image image = new Image(form.getProfileImage().getBytes());

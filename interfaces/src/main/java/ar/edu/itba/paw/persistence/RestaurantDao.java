@@ -39,6 +39,7 @@ public interface RestaurantDao {
     public void updateRating(long id, int rating);
 
 
+
     // DESTROY
     public boolean deleteRestaurantById(long id);
     public boolean addTag(long restaurantId, int tagId);

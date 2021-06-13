@@ -73,6 +73,16 @@ public class Restaurant {
     @OneToMany(orphanRemoval = true, mappedBy = "restaurant")
     private List<Rating> ratings;
 
+    @Column(length = 100)
+    private String facebook;
+
+    @Column(length = 100)
+    private String instagram;
+
+    @Column(length = 100)
+    private String twitter;
+
+
     // private List<Reservation> reservations; ?
 
     Restaurant() {
@@ -139,6 +149,12 @@ public class Restaurant {
     public List<Tags> getTags() {return this.tags;}
     public Image getProfileImage() { return this.profileImage; }
 
+    public String getFacebook() { return facebook; }
+    public String getInstagram() { return instagram; }
+    public String getTwitter() { return twitter; }
+
+
+
     public void setId(Long id) { this.id = id; }
     public void setName(String name) { this.name = name; }
     public void setAddress(String address) { this.address = address; }
@@ -149,4 +165,9 @@ public class Restaurant {
     public void setTags(List<Tags> tags) { this.tags = tags; }
     public void addMenuItem(MenuItem menuItem) { this.menu.add(menuItem); }
     public void setProfileImage(Image profileImage) { this.profileImage = profileImage; }
+
+    public void setFacebook(String facebook) { this.facebook = facebook; }
+    public void setInstagram(String instagram) { this.instagram = instagram; }
+    public void setTwitter(String twitter) { this.twitter = twitter; }
+
 }

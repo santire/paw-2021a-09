@@ -383,6 +383,7 @@ public class RestaurantJpaDao implements RestaurantDao {
 
     }
 
+
     @Override
     @Deprecated
     public boolean addTag(long restaurantId, int tagId) {

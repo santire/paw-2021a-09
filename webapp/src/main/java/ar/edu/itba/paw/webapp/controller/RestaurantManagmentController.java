@@ -1,7 +1,6 @@
 package ar.edu.itba.paw.webapp.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -11,6 +10,7 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import ar.edu.itba.paw.service.SocialMediaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +54,9 @@ public class RestaurantManagmentController {
     @Autowired
     private RestaurantService restaurantService;
 
+    @Autowired
+    private SocialMediaService socialMediaService;
+
 
     // Edit restaurant
     @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.GET)
@@ -75,6 +78,17 @@ public class RestaurantManagmentController {
                     if(form.getPhoneNumber() != null && !form.getPhoneNumber().isEmpty()) {
                         restaurant.setPhoneNumber(form.getPhoneNumber());
                     }
+                    if(form.getFacebook() != null && !form.getFacebook().isEmpty()) {
+                        restaurant.setFacebook(form.getFacebook());
+                    }
+                    if(form.getInstagram() != null && !form.getInstagram().isEmpty()) {
+                        restaurant.setInstagram(form.getInstagram());
+                    }
+                    if(form.getTwitter() != null && !form.getTwitter().isEmpty()) {
+                        restaurant.setTwitter(form.getTwitter());
+                    }
+
+
                     mav.addObject("restaurant", restaurant);
 
                     mav.addObject("tags", Tags.allTags());
@@ -116,6 +130,19 @@ public class RestaurantManagmentController {
             final Restaurant restaurant = restaurantService
                 .updateRestaurant(restaurantId, form.getName(), form.getAddress(), form.getPhoneNumber(), tagList)
                 .orElseThrow(RestaurantNotFoundException::new);
+
+
+            if (form.getFacebook() != null){
+                socialMediaService.updateFacebook(form.getFacebook(), restaurant.getId());
+            }
+            if (form.getInstagram() != null){
+                socialMediaService.updateInstagram(form.getInstagram(), restaurant.getId());
+            }
+            if (form.getTwitter() != null){
+                socialMediaService.updateTwitter(form.getTwitter(), restaurant.getId());
+            }
+            //SOSS
+            System.out.println(form.getFacebook() + " " + form.getInstagram() + " " + form.getTwitter());
 
             if (form.getProfileImage() != null && !form.getProfileImage().isEmpty()) {
                 try {

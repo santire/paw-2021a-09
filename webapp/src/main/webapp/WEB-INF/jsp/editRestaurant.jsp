@@ -49,6 +49,29 @@
                             </form:label>
                             <form:errors path="phoneNumber" class="px-3 text-danger" element="p"/>
 
+                            <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+
+                            <i class="px-3 mx-auto w-100"><spring:message code="restaurant.socialmedia" /></i>
+
+                            <form:label class="px-3 mx-auto w-100" path="facebook">
+                                <spring:message code="restaurant.socialmedia.facebook" />:
+                                <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="text" placeholder="www.facebook.com/myprofile" path="facebook"  value="${restaurant.facebook}"/>
+                            </form:label>
+                            <form:errors path="facebook" class="px-3 text-danger" element="p"/>
+
+                            <form:label class="px-3 mx-auto w-100" path="instagram">
+                                <spring:message code="restaurant.socialmedia.instagram" />:
+                                <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="text" placeholder="www.instagram.com/myprofile"  path="instagram" value="${restaurant.instagram}"/>
+                            </form:label>
+                            <form:errors path="instagram" class="px-3 text-danger" element="p"/>
+
+                            <form:label class="px-3 mx-auto w-100" path="twitter">
+                                <spring:message code="restaurant.socialmedia.twitter" />:
+                                <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="text" placeholder="www.twitter.com/myprofile"  path="twitter" value="${restaurant.twitter}"/>
+                            </form:label>
+                            <form:errors path="twitter" class="px-3 text-danger" element="p"/>
+
+                            <hr style="height:2px;border-width:0;color:gray;background-color:gray">
 
                             <div class="container">
                                 <spring:message code="restaurant.edit.tags" />
@@ -80,6 +103,8 @@
                                     </c:forEach>
                                 </div>
                             </div>
+
+                            <hr style="height:2px;border-width:0;color:gray;background-color:gray">
 
                             <form:label class="px-3 mx-auto w-100 mt-3" path="profileImage">
                                 <b><spring:message code="restaurant.edit.profileImage"/></b>

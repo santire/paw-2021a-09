@@ -54,6 +54,29 @@
                   </div>
                   <form:errors path="profileImage" class="px-3 text-danger" element="p"/>
 
+
+                  <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+
+                  <spring:message code="restaurant.socialmedia" />
+
+                  <form:label class="px-3 mx-auto w-100" path="facebook">
+                      <spring:message code="restaurant.socialmedia.facebook" />:
+                      <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="text" placeholder="www.facebook.com/myprofile" path="facebook"/>
+                  </form:label>
+                  <form:errors path="facebook" class="px-3 text-danger" element="p"/>
+
+                  <form:label class="px-3 mx-auto w-100" path="instagram">
+                      <spring:message code="restaurant.socialmedia.instagram" />:
+                      <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="text" placeholder="www.instagram.com/myprofile" path="instagram"/>
+                  </form:label>
+                  <form:errors path="instagram" class="px-3 text-danger" element="p"/>
+
+                  <form:label class="px-3 mx-auto w-100" path="twitter">
+                      <spring:message code="restaurant.socialmedia.twitter" />:
+                      <form:input class="px-1 mx-auto w-100 input-group-text text-left" type="text" placeholder="www.twitter.com/myprofile" path="twitter"/>
+                  </form:label>
+                  <form:errors path="twitter" class="px-3 text-danger" element="p"/>
+
                   <hr style="height:2px;border-width:0;color:gray;background-color:gray">
 
                   <div class="container">

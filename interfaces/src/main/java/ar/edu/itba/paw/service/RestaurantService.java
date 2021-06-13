@@ -41,6 +41,8 @@ public interface RestaurantService {
     // public void updatePhoneNumber(long id, String phoneNumber);
     public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber, List<Tags> tags);
 
+
+
     // DESTROY
     public boolean deleteRestaurantById(long id);
     public boolean deleteRestaurantByName(String name);
