@@ -148,7 +148,7 @@ public class UserController {
             LOGGER.warn("token {} does not exist", token);
             return new ModelAndView("requestedResetPassword").addObject("invalidToken", true);
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             // Unexpected error happened, showing register screen with generic error message
             return new ModelAndView("redirect:/login").addObject("tokenError", true);
         }

@@ -45,7 +45,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
         try {
             key = getFileFromResources("key.txt");
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
 
 
