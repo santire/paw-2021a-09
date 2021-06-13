@@ -106,10 +106,10 @@
 
     <ul class="nav nav-pills nav-fill navtop mb-5">
       <li class="nav-item">
-        <a class="nav-link active"  href="#">Menu</a>
+        <a class="nav-link active"  href="#"><spring:message code="restaurant.menu.title"/></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="<c:url value="/restaurant/${restaurant.getId()}/reviews"/>">Reviews</a>
+        <a class="nav-link" href="<c:url value="/restaurant/${restaurant.getId()}/reviews"/>"><spring:message code="restaurant.reviews.title"/></a>
       </li>
     </ul>
 
@@ -166,9 +166,6 @@
     </c:choose>
     </div>
   </div>
-
-
-
 
 </div>
 

@@ -110,10 +110,10 @@
 
         <ul class="nav nav-pills nav-fill navtop mb-5">
             <li class="nav-item">
-                <a class="nav-link"  href="<c:url value="/restaurant/${restaurant.getId()}"/>">Menu</a>
+                <a class="nav-link"  href="<c:url value="/restaurant/${restaurant.getId()}"/>"><spring:message code="restaurant.menu.title"/></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link active" href="#">Reviews</a>
+                <a class="nav-link active" href="#"><spring:message code="restaurant.reviews.title"/></a>
             </li>
         </ul>
 
@@ -137,7 +137,7 @@
                     </c:when>
                     <%--USER NEVER MADE A COMMENT--%>
                     <c:otherwise>
-                        <h5 class="display-5 text-center mt-4 mb-5">How was your experience in this restaurant?</h5>
+                        <h5 class="display-5 text-center mt-4 mb-5"><spring:message code="restaurant.reviews.create.title"/></h5>
                         <c:url value="/restaurant/${restaurant.getId()}/reviews" var="addReviewPath"/>
                         <form action="${addReviewPath}" method="post">
                             <div class="input-group">
@@ -147,7 +147,7 @@
                                 <textarea class="form-control" style="resize: none" name="review" aria-label="Review"></textarea>
                             </div>
                             <div class="mt-2 d-flex justify-content-end">
-                                <button class="btn btn-outline-warning">Send review</button>
+                                <button class="btn btn-outline-warning"><spring:message code="restaurant.reviews.create.send"/></button>
                             </div>
                         </form>
                         <hr style="height:2px;border-width:0;color:gray;background-color:gray">
@@ -157,7 +157,7 @@
                 <c:choose>
                     <%--WHEN THERE ARE NO REVIEWS--%>
                     <c:when test="${empty reviews}">
-                        <h2 class="display-5 text-center mt-4 mb-5">This restaurant has no reviews yet</h2>
+                        <h2 class="display-5 text-center mt-4 mb-5"><spring:message code="restaurant.reviews.noReviews"/></h2>
                     </c:when>
                     <%--WHEN THERE ARE MORE REVIEWS--%>
                     <c:otherwise>
