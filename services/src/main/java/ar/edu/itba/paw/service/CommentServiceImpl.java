@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,9 +32,9 @@ public class CommentServiceImpl implements CommentService {
     public Comment addComment(long userId, long restaurantId, String comment){
         Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
         User user = userService.findById(userId).orElseThrow(UserNotFoundException::new);
-        User owner = restaurant.getOwner();
+        LocalDateTime currentDate = LocalDateTime.now();
 
-        return commentDao.addComment(user, restaurant, comment);
+        return commentDao.addComment(user, restaurant, comment, currentDate);
     }
 
     // READ

@@ -10,6 +10,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -25,8 +26,8 @@ public class CommentJpaDao implements CommentDao {
     // CREATE
 
     @Override
-    public Comment addComment(User user, Restaurant restaurant, String comment){
-        final Comment userComment = new Comment(comment);
+    public Comment addComment(User user, Restaurant restaurant, String comment, LocalDateTime date){
+        final Comment userComment = new Comment(comment, date);
         userComment.setUser(user);
         userComment.setRestaurant(restaurant);
         em.persist(userComment);
@@ -43,7 +44,7 @@ public class CommentJpaDao implements CommentDao {
     @Override
     public Optional<Comment> findByUserAndRestaurantId(long userId, long restaurantId){
         Query nativeQuery = em.createNativeQuery(
-                "SELECT comment_id FROM comments WHERE user_id = :userId and restaurant_id = :restaurantId");
+                "SELECT comment_id FROM comments WHERE user_id = :userId and restaurant_id = :restaurantId ORDER BY date ASC");
         nativeQuery.setParameter("userId", userId);
         nativeQuery.setParameter("restaurantId", restaurantId);
 
@@ -56,18 +57,6 @@ public class CommentJpaDao implements CommentDao {
         query.setParameter("filteredId", filteredId);
         return query.getResultList().stream().findFirst();
     }
-
-    /*        Query nativeQuery = em.createQuery(
-                "SELECT * FROM comments"
-                        +
-                        " WHERE restaurant_id = :restaurantId"
-                        +
-                        " AND user_id = :userId"
-                , Comment.class);
-        nativeQuery.setParameter("restaurantId", restaurantId);
-        nativeQuery.setParameter("userId", userId);
-        return Optional.ofNullable((Comment) nativeQuery.getSingleResult());*/
-
 
 
     @Override

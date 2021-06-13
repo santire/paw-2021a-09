@@ -196,7 +196,7 @@
                                             <small class="font-weight-bold text-primary">${review.getUser().getUsername()}</small>
                                             <small class="font-weight-bold">${review.getUserComment()}</small>
                                         </span>
-                                    </div> <small>2 days ago</small>
+                                    </div> <small>${review.getDate().toLocalDate()}</small>
                                 </div>
                             </div>
                         </c:forEach>
