@@ -7,6 +7,8 @@
 <%@attribute name="restaurant" required="true" type="ar.edu.itba.paw.model.Restaurant"%>
 <%@attribute name="times" required="true" type="java.util.List"%>
 <%@attribute name="reviews" required="true" type="java.util.List"%>
+<%@attribute name="userMadeComment" required="true" type="java.lang.Boolean"%>
+<%@attribute name="userReview" required="false" type="ar.edu.itba.paw.model.Comment"%>
 
 
 <div class="container">
@@ -115,30 +117,98 @@
             </li>
         </ul>
 
-        <%-- <h3 class="pb-1 text-center border-bottom">Menu</h3>--%>
         <c:choose>
-            <c:when test="${ reviews.size() == 0 }">
-                <h2 class="display-5 text-center">This restaurant has no reviews yet</h2>
-            </c:when>
-            <c:otherwise>
-                <%--REVIEWS--%>
-                <div class="card p-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="user d-flex flex-row align-items-center"> <img src="https://i.imgur.com/hczKIze.jpg" width="30" class="user-img rounded-circle mr-2"> <span><small class="font-weight-bold text-primary">james_olesenn</small> <small class="font-weight-bold">Hmm, This poster looks cool</small></span> </div> <small>2 days ago</small>
-                    </div>
-                    <div class="action d-flex justify-content-between mt-2 align-items-center">
-                        <div class="reply px-4"> <small>Remove</small> <span class="dots"></span> <small>Reply</small> <span class="dots"></span> <small>Translate</small> </div>
-                        <div class="icons align-items-center"> <i class="fa fa-star text-warning"></i> <i class="fa fa-check-circle-o check-icon"></i> </div>
-                    </div>
-                </div>
+            <%--WHEN USER IS LOGGED--%>
+            <c:when test="${not empty loggedUser}">
+                <c:choose>
+                    <%--WHEN USER ALREADY MADE A COMMENT--%>
+                    <c:when test="${userMadeComment}">
+                        <div class="card p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="user d-flex flex-row align-items-center">
+                            <span>
+                                <small class="font-weight-bold text-primary">${userReview.getUser().getUsername()}</small>
+                                <small class="font-weight-bold">${userReview.getUserComment()}</small>
+                            </span>
+                                </div> <small>2 days ago</small>
+                            </div>
+                        </div>
+                        <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+                    </c:when>
+                    <%--USER NEVER MADE A COMMENT--%>
+                    <c:otherwise>
+                        <h5 class="display-5 text-center mt-4 mb-5">How was your experience in this restaurant?</h5>
+                        <c:url value="/restaurant/${restaurant.getId()}/reviews" var="addReviewPath"/>
+                        <form action="${addReviewPath}" method="post">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">${loggedUser.getUsername()}</span>
+                                </div>
+                                <textarea class="form-control" style="resize: none" name="review" aria-label="Review"></textarea>
+                            </div>
+                            <div class="mt-2 d-flex justify-content-end">
+                                <button class="btn btn-outline-warning">Send review</button>
+                            </div>
+                        </form>
+                        <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+                    </c:otherwise>
+                </c:choose>
 
-                <%--ADD A REVIEW--%>
-                <c:url value="/restaurant/${restaurant.getId()/reviews}" var="url"/>
-                <div class="mx-auto">
-                    <sc:pagination baseUrl="/restaurant/${restaurant.getId()/reviews}" pages="${maxPages}"/>
-                </div>
+                <c:choose>
+                    <%--WHEN THERE ARE NO REVIEWS--%>
+                    <c:when test="${empty reviews}">
+                        <h2 class="display-5 text-center mt-4 mb-5">This restaurant has no reviews yet</h2>
+                    </c:when>
+                    <%--WHEN THERE ARE MORE REVIEWS--%>
+                    <c:otherwise>
+                        <c:forEach var="review" items="${reviews}">
+                            <c:if test="${review.getUser().getId() != loggedUser.getId()}">
+                                <div class="card p-3 mb-4 mt-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="user d-flex flex-row align-items-center">
+                                            <span>
+                                                <small class="font-weight-bold text-primary">${review.getUser().getUsername()}</small>
+                                                <small class="font-weight-bold">${review.getUserComment()}</small>
+                                            </span>
+                                        </div> <small>2 days ago</small>
+                                    </div>
+                                </div>
+                            </c:if>
+                        </c:forEach>
+                    </c:otherwise>
+                </c:choose>
+            </c:when>
+
+            <%--WHEN ANONYMOUS USER--%>
+            <c:otherwise>
+                <c:choose>
+                    <%--WHEN THERE ARE NO REVIEWS--%>
+                    <c:when test="${empty reviews}">
+                        <h2 class="display-5 text-center mt-4 mb-5">This restaurant has no reviews yet</h2>
+                    </c:when>
+                    <%--WHEN THERE ARE MORE REVIEWS--%>
+                    <c:otherwise>
+                        <c:forEach var="review" items="${reviews}">
+                            <div class="card p-3 mb-4 mt-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="user d-flex flex-row align-items-center">
+                                        <span>
+                                            <small class="font-weight-bold text-primary">${review.getUser().getUsername()}</small>
+                                            <small class="font-weight-bold">${review.getUserComment()}</small>
+                                        </span>
+                                    </div> <small>2 days ago</small>
+                                </div>
+                            </div>
+                        </c:forEach>
+                    </c:otherwise>
+                </c:choose>
             </c:otherwise>
         </c:choose>
+
+        <%--                <c:url value="/restaurant/${restaurant.getId()/reviews}" var="url"/>
+                <div class="mx-auto">
+                    <sc:pagination baseUrl="/restaurant/${restaurant.getId()/reviews}" pages="${maxPages}"/>
+                </div>--%>
     </div>
 
     <%--  RESERVATIONS // ADD MENU--%>

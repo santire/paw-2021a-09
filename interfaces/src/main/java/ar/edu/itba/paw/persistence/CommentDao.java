@@ -13,6 +13,7 @@ public interface CommentDao {
 
     // READ
     public Optional<Comment> findById(long id);
+    public Optional<Comment> findByUserAndRestaurantId(long userId, long restaurantId);
     public List<Comment> findByRestaurant(int page, int amountOnPage, long restaurantId);
     public int findByRestaurantPageCount(int amountOnPage, long restaurantId);
 

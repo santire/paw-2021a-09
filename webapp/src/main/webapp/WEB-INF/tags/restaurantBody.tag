@@ -97,9 +97,23 @@
     </div>
   </div>
 </div>
+
+<%--RESERVATIONS, COMMENTS AND MENU--%>
 <div class="row row-cols-1 row-cols-lg-2 w-75 mx-auto">
+
+<%--  COMMENTS AND MENU--%>
   <div class="order-2 order-lg-1">
-    <h3 class="pb-1 text-center border-bottom">Menu</h3>
+
+    <ul class="nav nav-pills nav-fill navtop mb-5">
+      <li class="nav-item">
+        <a class="nav-link active"  href="#">Menu</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="<c:url value="/restaurant/${restaurant.getId()}/reviews"/>">Reviews</a>
+      </li>
+    </ul>
+
+   <%-- <h3 class="pb-1 text-center border-bottom">Menu</h3>--%>
     <c:choose>
       <c:when test="${ restaurant.getMenu().size() == 0 }">
       <h2 class="display-5 text-center"><spring:message code="restaurants.menuNotAvailable" /></h2>
@@ -115,6 +129,8 @@
       </c:otherwise>
     </c:choose>
   </div>
+
+<%--  RESERVATIONS // ADD MENU--%>
   <div class="order-1 order-lg-2">
     <c:choose>
       <c:when test="${isTheOwner}">

@@ -46,6 +46,12 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
+    public Optional<Comment> findByUserAndRestaurantId(long userId, long restaurantId){
+        return commentDao.findByUserAndRestaurantId(userId, restaurantId);
+    }
+
+    @Override
+    @Transactional
     public List<Comment> findByRestaurant(int page, int amountOnPage, long restaurantId){
         List<Comment> comments = commentDao.findByRestaurant(page, amountOnPage, restaurantId);
         return comments;

@@ -29,7 +29,7 @@ public class CommentJpaDao implements CommentDao {
         final Comment userComment = new Comment(comment);
         userComment.setUser(user);
         userComment.setRestaurant(restaurant);
-        em.persist(comment);
+        em.persist(userComment);
         return userComment;
     }
 
@@ -39,6 +39,35 @@ public class CommentJpaDao implements CommentDao {
     public Optional<Comment> findById(long id){
         return Optional.ofNullable(em.find(Comment.class, id));
     }
+
+    @Override
+    public Optional<Comment> findByUserAndRestaurantId(long userId, long restaurantId){
+        Query nativeQuery = em.createNativeQuery(
+                "SELECT comment_id FROM comments WHERE user_id = :userId and restaurant_id = :restaurantId");
+        nativeQuery.setParameter("userId", userId);
+        nativeQuery.setParameter("restaurantId", restaurantId);
+
+        @SuppressWarnings("unchecked")
+        Long filteredId = (Long)nativeQuery.getResultList().stream().map(e -> Long.valueOf(e.toString())).findFirst().orElse(null);
+        if (filteredId == null) {
+            return Optional.empty();
+        }
+        TypedQuery<Comment> query = em.createQuery("from Comment where id = :filteredId", Comment.class);
+        query.setParameter("filteredId", filteredId);
+        return query.getResultList().stream().findFirst();
+    }
+
+    /*        Query nativeQuery = em.createQuery(
+                "SELECT * FROM comments"
+                        +
+                        " WHERE restaurant_id = :restaurantId"
+                        +
+                        " AND user_id = :userId"
+                , Comment.class);
+        nativeQuery.setParameter("restaurantId", restaurantId);
+        nativeQuery.setParameter("userId", userId);
+        return Optional.ofNullable((Comment) nativeQuery.getSingleResult());*/
+
 
 
     @Override

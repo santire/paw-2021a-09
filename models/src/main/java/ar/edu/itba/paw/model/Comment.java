@@ -20,7 +20,7 @@ public class Comment {
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
-    @Column
+    @Column(name = "user_comment")
     private String userComment;
 
     Comment(){

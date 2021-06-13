@@ -6,11 +6,26 @@
     <jsp:body>
         <main>
             <c:url value="/resources/images/resto1.jpg" var="restaurantImageUrl" />
-            <sc:restaurantBodyReviews
-                    restaurant="${restaurant}"
-                    times="${times}"
-                    reviews="${reviews}"
-            />
+            <c:choose>
+                <c:when test="${userMadeComment}">
+                    <sc:restaurantBodyReviews
+                            restaurant="${restaurant}"
+                            times="${times}"
+                            reviews="${reviews}"
+                            userMadeComment="${userMadeComment}"
+                            userReview="${userReview}"
+                    />
+                </c:when>
+                <c:otherwise>
+                    <sc:restaurantBodyReviews
+                            restaurant="${restaurant}"
+                            times="${times}"
+                            reviews="${reviews}"
+                            userMadeComment="${userMadeComment}"
+                    />
+                </c:otherwise>
+            </c:choose>
+        </main>
         </main>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
