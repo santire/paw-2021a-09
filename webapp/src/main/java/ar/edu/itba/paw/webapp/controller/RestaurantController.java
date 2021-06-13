@@ -66,19 +66,23 @@ public class RestaurantController {
     @Autowired
     private MenuService menuService;
 
+    @Autowired
+    private CommonAttributes ca;
+
 
 
 
 
 
     @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.GET)
-    public ModelAndView restaurant(@ModelAttribute("loggedUser") final User loggedUser,
-            @ModelAttribute("reservationForm") final ReservationForm form,
+    public ModelAndView restaurant(@ModelAttribute("reservationForm") final ReservationForm form,
             @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
             @ModelAttribute("ratingForm") final RatingForm ratingForm,
             @RequestParam(defaultValue="1") Integer page,
             @PathVariable("restaurantId") final long restaurantId) {
         final ModelAndView mav = new ModelAndView("restaurant");
+
+        User loggedUser = ca.loggedUser();
 
         int maxPages = restaurantService.findByIdWithMenuPagesCount(AMOUNT_OF_MENU_ITEMS, restaurantId);
 
@@ -118,8 +122,7 @@ public class RestaurantController {
     }
 
     @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.POST)
-    public ModelAndView reservationAndMenu(@ModelAttribute("loggedUser") final User loggedUser,
-            @Valid @ModelAttribute("reservationForm") final ReservationForm form,
+    public ModelAndView reservationAndMenu(@Valid @ModelAttribute("reservationForm") final ReservationForm form,
             final BindingResult errors,
              @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
             final BindingResult menuErrors,
@@ -129,6 +132,7 @@ public class RestaurantController {
             @PathVariable("restaurantId") final long restaurantId,
             RedirectAttributes redirectAttributes) {
 
+        User loggedUser = ca.loggedUser();
         LocalTime time;
         LocalDate date;
         if (form != null && errors != null) {
@@ -159,7 +163,7 @@ public class RestaurantController {
             }
         }
         if (errors.hasErrors()) {
-            return restaurant(loggedUser, form, menuForm, ratingForm, page, restaurantId);
+            return restaurant(form, menuForm, ratingForm, page, restaurantId);
         }
 
         if (loggedUser != null) {
@@ -177,8 +181,7 @@ public class RestaurantController {
     }
 
     @RequestMapping(path = { "/restaurant/{restaurantId}/menu" }, method = RequestMethod.POST)
-    public ModelAndView addMenu(@ModelAttribute("loggedUser") final User loggedUser,
-             @ModelAttribute("reservationForm") final ReservationForm form,
+    public ModelAndView addMenu(@ModelAttribute("reservationForm") final ReservationForm form,
              @Valid @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
              final BindingResult errors,
              @ModelAttribute("ratingForm") final RatingForm ratingForm,
@@ -187,8 +190,10 @@ public class RestaurantController {
              @PathVariable("restaurantId") final long restaurantId,
              RedirectAttributes redirectAttributes) {
 
+        User loggedUser = ca.loggedUser();
+
         if(errors.hasErrors()) {
-            return restaurant(loggedUser, form, menuForm, ratingForm, page, restaurantId);
+            return restaurant(form, menuForm, ratingForm, page, restaurantId);
         }
         if (loggedUser != null) {
             boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
@@ -208,7 +213,7 @@ public class RestaurantController {
     
 
     @RequestMapping(path = { "/register/restaurant" }, method = RequestMethod.GET)
-    public ModelAndView registerRestaurant( @ModelAttribute("loggedUser") final User loggedUser, @ModelAttribute("RestaurantForm") final RestaurantForm form) {
+    public ModelAndView registerRestaurant(@ModelAttribute("RestaurantForm") final RestaurantForm form) {
 
         ModelAndView mav =  new ModelAndView("registerRestaurant");
         mav.addObject("tags", Tags.allTags());
@@ -219,7 +224,9 @@ public class RestaurantController {
 
 
     @RequestMapping(path = { "/register/restaurant" }, method = RequestMethod.POST)
-    public ModelAndView registerRestaurant( @ModelAttribute("loggedUser") final User loggedUser, @Valid @ModelAttribute("RestaurantForm") final RestaurantForm form, final BindingResult errors) {
+    public ModelAndView registerRestaurant(@Valid @ModelAttribute("RestaurantForm") final RestaurantForm form, final BindingResult errors) {
+
+        User loggedUser = ca.loggedUser();
 
         if (form.getTags().length>3) {
             errors.rejectValue("tags", "restaurant.edit.tagsLimit");
@@ -227,15 +234,17 @@ public class RestaurantController {
 
         if (errors.hasErrors()) {
             LOGGER.debug("Form has errors at /register/restaurant");
-            return registerRestaurant(loggedUser, form);
+            return registerRestaurant(form);
         }
+
+        // Unnecesary, check should be handled by spring security
         if(loggedUser != null){
             LOGGER.debug("Creating restaurant for user {}", loggedUser.getName());
             List<Tags> tagList = Arrays.asList(form.getTags()).stream().map((i) -> Tags.valueOf(i)).collect(Collectors.toList());
             LOGGER.debug("tags: {}", tagList);
             final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
                     form.getPhoneNumber(), tagList, loggedUser);
-            updateAuthorities(loggedUser);
+            updateAuthorities();
             if (form.getProfileImage() != null && !form.getProfileImage().isEmpty()) {
                 try {
                 Image image = new Image(form.getProfileImage().getBytes());
@@ -252,7 +261,10 @@ public class RestaurantController {
     }
 
     @RequestMapping(path = {"restaurant/{restaurantId}/like"}, method = RequestMethod.POST)
-    public ModelAndView like(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId){
+    public ModelAndView like(@PathVariable("restaurantId") final long restaurantId){
+
+        // Unnecesary check, should be handled by spring security
+        User loggedUser = ca.loggedUser();
         if(loggedUser != null){
             long userId = loggedUser.getId();
             likesService.like(userId, restaurantId);
@@ -262,7 +274,10 @@ public class RestaurantController {
     }
 
     @RequestMapping(path = {"restaurant/{restaurantId}/dislike"}, method = RequestMethod.POST)
-    public ModelAndView dislike(@ModelAttribute("loggedUser") final User loggedUser, @PathVariable("restaurantId") final long restaurantId){
+    public ModelAndView dislike(@PathVariable("restaurantId") final long restaurantId){
+
+        // Unnecesary check, should be handled by spring security
+        User loggedUser = ca.loggedUser();
         if(loggedUser != null){
             long userId = loggedUser.getId();
             likesService.dislike(userId, restaurantId);
@@ -272,12 +287,12 @@ public class RestaurantController {
     }
 
     @RequestMapping(path ={  "/restaurant/{restaurantId}/delete/{menuId}" }, method=RequestMethod.POST)
-    public ModelAndView deleteMenuItem(
-            @ModelAttribute("loggedUser") final User loggedUser,
-            @PathVariable("restaurantId") final long restaurantId,
+    public ModelAndView deleteMenuItem(@PathVariable("restaurantId") final long restaurantId,
             @PathVariable("menuId") final long menuId
     ) {
 
+        // Unnecesary check, should be handled by spring security
+        User loggedUser = ca.loggedUser();
         if(loggedUser != null){
             boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
             boolean menuBelongsToRestaurant = menuService.menuBelongsToRestaurant(menuId, restaurantId);
@@ -291,11 +306,11 @@ public class RestaurantController {
 
 
     @RequestMapping(path={ "/restaurants/user/{userId}" }, method=RequestMethod.GET)
-    public ModelAndView userRestaurants(
-            @ModelAttribute("loggedUser") final User loggedUser,
-            @PathVariable("userId") final long userId,
+    public ModelAndView userRestaurants(@PathVariable("userId") final long userId,
             @RequestParam(defaultValue = "1") Integer page) {
 
+        // Unnecesary check, should be handled by spring security
+        User loggedUser = ca.loggedUser();
         // Shouldn't be able to get here unless logged it but just in case
         if(loggedUser != null){
             final ModelAndView mav = new ModelAndView("myRestaurants");
@@ -319,10 +334,11 @@ public class RestaurantController {
 
 
     @RequestMapping(path = { "/restaurant/{restaurantId}/rate" }, method = RequestMethod.POST)
-    public ModelAndView rateRestaurant( @ModelAttribute("loggedUser") final User loggedUser,
-                                        @PathVariable("restaurantId") final long restaurantId,
+    public ModelAndView rateRestaurant(@PathVariable("restaurantId") final long restaurantId,
                                         @Valid @ModelAttribute("ratingForm") final RatingForm ratingForm,
                                         final BindingResult errors) {
+        // Unnecesary check, should be handled by spring security
+        User loggedUser = ca.loggedUser();
         if(errors.hasErrors()) {
             return new ModelAndView("redirect:/restaurant/" + restaurantId);
         }
@@ -336,7 +352,9 @@ public class RestaurantController {
 
 
 
-    public void updateAuthorities(@ModelAttribute("loggedUser") final User loggedUser) {
+    public void updateAuthorities() {
+        // Unnecesary check, should be handled by spring security
+        User loggedUser = ca.loggedUser();
         if(loggedUser!=null){
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             Collection<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();

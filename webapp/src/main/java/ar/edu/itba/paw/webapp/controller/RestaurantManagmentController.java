@@ -54,13 +54,16 @@ public class RestaurantManagmentController {
     @Autowired
     private RestaurantService restaurantService;
 
+    @Autowired
+    private CommonAttributes ca;
 
     // Edit restaurant
     @RequestMapping(path ={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.GET)
-    public ModelAndView editRestaurant(
-            @ModelAttribute("loggedUser") final User loggedUser, 
-            @PathVariable("restaurantId") final long restaurantId, 
+    public ModelAndView editRestaurant(@PathVariable("restaurantId") final long restaurantId, 
             @ModelAttribute("RestaurantForm") final RestaurantForm form) {
+
+        // Unnecesary, check should be handled by spring security
+        User loggedUser = ca.loggedUser();
 
             if (loggedUser != null) {
                 Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
@@ -91,11 +94,12 @@ public class RestaurantManagmentController {
     }
 
     @RequestMapping(path={"/restaurant/{restaurantId}/edit"}, method = RequestMethod.POST)
-    public ModelAndView editRestaurant(@ModelAttribute("loggedUser") final User loggedUser, 
-            @PathVariable("restaurantId") final long restaurantId, 
+    public ModelAndView editRestaurant(@PathVariable("restaurantId") final long restaurantId, 
             @Valid @ModelAttribute("RestaurantForm") final RestaurantForm form,
             final BindingResult errors) {
 
+        // Unnecesary, check should be handled by spring security
+        User loggedUser = ca.loggedUser();
 
         if (form.getTags().length>3) {
             errors.rejectValue("tags", "restaurant.edit.tagsLimit");
@@ -104,7 +108,7 @@ public class RestaurantManagmentController {
 
         if (errors.hasErrors()) {
             LOGGER.debug("Form has errors at /restaurant/{}/edit", restaurantId);
-            return editRestaurant(loggedUser, restaurantId, form);
+            return editRestaurant(restaurantId, form);
         }
         // Should be if it got here, 
         // but it doesn't hurt to escape a potential null pointer exception
@@ -134,14 +138,16 @@ public class RestaurantManagmentController {
     // Delete restaurant
         
     @RequestMapping(path = { "/restaurant/{restaurantId}/delete" }, method = RequestMethod.POST)
-    public ModelAndView deleteRestaurant(@ModelAttribute("loggedUser") final User loggedUser, 
-            @PathVariable("restaurantId") final long restaurantId) {
+    public ModelAndView deleteRestaurant(@PathVariable("restaurantId") final long restaurantId) {
+
+        // Unnecesary, check should be handled by spring security
+        User loggedUser = ca.loggedUser();
 
         if (loggedUser != null) {
             if(userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId)){
                 restaurantService.deleteRestaurantById(restaurantId);
                 if(userService.isRestaurantOwner(loggedUser.getId())){
-                    updateAuthorities(loggedUser);
+                    updateAuthorities();
                 }
                 return new ModelAndView("redirect:/restaurants/user/" + loggedUser.getId());
             }
@@ -154,10 +160,11 @@ public class RestaurantManagmentController {
 
     @RequestMapping(path={"/restaurant/{restaurantId}/manage/pending"}, method = RequestMethod.GET)
     public ModelAndView manageRestaurantPending(
-            @ModelAttribute("loggedUser") final User loggedUser,
             @PathVariable("restaurantId") final long restaurantId,
             @RequestParam(defaultValue = "1") Integer page) {
 
+        // Unnecesary, check should be handled by spring security
+        User loggedUser = ca.loggedUser();
         if (loggedUser != null) {
             final ModelAndView mav =  new ModelAndView("managePendingReservations");
             Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
@@ -191,9 +198,11 @@ public class RestaurantManagmentController {
 
     @RequestMapping(path={"/restaurant/{restaurantId}/manage/confirmed"}, method = RequestMethod.GET)
     public ModelAndView manageRestaurantConfirmed(
-            @ModelAttribute("loggedUser") final User loggedUser,
             @PathVariable("restaurantId") final long restaurantId,
             @RequestParam(defaultValue = "1") Integer page) {
+
+        // Unnecesary, check should be handled by spring security
+        User loggedUser = ca.loggedUser();
         if (loggedUser != null) {
             final ModelAndView mav =  new ModelAndView("manageConfirmedReservations");
             Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
@@ -229,7 +238,9 @@ public class RestaurantManagmentController {
 
 
 
-    public void updateAuthorities(@ModelAttribute("loggedUser") final User loggedUser) {
+    public void updateAuthorities() {
+        // Unnecesary, check should be handled by spring security
+        User loggedUser = ca.loggedUser();
         if(loggedUser!=null){
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             Collection<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();

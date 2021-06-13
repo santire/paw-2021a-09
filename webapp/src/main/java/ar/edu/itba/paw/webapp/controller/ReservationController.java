@@ -43,14 +43,18 @@ public class ReservationController {
     @Autowired
     private MessageSource messageSource;
 
+    @Autowired
+    private CommonAttributes ca;
+
 
     @RequestMapping(path = { "/reservations" }, method = RequestMethod.GET)
     public ModelAndView userReservations(
-            @ModelAttribute("loggedUser") final User loggedUser,
             @RequestParam(defaultValue="1") Integer page){
 
         final ModelAndView mav = new ModelAndView("myReservations");
 
+        // Unnecesary check, should be handled by spring security
+        User loggedUser = ca.loggedUser();
         // Shouldn't get here unless logged in, but just in case
         if(loggedUser != null){
             long userId = loggedUser.getId();
@@ -72,11 +76,12 @@ public class ReservationController {
 
     @RequestMapping(path = { "/reservations/history" }, method = RequestMethod.GET)
     public ModelAndView userReservationsHistory(
-            @ModelAttribute("loggedUser") final User loggedUser,
             @RequestParam(defaultValue="1") Integer page){
 
         final ModelAndView mav = new ModelAndView("myReservationsHistory");
 
+        // Unnecesary check, should be handled by spring security
+        User loggedUser = ca.loggedUser();
         // Shouldn't get here unless logged in, but just in case
         if(loggedUser != null){
             long userId = loggedUser.getId();
@@ -98,8 +103,9 @@ public class ReservationController {
 
 
     @RequestMapping(path = "/reservations/{reservationId}/cancel", method = RequestMethod.POST)
-    public ModelAndView cancelReservation(@ModelAttribute("loggedUser") final User loggedUser,
-                                          @PathVariable("reservationId") final int reservationId){
+    public ModelAndView cancelReservation(@PathVariable("reservationId") final int reservationId){
+        // Unnecesary check, should be handled by spring security
+        User loggedUser = ca.loggedUser();
         if(loggedUser != null){
             reservationService.userCancelReservation(reservationId);
             return new ModelAndView("redirect:/reservations");
@@ -109,10 +115,12 @@ public class ReservationController {
 
 
     @RequestMapping(path = "/reservations/{restaurantId}/{reservationId}/cancel", method = RequestMethod.POST)
-    public ModelAndView cancelReservationFromOwner(@ModelAttribute("loggedUser") final User loggedUser,
+    public ModelAndView cancelReservationFromOwner(
                                                    @PathVariable("restaurantId") final long restaurantId,
                                                    @PathVariable("reservationId") final int reservationId,
                                                    @RequestParam("cancellationMessage") final String cancellationMessage){
+        // Unnecesary check, should be handled by spring security
+        User loggedUser = ca.loggedUser();
         if(loggedUser != null){
             Optional<Reservation> maybeReservation = reservationService.findById(reservationId);
             if(maybeReservation.isPresent()){
@@ -136,9 +144,11 @@ public class ReservationController {
      }
 
     @RequestMapping(path = "/reservations/{restaurantId}/{reservationId}/reject", method = RequestMethod.POST)
-     public ModelAndView rejectReservationFromOwner(@ModelAttribute("loggedUser") final User loggedUser,
+     public ModelAndView rejectReservationFromOwner(
                                                     @PathVariable("restaurantId") final long restaurantId,
                                                     @PathVariable("reservationId") final int reservationId){
+        // Unnecesary check, should be handled by spring security
+        User loggedUser = ca.loggedUser();
          if(loggedUser != null){
             Optional<Reservation> reservation = reservationService.findById(reservationId);
             if(reservation.isPresent()){
@@ -158,9 +168,11 @@ public class ReservationController {
      }
 
     @RequestMapping(path = "/reservations/{restaurantId}/{reservationId}/confirm", method = RequestMethod.POST)
-        public ModelAndView confirmReservation(@ModelAttribute("loggedUser") final User loggedUser,
+        public ModelAndView confirmReservation(
                                             @PathVariable("restaurantId") final long restaurantId,
                                             @PathVariable("reservationId") final int reservationId){
+        // Unnecesary check, should be handled by spring security
+        User loggedUser = ca.loggedUser();
          if(loggedUser != null){
              Optional<Reservation> reservation = reservationService.findById(reservationId);
                 if(reservation.isPresent()){

@@ -37,11 +37,13 @@ public class UserController {
     @Autowired
     private PawUserDetailsService pawUserDetailsService;
 
+    @Autowired
+    private CommonAttributes ca;
+
     // UPDATE USER
 
     @RequestMapping(path = { "/user/edit" }, method = RequestMethod.GET)
     public ModelAndView editUser(
-            @ModelAttribute("loggedUser") final User loggedUser,
             @ModelAttribute("updateUserForm") final UserForm form) {
 
         final ModelAndView mav = new ModelAndView("editUser");
@@ -50,14 +52,15 @@ public class UserController {
 
     @RequestMapping(path = { "/user/edit" }, method = RequestMethod.POST)
     public ModelAndView editUser(
-            @ModelAttribute("loggedUser") final User loggedUser,
             @Valid @ModelAttribute("updateUserForm") final UserForm form,
             final BindingResult errors,
             RedirectAttributes redirectAttributes) {
 
+        User loggedUser = ca.loggedUser();
+
         if (errors.hasErrors()) {
             LOGGER.debug("Form has errors at /user/edit for user {}", loggedUser.getId());
-            return editUser(loggedUser, form);
+            return editUser(form);
         }
         try {
             userService.updateUser(

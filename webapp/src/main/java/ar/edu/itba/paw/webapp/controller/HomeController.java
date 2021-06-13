@@ -28,7 +28,6 @@ import ar.edu.itba.paw.model.exceptions.EmailInUseException;
 import ar.edu.itba.paw.model.exceptions.TokenCreationException;
 import ar.edu.itba.paw.model.exceptions.TokenDoesNotExistException;
 import ar.edu.itba.paw.model.exceptions.TokenExpiredException;
-import ar.edu.itba.paw.service.LikesService;
 import ar.edu.itba.paw.service.RestaurantService;
 import ar.edu.itba.paw.service.UserService;
 import ar.edu.itba.paw.webapp.auth.PawUserDetailsService;
@@ -49,20 +48,22 @@ public class HomeController {
     @Autowired
     private UserService userService;
 
-    // @Autowired
-    // private LikesService likesService;
-
     @Autowired
     private RestaurantService restaurantService;
 
     @Autowired
     private PawUserDetailsService pawUserDetailsService;
 
+    @Autowired
+    private CommonAttributes ca;
+
 
     @RequestMapping("/")
-    public ModelAndView helloWorld(@ModelAttribute("loggedUser") final User loggedUser, 
-            @RequestParam(defaultValue = "1") Integer page) {
+    public ModelAndView home(@RequestParam(defaultValue = "1") Integer page) {
         final ModelAndView mav = new ModelAndView("home");
+        User loggedUser = ca.loggedUser();
+
+
 
         if(page == null || page <1) {
             page=1;
@@ -155,7 +156,6 @@ public class HomeController {
         mav.addObject("defaultOrder", DEFAULT_ORDER);
 
         mav.addObject("restaurants", restaurantService.getRestaurantsFilteredBy(page, AMOUNT_OF_RESTAURANTS, search, tagsSelected,min,max, sort, desc, 7));
-        // mav.addObject("restaurants", restaurantService.getAllRestaurants(page, AMOUNT_OF_RESTAURANTS, search));
         mav.addObject("page", page);
         mav.addObject("sortBy", sortBy);
         mav.addObject("order", order);
