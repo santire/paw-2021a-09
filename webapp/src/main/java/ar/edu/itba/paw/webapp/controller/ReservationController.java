@@ -14,7 +14,6 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Locale;
 
 @Controller
@@ -81,6 +80,7 @@ public class ReservationController {
     @RequestMapping(path = "/reservations/{reservationId}/cancel", method = RequestMethod.POST)
     @PreAuthorize("@authComponent.isReservationUser(#reservationId)")
     public ModelAndView cancelReservation(@PathVariable("reservationId") final int reservationId){
+
         reservationService.userCancelReservation(reservationId);
         return new ModelAndView("redirect:/reservations");
     }
@@ -92,14 +92,8 @@ public class ReservationController {
                                                    @PathVariable("reservationId") final int reservationId,
                                                    @RequestParam("cancellationMessage") final String cancellationMessage){
 
-        Optional<Reservation> maybeReservation = reservationService.findById(reservationId);
-        // TODO: reservation.orElseThrow(ReservationNotFoundException)
-        if(maybeReservation.isPresent()){
-            reservationService.ownerCancelReservation(reservationId, cancellationMessage);
-            return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/confirmed");
-         }
-
-         return new ModelAndView("redirect:/404");
+        reservationService.ownerCancelReservation(reservationId, cancellationMessage);
+        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/confirmed");
      }
 
     @RequestMapping(path = "/reservations/{restaurantId}/{reservationId}/reject", method = RequestMethod.POST)
@@ -107,14 +101,9 @@ public class ReservationController {
     public ModelAndView rejectReservationFromOwner(@PathVariable("restaurantId") final long restaurantId,
                                                     @PathVariable("reservationId") final int reservationId){
 
-        // TODO: reservation.orElseThrow(ReservationNotFoundException)
-        Optional<Reservation> reservation = reservationService.findById(reservationId);
-        if(reservation.isPresent()){
-            Locale locale = LocaleContextHolder.getLocale();
-            reservationService.ownerCancelReservation(reservationId, messageSource.getMessage("mail.rejection",null,locale));
-            return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/pending");
-         }
-        return new ModelAndView("redirect:/404");
+        Locale locale = LocaleContextHolder.getLocale();
+        reservationService.ownerCancelReservation(reservationId, messageSource.getMessage("mail.rejection",null,locale));
+        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/pending");
      }
 
     @RequestMapping(path = "/reservations/{restaurantId}/{reservationId}/confirm", method = RequestMethod.POST)
@@ -122,12 +111,7 @@ public class ReservationController {
     public ModelAndView confirmReservation(@PathVariable("restaurantId") final long restaurantId,
                                         @PathVariable("reservationId") final int reservationId){
 
-        // TODO: reservation.orElseThrow(ReservationNotFoundException)
-         Optional<Reservation> reservation = reservationService.findById(reservationId);
-            if(reservation.isPresent()){
-                reservationService.confirmReservation(reservation.get());
-                return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/pending");
-         }
-         return new ModelAndView("redirect:/404");
+        reservationService.confirmReservation(reservationId);
+        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/pending");
     }
  }
