@@ -23,6 +23,7 @@ public class EmailServiceImpl implements EmailService {
     private JavaMailSender emailSender;
 
     @Async
+    @Override
     public void sendEmail(Email mail, String plainText){
         MimeMessage mimeMessage = emailSender.createMimeMessage();
         try {
