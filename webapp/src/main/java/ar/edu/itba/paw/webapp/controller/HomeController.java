@@ -77,6 +77,7 @@ public class HomeController {
         mav.addObject("hotRestaurants", hotRestaurants);
         LOGGER.debug("Amount of hot restaurants: {}", hotRestaurants.size());
 
+        // If a user is present, show their liked restaurants
         if(loggedUser != null){
             List<Restaurant> likedRestaurants = restaurantService.getLikedRestaurantsPreview(AMOUNT_OF_POPULAR_RESTAURANTS, loggedUser.getId());
             mav.addObject("likedRestaurants", likedRestaurants);
@@ -134,7 +135,6 @@ public class HomeController {
         // Catching invalid page value and setting it at max or min
         // depending on the overflow direction
         int maxPages = restaurantService.getRestaurantsFilteredByPageCount(AMOUNT_OF_RESTAURANTS, search, tagsSelected, min, max);
-        // int maxPages = restaurantService.getAllRestaurantPagesCount(AMOUNT_OF_RESTAURANTS, search);
         if(page == null || page <1) {
             page=1;
         }else if (page > maxPages) {
@@ -185,6 +185,7 @@ public class HomeController {
                                     "userForm.repeatPassword",
                                     "Passwords do not match");
             }
+            // TODO: Move this to custom validator
             if (form.getEmail() == null || !form.getEmail().trim().isEmpty() 
                     && userService.findByEmail(form.getEmail()).isPresent()){
                 errors.rejectValue("emailInUse", 
@@ -250,6 +251,5 @@ public class HomeController {
 
         return mav;
     }
-
 
 }

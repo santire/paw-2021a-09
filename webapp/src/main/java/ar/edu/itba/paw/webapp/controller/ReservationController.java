@@ -1,13 +1,8 @@
 package ar.edu.itba.paw.webapp.controller;
 
 import ar.edu.itba.paw.model.Reservation;
-import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
-import ar.edu.itba.paw.model.Email;
-import ar.edu.itba.paw.service.EmailService;
 import ar.edu.itba.paw.service.ReservationService;
-import ar.edu.itba.paw.service.RestaurantService;
-import ar.edu.itba.paw.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 
-
-
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Locale;
@@ -29,12 +21,6 @@ import java.util.Locale;
 public class ReservationController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReservationController.class);
     private static final int AMOUNT_OF_RESERVATIONS = 2;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private RestaurantService restaurantService;
 
     @Autowired
     private ReservationService reservationService;
@@ -48,148 +34,100 @@ public class ReservationController {
 
 
     @RequestMapping(path = { "/reservations" }, method = RequestMethod.GET)
-    public ModelAndView userReservations(
-            @RequestParam(defaultValue="1") Integer page){
+    public ModelAndView userReservations(@RequestParam(defaultValue="1") Integer page){
 
         final ModelAndView mav = new ModelAndView("myReservations");
-
-        // Unnecesary check, should be handled by spring security
         User loggedUser = ca.loggedUser();
-        // Shouldn't get here unless logged in, but just in case
-        if(loggedUser != null){
-            long userId = loggedUser.getId();
-            int maxPages = reservationService.findByUserPageCount(AMOUNT_OF_RESERVATIONS, userId);
-            if(page == null || page <1) {
-                page=1;
-            }else if (page > maxPages) {
-                page = maxPages;
-            }
-            mav.addObject("maxPages", maxPages);
 
-            List<Reservation> reservations = reservationService.findByUser(page, AMOUNT_OF_RESERVATIONS, userId);
-            mav.addObject("userHasReservations", !reservations.isEmpty());
-            mav.addObject("reservations", reservations);
-            return mav;
-         }
-         else return new ModelAndView("redirect:/login");
+        long userId = loggedUser.getId();
+        int maxPages = reservationService.findByUserPageCount(AMOUNT_OF_RESERVATIONS, userId);
+
+        if(page == null || page <1) {
+            page=1;
+        }else if (page > maxPages) {
+            page = maxPages;
+        }
+
+        mav.addObject("maxPages", maxPages);
+
+        List<Reservation> reservations = reservationService.findByUser(page, AMOUNT_OF_RESERVATIONS, userId);
+        mav.addObject("userHasReservations", !reservations.isEmpty());
+        mav.addObject("reservations", reservations);
+        return mav;
      }
 
     @RequestMapping(path = { "/reservations/history" }, method = RequestMethod.GET)
-    public ModelAndView userReservationsHistory(
-            @RequestParam(defaultValue="1") Integer page){
+    public ModelAndView userReservationsHistory(@RequestParam(defaultValue="1") Integer page){
 
         final ModelAndView mav = new ModelAndView("myReservationsHistory");
-
-        // Unnecesary check, should be handled by spring security
         User loggedUser = ca.loggedUser();
-        // Shouldn't get here unless logged in, but just in case
-        if(loggedUser != null){
-            long userId = loggedUser.getId();
-            int maxPages = reservationService.findByUserHistoryPageCount(AMOUNT_OF_RESERVATIONS, userId);
-            if(page == null || page <1) {
-                page=1;
-            }else if (page > maxPages) {
-                page = maxPages;
-            }
-            mav.addObject("maxPages", maxPages);
 
-            List<Reservation> reservations = reservationService.findByUserHistory(page, AMOUNT_OF_RESERVATIONS, userId);
-            mav.addObject("userHasReservations", !reservations.isEmpty());
-            mav.addObject("reservations", reservations);
-            return mav;
+        long userId = loggedUser.getId();
+        int maxPages = reservationService.findByUserHistoryPageCount(AMOUNT_OF_RESERVATIONS, userId);
+        if(page == null || page <1) {
+            page=1;
+        }else if (page > maxPages) {
+            page = maxPages;
         }
-        else return new ModelAndView("redirect:/login");
+        mav.addObject("maxPages", maxPages);
+
+        List<Reservation> reservations = reservationService.findByUserHistory(page, AMOUNT_OF_RESERVATIONS, userId);
+        mav.addObject("userHasReservations", !reservations.isEmpty());
+        mav.addObject("reservations", reservations);
+        return mav;
     }
 
 
     @RequestMapping(path = "/reservations/{reservationId}/cancel", method = RequestMethod.POST)
+    @PreAuthorize("@authComponent.isReservationUser(#reservationId)")
     public ModelAndView cancelReservation(@PathVariable("reservationId") final int reservationId){
-        // Unnecesary check, should be handled by spring security
-        User loggedUser = ca.loggedUser();
-        if(loggedUser != null){
-            reservationService.userCancelReservation(reservationId);
-            return new ModelAndView("redirect:/reservations");
-         }
-         else return new ModelAndView("redirect:/login");
+        reservationService.userCancelReservation(reservationId);
+        return new ModelAndView("redirect:/reservations");
     }
 
 
     @RequestMapping(path = "/reservations/{restaurantId}/{reservationId}/cancel", method = RequestMethod.POST)
-    public ModelAndView cancelReservationFromOwner(
-                                                   @PathVariable("restaurantId") final long restaurantId,
+    @PreAuthorize("@authComponent.isReservationOwner(#reservationId)")
+    public ModelAndView cancelReservationFromOwner(@PathVariable("restaurantId") final long restaurantId,
                                                    @PathVariable("reservationId") final int reservationId,
                                                    @RequestParam("cancellationMessage") final String cancellationMessage){
-        // Unnecesary check, should be handled by spring security
-        User loggedUser = ca.loggedUser();
-        if(loggedUser != null){
-            Optional<Reservation> maybeReservation = reservationService.findById(reservationId);
-            if(maybeReservation.isPresent()){
-                // Reservation reservation = maybeReservation.get();
 
-                // Optional<User> userToCancel = userService.findById(reservation.get().getUserId());
-                // User userToCancel = reservation.getUser();
-                // Restaurant restaurant = reservation.getRestaurant();
-                reservationService.ownerCancelReservation(reservationId, cancellationMessage);
-                return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/confirmed");
-
-                // if(userToCancel.isPresent()){
-                    // Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
-                    // if(restaurant.isPresent()){
-                    // }
-                // }
-             }
-             return new ModelAndView("redirect:/403");
+        Optional<Reservation> maybeReservation = reservationService.findById(reservationId);
+        // TODO: reservation.orElseThrow(ReservationNotFoundException)
+        if(maybeReservation.isPresent()){
+            reservationService.ownerCancelReservation(reservationId, cancellationMessage);
+            return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/confirmed");
          }
-         return new ModelAndView("redirect:/login");
+
+         return new ModelAndView("redirect:/404");
      }
 
     @RequestMapping(path = "/reservations/{restaurantId}/{reservationId}/reject", method = RequestMethod.POST)
-     public ModelAndView rejectReservationFromOwner(
-                                                    @PathVariable("restaurantId") final long restaurantId,
+    @PreAuthorize("@authComponent.isReservationOwner(#reservationId)")
+    public ModelAndView rejectReservationFromOwner(@PathVariable("restaurantId") final long restaurantId,
                                                     @PathVariable("reservationId") final int reservationId){
-        // Unnecesary check, should be handled by spring security
-        User loggedUser = ca.loggedUser();
-         if(loggedUser != null){
-            Optional<Reservation> reservation = reservationService.findById(reservationId);
-            if(reservation.isPresent()){
-                Locale locale = LocaleContextHolder.getLocale();
-                reservationService.ownerCancelReservation(reservationId, messageSource.getMessage("mail.rejection",null,locale));
-                return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/pending");
-                // Optional<User> userToCancel = userService.findById(reservation.get().getUserId());
-                // if(userToCancel.isPresent()){
-                    // Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
-                    // if(restaurant.isPresent()){
-                    // }
-                // }
-             }
-            return new ModelAndView("redirect:/403");
-        }
-        return new ModelAndView("redirect:/login");
+
+        // TODO: reservation.orElseThrow(ReservationNotFoundException)
+        Optional<Reservation> reservation = reservationService.findById(reservationId);
+        if(reservation.isPresent()){
+            Locale locale = LocaleContextHolder.getLocale();
+            reservationService.ownerCancelReservation(reservationId, messageSource.getMessage("mail.rejection",null,locale));
+            return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/pending");
+         }
+        return new ModelAndView("redirect:/404");
      }
 
     @RequestMapping(path = "/reservations/{restaurantId}/{reservationId}/confirm", method = RequestMethod.POST)
-        public ModelAndView confirmReservation(
-                                            @PathVariable("restaurantId") final long restaurantId,
-                                            @PathVariable("reservationId") final int reservationId){
-        // Unnecesary check, should be handled by spring security
-        User loggedUser = ca.loggedUser();
-         if(loggedUser != null){
-             Optional<Reservation> reservation = reservationService.findById(reservationId);
-                if(reservation.isPresent()){
-                 // Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
-                    Restaurant restaurant = reservation.get().getRestaurant();
-                    if (restaurant.getOwner().getId() == loggedUser.getId()) {
-                     reservationService.confirmReservation(reservation.get());
-                     return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/pending");
-                    }
-                 // if(restaurant.isPresent()){
-                     // if(restaurant.get().getUserId() == loggedUser.getId()){
-                     // }
-                     // return new ModelAndView("redirect:/403");
-                 // }
-             }
-             return new ModelAndView("redirect:/403");
+    @PreAuthorize("@authComponent.isReservationOwner(#reservationId)")
+    public ModelAndView confirmReservation(@PathVariable("restaurantId") final long restaurantId,
+                                        @PathVariable("reservationId") final int reservationId){
+
+        // TODO: reservation.orElseThrow(ReservationNotFoundException)
+         Optional<Reservation> reservation = reservationService.findById(reservationId);
+            if(reservation.isPresent()){
+                reservationService.confirmReservation(reservation.get());
+                return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/pending");
          }
-         return new ModelAndView("redirect:/login");
-     }
+         return new ModelAndView("redirect:/404");
+    }
  }
