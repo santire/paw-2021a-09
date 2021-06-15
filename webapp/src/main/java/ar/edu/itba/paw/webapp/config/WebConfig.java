@@ -16,6 +16,7 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -39,6 +40,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Properties;
 
+@EnableAsync
 @EnableTransactionManagement
 @EnableScheduling
 @EnableWebMvc
@@ -127,9 +129,11 @@ public class WebConfig {
     props.put("mail.transport.protocol", "smtp");
     props.put("mail.smtp.auth", "true");
     props.put("mail.smtp.starttls.enable", "true");
+
     
     // Local Machine only, don't deploy!
     props.put("mail.debug", "false");
+
 
     return mailSender;
   }

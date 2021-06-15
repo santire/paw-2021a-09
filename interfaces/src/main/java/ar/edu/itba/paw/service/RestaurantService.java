@@ -36,9 +36,6 @@ public interface RestaurantService {
 
 
     // UPDATE
-    // public void updateName(long id, String name);
-    // public void updateAddress(long id, String address);
-    // public void updatePhoneNumber(long id, String phoneNumber);
     public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber, List<Tags> tags);
 
 
@@ -60,6 +57,5 @@ public interface RestaurantService {
     public int getRestaurantsFilteredByPageCount(int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice);
 
 
-    public List<LocalTime> availableTime(long restaurantId);
     public List<String> availableStringTime(long restaurantId);
 }

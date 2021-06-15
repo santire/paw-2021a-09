@@ -176,49 +176,17 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public List<LocalTime> availableTime(long restaurantId) {
-        LocalTime time;
-        LocalTime currentTime = LocalTime.now();
-        int min = 12;
-        int max = 23;
-        List<LocalTime> availableHours = new ArrayList<>();
-        String str;
-        for (int i = min; i <= max; i++) {
-            str = String.valueOf(i) + ':' + "00";
-            time = LocalTime.parse(str);
-            if (time.isAfter(currentTime)) {
-                availableHours.add(time);
-            }
-            str = String.valueOf(i) + ':' + "30";
-            time = LocalTime.parse(str);
-            if (time.isAfter(currentTime)) {
-                availableHours.add(time);
+    public List<String> availableStringTime(long restaurantId) {
+        int minHour = 12;
+        int maxHour = 23;
+        int stepMinutes = 30;
+        List<String> availableHours = new ArrayList<>();
+        for (int i = minHour; i <= maxHour; i++) {
+            for (int j=0; j<60; j+=stepMinutes) {
+                availableHours.add(String.format("%02d", i) + ":" + String.format("%02d", j));
             }
         }
         return availableHours;
-    }
-
-    @Override
-    public List<String> availableStringTime(long restaurantId) {
-        LocalTime time;
-        int min = 12;
-        int max = 23;
-        List<String> afterLocalTime = new ArrayList<>();
-        LocalTime localTime = LocalTime.now();
-        String str;
-        for (int i = min; i <= max; i++) {
-            str = String.valueOf(i) + ':' + "00";
-            time = LocalTime.parse(str);
-            if (time.isAfter(localTime)) {
-                afterLocalTime.add(str);
-            }
-            str = String.valueOf(i) + ':' + "30";
-            time = LocalTime.parse(str);
-            if (time.isAfter(localTime)) {
-                afterLocalTime.add(str);
-            }
-        }
-        return afterLocalTime;
     }
 
     @Override

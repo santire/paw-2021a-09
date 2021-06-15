@@ -25,6 +25,7 @@ public class RestaurantForm {
     @MultipartFileSizeValid
     private MultipartFile profileImage;
 
+    @Size(max=3)
     private Integer[] tags;
 
     @Pattern(regexp = "(^((ftp|http|https):\\/\\/)?(www.)?(?!.*(ftp|http|https|www.))facebook+\\.com+(\\/[a-zA-Z0-9#]+\\/?)$)|(^$)")

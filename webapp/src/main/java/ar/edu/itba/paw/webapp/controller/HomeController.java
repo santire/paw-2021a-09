@@ -28,7 +28,6 @@ import ar.edu.itba.paw.model.exceptions.EmailInUseException;
 import ar.edu.itba.paw.model.exceptions.TokenCreationException;
 import ar.edu.itba.paw.model.exceptions.TokenDoesNotExistException;
 import ar.edu.itba.paw.model.exceptions.TokenExpiredException;
-import ar.edu.itba.paw.service.LikesService;
 import ar.edu.itba.paw.service.RestaurantService;
 import ar.edu.itba.paw.service.UserService;
 import ar.edu.itba.paw.webapp.auth.PawUserDetailsService;
@@ -49,20 +48,22 @@ public class HomeController {
     @Autowired
     private UserService userService;
 
-    // @Autowired
-    // private LikesService likesService;
-
     @Autowired
     private RestaurantService restaurantService;
 
     @Autowired
     private PawUserDetailsService pawUserDetailsService;
 
+    @Autowired
+    private CommonAttributes ca;
+
 
     @RequestMapping("/")
-    public ModelAndView helloWorld(@ModelAttribute("loggedUser") final User loggedUser, 
-            @RequestParam(defaultValue = "1") Integer page) {
+    public ModelAndView home(@RequestParam(defaultValue = "1") Integer page) {
         final ModelAndView mav = new ModelAndView("home");
+        User loggedUser = ca.loggedUser();
+
+
 
         if(page == null || page <1) {
             page=1;
@@ -76,6 +77,7 @@ public class HomeController {
         mav.addObject("hotRestaurants", hotRestaurants);
         LOGGER.debug("Amount of hot restaurants: {}", hotRestaurants.size());
 
+        // If a user is present, show their liked restaurants
         if(loggedUser != null){
             List<Restaurant> likedRestaurants = restaurantService.getLikedRestaurantsPreview(AMOUNT_OF_POPULAR_RESTAURANTS, loggedUser.getId());
             mav.addObject("likedRestaurants", likedRestaurants);
@@ -111,6 +113,7 @@ public class HomeController {
         List<Integer> tagsChecked = new ArrayList<>();
         if(tags!=null){
             for( int i : tags){
+                // TODO: fix this, should throw some exception
                 if(Tags.valueOf(i) == null)
                     return new ModelAndView("redirect:/403");
                 tagsSelected.add(Tags.valueOf(i));
@@ -130,10 +133,7 @@ public class HomeController {
             desc = true;
 
         order = desc ? "DESC" : "ASC";
-        // Catching invalid page value and setting it at max or min
-        // depending on the overflow direction
         int maxPages = restaurantService.getRestaurantsFilteredByPageCount(AMOUNT_OF_RESTAURANTS, search, tagsSelected, min, max);
-        // int maxPages = restaurantService.getAllRestaurantPagesCount(AMOUNT_OF_RESTAURANTS, search);
         if(page == null || page <1) {
             page=1;
         }else if (page > maxPages) {
@@ -155,7 +155,6 @@ public class HomeController {
         mav.addObject("defaultOrder", DEFAULT_ORDER);
 
         mav.addObject("restaurants", restaurantService.getRestaurantsFilteredBy(page, AMOUNT_OF_RESTAURANTS, search, tagsSelected,min,max, sort, desc, 7));
-        // mav.addObject("restaurants", restaurantService.getAllRestaurants(page, AMOUNT_OF_RESTAURANTS, search));
         mav.addObject("page", page);
         mav.addObject("sortBy", sortBy);
         mav.addObject("order", order);
@@ -177,21 +176,6 @@ public class HomeController {
     @RequestMapping(path ={"/register"}, method = RequestMethod.POST)
     public ModelAndView register(@Valid @ModelAttribute("userForm") final UserForm form, 
             final BindingResult errors ) {
-        // if there are errors it goes back to the register form without losing data
-        // but letting the user know it has errors
-        if(form != null && errors != null){
-            if(form.getPassword() == null || !form.getPassword().equals(form.getRepeatPassword())) {
-                errors.rejectValue("repeatPassword", 
-                                    "userForm.repeatPassword",
-                                    "Passwords do not match");
-            }
-            if (form.getEmail() == null || !form.getEmail().trim().isEmpty() 
-                    && userService.findByEmail(form.getEmail()).isPresent()){
-                errors.rejectValue("emailInUse", 
-                                    "userForm.emailInUse",
-                                    "Email is already in use");
-            }
-        }
 
         if (errors!=null && errors.hasErrors()) {
             return registerForm(form,errors);
@@ -250,6 +234,5 @@ public class HomeController {
 
         return mav;
     }
-
 
 }

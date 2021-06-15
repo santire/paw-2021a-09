@@ -13,7 +13,6 @@ public interface ReservationService {
 
     // READ
     public Optional<Reservation> findById(long reservationId);
-    public List<Reservation> findByUser(long userId);
     public List<Reservation> findByUser(int page, int amountOnPage, long userId);
     public List<Reservation> findByUserHistory(int page, int amountOnPage, long userId);
     public int findByUserPageCount(int amountOnPage, long userId);
@@ -28,8 +27,7 @@ public interface ReservationService {
     public int findPendingByRestaurantPageCount(int amountOnPage, long restaurantId);
 
     // UPDATE
-    public Optional<Reservation> modifyReservation(int reservationId, LocalDateTime date, long quantity);
-    public boolean confirmReservation(Reservation reservation);
+    public boolean confirmReservation(long reservationId);
 
     //DESTROY
     public boolean ownerCancelReservation(long reservationId, String message);

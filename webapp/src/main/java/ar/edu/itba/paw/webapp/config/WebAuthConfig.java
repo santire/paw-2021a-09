@@ -5,7 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,6 +23,7 @@ import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @ComponentScan({"ar.edu.itba.paw.webapp.auth"})
 @Configuration
 public class WebAuthConfig extends WebSecurityConfigurerAdapter {
@@ -31,6 +35,12 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
         }
+
+    @Override
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception{
@@ -45,7 +55,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
         try {
             key = getFileFromResources("key.txt");
         } catch (Exception e) {
-            e.printStackTrace();
+            // Ignore
         }
 
 
@@ -53,13 +63,23 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .invalidSessionUrl("/")
                 .and().authorizeRequests()
                 .antMatchers("/login", "/register").anonymous()
-                .antMatchers("/user/*", "/user/edit", "/register/restaurant", "/restaurants/user/*").hasRole("USER")
-                .antMatchers("/reservations","/reservations/*/*/cancel" ,"/reservations/*","/reservations/*/*", "/restaurant/*/rate").hasRole("USER")
+                .antMatchers("/user/*",
+                             "/user/edit",
+                             "/register/restaurant",
+                             "/restaurants/user/*").hasRole("USER")
+                .antMatchers("/reservations",
+                             "/reservations/*/cancel",
+                             "/reservations/history",
+                             "/restaurant/*/rate",
+                             "/restaurant/*/dislike",
+                             "/restaurant/*/like"
+                             ).hasRole("USER")
                 .antMatchers("/restaurant/*/edit",
                              "/restaurant/*/delete",
                              "/restaurant/*/menu",
-                             "/restaurant/*/menu/delete",
+                             "/restaurant/*/delete/*",
                              "/restaurant/*/manage/confirmed",
+                             "/reservations/*/*/cancel",
                              "/reservations/*/*/reject",
                              "/reservations/*/*/confirm",
                              "/restaurant/*/manage/pending").hasRole("RESTAURANTOWNER")
