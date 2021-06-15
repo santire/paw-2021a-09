@@ -175,6 +175,17 @@ public class RestaurantController {
         return mav;
     }
 
+    @RequestMapping(path = { "/restaurant/{restaurantId}/reviews/delete" }, method = RequestMethod.POST)
+    public ModelAndView deleteReview(@ModelAttribute("loggedUser") final User loggedUser,
+                                     @PathVariable("restaurantId") final long restaurantId,
+                                     @RequestParam("reviewId") final long reviewId) {
+        if(loggedUser!=null){
+            commentService.deleteComment(reviewId);
+            return new ModelAndView("redirect:/restaurant/" + restaurantId + "/reviews");
+        }
+        return new ModelAndView("redirect:/login");
+    }
+
     @RequestMapping(path = { "/restaurant/{restaurantId}/reviews" }, method = RequestMethod.POST)
     public ModelAndView addRestaurantReview(@ModelAttribute("loggedUser") final User loggedUser,
                                           @PathVariable("restaurantId") final long restaurantId,

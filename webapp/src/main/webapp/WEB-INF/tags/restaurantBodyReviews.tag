@@ -123,15 +123,39 @@
                 <c:choose>
                     <%--WHEN USER ALREADY MADE A COMMENT--%>
                     <c:when test="${userMadeComment}">
-                        <h3 class="d-flex justify-content-center">Your review</h3>
+                        <h3 class="d-flex justify-content-center"><spring:message code="restaurant.reviews.yourReview"/></h3>
                         <div class="card p-3">
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-between">
                                 <div class="user d-flex flex-row align-items-center">
-                            <span>
-                                <small class="font-weight-bold text-primary">${userReview.getUser().getUsername()}</small>
-                                <small class="font-weight-bold"><c:out value="${userReview.getUserComment()}"/></small>
-                            </span>
-                                </div> <small>${userReview.getDate()}</small>
+                                    <span>
+                                        <small class="font-weight-bold text-primary">${userReview.getUser().getUsername()}</small>
+                                        <small class="font-weight-bold"><c:out value="${userReview.getUserComment()}"/></small>
+                                    </span>
+                                </div>
+                                <div class="d-flex justify-content-end align-items-center">
+                                    <small class="float-right mr-4">${userReview.getDate()}</small>
+                                    <button type="button" class="close"  data-toggle="modal" data-target="#deleteComment" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="deleteComment" tabindex="-1" role="dialog" aria-labelledby="deleteComment" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-body d-flex justify-content-center">
+                                                    <spring:message code="restaurant.reviews.delete.confirmation"/>
+                                                </div>
+                                                <div class="modal-footer d-flex justify-content-center">
+                                                    <button type="button" class="btn btn-secondary text-white mx-auto" data-dismiss="modal"><spring:message code="general.cancel"/></button>
+                                                    <c:url value="/restaurant/${restaurant.getId()}/reviews/delete" var="deleteReviewPath"/>
+                                                    <form class="mx-auto"  action="${deleteReviewPath}" method="post">
+                                                        <input type="hidden" name="reviewId" value="${userReview.getId()}">
+                                                        <button type="submit" class="btn btn-danger text-white mx-auto"><spring:message code="restaurant.edit.deleteConfirmation"/></button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <hr  class="mt-5 mb-4" style="height:2px;border-width:0;color:gray;background-color:gray">
@@ -164,10 +188,10 @@
                     <c:otherwise>
                         <c:choose>
                             <c:when test="${userMadeComment && reviews.size()==1}">
-                                <h3 class="d-flex justify-content-center mb-4">There are no more reviews</h3>
+                                <h3 class="d-flex justify-content-center mb-4"><spring:message code="restaurant.reviews.noMoreReviews"/></h3>
                             </c:when>
                             <c:otherwise>
-                                <h3 class="d-flex justify-content-center mb-4">Other customer's reviews</h3>
+                                <h3 class="d-flex justify-content-center mb-4"><spring:message code="restaurant.reviews.otherCustomers"/></h3>
                                 <c:forEach var="review" items="${reviews}">
                                     <c:if test="${review.getUser().getId() != loggedUser.getId()}">
                                         <div class="card p-3 mb-4 mt-3">
@@ -193,12 +217,12 @@
                 <c:choose>
                     <%--WHEN THERE ARE NO REVIEWS--%>
                     <c:when test="${empty reviews}">
-                        <h2 class="display-5 text-center mt-4 mb-5">This restaurant has no reviews yet</h2>
+                        <h2 class="display-5 text-center mt-4 mb-5"><spring:message code="restaurant.reviews.noReviews"/></h2>
                     </c:when>
                     <%--WHEN THERE ARE MORE REVIEWS--%>
                     <c:otherwise>
                         <c:forEach var="review" items="${reviews}">
-                            <h3 class="d-flex justify-content-center">Customer's reviews</h3>
+                            <h3 class="d-flex justify-content-center"><spring:message code="restaurant.reviews.customersReview"/></h3>
                             <div class="card p-3 mb-4 mt-3">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="user d-flex flex-row align-items-center">
