@@ -33,9 +33,9 @@ public class EmailServiceImpl implements EmailService {
             emailSender.send(mimeMessageHelper.getMimeMessage());
 
         } catch (MessagingException e) {
-            // e.printStackTrace();
+            // Ignore
         } catch (UnsupportedEncodingException e) {
-            // e.printStackTrace();
+            // Ignore
         }
     }
 
@@ -51,9 +51,9 @@ public class EmailServiceImpl implements EmailService {
             emailSender.send(mimeMessageHelper.getMimeMessage());
 
         } catch (MessagingException e) {
-            // e.printStackTrace();
+            // Ignore
         } catch (UnsupportedEncodingException e) {
-            // e.printStackTrace();
+            // Ignore
         }
 
     }

@@ -121,16 +121,6 @@ public class UserController {
             @Valid @ModelAttribute("passwordForm") final PasswordForm form,
             final BindingResult errors) {
 
-        // if there are errors it goes back to the register form without losing data
-        // but letting the user know it has errors
-        // if (form != null && errors != null) {
-            // if (form.getPassword() == null || !form.getPassword().equals(form.getRepeatPassword())) {
-                // errors.rejectValue("repeatPassword", 
-                        // "passwordForm.repeatPassword",
-                        // "Passwords do not match");
-            // }
-        // }
-
         if (errors != null && errors.hasErrors()) {
             return updatePasswordForm(token, form, errors);
         }
@@ -145,7 +135,7 @@ public class UserController {
             LOGGER.warn("token {} does not exist", token);
             return new ModelAndView("requestedResetPassword").addObject("invalidToken", true);
         } catch (Exception e) {
-            // e.printStackTrace();
+            // Ignore
             // Unexpected error happened, showing register screen with generic error message
             return new ModelAndView("redirect:/login").addObject("tokenError", true);
         }
