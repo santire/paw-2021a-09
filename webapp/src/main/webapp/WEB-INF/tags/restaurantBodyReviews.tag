@@ -123,17 +123,18 @@
                 <c:choose>
                     <%--WHEN USER ALREADY MADE A COMMENT--%>
                     <c:when test="${userMadeComment}">
+                        <h3 class="d-flex justify-content-center">Your review</h3>
                         <div class="card p-3">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="user d-flex flex-row align-items-center">
                             <span>
                                 <small class="font-weight-bold text-primary">${userReview.getUser().getUsername()}</small>
-                                <small class="font-weight-bold">${userReview.getUserComment()}</small>
+                                <small class="font-weight-bold"><c:out value="${userReview.getUserComment()}"/></small>
                             </span>
-                                </div> <small>2 days ago</small>
+                                </div> <small>${userReview.getDate()}</small>
                             </div>
                         </div>
-                        <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+                        <hr  class="mt-5 mb-4" style="height:2px;border-width:0;color:gray;background-color:gray">
                     </c:when>
                     <%--USER NEVER MADE A COMMENT--%>
                     <c:otherwise>
@@ -161,20 +162,28 @@
                     </c:when>
                     <%--WHEN THERE ARE MORE REVIEWS--%>
                     <c:otherwise>
-                        <c:forEach var="review" items="${reviews}">
-                            <c:if test="${review.getUser().getId() != loggedUser.getId()}">
-                                <div class="card p-3 mb-4 mt-3">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="user d-flex flex-row align-items-center">
+                        <c:choose>
+                            <c:when test="${userMadeComment && reviews.size()==1}">
+                                <h3 class="d-flex justify-content-center mb-4">There are no more reviews</h3>
+                            </c:when>
+                            <c:otherwise>
+                                <h3 class="d-flex justify-content-center mb-4">Other customer's reviews</h3>
+                                <c:forEach var="review" items="${reviews}">
+                                    <c:if test="${review.getUser().getId() != loggedUser.getId()}">
+                                        <div class="card p-3 mb-4 mt-3">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="user d-flex flex-row align-items-center">
                                             <span>
                                                 <small class="font-weight-bold text-primary">${review.getUser().getUsername()}</small>
-                                                <small class="font-weight-bold">${review.getUserComment()}</small>
+                                                <small class="font-weight-bold"><c:out value="${review.getUserComment()}"/></small>
                                             </span>
-                                        </div> <small>2 days ago</small>
-                                    </div>
-                                </div>
-                            </c:if>
-                        </c:forEach>
+                                                </div> <small>${userReview.getDate()}</small>
+                                            </div>
+                                        </div>
+                                    </c:if>
+                                </c:forEach>
+                            </c:otherwise>
+                        </c:choose>
                     </c:otherwise>
                 </c:choose>
             </c:when>
@@ -189,14 +198,15 @@
                     <%--WHEN THERE ARE MORE REVIEWS--%>
                     <c:otherwise>
                         <c:forEach var="review" items="${reviews}">
+                            <h3 class="d-flex justify-content-center">Customer's reviews</h3>
                             <div class="card p-3 mb-4 mt-3">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="user d-flex flex-row align-items-center">
                                         <span>
                                             <small class="font-weight-bold text-primary">${review.getUser().getUsername()}</small>
-                                            <small class="font-weight-bold">${review.getUserComment()}</small>
+                                            <small class="font-weight-bold"><c:out value="${review.getUserComment()}"/></small>
                                         </span>
-                                    </div> <small>${review.getDate().toLocalDate()}</small>
+                                    </div> <small>${review.getDate()}</small>
                                 </div>
                             </div>
                         </c:forEach>

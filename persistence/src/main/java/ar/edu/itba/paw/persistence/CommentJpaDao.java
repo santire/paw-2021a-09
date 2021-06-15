@@ -10,6 +10,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,7 +27,7 @@ public class CommentJpaDao implements CommentDao {
     // CREATE
 
     @Override
-    public Comment addComment(User user, Restaurant restaurant, String comment, LocalDateTime date){
+    public Comment addComment(User user, Restaurant restaurant, String comment, LocalDate date){
         final Comment userComment = new Comment(comment, date);
         userComment.setUser(user);
         userComment.setRestaurant(restaurant);

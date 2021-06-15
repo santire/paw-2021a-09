@@ -1,7 +1,7 @@
 package ar.edu.itba.paw.model;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "comments")
@@ -25,13 +25,13 @@ public class Comment {
     private String userComment;
 
     @Column(name = "date")
-    private LocalDateTime date;
+    private LocalDate date;
 
     Comment(){
         // Just for hibernate
     }
 
-    public Comment(Long id, User user, Restaurant restaurant, String userComment, LocalDateTime date){
+    public Comment(Long id, User user, Restaurant restaurant, String userComment, LocalDate date){
         this.id = id;
         this.user = user;
         this.restaurant = restaurant;
@@ -40,7 +40,7 @@ public class Comment {
     }
 
 
-    public Comment(String userComment, LocalDateTime date){
+    public Comment(String userComment, LocalDate date){
         this.userComment = userComment;
         this.date = date;
     }
@@ -61,7 +61,7 @@ public class Comment {
 
     public void setUserComment(String userComment) { this.userComment = userComment; }
 
-    public LocalDateTime getDate() { return date; }
+    public LocalDate getDate() { return date; }
 
-    public void setDate(LocalDateTime date) { this.date = date; }
+    public void setDate(LocalDate date) { this.date = date; }
 }
