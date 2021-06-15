@@ -177,22 +177,6 @@ public class HomeController {
     @RequestMapping(path ={"/register"}, method = RequestMethod.POST)
     public ModelAndView register(@Valid @ModelAttribute("userForm") final UserForm form, 
             final BindingResult errors ) {
-        // if there are errors it goes back to the register form without losing data
-        // but letting the user know it has errors
-        if(form != null && errors != null){
-            if(form.getPassword() == null || !form.getPassword().equals(form.getRepeatPassword())) {
-                errors.rejectValue("repeatPassword", 
-                                    "userForm.repeatPassword",
-                                    "Passwords do not match");
-            }
-            // TODO: Move this to custom validator
-            if (form.getEmail() == null || !form.getEmail().trim().isEmpty() 
-                    && userService.findByEmail(form.getEmail()).isPresent()){
-                errors.rejectValue("emailInUse", 
-                                    "userForm.emailInUse",
-                                    "Email is already in use");
-            }
-        }
 
         if (errors!=null && errors.hasErrors()) {
             return registerForm(form,errors);

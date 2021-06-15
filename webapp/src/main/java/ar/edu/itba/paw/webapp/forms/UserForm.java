@@ -4,6 +4,10 @@ package ar.edu.itba.paw.webapp.forms;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import ar.edu.itba.paw.webapp.validators.EmailNotInUse;
+import ar.edu.itba.paw.webapp.validators.FieldMatch;
+
+@FieldMatch(first = "password", second = "repeatPassword")
 public class UserForm {
 
   @Size(min = 3, max = 30)
@@ -30,6 +34,7 @@ public class UserForm {
   // "/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/")
 
   @Pattern(regexp = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$")
+  @EmailNotInUse
   private String email;
 
   private boolean emailInUse;

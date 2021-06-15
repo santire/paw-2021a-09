@@ -10,7 +10,7 @@ import javax.validation.Payload;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = {})
+@Constraint(validatedBy = {EmailNotInUseValidator.class})
 public @interface EmailNotInUse {
     String message() default "Email is already in use";
 
