@@ -9,6 +9,8 @@
 <%@attribute name="reviews" required="true" type="java.util.List"%>
 <%@attribute name="userMadeComment" required="true" type="java.lang.Boolean"%>
 <%@attribute name="userReview" required="false" type="ar.edu.itba.paw.model.Comment"%>
+<%@attribute name="hasOnceReserved" required="false" type="java.lang.Boolean"%>
+<%@attribute name="isOwner" required="false" type="java.lang.Boolean"%>
 
 
 <div class="container">
@@ -162,20 +164,31 @@
                     </c:when>
                     <%--USER NEVER MADE A COMMENT--%>
                     <c:otherwise>
-                        <h5 class="display-5 text-center mt-4 mb-5"><spring:message code="restaurant.reviews.create.title"/></h5>
-                        <c:url value="/restaurant/${restaurant.getId()}/reviews" var="addReviewPath"/>
-                        <form action="${addReviewPath}" method="post">
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">${loggedUser.getUsername()}</span>
-                                </div>
-                                <textarea class="form-control" style="resize: none" name="review" aria-label="Review"></textarea>
-                            </div>
-                            <div class="mt-2 d-flex justify-content-end">
-                                <button class="btn btn-outline-warning"><spring:message code="restaurant.reviews.create.send"/></button>
-                            </div>
-                        </form>
-                        <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+                        <c:choose>
+                            <c:when test="${hasOnceReserved}">
+                                <h5 class="display-5 text-center mt-4 mb-5"><spring:message code="restaurant.reviews.create.title"/></h5>
+                                <c:url value="/restaurant/${restaurant.getId()}/reviews" var="addReviewPath"/>
+                                <form action="${addReviewPath}" method="post">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">${loggedUser.getUsername()}</span>
+                                        </div>
+                                        <textarea class="form-control" style="resize: none" name="review" aria-label="Review"></textarea>
+                                    </div>
+                                    <div class="mt-2 d-flex justify-content-end">
+                                        <button class="btn btn-outline-warning"><spring:message code="restaurant.reviews.create.send"/></button>
+                                    </div>
+                                </form>
+                                <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+                            </c:when>
+                            <c:otherwise>
+                                <c:if test="${!isTheOwner}">
+                                    <p class="d-flex justify-content-center font-italic font-weight-light">
+                                        <spring:message code="restaurant.reviews.cannotReview"/>
+                                    </p>
+                                </c:if>
+                            </c:otherwise>
+                        </c:choose>
                     </c:otherwise>
                 </c:choose>
 

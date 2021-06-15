@@ -166,6 +166,8 @@ public class RestaurantController {
             else{
                 mav.addObject("userMadeComment", false);
             }
+            List<Reservation> userReservationHistory = reservationService.findByUserAndRestaurantHistory(loggedUser.getId(), restaurantId);
+            mav.addObject("hasOnceReserved", !userReservationHistory.isEmpty());
         }
 
         LOGGER.error("page value: {}", page);

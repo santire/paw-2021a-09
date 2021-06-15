@@ -14,6 +14,8 @@
                             reviews="${reviews}"
                             userMadeComment="${userMadeComment}"
                             userReview="${userReview}"
+                            hasOnceReserved="${hasOnceReserved}"
+                            isOwner="${isTheOwner}"
                     />
                 </c:when>
                 <c:otherwise>
@@ -22,6 +24,7 @@
                             times="${times}"
                             reviews="${reviews}"
                             userMadeComment="${userMadeComment}"
+                            hasOnceReserved="${hasOnceReserved}"
                     />
                 </c:otherwise>
             </c:choose>
