@@ -9,12 +9,17 @@ import org.hibernate.validator.constraints.Email;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.NumberFormat;
 
+import ar.edu.itba.paw.webapp.validators.PresentTime;
+import ar.edu.itba.paw.webapp.validators.ValidTime;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+@PresentTime(date = "date", time = "time", daysLimit = 7)
 public class ReservationForm {
 
 
+    @ValidTime(minHour = 12, maxHour = 23, stepMinutes = 30)
     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime time;
 

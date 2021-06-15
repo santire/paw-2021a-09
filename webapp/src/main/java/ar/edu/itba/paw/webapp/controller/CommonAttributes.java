@@ -27,12 +27,12 @@ public class CommonAttributes {
         final Optional<User> maybeUser = userService.findByEmail((String) auth.getName());
 
         User user = maybeUser.orElse(null);
-        LOGGER.debug("Logged user is {}", user);
+        if (user != null) {
+            LOGGER.debug("Logged user is {}", user.getName());
+        } else {
+            LOGGER.debug("No logged user");
+        }
 
         return user;
-
     }
-
-
-
 }

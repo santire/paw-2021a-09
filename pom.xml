@@ -20,6 +20,7 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <spring.version>4.2.5.RELEASE</spring.version>
     <spring-boot.version>2.2.5.RELEASE</spring-boot.version>
+    <email.version>1.6.4</email.version>
     <servlet-api.version>2.5</servlet-api.version>
     <validation-api.version>1.0.0.GA</validation-api.version>
     <hibernate-validator.version>4.3.1.Final</hibernate-validator.version>
@@ -88,9 +89,14 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-mail</artifactId>
-        <version>${spring-boot.version}</version>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context-support</artifactId>
+        <version>${spring.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.mail</groupId>
+        <artifactId>jakarta.mail</artifactId>
+        <version>${email.version}</version>
       </dependency>
       <dependency>
         <groupId>commons-fileupload</groupId>

@@ -37,11 +37,13 @@ public class UserController {
     @Autowired
     private PawUserDetailsService pawUserDetailsService;
 
+    @Autowired
+    private CommonAttributes ca;
+
     // UPDATE USER
 
     @RequestMapping(path = { "/user/edit" }, method = RequestMethod.GET)
     public ModelAndView editUser(
-            @ModelAttribute("loggedUser") final User loggedUser,
             @ModelAttribute("updateUserForm") final UserForm form) {
 
         final ModelAndView mav = new ModelAndView("editUser");
@@ -50,14 +52,15 @@ public class UserController {
 
     @RequestMapping(path = { "/user/edit" }, method = RequestMethod.POST)
     public ModelAndView editUser(
-            @ModelAttribute("loggedUser") final User loggedUser,
             @Valid @ModelAttribute("updateUserForm") final UserForm form,
             final BindingResult errors,
             RedirectAttributes redirectAttributes) {
 
+        User loggedUser = ca.loggedUser();
+
         if (errors.hasErrors()) {
             LOGGER.debug("Form has errors at /user/edit for user {}", loggedUser.getId());
-            return editUser(loggedUser, form);
+            return editUser(form);
         }
         try {
             userService.updateUser(
@@ -89,12 +92,6 @@ public class UserController {
     public ModelAndView forgotPassword(
             @Valid @ModelAttribute("emailForm") final EmailForm form,
             final BindingResult errors) {
-        if (form.getEmail() != null 
-                && !userService.findByEmail(form.getEmail()).isPresent()) {
-            errors.rejectValue("email", 
-                    "emailForm.emailNotInUse", 
-                    "Email is not associated to a valid user");
-        }
 
         if (errors != null && errors.hasErrors()) {
             return forgotPasswordForm(form, errors);
@@ -124,16 +121,6 @@ public class UserController {
             @Valid @ModelAttribute("passwordForm") final PasswordForm form,
             final BindingResult errors) {
 
-        // if there are errors it goes back to the register form without losing data
-        // but letting the user know it has errors
-        if (form != null && errors != null) {
-            if (form.getPassword() == null || !form.getPassword().equals(form.getRepeatPassword())) {
-                errors.rejectValue("repeatPassword", 
-                        "passwordForm.repeatPassword",
-                        "Passwords do not match");
-            }
-        }
-
         if (errors != null && errors.hasErrors()) {
             return updatePasswordForm(token, form, errors);
         }
@@ -148,7 +135,7 @@ public class UserController {
             LOGGER.warn("token {} does not exist", token);
             return new ModelAndView("requestedResetPassword").addObject("invalidToken", true);
         } catch (Exception e) {
-            e.printStackTrace();
+            // Ignore
             // Unexpected error happened, showing register screen with generic error message
             return new ModelAndView("redirect:/login").addObject("tokenError", true);
         }
