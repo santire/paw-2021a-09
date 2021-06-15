@@ -187,10 +187,6 @@ public class RestaurantController {
 
         User loggedUser = ca.loggedUser();
 
-        if (form.getTags().length>3) {
-            errors.rejectValue("tags", "restaurant.edit.tagsLimit");
-        }
-
         if (errors.hasErrors()) {
             LOGGER.debug("Form has errors at /register/restaurant");
             return registerRestaurant(form);

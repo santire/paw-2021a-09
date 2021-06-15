@@ -91,9 +91,6 @@ public class RestaurantManagmentController {
             @Valid @ModelAttribute("RestaurantForm") final RestaurantForm form,
             final BindingResult errors) {
 
-        if (form.getTags().length>3) {
-            errors.rejectValue("tags", "restaurant.edit.tagsLimit");
-        }
         if (errors.hasErrors()) {
             LOGGER.debug("Form has errors at /restaurant/{}/edit", restaurantId);
             return editRestaurant(restaurantId, form);

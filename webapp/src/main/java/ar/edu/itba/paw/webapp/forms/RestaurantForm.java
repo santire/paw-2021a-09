@@ -25,6 +25,7 @@ public class RestaurantForm {
     @MultipartFileSizeValid
     private MultipartFile profileImage;
 
+    @Size(max=3)
     private Integer[] tags;
 
     public Integer[] getTags() {
