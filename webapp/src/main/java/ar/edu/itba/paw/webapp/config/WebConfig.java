@@ -32,6 +32,10 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+import org.thymeleaf.spring4.SpringTemplateEngine;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import org.thymeleaf.templateresolver.ITemplateResolver;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
@@ -114,6 +118,23 @@ public class WebConfig {
   @Bean
   public PlatformTransactionManager transactionManager(final EntityManagerFactory emf) {
     return new JpaTransactionManager(emf);
+  }
+
+  @Bean
+  public ITemplateResolver thymeleafTemplateResolver() {
+    ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+    templateResolver.setPrefix("mail-templates/");
+    templateResolver.setSuffix(".html");
+    templateResolver.setTemplateMode("HTML");
+    templateResolver.setCharacterEncoding("UTF-8");
+    return templateResolver;
+  }
+  @Bean
+  public SpringTemplateEngine thymeleafTemplateEngine(ITemplateResolver templateResolver) {
+      SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+      templateEngine.setTemplateResolver(templateResolver);
+      templateEngine.setTemplateEngineMessageSource(messageSource());
+      return templateEngine;
   }
 
   @Bean
