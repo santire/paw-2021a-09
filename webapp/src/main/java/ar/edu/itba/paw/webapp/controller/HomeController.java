@@ -183,7 +183,7 @@ public class HomeController {
 
         try{
            userService.register(form.getUsername(), form.getPassword(), form.getFirstName(),
-                    form.getLastName(), form.getEmail(), form.getPhone());
+                    form.getLastName(), form.getEmail(), form.getPhone(), ca.getUri());
             return new ModelAndView("activate");
         } catch (EmailInUseException e) {
             LOGGER.error("Email {} is already in use (this should have been caught by validator)", e.getEmail());

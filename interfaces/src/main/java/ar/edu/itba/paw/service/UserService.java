@@ -15,7 +15,8 @@ public interface UserService {
       final String firstName,
       final String lastName,
       final String email, 
-      final String phone) throws EmailInUseException, TokenCreationException;
+      final String phone,
+      String baseUrl) throws EmailInUseException, TokenCreationException;
 
   // READ
   public Optional<User> findById(long id);
@@ -27,6 +28,6 @@ public interface UserService {
   public User activateUserByToken(String token) throws TokenExpiredException;
   public User updatePasswordByToken(String token, String password) throws TokenExpiredException;
   public void updateUser(long id, String username, String password, String firstName, String lastName, String email, String phone);
-  public void requestPasswordReset(String email) throws TokenCreationException;
+  public void requestPasswordReset(String email, String baseUrl) throws TokenCreationException;
 
 }
