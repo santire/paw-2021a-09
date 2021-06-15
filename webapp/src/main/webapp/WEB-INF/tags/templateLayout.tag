@@ -83,12 +83,12 @@
         format: "dd/mm/yyyy",
         maxDate: function() {
           var date = new Date();
-          date.setDate(date.getDate()+7);
+          date.setDate(date.getDate()+17);
           return new Date(date.getFullYear(), date.getMonth(), date.getDate());
         },
         minDate: function() {
           var date = new Date();
-          date.setDate(date.getDate());
+          date.setDate(date.getDate()-1);
           return new Date(date.getFullYear(), date.getMonth(), date.getDate());
         },
         showOtherMonths: false

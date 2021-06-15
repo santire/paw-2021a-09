@@ -133,43 +133,13 @@ public class RestaurantController {
             RedirectAttributes redirectAttributes) {
 
         User loggedUser = ca.loggedUser();
-        LocalTime time;
-        LocalDate date;
-        if (form != null && errors != null) {
-            time = form.getTime();
-            LocalTime currentTime = LocalTime.now();
-
-            if (time!=null &&  time.isBefore(currentTime)) {
-                errors.rejectValue("time",
-                                    "reservationForm.time",
-                                    "Selected hour has already passed");
-            }
-            // Range validator
-            if(!restaurantService.availableTime(restaurantId).contains(time)){
-                errors.rejectValue("time",
-                        "reservationForm.time",
-                        "Select an hour from list");
-            }
-
-            // Date validator
-            date = form.getDate();
-            LocalDate currentDate = LocalDate.now();
-            LocalDate yesterday = currentDate.minusDays(1);
-            LocalDate dateInAWeek = currentDate.plusDays(7);
-            if(date.isAfter(dateInAWeek) || date.isBefore(yesterday)){
-                errors.rejectValue("date",
-                        "reservationForm.date",
-                        "Select a valid date");
-            }
-        }
         if (errors.hasErrors()) {
             return restaurant(form, menuForm, ratingForm, page, restaurantId);
         }
 
         if (loggedUser != null) {
-            time = form.getTime();
-            date = form.getDate();
-            LocalDateTime todayAtDate = LocalDate.now().atTime(time.getHour(), time.getMinute());
+            LocalTime time = form.getTime();
+            LocalDate date = form.getDate();
             LocalDateTime dateAt = date.atTime(time.getHour(), time.getMinute());
             reservationService.addReservation(loggedUser.getId(), restaurantId, dateAt, Long.parseLong(form.getQuantity()));
             redirectAttributes.addFlashAttribute("madeReservation", true);

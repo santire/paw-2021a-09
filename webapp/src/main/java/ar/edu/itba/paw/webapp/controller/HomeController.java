@@ -113,6 +113,7 @@ public class HomeController {
         List<Integer> tagsChecked = new ArrayList<>();
         if(tags!=null){
             for( int i : tags){
+                // TODO: fix this, should throw some exception
                 if(Tags.valueOf(i) == null)
                     return new ModelAndView("redirect:/403");
                 tagsSelected.add(Tags.valueOf(i));
@@ -132,8 +133,6 @@ public class HomeController {
             desc = true;
 
         order = desc ? "DESC" : "ASC";
-        // Catching invalid page value and setting it at max or min
-        // depending on the overflow direction
         int maxPages = restaurantService.getRestaurantsFilteredByPageCount(AMOUNT_OF_RESTAURANTS, search, tagsSelected, min, max);
         if(page == null || page <1) {
             page=1;
