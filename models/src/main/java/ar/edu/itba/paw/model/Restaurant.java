@@ -2,6 +2,7 @@ package ar.edu.itba.paw.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.text.DecimalFormat;
 
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
@@ -140,9 +141,13 @@ public class Restaurant {
     public String getPhoneNumber(){ return this.phoneNumber; }
     public List<Rating> getRatings(){ return this.ratings; }
     public double getRating() { 
-        return ratings
-            .stream()
-            .mapToDouble(r -> r.getRating()).average().orElse(0);
+        DecimalFormat df = new DecimalFormat("#.##");    
+        double result = new Double(df.format(
+        ratings
+        .stream()
+        .mapToDouble(r -> r.getRating()).average().orElse(0)));
+        
+        return result;
     }
     public User getOwner() { return owner; }
     public int getLikes() { return likes.size(); }
