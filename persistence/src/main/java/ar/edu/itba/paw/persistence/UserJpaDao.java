@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.persistence;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -123,8 +124,15 @@ public class UserJpaDao implements UserDao {
 
     @Override
     public void purgeAllExpiredTokensSince(LocalDateTime expiredCreatedAt) {
-        // TODO Auto-generated method stub
+        Timestamp expiredCreatedAtTimestamp = Timestamp.valueOf(expiredCreatedAt);
 
+        Query query = em.createQuery("delete VerificationToken v where v.createdAt < :exDate");
+        query.setParameter("exDate", expiredCreatedAtTimestamp);
+        Query query2 = em.createQuery("delete PasswordToken v where v.createdAt < :exDate");
+        query2.setParameter("exDate", expiredCreatedAtTimestamp);
+
+        query.executeUpdate();
+        query2.executeUpdate();
     }
 
 }
