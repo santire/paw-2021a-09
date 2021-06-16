@@ -148,9 +148,8 @@
                                                 </div>
                                                 <div class="modal-footer d-flex justify-content-center">
                                                     <button type="button" class="btn btn-secondary text-white mx-auto" data-dismiss="modal"><spring:message code="general.cancel"/></button>
-                                                    <c:url value="/restaurant/${restaurant.getId()}/reviews/delete" var="deleteReviewPath"/>
+                                                    <c:url value="/restaurant/${restaurant.getId()}/reviews/${userReview.getId()}/delete/" var="deleteReviewPath"/>
                                                     <form class="mx-auto"  action="${deleteReviewPath}" method="post">
-                                                        <input type="hidden" name="reviewId" value="${userReview.getId()}">
                                                         <button type="submit" class="btn btn-danger text-white mx-auto"><spring:message code="restaurant.edit.deleteConfirmation"/></button>
                                                     </form>
                                                 </div>

@@ -72,7 +72,9 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                              "/reservations/history",
                              "/restaurant/*/rate",
                              "/restaurant/*/dislike",
-                             "/restaurant/*/like"
+                             "/restaurant/*/like",
+                             "/restaurant/*/reviews",
+                             "/restaurant/*/reviews/delete"
                              ).hasRole("USER")
                 .antMatchers("/restaurant/*/edit",
                              "/restaurant/*/delete",
