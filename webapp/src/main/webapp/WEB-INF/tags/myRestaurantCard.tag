@@ -28,9 +28,9 @@
             <h6 class="card-title text-break text-break text-center" style="min-height: 35px;">${restaurant.getName()}</h6>
             <div class="card-text d-flex flex-wrap justify-content-center align-items-center text-center mx-auto " style="min-height: 50px;">
                 <c:forEach items="${restaurant.getTags()}" var="tag">
-                    <div class=" border border rounded mr-2 mb-2 text-muted">
+                    <a style="text-decoration:none" href="/restaurants?tags=${tag.getValue()}"><div class=" border border rounded mr-2 mb-2 text-muted">
                         &nbsp;<spring:message code="restaurant.tag.${tag.getValue()}"/>&nbsp;
-                    </div>
+                    </div></a>
                 </c:forEach>
             </div>
             <div class="d-flex justify-content-center">

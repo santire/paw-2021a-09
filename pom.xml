@@ -19,7 +19,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <spring.version>4.2.5.RELEASE</spring.version>
-    <spring-boot.version>2.2.5.RELEASE</spring-boot.version>
+    <thymeleaf.version>3.0.12.RELEASE</thymeleaf.version>
     <email.version>1.6.4</email.version>
     <servlet-api.version>2.5</servlet-api.version>
     <validation-api.version>1.0.0.GA</validation-api.version>
@@ -92,6 +92,16 @@
         <groupId>org.springframework</groupId>
         <artifactId>spring-context-support</artifactId>
         <version>${spring.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.thymeleaf</groupId>
+        <artifactId>thymeleaf</artifactId>
+        <version>${thymeleaf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.thymeleaf</groupId>
+        <artifactId>thymeleaf-spring4</artifactId>
+        <version>${thymeleaf.version}</version>
       </dependency>
       <dependency>
         <groupId>com.sun.mail</groupId>

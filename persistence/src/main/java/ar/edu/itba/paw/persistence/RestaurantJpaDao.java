@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import ar.edu.itba.paw.model.Image;
+import ar.edu.itba.paw.model.MenuItem;
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.Sorting;
 import ar.edu.itba.paw.model.Tags;
@@ -55,6 +56,69 @@ public class RestaurantJpaDao implements RestaurantDao {
     @Override
     public Optional<Restaurant> findById(long id) {
         return Optional.ofNullable(em.find(Restaurant.class, id));
+    }
+
+    @Override
+    public Optional<Restaurant> findByIdWithMenu(int page, int amountOnPage, long id){
+        Optional<Restaurant> maybeRestaurant = findById(id);
+        if (!maybeRestaurant.isPresent()) {
+            return maybeRestaurant;
+        }
+        Restaurant restaurant = maybeRestaurant.get();
+
+        List<MenuItem> menuItems;
+        Query nativeQuery = em.createNativeQuery(
+                "SELECT menu_item_id"
+                +
+                " FROM restaurants r LEFT JOIN menu_items m"
+                +
+                " ON r.restaurant_id = m.restaurant_id"
+                +
+                " WHERE r.restaurant_id = :rid"
+                +
+                " ORDER BY menu_item_id ASC"
+                );
+
+        nativeQuery.setParameter("rid", id);
+        nativeQuery.setFirstResult((page - 1) * amountOnPage);
+        nativeQuery.setMaxResults(amountOnPage);
+
+        @SuppressWarnings("unchecked")
+        // List<Long> filteredIds = (List<Long>) nativeQuery.getResultList().stream().map(e -> Long.valueOf(e.toString())).collect(Collectors.toList());
+        List<Long> filteredIds = (List<Long>) nativeQuery.getResultList().stream().filter(e -> e!=null).map(e -> Long.valueOf(e.toString())).collect(Collectors.toList());
+
+        if (filteredIds.isEmpty()) {
+            menuItems = Collections.emptyList();
+        } else {
+            final TypedQuery<MenuItem> query = em.createQuery("from MenuItem where id IN :filteredIds",
+                    MenuItem.class);
+            query.setParameter("filteredIds", filteredIds);
+            menuItems =  query.getResultList().stream().sorted(Comparator.comparing(v->filteredIds.indexOf(v.getId()))).collect(Collectors.toList());
+        }
+
+        restaurant.setMenuPage(menuItems);
+        return Optional.of(restaurant);
+    }
+
+    @Override
+    public int findByIdWithMenuPageCount(int amountOnPage, long id){
+        Query nativeQuery = em.createNativeQuery(
+                "SELECT menu_item_id"
+                +
+                " FROM restaurants r LEFT JOIN menu_items m"
+                +
+                " ON r.restaurant_id = m.restaurant_id"
+                +
+                " WHERE r.restaurant_id = :rid"
+                +
+                " ORDER BY menu_item_id ASC"
+                );
+
+        nativeQuery.setParameter("rid", id);
+        int amountOfRestaurants = nativeQuery.getResultList().size();
+        int pageAmount = (int) Math.ceil((double) amountOfRestaurants / amountOnPage);
+
+        return pageAmount <= 0 ? 1 : pageAmount;
     }
 
     @Override
@@ -368,6 +432,16 @@ public class RestaurantJpaDao implements RestaurantDao {
 
     // UPDATE
     // These should be done from the service by modifying the instance (i think)
+
+
+    @Override
+    public boolean menuBelongsToRestaurant(long restaurantId, long menuId) {
+        Query nativeQuery = em.createNativeQuery("SELECT menu_item_id FROM restaurants r LEFT JOIN menu_items m ON r.restaurant_id = m.restaurant_id WHERE r.restaurant_id = :rid AND m.menu_item_id = :mid");
+            nativeQuery.setParameter("rid", restaurantId);
+            nativeQuery.setParameter("mid", menuId);
+
+            return !nativeQuery.getResultList().isEmpty();
+    }
 
     @Override
     @Deprecated

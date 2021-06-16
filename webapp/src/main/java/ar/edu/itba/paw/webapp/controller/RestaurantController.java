@@ -147,15 +147,43 @@ public class RestaurantController {
         return mav;
     }
 
+    @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.POST)
+    public ModelAndView reservationAndMenu(@Valid @ModelAttribute("reservationForm") final ReservationForm form,
+                                           final BindingResult errors,
+                                           @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
+                                           final BindingResult menuErrors,
+                                           @ModelAttribute("ratingForm") final RatingForm ratingForm,
+                                           final BindingResult ratingError,
+                                           @RequestParam(defaultValue="1") Integer page,
+                                           @PathVariable("restaurantId") final long restaurantId,
+                                           RedirectAttributes redirectAttributes) {
+
+        User loggedUser = ca.loggedUser();
+        if (errors.hasErrors()) {
+            return restaurant(form, menuForm, ratingForm, page, restaurantId);
+        }
+
+        if (loggedUser != null) {
+            LocalTime time = form.getTime();
+            LocalDate date = form.getDate();
+            LocalDateTime dateAt = date.atTime(time.getHour(), time.getMinute());
+            reservationService.addReservation(loggedUser.getId(), restaurantId, dateAt, Long.parseLong(form.getQuantity()), ca.getUri());
+            redirectAttributes.addFlashAttribute("madeReservation", true);
+        } else {
+            return new ModelAndView("redirect:/login");
+        }
+
+        return new ModelAndView("redirect:/");
+    }
+
     @RequestMapping(path = { "/restaurant/{restaurantId}/reviews" }, method = RequestMethod.GET)
-    public ModelAndView restaurantReviews(@ModelAttribute("loggedUser") final User loggedUser,
-                                   @ModelAttribute("reservationForm") final ReservationForm form,
+    public ModelAndView restaurantReviews(@ModelAttribute("reservationForm") final ReservationForm form,
                                           @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
                                    @ModelAttribute("ratingForm") final RatingForm ratingForm,
                                    @RequestParam(defaultValue="1") Integer page,
                                    @PathVariable("restaurantId") final long restaurantId) {
         final ModelAndView mav = new ModelAndView("restaurantReviews");
-
+        User loggedUser = ca.loggedUser();
         //int maxPages = restaurantService.findByIdWithMenuPagesCount(AMOUNT_OF_MENU_ITEMS, restaurantId);
         int maxPages = commentService.findByRestaurantPageCount(AMOUNT_OF_REVIEWS, restaurantId);
 
@@ -219,21 +247,10 @@ public class RestaurantController {
         return mav;
     }
 
-    @RequestMapping(path = { "/restaurant/{restaurantId}/reviews/delete" }, method = RequestMethod.POST)
-    public ModelAndView deleteReview(@ModelAttribute("loggedUser") final User loggedUser,
-                                     @PathVariable("restaurantId") final long restaurantId,
-                                     @RequestParam("reviewId") final long reviewId) {
-        if(loggedUser!=null){
-            commentService.deleteComment(reviewId);
-            return new ModelAndView("redirect:/restaurant/" + restaurantId + "/reviews");
-        }
-        return new ModelAndView("redirect:/login");
-    }
-
     @RequestMapping(path = { "/restaurant/{restaurantId}/reviews" }, method = RequestMethod.POST)
-    public ModelAndView addRestaurantReview(@ModelAttribute("loggedUser") final User loggedUser,
-                                          @PathVariable("restaurantId") final long restaurantId,
+    public ModelAndView addRestaurantReview(@PathVariable("restaurantId") final long restaurantId,
                                             @RequestParam("review") final String review) {
+        User loggedUser = ca.loggedUser();
         if(loggedUser!=null){
             // TODO: ADD MORE VALIDATIONS
             commentService.addComment(loggedUser.getId(), restaurantId, review);
@@ -242,34 +259,14 @@ public class RestaurantController {
         return new ModelAndView("redirect:/login");
     }
 
-    @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.POST)
-    public ModelAndView reservationAndMenu(@Valid @ModelAttribute("reservationForm") final ReservationForm form,
-            final BindingResult errors,
-             @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
-            final BindingResult menuErrors,
-            @ModelAttribute("ratingForm") final RatingForm ratingForm,
-            final BindingResult ratingError,
-            @RequestParam(defaultValue="1") Integer page,
-            @PathVariable("restaurantId") final long restaurantId,
-            RedirectAttributes redirectAttributes) {
-
-        User loggedUser = ca.loggedUser();
-        if (errors.hasErrors()) {
-            return restaurant(form, menuForm, ratingForm, page, restaurantId);
-        }
-
-        if (loggedUser != null) {
-            LocalTime time = form.getTime();
-            LocalDate date = form.getDate();
-            LocalDateTime dateAt = date.atTime(time.getHour(), time.getMinute());
-            reservationService.addReservation(loggedUser.getId(), restaurantId, dateAt, Long.parseLong(form.getQuantity()));
-            redirectAttributes.addFlashAttribute("madeReservation", true);
-        } else {
-            return new ModelAndView("redirect:/login");
-        }
-
-        return new ModelAndView("redirect:/");
+    @RequestMapping(path = { "/restaurant/{restaurantId}/reviews/{reviewId}/delete" }, method = RequestMethod.POST)
+    @PreAuthorize("@authComponent.isReviewOwner(#reviewId)")
+    public ModelAndView deleteReview(@PathVariable("restaurantId") final long restaurantId,
+                                     @PathVariable("reviewId") final long reviewId) {
+        commentService.deleteComment(reviewId);
+        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/reviews");
     }
+
 
     @RequestMapping(path = { "/restaurant/{restaurantId}/menu" }, method = RequestMethod.POST)
     @PreAuthorize("@authComponent.isRestaurantOwner(#restaurantId)")

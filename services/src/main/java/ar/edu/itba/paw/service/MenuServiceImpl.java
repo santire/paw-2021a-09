@@ -38,9 +38,10 @@ public class MenuServiceImpl implements MenuService {
 	@Override
 	public boolean menuBelongsToRestaurant(long menuId, long restaurantId) {
 		Restaurant restaurant = restaurantDao.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
-		return restaurant.getMenu()
-					.stream()
-					.anyMatch(m -> menuId == m.getId());
+		return restaurantDao.menuBelongsToRestaurant(restaurantId, menuId);
+		// return restaurant.getMenu()
+					// .stream()
+					// .anyMatch(m -> menuId == m.getId());
 
 		// return menuDao.findById(menuId).getRestaurant().getId() == restaurantId
 	}

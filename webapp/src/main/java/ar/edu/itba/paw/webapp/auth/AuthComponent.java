@@ -2,16 +2,14 @@ package ar.edu.itba.paw.webapp.auth;
 
 import java.util.Optional;
 
+import ar.edu.itba.paw.model.Comment;
+import ar.edu.itba.paw.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import ar.edu.itba.paw.model.Reservation;
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
-import ar.edu.itba.paw.service.MenuService;
-import ar.edu.itba.paw.service.ReservationService;
-import ar.edu.itba.paw.service.RestaurantService;
-import ar.edu.itba.paw.service.UserService;
 import ar.edu.itba.paw.webapp.controller.CommonAttributes;
 
 @Component
@@ -30,6 +28,9 @@ public class AuthComponent {
     MenuService menuService;
 
     @Autowired
+    CommentService commentService;
+
+    @Autowired
     CommonAttributes ca;
 
     public boolean isReservationUser(Long reservationId) {
@@ -37,7 +38,7 @@ public class AuthComponent {
         Optional<Reservation> maybeReservation = reservationService.findById(reservationId);
         return loggedUser != null 
             && maybeReservation.isPresent() 
-            && loggedUser.getId() == maybeReservation.get().getUser().getId();
+            && loggedUser.getId().equals(maybeReservation.get().getUser().getId());
     }
 
     public boolean isReservationOwner(Long reservationId) {
@@ -46,12 +47,21 @@ public class AuthComponent {
 
         return loggedUser != null
             && maybeReservation.isPresent()
-            && loggedUser.getId() == maybeReservation.get().getRestaurant().getOwner().getId();
+            && loggedUser.getId().equals(maybeReservation.get().getRestaurant().getOwner().getId());
     }
 
     public boolean isRestaurantOwner(Long restaurantId) {
         User loggedUser = ca.loggedUser();
         return userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
+    }
+
+    public boolean isReviewOwner(Long reviewId) {
+        Optional<Comment> maybeReview = commentService.findById(reviewId);
+        User loggedUser = ca.loggedUser();
+
+        return loggedUser != null
+                && maybeReview.isPresent()
+                && loggedUser.getId().equals(maybeReview.get().getUser().getId());
     }
 
     public boolean isRestaurantAndMenuOwner(Long restaurantId, Long menuItemId) {
