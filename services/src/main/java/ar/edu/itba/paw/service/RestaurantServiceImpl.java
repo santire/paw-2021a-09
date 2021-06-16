@@ -91,7 +91,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Override
     @Transactional
     public List<Restaurant> getHotRestaurants(int limit, int lastDays) {
-        return this.restaurantDao.getHotRestaurants(limit, lastDays);
+        return restaurantDao.getHotRestaurants(limit, lastDays);
     }
 
     // UPDATE
