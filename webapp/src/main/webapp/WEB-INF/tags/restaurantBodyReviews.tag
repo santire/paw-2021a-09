@@ -135,11 +135,11 @@
                                 <div class="user d-flex flex-row align-items-center">
                                     <span>
                                         <small class="font-weight-bold text-primary">${userReview.getUser().getUsername()}</small>
-                                        <small class="font-weight-bold"><c:out value="${userReview.getUserComment()}"/></small>
+                                        <small class="font-weight-bold" style="word-break: break-word"><c:out value="${userReview.getUserComment()}"/></small>
                                     </span>
                                 </div>
                                 <div class="d-flex justify-content-end align-items-center">
-                                    <small class="float-right mr-4">${userReview.getDate()}</small>
+                                    <small class="float-right mr-4 ml-3" style="white-space: nowrap">${userReview.getDate()}</small>
                                     <button type="button" class="close"  data-toggle="modal" data-target="#deleteComment" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
@@ -179,9 +179,9 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">${loggedUser.getUsername()}</span>
                                         </div>
-                                        <form:textarea class="form-control" style="resize: none" path="review" aria-label="Review"></form:textarea>
-                                        <form:errors class="text-danger" element="p" path="review"/>
+                                        <form:textarea class="form-control" style="resize: none" cssStyle="word-wrap: break-word" path="review" aria-label="Review"></form:textarea>
                                     </div>
+                                    <form:errors class="text-danger" element="p" path="review"/>
                                     <div class="mt-2 d-flex justify-content-end">
                                         <button class="btn btn-outline-warning"><spring:message code="restaurant.reviews.create.send"/></button>
                                     </div>

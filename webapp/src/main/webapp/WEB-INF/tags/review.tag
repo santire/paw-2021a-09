@@ -9,9 +9,9 @@
         <div class="user d-flex flex-row align-items-center">
     <span>
         <small class="font-weight-bold text-primary">${review.getUser().getUsername()}</small>
-        <small class="font-weight-bold"><c:out value="${review.getUserComment()}"/></small>
+        <small class="font-weight-bold" style="word-break: break-word"><c:out value="${review.getUserComment()}"/></small>
     </span>
-        </div> <small>${review.getDate()}</small>
+        </div> <small class="ml-3" style="white-space: nowrap">${review.getDate()}</small>
     </div>
 </div>
 
