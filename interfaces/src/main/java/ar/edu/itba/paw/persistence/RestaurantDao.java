@@ -34,6 +34,7 @@ public interface RestaurantDao {
     public int getRestaurantsFromOwnerPagesCount(int amountOnPage, long userId);
 
 
+    public boolean menuBelongsToRestaurant(long restaurantId, long menuId);
 
 
     // UPDATE

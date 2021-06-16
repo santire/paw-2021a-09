@@ -84,17 +84,17 @@ public class RestaurantJpaDao implements RestaurantDao {
         nativeQuery.setMaxResults(amountOnPage);
 
         @SuppressWarnings("unchecked")
-        List<Long> filteredIds = (List<Long>) nativeQuery.getResultList().stream().map(e -> Long.valueOf(e.toString()))
-                .collect(Collectors.toList());
+        // List<Long> filteredIds = (List<Long>) nativeQuery.getResultList().stream().map(e -> Long.valueOf(e.toString())).collect(Collectors.toList());
+        List<Long> filteredIds = (List<Long>) nativeQuery.getResultList().stream().filter(e -> e!=null).map(e -> Long.valueOf(e.toString())).collect(Collectors.toList());
 
         if (filteredIds.isEmpty()) {
             menuItems = Collections.emptyList();
+        } else {
+            final TypedQuery<MenuItem> query = em.createQuery("from MenuItem where id IN :filteredIds",
+                    MenuItem.class);
+            query.setParameter("filteredIds", filteredIds);
+            menuItems =  query.getResultList().stream().sorted(Comparator.comparing(v->filteredIds.indexOf(v.getId()))).collect(Collectors.toList());
         }
-
-        final TypedQuery<MenuItem> query = em.createQuery("from MenuItem where id IN :filteredIds",
-                MenuItem.class);
-        query.setParameter("filteredIds", filteredIds);
-        menuItems =  query.getResultList().stream().sorted(Comparator.comparing(v->filteredIds.indexOf(v.getId()))).collect(Collectors.toList());
 
         restaurant.setMenuPage(menuItems);
         return Optional.of(restaurant);
@@ -432,6 +432,16 @@ public class RestaurantJpaDao implements RestaurantDao {
 
     // UPDATE
     // These should be done from the service by modifying the instance (i think)
+
+
+    @Override
+    public boolean menuBelongsToRestaurant(long restaurantId, long menuId) {
+        Query nativeQuery = em.createNativeQuery("SELECT menu_item_id FROM restaurants r LEFT JOIN menu_items m ON r.restaurant_id = m.restaurant_id WHERE r.restaurant_id = :rid AND m.menu_item_id = :mid");
+            nativeQuery.setParameter("rid", restaurantId);
+            nativeQuery.setParameter("mid", menuId);
+
+            return !nativeQuery.getResultList().isEmpty();
+    }
 
     @Override
     @Deprecated
