@@ -14,6 +14,7 @@ public interface ReservationService {
     // READ
     public Optional<Reservation> findById(long reservationId);
     public List<Reservation> findByUser(int page, int amountOnPage, long userId);
+    public List<Reservation> findByUserAndRestaurantHistory(long userId, long restaurantId);
     public List<Reservation> findByUserHistory(int page, int amountOnPage, long userId);
     public int findByUserPageCount(int amountOnPage, long userId);
     public int findByUserHistoryPageCount(int amountOnPage, long userId);

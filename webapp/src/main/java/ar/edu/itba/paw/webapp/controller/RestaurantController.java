@@ -48,6 +48,7 @@ public class RestaurantController {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
     private static final int AMOUNT_OF_MENU_ITEMS = 8;
     private static final int AMOUNT_OF_RESTAURANTS = 10;
+    private static final int AMOUNT_OF_REVIEWS = 4;
 
     @Autowired
     private UserService userService;
@@ -69,6 +70,9 @@ public class RestaurantController {
 
     @Autowired
     private CommonAttributes ca;
+    
+    @Autowired
+    private CommentService commentService;
 
 
 
@@ -119,6 +123,85 @@ public class RestaurantController {
         mav.addObject("restaurant",
                 restaurantService.findByIdWithMenu(restaurantId, page, AMOUNT_OF_MENU_ITEMS).orElseThrow(RestaurantNotFoundException::new));
         return mav;
+    }
+
+    @RequestMapping(path = { "/restaurant/{restaurantId}/reviews" }, method = RequestMethod.GET)
+    public ModelAndView restaurantReviews(@ModelAttribute("loggedUser") final User loggedUser,
+                                   @ModelAttribute("reservationForm") final ReservationForm form,
+                                          @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
+                                   @ModelAttribute("ratingForm") final RatingForm ratingForm,
+                                   @RequestParam(defaultValue="1") Integer page,
+                                   @PathVariable("restaurantId") final long restaurantId) {
+        final ModelAndView mav = new ModelAndView("restaurantReviews");
+
+        //int maxPages = restaurantService.findByIdWithMenuPagesCount(AMOUNT_OF_MENU_ITEMS, restaurantId);
+        int maxPages = commentService.findByRestaurantPageCount(AMOUNT_OF_REVIEWS, restaurantId);
+
+        if(page == null || page <1) {
+            page=1;
+        }else if (page > maxPages) {
+            page = maxPages;
+        }
+        mav.addObject("maxPages", maxPages);
+
+        if(loggedUser != null){
+            Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
+            boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
+            if (isTheRestaurantOwner) {
+                mav.addObject("isTheOwner", true);
+            }
+
+            mav.addObject("userRatingToRestaurant", 0);
+
+            if(userRating.isPresent()){
+                mav.addObject("rated", true);
+                mav.addObject("userRatingToRestaurant", userRating.get().getRating());
+            }
+
+            mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
+            List<String> times = restaurantService.availableStringTime(restaurantId);
+            mav.addObject("times", times);
+
+            Optional<Comment> maybeComment = commentService.findByUserAndRestaurantId(loggedUser.getId(), restaurantId);
+            if(maybeComment.isPresent()){
+                mav.addObject("userMadeComment", true);
+                mav.addObject("userReview", maybeComment.get());
+            }
+            else{
+                mav.addObject("userMadeComment", false);
+            }
+            List<Reservation> userReservationHistory = reservationService.findByUserAndRestaurantHistory(loggedUser.getId(), restaurantId);
+            mav.addObject("hasOnceReserved", !userReservationHistory.isEmpty());
+        }
+
+        LOGGER.error("page value: {}", page);
+        mav.addObject("restaurant",
+                restaurantService.findByIdWithMenu(restaurantId, page, AMOUNT_OF_MENU_ITEMS).orElseThrow(RestaurantNotFoundException::new));
+        mav.addObject("reviews", commentService.findByRestaurant(page, AMOUNT_OF_REVIEWS, restaurantId));
+        return mav;
+    }
+
+    @RequestMapping(path = { "/restaurant/{restaurantId}/reviews/delete" }, method = RequestMethod.POST)
+    public ModelAndView deleteReview(@ModelAttribute("loggedUser") final User loggedUser,
+                                     @PathVariable("restaurantId") final long restaurantId,
+                                     @RequestParam("reviewId") final long reviewId) {
+        if(loggedUser!=null){
+            commentService.deleteComment(reviewId);
+            return new ModelAndView("redirect:/restaurant/" + restaurantId + "/reviews");
+        }
+        return new ModelAndView("redirect:/login");
+    }
+
+    @RequestMapping(path = { "/restaurant/{restaurantId}/reviews" }, method = RequestMethod.POST)
+    public ModelAndView addRestaurantReview(@ModelAttribute("loggedUser") final User loggedUser,
+                                          @PathVariable("restaurantId") final long restaurantId,
+                                            @RequestParam("review") final String review) {
+        if(loggedUser!=null){
+            // TODO: ADD MORE VALIDATIONS
+            commentService.addComment(loggedUser.getId(), restaurantId, review);
+            return new ModelAndView("redirect:/restaurant/" + restaurantId + "/reviews");
+        }
+        return new ModelAndView("redirect:/login");
     }
 
     @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.POST)
