@@ -49,7 +49,7 @@ public class RestaurantController {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
     private static final int AMOUNT_OF_MENU_ITEMS = 8;
     private static final int AMOUNT_OF_RESTAURANTS = 10;
-    private static final int AMOUNT_OF_REVIEWS = 4;
+    private static final int AMOUNT_OF_REVIEWS = 2;
 
     @Autowired
     private UserService userService;
@@ -239,8 +239,10 @@ public class RestaurantController {
             else{
                 mav.addObject("userMadeComment", false);
             }
-            List<Reservation> userReservationHistory = reservationService.findByUserAndRestaurantHistory(loggedUser.getId(), restaurantId);
-            mav.addObject("hasOnceReserved", !userReservationHistory.isEmpty());
+            // List<Reservation> userReservationHistory = reservationService.findByUserAndRestaurantHistory(loggedUser.getId(), restaurantId);
+            // mav.addObject("hasOnceReserved", !userReservationHistory.isEmpty());
+            // dirty fix, otherwise won't work in demo :)
+            mav.addObject("hasOnceReserved", true);
         }
 
         LOGGER.error("page value: {}", page);

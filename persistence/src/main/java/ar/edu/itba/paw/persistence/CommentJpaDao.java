@@ -71,6 +71,7 @@ public class CommentJpaDao implements CommentDao {
         nativeQuery.setParameter("restaurantId", restaurantId);
         nativeQuery.setFirstResult((page - 1) * amountOnPage);
         nativeQuery.setMaxResults(amountOnPage);
+        @SuppressWarnings("unchecked")
         List<Long> filteredIds = (List<Long>) nativeQuery.getResultList().stream().map(e -> Long.valueOf(e.toString()))
                 .collect(Collectors.toList());
 
