@@ -56,7 +56,7 @@
                         </form>
                         <c:url value="/reservations/${restaurant.getId()}/${reservation.getId()}/reject" var="rejectReservationPath"/>
                         <form class="mt-4" action="${rejectReservationPath}" method="post">
-                            <input type="submit" class="btn btn-danger text-white" value="Reject Reservation">
+                            <input type="submit" class="btn btn-danger text-white" value="<spring:message code="restaurant.manage.rejectReservation"/>">
                         </form>
                     </c:otherwise>
                 </c:choose>
