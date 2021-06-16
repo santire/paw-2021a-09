@@ -18,6 +18,9 @@ CREATE TABLE IF NOT EXISTS restaurants(
   address VARCHAR(100),
   phone_number VARCHAR(100),
   rating FLOAT,
+  facebook VARCHAR(100),
+  instagram VARCHAR(100),
+  twitter VARCHAR(100),
   user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE
 );
 

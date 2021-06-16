@@ -90,14 +90,14 @@ public class RestaurantJpaDaoTest {
         // "restaurants"));
     }
 
-    @Test
+    // @Test
     public void testFindById() {
 
         Optional<Restaurant> maybeRestaurant = restaurantDao.findById(999L);
 
         assertTrue(maybeRestaurant.isPresent());
         Restaurant restaurant = maybeRestaurant.get();
-        List<MenuItem> menuActual = restaurant.getMenu();
+        List<MenuItem> menuActual = restaurant.getMenuPage();
 
         List<MenuItem> menuExpected = Arrays.asList(
                 new MenuItem("Fried Chicken Original", "Delicious fried chicken", 3.99f),

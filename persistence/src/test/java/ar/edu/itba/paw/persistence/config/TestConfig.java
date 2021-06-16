@@ -72,11 +72,12 @@ public class TestConfig {
 
     final Properties jpaProperties = new Properties();
     jpaProperties.setProperty("hibernate.hbm2ddl.auto", "update");
+    jpaProperties.setProperty("spring.jpa.hibernate.ddl-auto", "none");
     jpaProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
 
     // Local Machine only, don't deploy!
-/*    jpaProperties.setProperty("hibernate.show_sql", "true");
-    jpaProperties.setProperty("format_sql", "true");*/
+    jpaProperties.setProperty("hibernate.show_sql", "false");
+    jpaProperties.setProperty("format_sql", "false");
 
     entityFactory.setJpaProperties(jpaProperties);
     return entityFactory;
