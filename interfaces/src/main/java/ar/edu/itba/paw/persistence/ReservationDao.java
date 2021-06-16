@@ -14,25 +14,24 @@ public interface ReservationDao {
     public Reservation addReservation(User user, Restaurant restaurant, LocalDateTime date, long quantity);
 
     // READ
-    public List<Reservation> findByUser(long userId);
     public List<Reservation> findByUser(int page, int amountOnPage, long userId, LocalDateTime currentTime);
-    public List<Reservation> findByUserAndRestaurantHistory(long userId, long restaurantId, LocalDateTime currentTime);
-    public List<Reservation> findByUserHistory(int page, int amountOnPage, long userId, LocalDateTime currentTime);
     public int findByUserPageCount(int amountOnPage, long userId, LocalDateTime currentTime);
+
+    public List<Reservation> findByUserHistory(int page, int amountOnPage, long userId, LocalDateTime currentTime);
     public int findByUserHistoryPageCount(int amountOnPage, long userId, LocalDateTime currentTime);
-    public List<Reservation> findByRestaurant(long restaurantId);
+
     public List<Reservation> findByRestaurant(int page, int amountOnPage, long restaurantId);
-    public List<Reservation> findConfirmedByRestaurant(int page, int amountOnPage, long restaurantId, LocalDateTime currentTime);
-    public List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId, LocalDateTime currentTime);
     public int findByRestaurantPageCount(int amountOnPage, long restaurantId);
+
+    public List<Reservation> findConfirmedByRestaurant(int page, int amountOnPage, long restaurantId, LocalDateTime currentTime);
     public int findConfirmedByRestaurantPageCount(int amountOnPage, long restaurantId, LocalDateTime currentTime);
+
+    public List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId, LocalDateTime currentTime);
     public int findPendingByRestaurantPageCount(int amountOnPage, long restaurantId, LocalDateTime currentTime);
+
 
     public Optional<Reservation> findById(long id);
 
-    // UPDATE
-    public Optional<Reservation> modifyReservation(long reservationId, LocalDateTime date, long quantity);
-    public boolean confirmReservation(long reservationId);
 
     // DESTROY
     public boolean cancelReservation(long id);

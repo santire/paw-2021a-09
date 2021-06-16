@@ -2,7 +2,6 @@ package ar.edu.itba.paw.persistence;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
@@ -89,22 +88,6 @@ public class UserJpaDao implements UserDao {
         query.setParameter("token", token);
         return query.getResultList().stream().findFirst();
     }
-
-    @Override
-    @Deprecated
-    // Could be a service method
-    // But maybe it's better as a single query
-    public boolean isTheRestaurantOwner(long userId, long restaurantId) {
-        return false;
-    }
-
-    @Override
-    @Deprecated
-    // Could be a service method
-    public boolean isRestaurantOwner(long userId) {
-        return false;
-    }
-
 
 
     @Override

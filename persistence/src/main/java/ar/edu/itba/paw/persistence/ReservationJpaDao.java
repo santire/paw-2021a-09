@@ -15,11 +15,8 @@ import javax.persistence.TypedQuery;
 
 import org.springframework.stereotype.Repository;
 
-import ar.edu.itba.paw.model.Image;
 import ar.edu.itba.paw.model.Reservation;
 import ar.edu.itba.paw.model.Restaurant;
-import ar.edu.itba.paw.model.Sorting;
-import ar.edu.itba.paw.model.Tags;
 import ar.edu.itba.paw.model.User;
 
 @Repository
@@ -88,7 +85,6 @@ public class ReservationJpaDao implements ReservationDao {
     }
 
 
-    // TODO: refactor this to receive Restaurant entity not id
     @Override
     public boolean cancelReservation(long reservationId) {
         Optional<Reservation> maybeReservation = findById(reservationId);
@@ -99,12 +95,6 @@ public class ReservationJpaDao implements ReservationDao {
         return false;
     }
 
-
-	@Override
-  @Deprecated
-	public List<Reservation> findByUser(long userId) {
-		return null;
-	}
 
 
 	@Override
@@ -155,35 +145,6 @@ public class ReservationJpaDao implements ReservationDao {
         return pageAmount <= 0 ? 1 : pageAmount;
 	}
 
-	@Override
-    public List<Reservation> findByUserAndRestaurantHistory(long userId, long restaurantId , LocalDateTime currentTime){
-        Timestamp currentTimestamp = Timestamp.valueOf(currentTime);
-        Query nativeQuery = em.createNativeQuery(
-                "SELECT reservation_id FROM reservations"
-                        +
-                        " WHERE user_id = :userId and restaurant_id = :restaurantId and date < :currTimestamp"
-                        +
-                        " ORDER BY date ASC"
-        );
-        nativeQuery.setParameter("userId", userId);
-        nativeQuery.setParameter("restaurantId", restaurantId);
-        nativeQuery.setParameter("currTimestamp", currentTimestamp);
-
-        @SuppressWarnings("unchecked")
-        List<Long> filteredIds = (List<Long>) nativeQuery.getResultList().stream().map(e -> Long.valueOf(e.toString()))
-                .collect(Collectors.toList());
-
-        if (filteredIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        final TypedQuery<Reservation> query = em.createQuery("from Reservation where id IN :filteredIds",
-                Reservation.class);
-        query.setParameter("filteredIds", filteredIds);
-
-        return query.getResultList().stream().sorted(Comparator.comparing(v->filteredIds.indexOf(v.getId()))).collect(Collectors.toList());
-    }
-
     @Override
     public List<Reservation> findByUserHistory(int page, int amountOnPage, long userId, LocalDateTime currentTime) {
         Timestamp currentTimestamp = Timestamp.valueOf(currentTime);
@@ -233,12 +194,6 @@ public class ReservationJpaDao implements ReservationDao {
     }
 
 
-	@Override
-  @Deprecated
-	public List<Reservation> findByRestaurant(long restaurantId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 
 	@Override
@@ -339,23 +294,6 @@ public class ReservationJpaDao implements ReservationDao {
 	@Override
 	public Optional<Reservation> findById(long id) {
 		return Optional.ofNullable(em.find(Reservation.class, id));
-	}
-
-
-	@Override
-  @Deprecated
-	public Optional<Reservation> modifyReservation(long reservationId, LocalDateTime date, long quantity) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-  @Deprecated
-  //Done by the service
-	public boolean confirmReservation(long reservationId) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 }

@@ -1,7 +1,6 @@
 package ar.edu.itba.paw.service;
 
 
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,12 +36,6 @@ public class MenuServiceImpl implements MenuService {
 
 	@Override
 	public boolean menuBelongsToRestaurant(long menuId, long restaurantId) {
-		Restaurant restaurant = restaurantDao.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
 		return restaurantDao.menuBelongsToRestaurant(restaurantId, menuId);
-		// return restaurant.getMenu()
-					// .stream()
-					// .anyMatch(m -> menuId == m.getId());
-
-		// return menuDao.findById(menuId).getRestaurant().getId() == restaurantId
 	}
 }

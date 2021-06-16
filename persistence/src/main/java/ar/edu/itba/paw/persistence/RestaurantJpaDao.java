@@ -388,17 +388,6 @@ public class RestaurantJpaDao implements RestaurantDao {
     }
 
 
-    @Override
-    public List<Restaurant> getAllLikedRestaurants(int page, int amountOnPage) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<Restaurant> getAllLikedRestaurantsPagesCount(int amountOnPage) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     @Override
     public List<Restaurant> getLikedRestaurantsPreview(int limit, long userId) {
@@ -431,7 +420,6 @@ public class RestaurantJpaDao implements RestaurantDao {
     }
 
     // UPDATE
-    // These should be done from the service by modifying the instance (i think)
 
 
     @Override
@@ -443,30 +431,7 @@ public class RestaurantJpaDao implements RestaurantDao {
             return !nativeQuery.getResultList().isEmpty();
     }
 
-    @Override
-    @Deprecated
-    public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber) {
-
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public void updateRating(long id, int rating) {
-        // TODO Auto-generated method stub
-
-    }
-
-
-    @Override
-    @Deprecated
-    public boolean addTag(long restaurantId, int tagId) {
-        return false;
-    }
-
     // DELETE
-
-    // TODO: refactor this to receive Restaurant entity not id
     @Override
     public boolean deleteRestaurantById(long id) {
         Optional<Restaurant> maybeRestaurant = findById(id);

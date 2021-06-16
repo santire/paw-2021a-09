@@ -2,6 +2,7 @@ package ar.edu.itba.paw.webapp.controller;
 
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
+import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
 
 import javax.validation.Valid;
 
@@ -26,8 +27,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -264,6 +264,9 @@ public class RestaurantController {
             return(restaurantReviews(form, menuForm, ratingForm, commentForm, page, restaurantId));
         }
         User loggedUser = ca.loggedUser();
+        if (loggedUser == null) {
+            throw new UserNotFoundException();
+        }
         commentService.addComment(loggedUser.getId(), restaurantId, commentForm.getReview());
         return new ModelAndView("redirect:/restaurant/" + restaurantId + "/reviews");
     }

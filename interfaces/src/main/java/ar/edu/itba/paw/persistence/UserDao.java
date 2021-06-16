@@ -22,11 +22,6 @@ public interface UserDao {
   public Optional<VerificationToken> getToken(String token);
   public Optional<PasswordToken> getPasswordToken(String token);
 
-  public boolean isTheRestaurantOwner(long userId, long restaurantId);
-  public boolean isRestaurantOwner(long userId);
-
-  // UPDATE
-
   // DESTROY
   public void deleteToken(String token);
   public void deleteAssociatedPasswordTokens(User user);
