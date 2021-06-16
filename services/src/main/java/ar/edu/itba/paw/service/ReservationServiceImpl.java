@@ -100,13 +100,6 @@ public class ReservationServiceImpl implements ReservationService{
         return reservationDao.findByUserPageCount(amountOnPage, userId, currentTime);
     }
 
-     @Override
-     @Transactional
-     public List<Reservation> findByUserAndRestaurantHistory(long userId, long restaurantId) {
-         LocalDateTime currentTime = LocalDateTime.now();
-         List<Reservation> reservations = reservationDao.findByUserAndRestaurantHistory(userId, restaurantId, currentTime);
-         return reservations;
-     }
 
      @Override
      @Transactional
@@ -123,12 +116,6 @@ public class ReservationServiceImpl implements ReservationService{
          return reservationDao.findByUserHistoryPageCount(amountOnPage, userId, currentTime);
      }
 
-    @Override
-    @Transactional
-    public List<Reservation> findByRestaurant(long restaurantId) {
-        List<Reservation> reservations =  reservationDao.findByRestaurant(restaurantId);
-        return reservations;
-     }
 	  @Override
     @Transactional
 	  public List<Reservation> findByRestaurant(int page, int amountOnPage, long restaurantId) {

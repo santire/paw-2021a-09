@@ -2,7 +2,6 @@ package ar.edu.itba.paw.service;
 
 import ar.edu.itba.paw.model.*;
 
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,10 +26,9 @@ public interface RestaurantService {
     public List<Restaurant> getPopularRestaurants(int limit, int minValue);
     public List<Restaurant> getLikedRestaurantsPreview(int limit, long userId);
 
-    public List<Restaurant> getAllRestaurants(int page, int amountOnPage);
-    public List<Restaurant> findByName(String name);
 
-
+    public List<Restaurant> getRestaurantsFilteredBy(int page, int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays);
+    public int getRestaurantsFilteredByPageCount(int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice);
 
     public List<Restaurant> getHotRestaurants(int limit, int lastDays);
 
@@ -42,19 +40,10 @@ public interface RestaurantService {
 
     // DESTROY
     public boolean deleteRestaurantById(long id);
-    public boolean deleteRestaurantByName(String name);
-
-    public Optional<User> findRestaurantOwner(long id);
 
 
 
-    public boolean addTag(long restaurantId, Tags tagId);
-    public boolean removeTag(long restaurantId, Tags tagId);
 
-    public List<Tags> tagsInRestaurant(long restaurantId);
-    public List<Restaurant> getRestaurantsWithTags(List<Tags> tags);
-    public List<Restaurant> getRestaurantsFilteredBy(int page, int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays);
-    public int getRestaurantsFilteredByPageCount(int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice);
 
 
     public List<String> availableStringTime(long restaurantId);

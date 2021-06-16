@@ -20,9 +20,6 @@ public interface RestaurantDao {
     public List<Restaurant> getAllRestaurants(int page, int amountOnPage, String searchTerm);
     public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm);
 
-    public List<Restaurant> getAllLikedRestaurants(int page, int amountOnPage);
-    public List<Restaurant> getAllLikedRestaurantsPagesCount(int amountOnPage);
-
     public List<Restaurant> getRestaurantsFilteredBy(int page, int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays);
     public int getRestaurantsFilteredByPageCount(int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice);
 
@@ -37,14 +34,8 @@ public interface RestaurantDao {
     public boolean menuBelongsToRestaurant(long restaurantId, long menuId);
 
 
-    // UPDATE
-    public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber);
-    public void updateRating(long id, int rating);
-
-
 
     // DESTROY
     public boolean deleteRestaurantById(long id);
-    public boolean addTag(long restaurantId, int tagId);
 
 }
