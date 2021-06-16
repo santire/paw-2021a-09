@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,6 +21,7 @@ import java.util.Locale;
 public class ReservationController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReservationController.class);
     private static final int AMOUNT_OF_RESERVATIONS = 2;
+
 
     @Autowired
     private ReservationService reservationService;
@@ -114,4 +116,5 @@ public class ReservationController {
         reservationService.confirmReservation(reservationId);
         return new ModelAndView("redirect:/restaurant/" + restaurantId + "/manage/pending");
     }
+
  }

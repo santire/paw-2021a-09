@@ -98,7 +98,7 @@ public class UserController {
         }
 
         try {
-            userService.requestPasswordReset(form.getEmail());
+            userService.requestPasswordReset(form.getEmail(), ca.getUri());
             return new ModelAndView("requestedResetPassword");
         } catch (TokenCreationException e) {
             LOGGER.error("Could not generate token");
