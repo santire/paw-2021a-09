@@ -28,7 +28,7 @@
 
             <div class="card-text d-flex flex-wrap justify-content-center align-items-center text-center mx-auto " style="min-height: 100px;">
                 <c:forEach items="${restaurant.getTags()}" var="tag">
-                    <a style="text-decoration:none" href="/restaurants?tags=${tag.getValue()}"><div class=" border border rounded mr-2 mb-2 text-muted">
+                    <a style="text-decoration:none" href="${pageContext.request.contextPath}/restaurants?tags=${tag.getValue()}"><div class=" border border rounded mr-2 mb-2 text-muted">
                         &nbsp;<spring:message code="restaurant.tag.${tag.getValue()}"/>&nbsp;
                     </div></a>
                 </c:forEach>
