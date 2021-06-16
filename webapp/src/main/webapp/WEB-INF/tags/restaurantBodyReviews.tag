@@ -168,20 +168,24 @@
                     <%--USER NEVER MADE A COMMENT--%>
                     <c:otherwise>
                         <c:choose>
-                            <c:when test="${hasOnceReserved}">
+                            <c:when test="${hasOnceReserved and not isTheOwner}">
                                 <h5 class="display-5 text-center mt-4 mb-5"><spring:message code="restaurant.reviews.create.title"/></h5>
                                 <c:url value="/restaurant/${restaurant.getId()}/reviews" var="addReviewPath"/>
-                                <form action="${addReviewPath}" method="post">
+                                <form:form
+                                modelAttribute="commentForm"
+                                action="${addReviewPath}"
+                                method="post">
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">${loggedUser.getUsername()}</span>
                                         </div>
-                                        <textarea class="form-control" style="resize: none" name="review" aria-label="Review"></textarea>
+                                        <form:textarea class="form-control" style="resize: none" path="review" aria-label="Review"></form:textarea>
+                                        <form:errors class="text-danger" element="p" path="review"/>
                                     </div>
                                     <div class="mt-2 d-flex justify-content-end">
                                         <button class="btn btn-outline-warning"><spring:message code="restaurant.reviews.create.send"/></button>
                                     </div>
-                                </form>
+                                </form:form>
                                 <hr style="height:2px;border-width:0;color:gray;background-color:gray">
                             </c:when>
                             <c:otherwise>
@@ -209,19 +213,12 @@
                             <c:otherwise>
                                 <h3 class="d-flex justify-content-center mb-4"><spring:message code="restaurant.reviews.otherCustomers"/></h3>
                                 <c:forEach var="review" items="${reviews}">
-                                    <c:if test="${review.getUser().getId() != loggedUser.getId()}">
-                                        <div class="card p-3 mb-4 mt-3">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div class="user d-flex flex-row align-items-center">
-                                            <span>
-                                                <small class="font-weight-bold text-primary">${review.getUser().getUsername()}</small>
-                                                <small class="font-weight-bold"><c:out value="${review.getUserComment()}"/></small>
-                                            </span>
-                                                </div> <small>${userReview.getDate()}</small>
-                                            </div>
-                                        </div>
-                                    </c:if>
+                                 <sc:review review="${review}"></sc:review>
                                 </c:forEach>
+                                <div class="mx-auto">
+                                  <sc:pagination baseUrl="/restaurant/${restaurant.getId()}/reviews" pages="${maxPages}"/>
+                                </div>
+
                             </c:otherwise>
                         </c:choose>
                     </c:otherwise>
@@ -237,28 +234,18 @@
                     </c:when>
                     <%--WHEN THERE ARE MORE REVIEWS--%>
                     <c:otherwise>
+                        <h3 class="d-flex justify-content-center"><spring:message code="restaurant.reviews.customersReview"/></h3>
                         <c:forEach var="review" items="${reviews}">
-                            <h3 class="d-flex justify-content-center"><spring:message code="restaurant.reviews.customersReview"/></h3>
-                            <div class="card p-3 mb-4 mt-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="user d-flex flex-row align-items-center">
-                                        <span>
-                                            <small class="font-weight-bold text-primary">${review.getUser().getUsername()}</small>
-                                            <small class="font-weight-bold"><c:out value="${review.getUserComment()}"/></small>
-                                        </span>
-                                    </div> <small>${review.getDate()}</small>
-                                </div>
-                            </div>
+                            <sc:review review="${review}"></sc:review>
                         </c:forEach>
+                        <div class="mx-auto">
+                          <sc:pagination baseUrl="/restaurant/${restaurant.getId()}/reviews" pages="${maxPages}"/>
+                        </div>
                     </c:otherwise>
                 </c:choose>
             </c:otherwise>
         </c:choose>
 
-        <%--                <c:url value="/restaurant/${restaurant.getId()/reviews}" var="url"/>
-                <div class="mx-auto">
-                    <sc:pagination baseUrl="/restaurant/${restaurant.getId()/reviews}" pages="${maxPages}"/>
-                </div>--%>
     </div>
 
     <%--  RESERVATIONS // ADD MENU--%>
