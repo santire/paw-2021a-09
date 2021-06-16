@@ -5,11 +5,11 @@
 
 <%@attribute name="restaurant" required="true" type="ar.edu.itba.paw.model.Restaurant"%>
 
--<div class="card"
--<%-- hack to make whole class clickable without breaking style --%>
--     onclick="window.location='<c:url value="/restaurant/${restaurant.getId()}"/>'"
--     style="cursor: pointer;"
-->
+<div class="card"
+<%-- hack to make whole class clickable without breaking style --%>
+     onclick="window.location='<c:url value="/restaurant/${restaurant.getId()}"/>'"
+     style="cursor: pointer;"
+>
     <c:choose>
         <c:when test="${not empty restaurant.getProfileImage()}" >
             <c:url value="data:image/jpg;base64,${restaurant.getProfileImage().getImageEnconded()}" var="imgUrl"/>
