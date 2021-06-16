@@ -78,26 +78,13 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Transactional
     // TODO: Implement
     public Optional<Restaurant> findByIdWithMenu(long id, int menuPage, int amountOnMenuPage) {
-        // Optional<Restaurant> maybeRestaurant = restaurantDao.findByIdWithMenu(id,
-        // menuPage, amountOnMenuPage);
-        // if (maybeRestaurant.isPresent()) {
-        // Restaurant restaurant = maybeRestaurant.get();
-        // int likes = likeDao.getLikesByRestaurantId(restaurant.getId());
-        // List<Tags> tags = tagDao.getTagsByRestaurantId(restaurant.getId());
-        // restaurant.setLikes(likes);
-        // restaurant.setTags(tags);
-        // return Optional.of(restaurant);
-        // }
-        // return Optional.empty();
-        return findById(id);
+        return restaurantDao.findByIdWithMenu(menuPage, amountOnMenuPage, id);
     }
 
     @Override
     @Transactional
-    // TODO: Implement
     public int findByIdWithMenuPagesCount(int amountOnMenuPage, long id) {
-        // return restaurantDao.findByIdWithMenuPagesCount(amountOnMenuPage, id);
-        return 1;
+        return restaurantDao.findByIdWithMenuPageCount(amountOnMenuPage, id);
     }
 
     @Override
