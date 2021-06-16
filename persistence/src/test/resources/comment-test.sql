@@ -1,6 +1,5 @@
 TRUNCATE TABLE restaurants RESTART IDENTITY AND COMMIT NO CHECK;
 TRUNCATE TABLE users RESTART IDENTITY AND COMMIT NO CHECK;
-TRUNCATE TABLE ratings RESTART IDENTITY AND COMMIT NO CHECK;
 
 /*Insert Users values*/
 INSERT INTO users(user_id, username, password, first_name, last_name, email, phone, is_active)
@@ -14,10 +13,6 @@ INSERT INTO restaurants(restaurant_id, name, address, phone_number, rating, user
 INSERT INTO restaurants(restaurant_id, name, address, phone_number, rating, user_id)
 VALUES(2, 'BurgerQueen', 'Salta 129', '1223346545', 0, 1);
 
-/*Insert Rating Values*/
-INSERT INTO ratings(rating_id, user_id, restaurant_id, rating)
- VALUES(1, 1, 1, 5);
-INSERT INTO ratings(rating_id, user_id, restaurant_id, rating)
- VALUES(2, 1, 2, 3);
-INSERT INTO ratings(rating_id, user_id, restaurant_id, rating)
-VALUES(3, 2, 1, 3);
+/*Insert Comment*/
+INSERT INTO comments(comment_id, date, user_comment, restaurant_id, user_id)
+ VALUES(1, TO_DATE('2021/05/15', 'YYYY/MM/DD'),'first', 1, 1);
