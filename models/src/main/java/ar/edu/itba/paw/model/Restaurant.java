@@ -18,6 +18,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -50,10 +51,6 @@ public class Restaurant {
     @JoinColumn(name = "user_id")
     private User owner;
 
-    // @Formula("(SELECT COUNT(l.like_id) from likes l where l.restaurant_id = id)")
-    // @Transient
-    // private int likes;
-
     @ElementCollection(targetClass = Tags.class)
     @CollectionTable(name = "restaurant_tags",
             joinColumns = @JoinColumn(name = "restaurant_id"))
@@ -73,7 +70,8 @@ public class Restaurant {
     @OneToMany(orphanRemoval = true, mappedBy = "restaurant")
     private List<Rating> ratings;
 
-    // private List<Reservation> reservations; ?
+    @Transient
+    private List<MenuItem> menuPage;
 
     Restaurant() {
         // Just for hibernate
@@ -135,7 +133,7 @@ public class Restaurant {
     public User getOwner() { return owner; }
     public int getLikes() { return likes.size(); }
     // public int getLikes() { return likes; }
-    public List<MenuItem> getMenu() { return this.menu; }
+    public List<MenuItem> getMenu() { return this.menuPage; }
     public List<Tags> getTags() {return this.tags;}
     public Image getProfileImage() { return this.profileImage; }
 
@@ -147,6 +145,15 @@ public class Restaurant {
     public void setOwner(User owner) { this.owner = owner; }
     // public void setLikes(int likes) { this.likes = likes; }
     public void setTags(List<Tags> tags) { this.tags = tags; }
+    public void setMenu(List<MenuItem> menu) { this.menu = menu; }
     public void addMenuItem(MenuItem menuItem) { this.menu.add(menuItem); }
     public void setProfileImage(Image profileImage) { this.profileImage = profileImage; }
+
+    public List<MenuItem> getMenuPage() {
+        return menuPage;
+    }
+
+    public void setMenuPage(List<MenuItem> menuPage) {
+        this.menuPage = menuPage;
+    }
 }
