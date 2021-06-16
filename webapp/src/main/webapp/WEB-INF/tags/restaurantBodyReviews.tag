@@ -56,9 +56,9 @@
 
                     <div class="row row-cols-3 mb-3 text-center">
                         <c:forEach var="tag" items="${restaurant.getTags()}">
-                            <div class="card-text border border rounded mr-2 mb-2"><medium class="text-muted">
+                           <a style="text-decoration:none" href="/restaurants?tags=${tag.getValue()}"> <div class="card-text border border rounded mr-2 mb-2"><medium class="text-muted">
                                 <spring:message code="restaurant.tag.${tag.getValue()}"/>
-                            </medium></div>
+                            </medium></div></a>
                         </c:forEach>
                     </div>
 
