@@ -114,12 +114,16 @@
     <%--  COMMENTS AND MENU--%>
     <div class="order-2 order-lg-1">
 
-        <ul class="nav nav-pills nav-fill navtop mb-5">
+        <ul class="nav nav-pills nav-fill navtop">
             <li class="nav-item">
+            <h5 class="pb-1 text-center">
                 <a class="nav-link"  href="<c:url value="/restaurant/${restaurant.getId()}"/>"><spring:message code="restaurant.menu.title"/></a>
+            </h5>
             </li>
             <li class="nav-item">
+            <h5 class="pb-1 text-center">
                 <a class="nav-link active" href="#"><spring:message code="restaurant.reviews.title"/></a>
+            </h5>
             </li>
         </ul>
 
@@ -129,7 +133,7 @@
                 <c:choose>
                     <%--WHEN USER ALREADY MADE A COMMENT--%>
                     <c:when test="${userMadeComment}">
-                        <h3 class="d-flex justify-content-center"><spring:message code="restaurant.reviews.yourReview"/></h3>
+                        <h3 class="d-flex justify-content-center mt-2"><spring:message code="restaurant.reviews.yourReview"/></h3>
                         <div class="card p-3">
                             <div class="d-flex justify-content-between">
                                 <div class="user d-flex flex-row align-items-center">
@@ -252,13 +256,13 @@
     <div class="order-1 order-lg-2">
         <c:choose>
             <c:when test="${isTheOwner}">
-                <h3 class="pb-1 text-center border-bottom">
+                <h3 class="pb-1 text-center ">
                     <spring:message code="restaurants.menuAdd"/>
                 </h3>
                 <sc:menuItemForm/>
             </c:when>
             <c:otherwise>
-                <h3 class="pb-1 text-center border-bottom">
+                <h3 class="pb-1 text-center">
                     <spring:message code="restaurants.reservation"/>
                 </h3>
                 <c:choose>

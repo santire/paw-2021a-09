@@ -41,8 +41,20 @@ div.dropdown.bootstrap-select {
   color: black;
 }
 
+small.font-weight-bold.text-primary {
+  color: rgb(153, 40, 59) !important;
+}
+
 a.dropdown-item.selected.active {
   background-color: lightgrey;
+  color: black;
+}
+.nav-pills .nav-link.active {
+  background-color: orange !important;
+  color: black;
+}
+
+.nav-pills .nav-link {
   color: black;
 }
 
@@ -250,13 +262,15 @@ a.dropdown-item.selected.active {
 #rateYo {
   height: 40px;
 }
-#select-filter,#sort-filter, #order-filter{
+#select-filter,
+#sort-filter,
+#order-filter {
   height: 60px;
 }
 
-
-
-.fa-facebook ,.fa-twitter,.fa-instagram{
+.fa-facebook,
+.fa-twitter,
+.fa-instagram {
   padding: 10px;
   font-size: 18px;
   text-align: center;
@@ -264,16 +278,15 @@ a.dropdown-item.selected.active {
   border-radius: 50%;
   width: 35px;
   height: 35px;
-
 }
 
 .fa-facebook {
-  background: #3B5998;
+  background: #3b5998;
   color: white;
 }
 
 .fa-twitter {
-  background: #55ACEE;
+  background: #55acee;
   color: white;
 }
 
@@ -282,11 +295,9 @@ a.dropdown-item.selected.active {
   color: white;
 }
 
-
-.fa-facebook:hover,.fa-twitter:hover,.fa-instagram:hover {
+.fa-facebook:hover,
+.fa-twitter:hover,
+.fa-instagram:hover {
   opacity: 0.7;
   cursor: pointer;
 }
-
-
-
