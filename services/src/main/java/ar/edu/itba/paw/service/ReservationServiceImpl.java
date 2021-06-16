@@ -110,6 +110,14 @@ public class ReservationServiceImpl implements ReservationService{
 
      @Override
      @Transactional
+     public List<Reservation> findByUserAndRestaurantHistory(long userId, long restaurantId) {
+         LocalDateTime currentTime = LocalDateTime.now();
+         List<Reservation> reservations = reservationDao.findByUserAndRestaurantHistory(userId, restaurantId, currentTime);
+         return reservations;
+     }
+
+     @Override
+     @Transactional
      public List<Reservation> findByUserHistory(int page, int amountOnPage, long userId) {
          LocalDateTime currentTime = LocalDateTime.now();
          List<Reservation> reservations = reservationDao.findByUserHistory(page, amountOnPage, userId, currentTime);

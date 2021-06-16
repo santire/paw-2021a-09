@@ -84,6 +84,16 @@ CREATE TABLE IF NOT EXISTS password_tokens(
   user_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS comments(
+    comment_id SERIAL PRIMARY KEY,
+    user_id INTEGER,
+    restaurant_id INTEGER,
+    user_comment TEXT,
+    UNIQUE(user_id, restaurant_id),
+    FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY(restaurant_id) REFERENCES restaurants(restaurant_id) ON DELETE CASCADE
+);
+
 /* CREATE TABLE IF NOT EXISTS reviews( */
   /* review_id SERIAL PRIMARY KEY, */
   /* user_rating INTEGER, */
