@@ -2,8 +2,8 @@ package ar.edu.itba.paw.model;
 
 public enum EmailTemplate {
 
-    REGISTER("register"),
-    FORGOT_PASSWORD("forgot_password");
+    BUTTON("button_template"),
+    BASIC("basic_template"),
 
     private final String name;
 

@@ -18,6 +18,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.Email;
+import ar.edu.itba.paw.model.EmailTemplate;
 import ar.edu.itba.paw.model.PasswordToken;
 import ar.edu.itba.paw.model.VerificationToken;
 import ar.edu.itba.paw.model.exceptions.EmailInUseException;
@@ -28,8 +29,9 @@ import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
 import ar.edu.itba.paw.persistence.UserDao;
 import org.springframework.context.MessageSource;
 
-
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -70,8 +72,13 @@ public class UserServiceImpl implements UserService {
         Email myemail = new Email();
         myemail.setMailTo(user.getEmail());
         myemail.setMailSubject(messageSource.getMessage("mail.register.subject",null,locale));
-        myemail.setButtonMailContent(messageSource.getMessage("mail.register.body",new Object[]{user.getFirstName()},locale),url+token,messageSource.getMessage("mail.register.button",null,locale));
-        emailService.sendEmail(myemail,plainText);
+        Map<String, Object> args = new HashMap<>();
+        args.put("titleMessage", "");
+        args.put("bodyMessage",messageSource.getMessage("mail.register.body",new Object[]{user.getFirstName()},locale));
+        args.put("buttonMessage",messageSource.getMessage("mail.register.button",null,locale));
+        args.put("link", url+token);
+
+        emailService.sendEmail(myemail,plainText, args, EmailTemplate.BUTTON);
     
     return  user;
   }
@@ -90,8 +97,13 @@ public class UserServiceImpl implements UserService {
     Email myemail = new Email();
     myemail.setMailTo(user.getEmail());
     myemail.setMailSubject(messageSource.getMessage("mail.forgot.subject",null,locale));
-    myemail.setButtonMailContent(messageSource.getMessage("mail.forgot.body",new Object[]{user.getFirstName()},locale),url+token,messageSource.getMessage("mail.forgot.button",null,locale));
-    emailService.sendEmail(myemail,plainText);
+    Map<String, Object> args = new HashMap<>();
+    args.put("titleMessage", "");
+    args.put("bodyMessage",messageSource.getMessage("mail.forgot.body",new Object[]{user.getFirstName()},locale));
+    args.put("buttonMessage",messageSource.getMessage("mail.forgot.button",null,locale));
+    args.put("link", url+token);
+
+    emailService.sendEmail(myemail,plainText, args, EmailTemplate.BUTTON);
   }
 
   @Override

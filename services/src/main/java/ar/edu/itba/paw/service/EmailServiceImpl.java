@@ -50,10 +50,12 @@ public class EmailServiceImpl implements EmailService {
 
     }
 
-    public void sendEmail(Email mail, String plainText) {
+    @Async
+    // @Override
+    private void sendEmail(Email mail, String plainText) {
         MimeMessage mimeMessage = emailSender.createMimeMessage();
         Context thymeleafContext = new Context();
-        String htmlBody = thymeleafTemplateEngine.process(EmailTemplate.REGISTER.getName() + ".html", thymeleafContext);
+        String htmlBody = thymeleafTemplateEngine.process(EmailTemplate.BUTTON.getName()+".html", thymeleafContext);
 
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
@@ -70,21 +72,5 @@ public class EmailServiceImpl implements EmailService {
             // Ignore
         }
 
-    }
-
-    @Async
-    public void sendMessageUsingThymeleafTemplate(String to, String subject, Map<String, Object> templateModel)
-            throws MessagingException {
-
-        Context thymeleafContext = new Context();
-        thymeleafContext.setVariables(templateModel);
-        String htmlBody = thymeleafTemplateEngine.process("template-thymeleaf.html", thymeleafContext);
-
-        MimeMessage message = emailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-        helper.setTo(to);
-        helper.setSubject(subject);
-        helper.setText(htmlBody, true);
-        emailSender.send(message);
     }
 }

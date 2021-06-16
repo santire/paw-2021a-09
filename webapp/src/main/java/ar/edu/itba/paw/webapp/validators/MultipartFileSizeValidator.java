@@ -24,7 +24,6 @@ public class MultipartFileSizeValidator implements ConstraintValidator<Multipart
 
     @Override
     public void initialize(MultipartFileSizeValid arg0) {
-        // TODO Auto-generated method stub
     }
 
 }
