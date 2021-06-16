@@ -5,7 +5,11 @@
 
 <%@attribute name="restaurant" required="true" type="ar.edu.itba.paw.model.Restaurant"%>
 
-<div class="card">
+-<div class="card"
+-<%-- hack to make whole class clickable without breaking style --%>
+-     onclick="window.location='<c:url value="/restaurant/${restaurant.getId()}"/>'"
+-     style="cursor: pointer;"
+->
     <c:choose>
         <c:when test="${not empty restaurant.getProfileImage()}" >
             <c:url value="data:image/jpg;base64,${restaurant.getProfileImage().getImageEnconded()}" var="imgUrl"/>
@@ -28,9 +32,9 @@
 
             <div class="card-text d-flex flex-wrap justify-content-center align-items-center text-center mx-auto " style="min-height: 100px;">
                 <c:forEach items="${restaurant.getTags()}" var="tag">
-                    <a style="text-decoration:none" href="${pageContext.request.contextPath}/restaurants?tags=${tag.getValue()}"><div class=" border border rounded mr-2 mb-2 text-muted">
+                    <div class=" border border rounded mr-2 mb-2 text-muted">
                         &nbsp;<spring:message code="restaurant.tag.${tag.getValue()}"/>&nbsp;
-                    </div></a>
+                    </div>
                 </c:forEach>
             </div>
             <div class="d-flex justify-content-center">
