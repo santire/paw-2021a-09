@@ -55,7 +55,6 @@ public class ReservationServiceImpl implements ReservationService{
     Email myemail = new Email();
     myemail.setMailTo(owner.getEmail());
     myemail.setMailSubject(messageSource.getMessage("mail.newReservation.owner.subject",null,locale));
-    // myemail.setButtonMailContent(messageSource.getMessage("mail.newReservation.owner.body",new Object[]{owner.getFirstName(),user.getName(),restaurant.getName()},locale),url,messageSource.getMessage("mail.newReservation.owner.button",null,locale));
     Map<String, Object> args = new HashMap<>();
     args.put("titleMessage", "");
     args.put("bodyMessage", messageSource.getMessage("mail.newReservation.owner.body",new Object[]{owner.getFirstName(),user.getName(),restaurant.getName()},locale));
@@ -69,7 +68,6 @@ public class ReservationServiceImpl implements ReservationService{
     myemail = new Email();
     myemail.setMailTo(user.getEmail());
     myemail.setMailSubject(messageSource.getMessage("mail.newReservation.customer.subject",null,locale));
-    // myemail.setBasicMailContent("","",messageSource.getMessage("mail.newReservation.customer.body",new Object[]{user.getName(),restaurant.getName()},locale));
 
     Map<String, Object> args2 = new HashMap<>();
     args2.put("titleMessage", "");
@@ -193,7 +191,6 @@ public class ReservationServiceImpl implements ReservationService{
         Email email = new Email();
         email.setMailTo(user.getEmail());
         email.setMailSubject(messageSource.getMessage("mail.newReservation.subject",null,locale));
-        // email.setBasicMailContent(messageSource.getMessage("mail.newReservation.title",null,locale),user.getFirstName(),body);
 
         Map<String, Object> args2 = new HashMap<>();
         args2.put("titleMessage", messageSource.getMessage("mail.newReservation.title",null,locale));
@@ -219,7 +216,6 @@ public class ReservationServiceImpl implements ReservationService{
         Email email = new Email();
         email.setMailTo(owner.getEmail());
         email.setMailSubject(messageSource.getMessage("mail.userCancelReservation.subject",null,locale));
-        // email.setBasicMailContent(messageSource.getMessage("mail.userCancelReservation.title",null,locale),"",body);
 
         Map<String, Object> args2 = new HashMap<>();
         args2.put("titleMessage", messageSource.getMessage("mail.userCancelReservation.title",null,locale));
@@ -243,7 +239,6 @@ public class ReservationServiceImpl implements ReservationService{
         Email email = new Email();
         email.setMailTo(user.getEmail());
         email.setMailSubject(messageSource.getMessage("mail.ownerCancelReservation.subject",null,locale));
-        // email.setBasicMailContent(messageSource.getMessage("mail.ownerCancelReservation.title",null,locale),"",body);
 
         Map<String, Object> args2 = new HashMap<>();
         args2.put("titleMessage", messageSource.getMessage("mail.ownerCancelReservation.title",null,locale));

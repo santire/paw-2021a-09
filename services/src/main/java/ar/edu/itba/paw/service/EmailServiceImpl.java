@@ -38,31 +38,6 @@ public class EmailServiceImpl implements EmailService {
             mimeMessageHelper.setSubject(mail.getMailSubject());
             mimeMessageHelper.setFrom(new InternetAddress("gourmetablewebapp@gmail.com", "Gourmetable"));
             mimeMessageHelper.setTo(mail.getMailTo());
-            // mimeMessageHelper.setText(plainText, mail.getMailContent());
-            mimeMessageHelper.setText(plainText, htmlBody);
-            emailSender.send(mimeMessageHelper.getMimeMessage());
-
-        } catch (MessagingException e) {
-            // Ignore
-        } catch (UnsupportedEncodingException e) {
-            // Ignore
-        }
-
-    }
-
-    @Async
-    // @Override
-    private void sendEmail(Email mail, String plainText) {
-        MimeMessage mimeMessage = emailSender.createMimeMessage();
-        Context thymeleafContext = new Context();
-        String htmlBody = thymeleafTemplateEngine.process(EmailTemplate.BUTTON.getName()+".html", thymeleafContext);
-
-        try {
-            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-            mimeMessageHelper.setSubject(mail.getMailSubject());
-            mimeMessageHelper.setFrom(new InternetAddress("gourmetablewebapp@gmail.com", "Gourmetable"));
-            mimeMessageHelper.setTo(mail.getMailTo());
-            // mimeMessageHelper.setText(plainText, mail.getMailContent());
             mimeMessageHelper.setText(plainText, htmlBody);
             emailSender.send(mimeMessageHelper.getMimeMessage());
 

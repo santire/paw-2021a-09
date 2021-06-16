@@ -12,10 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class LikesServiceImpl implements LikesService {
     @Autowired
@@ -46,19 +42,4 @@ public class LikesServiceImpl implements LikesService {
     public boolean userLikesRestaurant(long userId, long restaurantId){
     return likesDao.userLikesRestaurant(userId, restaurantId);
     }
-
-    // @Override
-    // public List<Restaurant> getLikedRestaurants(long userId){
-    // List<Long> restaurantsId = likesDao.getLikedRestaurantsId(userId);
-    // Optional<Restaurant> restaurant = java.util.Optional.empty();
-    // List<Restaurant> restaurants = new ArrayList<>();
-
-    // for(int i = 0; i < restaurantsId.size(); i++){
-    // restaurant = restaurantDao.findById(restaurantsId.get(i));
-    // if(restaurant.isPresent()){
-    // restaurants.add(restaurant.get());
-    // }
-    // }
-    // return restaurants;
-    // }
 }
