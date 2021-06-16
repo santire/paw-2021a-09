@@ -10,6 +10,7 @@ import ar.edu.itba.paw.service.MenuService;
 import ar.edu.itba.paw.service.ReservationService;
 
 import ar.edu.itba.paw.service.*;
+import ar.edu.itba.paw.webapp.forms.CommentForm;
 import ar.edu.itba.paw.webapp.forms.MenuItemForm;
 import ar.edu.itba.paw.webapp.forms.RatingForm;
 import ar.edu.itba.paw.webapp.forms.ReservationForm;
@@ -180,6 +181,7 @@ public class RestaurantController {
     public ModelAndView restaurantReviews(@ModelAttribute("reservationForm") final ReservationForm form,
                                           @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
                                    @ModelAttribute("ratingForm") final RatingForm ratingForm,
+                                   @ModelAttribute("commentForm") final CommentForm commentForm,
                                    @RequestParam(defaultValue="1") Integer page,
                                    @PathVariable("restaurantId") final long restaurantId) {
         final ModelAndView mav = new ModelAndView("restaurantReviews");
@@ -249,14 +251,19 @@ public class RestaurantController {
 
     @RequestMapping(path = { "/restaurant/{restaurantId}/reviews" }, method = RequestMethod.POST)
     public ModelAndView addRestaurantReview(@PathVariable("restaurantId") final long restaurantId,
-                                            @RequestParam("review") final String review) {
-        User loggedUser = ca.loggedUser();
-        if(loggedUser!=null){
-            // TODO: ADD MORE VALIDATIONS
-            commentService.addComment(loggedUser.getId(), restaurantId, review);
-            return new ModelAndView("redirect:/restaurant/" + restaurantId + "/reviews");
+                                            @Valid @ModelAttribute("commentForm") final CommentForm commentForm,
+                                            final BindingResult errors,
+                                            @ModelAttribute("reservationForm") final ReservationForm form,
+                                            @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
+                                            @ModelAttribute("ratingForm") final RatingForm ratingForm,
+                                            @RequestParam(defaultValue="1") Integer page
+                                            ) {
+        if(errors.hasErrors()) {
+            return(restaurantReviews(form, menuForm, ratingForm, commentForm, page, restaurantId));
         }
-        return new ModelAndView("redirect:/login");
+        User loggedUser = ca.loggedUser();
+        commentService.addComment(loggedUser.getId(), restaurantId, commentForm.getReview());
+        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/reviews");
     }
 
     @RequestMapping(path = { "/restaurant/{restaurantId}/reviews/{reviewId}/delete" }, method = RequestMethod.POST)

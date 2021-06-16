@@ -171,17 +171,21 @@
                             <c:when test="${hasOnceReserved}">
                                 <h5 class="display-5 text-center mt-4 mb-5"><spring:message code="restaurant.reviews.create.title"/></h5>
                                 <c:url value="/restaurant/${restaurant.getId()}/reviews" var="addReviewPath"/>
-                                <form action="${addReviewPath}" method="post">
+                                <form:form
+                                modelAttribute="commentForm"
+                                action="${addReviewPath}"
+                                method="post">
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">${loggedUser.getUsername()}</span>
                                         </div>
-                                        <textarea class="form-control" style="resize: none" name="review" aria-label="Review"></textarea>
+                                        <form:textarea class="form-control" style="resize: none" path="review" aria-label="Review"></form:textarea>
+                                        <form:errors class="text-danger" element="p" path="review"/>
                                     </div>
                                     <div class="mt-2 d-flex justify-content-end">
                                         <button class="btn btn-outline-warning"><spring:message code="restaurant.reviews.create.send"/></button>
                                     </div>
-                                </form>
+                                </form:form>
                                 <hr style="height:2px;border-width:0;color:gray;background-color:gray">
                             </c:when>
                             <c:otherwise>
