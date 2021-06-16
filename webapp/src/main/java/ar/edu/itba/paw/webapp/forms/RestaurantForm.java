@@ -28,11 +28,11 @@ public class RestaurantForm {
     @Size(max=3)
     private Integer[] tags;
 
-    @Pattern(regexp = "(^((ftp|http|https):\\/\\/)?(www.)?(?!.*(ftp|http|https|www.))facebook+\\.com+(\\/[a-zA-Z0-9#]+\\/?)$)|(^$)")
+    @Pattern(regexp = "(^((http|https):\\/\\/)?(www.)?(?!.*(http|https|www.))facebook+\\.com+(\\/[.\\-_a-zA-Z0-9#]+\\/?)$)|(^$)")
     private String facebook;
-    @Pattern(regexp = "(^((ftp|http|https):\\/\\/)?(www.)?(?!.*(ftp|http|https|www.))instagram+\\.com+(\\/[a-zA-Z0-9#]+\\/?)$)|(^$)")
+    @Pattern(regexp = "(^((http|https):\\/\\/)?(www.)?(?!.*(http|https|www.))instagram+\\.com+(\\/[.\\-_a-zA-Z0-9#]+\\/?)$)|(^$)")
     private String instagram;
-    @Pattern(regexp = "(^((ftp|http|https):\\/\\/)?(www.)?(?!.*(ftp|http|https|www.))twitter+\\.com+(\\/[a-zA-Z0-9#]+\\/?)$)|(^$)")
+    @Pattern(regexp = "(^((http|https):\\/\\/)?(www.)?(?!.*(http|https|www.))twitter+\\.com+(\\/[.\\-_a-zA-Z0-9#]+\\/?)$)|(^$)")
     private String twitter;
 
 
