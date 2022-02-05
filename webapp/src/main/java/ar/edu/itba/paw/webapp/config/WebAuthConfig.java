@@ -62,28 +62,29 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement()
                 .invalidSessionUrl("/")
                 .and().authorizeRequests()
-                .antMatchers("/login", "/register").anonymous()
-                .antMatchers("/user/*",
-                             "/user/edit",
-                             "/register/restaurant",
-                             "/restaurants/user/*").hasRole("USER")
-                .antMatchers("/reservations",
-                             "/reservations/*/cancel",
-                             "/reservations/history",
-                             "/restaurant/*/rate",
-                             "/restaurant/*/dislike",
-                             "/restaurant/*/like",
-                             "/restaurant/*/reviews/delete"
-                             ).hasRole("USER")
-                .antMatchers("/restaurant/*/edit",
-                             "/restaurant/*/delete",
-                             "/restaurant/*/menu",
-                             "/restaurant/*/delete/*",
-                             "/restaurant/*/manage/confirmed",
-                             "/reservations/*/*/cancel",
-                             "/reservations/*/*/reject",
-                             "/reservations/*/*/confirm",
-                             "/restaurant/*/manage/pending").hasRole("RESTAURANTOWNER")
+//                .antMatchers("/login", "/register").anonymous()
+//                .antMatchers("/user/*",
+//                             "/user/edit",
+//                             "/register/restaurant",
+//                             "/restaurants/user/*").hasRole("USER")
+//                .antMatchers("/reservations",
+//                             "/reservations/*/cancel",
+//                             "/reservations/history",
+//                             "/restaurant/*/rate",
+//                             "/restaurant/*/dislike",
+//                             "/restaurant/*/like",
+//                             "/restaurant/*/reviews/delete"
+//                             ).hasRole("USER")
+//                .antMatchers("/restaurant/*/edit",
+//                             "/restaurant/*/delete",
+//                             "/restaurant/*/menu",
+//                             "/restaurant/*/delete/*",
+//                             "/restaurant/*/manage/confirmed",
+//                             "/reservations/*/*/cancel",
+//                             "/reservations/*/*/reject",
+//                             "/reservations/*/*/confirm",
+//                             "/restaurant/*/manage/pending").hasRole("RESTAURANTOWNER")
+                .antMatchers("/**").permitAll()
                 .and().formLogin()
                 .loginPage("/login")
                 .usernameParameter("email")

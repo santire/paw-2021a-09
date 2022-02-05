@@ -47,7 +47,6 @@ import java.util.Properties;
 @EnableAsync
 @EnableTransactionManagement
 @EnableScheduling
-@EnableWebMvc
 @ComponentScan({ "ar.edu.itba.paw.webapp.controller", "ar.edu.itba.paw.service", "ar.edu.itba.paw.persistence", })
 @Configuration
 public class WebConfig {
@@ -71,14 +70,14 @@ public class WebConfig {
 
     final SimpleDriverDataSource ds = new SimpleDriverDataSource();
     ds.setDriverClass(org.postgresql.Driver.class);
-     // ds.setUrl("jdbc:postgresql://localhost/paw");
-     // ds.setUsername("root");
-     // ds.setPassword("root");
+      ds.setUrl("jdbc:postgresql://localhost/paw");
+      ds.setUsername("root");
+      ds.setPassword("root");
 
     // paw server
-    ds.setUrl("jdbc:postgresql://10.16.1.110/paw-2021a-09");
-    ds.setUsername("paw-2021a-09");
-    ds.setPassword("6jnqLFj1g");
+//    ds.setUrl("jdbc:postgresql://10.16.1.110/paw-2021a-09");
+//    ds.setUsername("paw-2021a-09");
+//    ds.setPassword("6jnqLFj1g");
 
     // remote testing database (very slow)
 
