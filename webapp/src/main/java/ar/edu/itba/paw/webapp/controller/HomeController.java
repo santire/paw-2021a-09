@@ -42,8 +42,8 @@ public class HomeController {
     private static final int AMOUNT_OF_RESTAURANTS = 6;
     private static final int AMOUNT_OF_POPULAR_RESTAURANTS = 10;
     private static final int POPULAR_MIN_RATING = 1;
-    private static Sorting DEFAULT_SORT = Sorting.NAME;
-    private static String DEFAULT_ORDER = "asc";
+    private static final Sorting DEFAULT_SORT = Sorting.NAME;
+    private static final String DEFAULT_ORDER = "asc";
 
     @Autowired
     private UserService userService;
