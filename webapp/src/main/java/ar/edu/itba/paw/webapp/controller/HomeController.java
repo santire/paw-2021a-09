@@ -63,8 +63,6 @@ public class HomeController {
         final ModelAndView mav = new ModelAndView("home");
         User loggedUser = ca.loggedUser();
 
-
-
         if(page == null || page <1) {
             page=1;
         }
@@ -84,11 +82,6 @@ public class HomeController {
         }
         return mav;
     }
-
-
-
-
-
 
     @RequestMapping(path ={"/restaurants"}, method = RequestMethod.GET)
     public ModelAndView restaurants(@RequestParam(defaultValue = "1") Integer page,
