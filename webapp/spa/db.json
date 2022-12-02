@@ -1,0 +1,12 @@
+{
+  "restaurants": [
+    {
+      "id": 1,
+      "name": "test",
+      "owner": {
+        "id": 1,
+        "firstName": "John"
+      }
+    }
+  ]
+}
