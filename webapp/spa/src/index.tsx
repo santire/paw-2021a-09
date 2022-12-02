@@ -1,8 +1,9 @@
-import React from "react";
+import { MantineProvider } from "@mantine/core";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { MantineProvider } from "@mantine/core";
+import "./i18n";
 import { HomePage } from "./pages/HomePage";
 
 const root = ReactDOM.createRoot(
@@ -20,7 +21,9 @@ root.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <MantineProvider withGlobalStyles withNormalizeCSS>
-        <RouterProvider router={router} />
+        <Suspense fallback="loading">
+          <RouterProvider router={router} />
+        </Suspense>
       </MantineProvider>
     </QueryClientProvider>
   </React.StrictMode>
