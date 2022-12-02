@@ -8,6 +8,20 @@
 <%@attribute name="times" required="true" type="java.util.List"%>
 
 <div class="container">
+  <spring:message code="home.reservations.confirmationMessage" var="confirmationMessage"/>
+  <c:if test="${madeReservation}">
+    <div class="alert alert-success alert-dissapear" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <strong><c:out value="${confirmationMessage}"/></strong>
+    </div>
+  </c:if>
+  <spring:message code="user.edit.confirmationMessage" var="confirmationMessage"/>
+  <c:if test="${editedUser}">
+    <div class="alert alert-success alert-dissapear" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <strong><c:out value="${confirmationMessage}"/></strong>
+    </div>
+  </c:if>
   <div class="mb-5 my-2" style="max-height: 450px;">
     <div class="row no-gutters mt-5">
       <div class="col-md-7 mx-auto pb-3">

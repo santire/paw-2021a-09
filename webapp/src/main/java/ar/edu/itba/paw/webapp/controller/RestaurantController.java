@@ -45,7 +45,6 @@ import java.time.LocalTime;
 @Controller
 public class RestaurantController {
 
-
     private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
     private static final int AMOUNT_OF_MENU_ITEMS = 8;
     private static final int AMOUNT_OF_RESTAURANTS = 10;
@@ -75,12 +74,8 @@ public class RestaurantController {
     @Autowired
     private CommentService commentService;
 
-
     @Autowired
     private CommonAttributes ca;
-
-
-
 
 
     @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.GET)
@@ -174,7 +169,7 @@ public class RestaurantController {
             return new ModelAndView("redirect:/login");
         }
 
-        return new ModelAndView("redirect:/");
+        return new ModelAndView("redirect:/restaurant/" + restaurantId);
     }
 
     @RequestMapping(path = { "/restaurant/{restaurantId}/reviews" }, method = RequestMethod.GET)

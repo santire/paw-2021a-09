@@ -141,7 +141,7 @@ public class Restaurant {
     public String getPhoneNumber(){ return this.phoneNumber; }
     public List<Rating> getRatings(){ return this.ratings; }
     public double getRating() { 
-        DecimalFormat df = new DecimalFormat("#.##");    
+        DecimalFormat df = new DecimalFormat("#,##");
         double result = new Double(df.format(
         ratings
         .stream()
