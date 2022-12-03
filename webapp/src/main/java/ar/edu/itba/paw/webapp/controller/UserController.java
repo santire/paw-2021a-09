@@ -28,33 +28,45 @@ public class UserController {
     private UserService userService;
 
     // UPDATE USER
-    @PUT
-    @Path("/user/edit")
-    @Produces(value = {MediaType.APPLICATION_JSON})
-    @Consumes(value = {MediaType.APPLICATION_JSON})
-    public Response editUser(final UserDto userDto, @Context HttpServletRequest request){
-        try{
-            userService.updateUser(
-                    userDto.getUserId(),
-                    userDto.getUsername(),
-                    userDto.getPassword(),
-                    userDto.getFirstName(),
-                    userDto.getLastName(),
-                    userDto.getEmail(),
-                    userDto.getPhone()
-            );
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            return Response.status(Response.Status.UNAUTHORIZED).header("error", e.getMessage()).build();
-        }
-        return Response.status(Response.Status.OK).build();
-    }
+//    @PUT
+//    @Path("/user/edit")
+//    @Produces(value = {MediaType.APPLICATION_JSON})
+//    @Consumes(value = {MediaType.APPLICATION_JSON})
+//    public Response editUser(final UserDto userDto, @Context HttpServletRequest request){
+//        try{
+//            userService.updateUser(
+//                    userDto.getUserId(),
+//                    userDto.getUsername(),
+//                    userDto.getPassword(),
+//                    userDto.getFirstName(),
+//                    userDto.getLastName(),
+//                    userDto.getEmail(),
+//                    userDto.getPhone()
+//            );
+//        } catch (Exception e) {
+//            LOGGER.error(e.getMessage());
+//            return Response.status(Response.Status.UNAUTHORIZED).header("error", e.getMessage()).build();
+//        }
+//        return Response.status(Response.Status.OK).build();
+//    }
 
     @GET
-    @Path("/user/{userId}")
+    @Path("/user/ByUserId/{userId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
     public Response getUserById(@PathParam("userId") final int userId, @Context HttpServletRequest request) {
         final Optional<User> user = userService.findById(userId);
+        if(user.isPresent()){
+            return Response.ok(UserDto.fromUser(user.get(), request.getRequestURL().toString())).build();
+        } else {
+            return Response.status(Response.Status.ACCEPTED).header("error", "user not found").build();
+        }
+    }
+
+    @GET
+    @Path("/user/byUsername/{username}")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    public Response getUserByUsername(@PathParam("username") final String username, @Context HttpServletRequest request) {
+        final Optional<User> user = userService.findByUsername(username);
         if(user.isPresent()){
             return Response.ok(UserDto.fromUser(user.get(), request.getRequestURL().toString())).build();
         } else {
