@@ -31,7 +31,7 @@ public class LoginAuthFailureHandler implements AuthenticationFailureHandler {
         else if (e instanceof BadCredentialsException) {
             LOGGER.info("bad credentials");
             LoginDto loginDto = (LoginDto) httpServletRequest.getAttribute("loginRequest");
-            if (loginDto.getUsername() == null || loginDto.getPassword() == null) {
+            if (loginDto.getEmail() == null || loginDto.getPassword() == null) {
                 LOGGER.info("the credentials introduced by the user are not correct. there is an error either on password or on username");
                 httpServletResponse.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
             }

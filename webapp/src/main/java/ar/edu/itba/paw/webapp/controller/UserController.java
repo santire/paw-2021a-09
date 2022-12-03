@@ -51,7 +51,7 @@ public class UserController {
 //    }
 
     @GET
-    @Path("/user/ByUserId/{userId}")
+    @Path("/user/byUserId/{userId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
     public Response getUserById(@PathParam("userId") final int userId, @Context HttpServletRequest request) {
         final Optional<User> user = userService.findById(userId);

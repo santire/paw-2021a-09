@@ -37,9 +37,10 @@ public class LoginAuthFilter extends UsernamePasswordAuthenticationFilter {
             throw new InvalidLoginException("An error occurred processing the login request", e);
         }
         UsernamePasswordAuthenticationToken token =
-                new UsernamePasswordAuthenticationToken(loginDto.getUsername(),
+                new UsernamePasswordAuthenticationToken(loginDto.getEmail(),
                         loginDto.getPassword());
         this.setDetails(request, token);
+
         return this.getAuthenticationManager().authenticate(token);
     }
 

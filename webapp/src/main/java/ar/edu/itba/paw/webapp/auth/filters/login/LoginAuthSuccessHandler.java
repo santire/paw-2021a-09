@@ -31,17 +31,16 @@ public class LoginAuthSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
                                         Authentication authentication) throws IOException {
-        LOGGER.info("The user with username {} has been successfully authenticated", authentication.getName());
+        LOGGER.info("The user with email {} has been successfully authenticated", authentication.getName());
 
-        User user = userService.findByUsername(authentication.getName()).get();
+        User user = userService.findByEmail(authentication.getName()).get();
         String jwt = jwtUtility.createToken(user);
 
         httpServletResponse.addHeader("Authorization" , jwt);
         httpServletResponse.setStatus(HttpStatus.OK.value());
         httpServletResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
-
+        LOGGER.info("Token is: {}", jwt);
         String username = user.getUsername();
-        long userId = user.getId();
 
         new ObjectMapper().writeValue(httpServletResponse.getOutputStream(), LoginDto.from(username,jwt));
     }

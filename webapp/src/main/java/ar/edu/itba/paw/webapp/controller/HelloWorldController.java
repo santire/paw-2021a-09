@@ -2,6 +2,8 @@ package ar.edu.itba.paw.webapp.controller;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
@@ -37,12 +39,15 @@ public class HelloWorldController {
     @Path("/me")
     @Produces(value = {MediaType.APPLICATION_JSON})
     public Response helloUser(@Context HttpServletRequest request) {
-        Optional<User> user = getLoggedUser(request);
-        List<String> hello = Arrays.asList("Hello", " World!");
-        if (user.isPresent()){
-            hello = Arrays.asList("Hello", user.get().getFirstName());
-        }
-        return Response.ok(hello).build();
+//        Optional<User> user = getLoggedUser(request);
+//        List<String> hello = Arrays.asList("Hello", " World!");
+//        if (user.isPresent()){
+//            hello = Arrays.asList("Hello", user.get().getFirstName());
+//        }
+//        return Response.ok(hello).build();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+        return Response.ok(currentPrincipalName).build();
     }
 
     @ModelAttribute("loggedUser")
