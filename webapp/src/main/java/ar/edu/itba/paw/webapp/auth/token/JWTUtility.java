@@ -19,6 +19,9 @@ public class JWTUtility {
     private final long maxValidTime;
     private final SecureRandom secureRandom;
 
+    private static final String RESTAURANT_OWNER = "ROLE_RESTAURANTOWNER";
+    private static final String USER = "ROLE_USER";
+
     @Autowired
     public JWTUtility(Environment environment) {
         this.secret = "my-secret" ;//environment.getRequiredProperty(environment.getRequiredProperty("state") + ".token.secret");
@@ -27,12 +30,12 @@ public class JWTUtility {
     }
 
     public String createToken(User user) {
-        Claims claims = Jwts.claims().setSubject(user.getUsername());
+        Claims claims = Jwts.claims().setSubject(user.getEmail());
         Date timeNow = new Date();
         return Jwts.builder()
                 .setClaims(claims)
                 // TODO: Change to real role ( user.getRole() )
-                .claim("Role", "USER")
+                .claim("Role", USER)
                 .setHeaderParam("salt",randomizer())
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .setIssuedAt(timeNow)

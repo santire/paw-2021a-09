@@ -76,7 +76,7 @@ public class SessionAuthFilter extends AbstractAuthenticationProcessingFilter {
         }
         else {
             LOGGER.info("Provide session with JWT access");
-            LOGGER.info("Provided BEARER TOKEN is: {}", token);
+            LOGGER.info("Provided BEARER TOKEN is: {}", token.get());
             auth = getAuthenticationManager().authenticate(token.get());
             if(restaurantOwnerEndpointsMatcher.matches(httpServletRequest)){
                 LOGGER.info("Provide session with JWT access - RESTAURANT OWNER");
