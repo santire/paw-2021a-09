@@ -16,8 +16,8 @@ function NavItem({ label, path, relative }: NavItemProps) {
     <Link
       key={label}
       to={path}
-      relative={relative ?? "path"}
       className={classes.link}
+      relative={relative ?? "route"}
     >
       {label}
     </Link>
@@ -55,8 +55,8 @@ export function Header() {
 
   return (
     <div className={classes.header}>
-      <Grid justify="center" p={0} m={0} align="center">
-        <Grid.Col span={5}>
+      <Grid justify="center" p={0} m={0} align="center" className={classes.grid}>
+        <Grid.Col span={4}>
           <Flex justify="left">
             <Group spacing={0}>
               <GourmetableLogo />
@@ -65,12 +65,13 @@ export function Header() {
             </Group>
           </Flex>
         </Grid.Col>
-        <Grid.Col span={5}>
+        <Grid.Col span={4}>
           <SearchBar />
         </Grid.Col>
-        <Grid.Col span={2}>
+        <Grid.Col span={4}>
           <Flex justify="right">
-            <span>login/user</span>
+              <NavItem label={t("header.register")} path="register" />
+              <NavItem label={t("header.login")} path="login" />
           </Flex>
         </Grid.Col>
       </Grid>

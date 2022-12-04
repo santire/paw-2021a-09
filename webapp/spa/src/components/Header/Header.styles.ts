@@ -1,6 +1,7 @@
 import { createStyles } from "@mantine/core";
 
 export default createStyles((theme) => ({
+  grid: {},
   header: {
     backgroundColor:
       theme.colorScheme === "dark"
@@ -9,11 +10,17 @@ export default createStyles((theme) => ({
     borderBottom: `1px solid ${
       theme.colorScheme === "dark" ? "transparent" : theme.colors.gray[2]
     }`,
+    minHeight: 67,
   },
   search: {
     padding: 0,
     alignSelf: "center",
     width: "100%",
+    maxWidth: 800,
+    margin: "0 auto",
+    [`@media (max-width: ${theme.breakpoints.lg}px)`]: {
+      display: "none",
+    },
   },
   link: {
     display: "block",
@@ -33,6 +40,10 @@ export default createStyles((theme) => ({
         theme.colorScheme === "dark"
           ? theme.colors.dark[5]
           : theme.colors.gray[2],
+    },
+
+    [`@media (max-width: ${theme.breakpoints.lg}px)`]: {
+      display: "none",
     },
   },
 }));

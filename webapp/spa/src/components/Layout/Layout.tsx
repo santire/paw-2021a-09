@@ -14,8 +14,8 @@ const useStyles = createStyles(() => ({
   },
   main: {
     flexGrow: 1,
-    maxWidth: 1280,
-    border: "1px solid red",
+    maxWidth: 1920,
+    margin: "0 auto",
   },
 }));
 

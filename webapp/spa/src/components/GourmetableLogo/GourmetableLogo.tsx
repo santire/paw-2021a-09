@@ -28,7 +28,7 @@ const useStyles = createStyles(() => ({
 export function GourmetableLogo() {
   const { classes } = useStyles();
   return (
-    <Link to="home" style={{ textDecoration: "none" }}>
+    <Link to="" style={{ textDecoration: "none" }}>
       <Group p={0} spacing={3} className={classes.wrapper}>
         <Logo className={classes.logo} />
         <div className={classes.title}>

@@ -7,12 +7,19 @@
   "header": {
     "browse": "Browse",
     "reservations": "My Reservations",
-    "search": "Search"
+    "search": "Search",
+    "login": "Log In",
+    "register": "Register"
   },
   "footer": {
     "copyright": "All rights reserved",
     "weAre": "We are",
     "contactUs": "Contact us"
+  },
+  "error": {
+    "title": "You have found a secret place.",
+    "description": "Unfortunately, this is only a 404 page. You may have mistyped the address, or the page has been moved to another URL.",
+    "takeMeBack": "Take me back to the home page"
   },
   "description": {
     "part1": "To get started, edit <1>src/App.js</1> and save to reload.",
