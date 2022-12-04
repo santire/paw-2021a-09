@@ -1,5 +1,19 @@
 {
   "title": "Welcome to react using react-i18next",
+  "theme": {
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "header": {
+    "browse": "Browse",
+    "reservations": "My Reservations",
+    "search": "Search"
+  },
+  "footer": {
+    "copyright": "All rights reserved",
+    "weAre": "We are",
+    "contactUs": "Contact us"
+  },
   "description": {
     "part1": "To get started, edit <1>src/App.js</1> and save to reload.",
     "part2": "Switch language between english and german using buttons above."

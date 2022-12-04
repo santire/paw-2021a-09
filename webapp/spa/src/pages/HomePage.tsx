@@ -1,13 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { getRestaurants } from "../api/services";
-import i18n from "i18next";
 import { Restaurant } from "../types";
-
-const LANGS = [
-  { code: "en", nativeName: "English" },
-  { code: "es", nativeName: "Español" },
-];
 
 export function HomePage() {
   const { status, data, error } = useQuery<Restaurant[], Error>(
@@ -32,20 +26,6 @@ export function HomePage() {
           ))}
         </ul>
       ) : null}
-      <div>
-        {LANGS.map((lng) => {
-          return (
-            <button
-              className="m-4 p-2 bg-blue-600 rounded"
-              key={lng.code}
-              type="submit"
-              onClick={() => i18n.changeLanguage(lng.code)}
-            >
-              {lng.nativeName}
-            </button>
-          );
-        })}
-      </div>
     </>
   );
 }
