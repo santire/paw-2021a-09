@@ -16,7 +16,14 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Optional;
+import javax.ws.rs.core.UriInfo;
+import java.util.*;
+import java.net.URI;
+
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+
 
 @Path("users")
 @Component
@@ -26,6 +33,10 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+
+    @Context
+    private UriInfo uriInfo;
 
     // UPDATE USER
 //    @PUT
@@ -51,9 +62,9 @@ public class UserController {
 //    }
 
     @GET
-    @Path("/user/byUserId/{userId}")
+    @Path("/{userId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
-    public Response getUserById(@PathParam("userId") final int userId, @Context HttpServletRequest request) {
+    public Response getUser(@PathParam("userId") final int userId, @Context HttpServletRequest request) {
         final Optional<User> user = userService.findById(userId);
         if(user.isPresent()){
             return Response.ok(UserDto.fromUser(user.get(), request.getRequestURL().toString())).build();
@@ -62,15 +73,34 @@ public class UserController {
         }
     }
 
-    @GET
-    @Path("/user/byUsername/{username}")
-    @Produces(value = {MediaType.APPLICATION_JSON})
-    public Response getUserByUsername(@PathParam("username") final String username, @Context HttpServletRequest request) {
-        final Optional<User> user = userService.findByUsername(username);
-        if(user.isPresent()){
-            return Response.ok(UserDto.fromUser(user.get(), request.getRequestURL().toString())).build();
-        } else {
-            return Response.status(Response.Status.ACCEPTED).header("error", "user not found").build();
+    @POST
+    @Produces(value = { MediaType.APPLICATION_JSON, })
+    @Consumes(value = { MediaType.APPLICATION_JSON, })
+    public Response registerUser(final UserDto userDto, @Context HttpServletRequest request) {
+        
+        final User user;
+
+        try {
+            LOGGER.info("POST /users -> attempt to create user");
+            user = userService.register(userDto.getUsername(),userDto.getPassword(),userDto.getFirstName(),userDto.getLastName(),userDto.getEmail(),userDto.getPhone(),request.getRequestURL().toString());
+        } catch (Exception e) {
+            return Response.status(Response.Status.CONFLICT).header("error", e.getMessage()).build();
         }
+        final URI uri = uriInfo.getAbsolutePathBuilder()
+                .path(String.valueOf(user.getId())).build();
+        LOGGER.info("user created: " + uri);
+        return Response.created(uri).build();
     }
+
+   // @GET
+   // @Path("/user/byUsername/{username}")
+   // @Produces(value = {MediaType.APPLICATION_JSON})
+   // public Response getUserByUsername(@PathParam("username") final String username, @Context HttpServletRequest request) {
+    //    final Optional<User> user = userService.findByUsername(username);
+     //   if(user.isPresent()){
+      //      return Response.ok(UserDto.fromUser(user.get(), request.getRequestURL().toString())).build();
+       // } else {
+        //    return Response.status(Response.Status.ACCEPTED).header("error", "user not found").build();
+       // }
+    //}
 }
