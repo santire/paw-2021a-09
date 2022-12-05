@@ -55,8 +55,8 @@ export function Header() {
 
   return (
     <div className={classes.header}>
-      <Grid justify="center" p={0} m={0} align="center" className={classes.grid}>
-        <Grid.Col span={4}>
+      <Grid justify="center" p={0} m={0} align="center">
+        <Grid.Col span={6}>
           <Flex justify="left">
             <Group spacing={0}>
               <GourmetableLogo />
@@ -65,13 +65,13 @@ export function Header() {
             </Group>
           </Flex>
         </Grid.Col>
-        <Grid.Col span={4}>
-          <SearchBar />
-        </Grid.Col>
-        <Grid.Col span={4}>
+        <Grid.Col span={6}>
           <Flex justify="right">
+            <SearchBar />
+            <Group spacing={0}>
               <NavItem label={t("header.register")} path="register" />
               <NavItem label={t("header.login")} path="login" />
+            </Group>
           </Flex>
         </Grid.Col>
       </Grid>
