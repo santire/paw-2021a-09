@@ -1,7 +1,8 @@
-import { User } from ".";
-
 export interface Restaurant {
   id?: string;
   name: string;
-  owner: User;
+  tags: string[];
+  likes: number;
+  rating: number;
+  imgUrl: string;
 }
