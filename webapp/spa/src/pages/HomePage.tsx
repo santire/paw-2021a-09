@@ -58,8 +58,8 @@ export function HomePage() {
 
   return (
     <>
-      <Title order={1} mt="xl" mb="sm">{t`pages.home.highlights`}</Title>
       <Container size="xl" my="xl">
+        <Title order={1} mt="xl" mb="sm">{t`pages.home.highlights`}</Title>
         <Carousel
           slideSize="20%"
           slideGap="sm"
@@ -68,7 +68,7 @@ export function HomePage() {
             { maxWidth: "md", slideSize: "50%" },
             { maxWidth: "sm", slideSize: "100%", slideGap: 0 },
           ]}
-          align="center"
+          align="start"
           controlSize={40}
           loop
         >
