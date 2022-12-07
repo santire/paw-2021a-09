@@ -2,10 +2,10 @@ import { Carousel } from "@mantine/carousel";
 import {
   Center,
   Container,
+  createStyles,
   Flex,
-  Group,
-  SimpleGrid,
-  Title,
+  Text,
+  Image,
 } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
@@ -13,12 +13,39 @@ import { getRestaurants } from "../api/services";
 import { RestaurantCard } from "../components/RestaurantCard/RestaurantCard";
 import { Restaurant } from "../types";
 
+const useStyles = createStyles((theme) => ({
+  heading: {
+    background:
+      theme.colorScheme === "dark"
+        ? theme.colors.dark[4]
+        : theme.colors.gray[3],
+    opacity: 0.8,
+    paddingTop: theme.spacing.xl,
+    paddingBottom: theme.spacing.xl,
+    paddingLeft: theme.spacing.md,
+    paddingRight: theme.spacing.md,
+  },
+  headingText: {
+    fontSize: "5vw",
+    paddingLeft: theme.spacing.xl,
+    color:
+      theme.colorScheme === "dark"
+        ? theme.colors.dark[0]
+        : theme.colors.gray[9],
+  },
+  title: {
+    fontSize: theme.fontSizes.xl * 1.8,
+    paddingLeft: theme.spacing.sm,
+  },
+}));
+
 export function HomePage() {
   const { status, data, error } = useQuery<Restaurant[], Error>(
     [],
     getRestaurants
   );
   const { t } = useTranslation();
+  const { classes } = useStyles();
 
   if (status === "loading") {
     return <div>...</div>;
@@ -58,8 +85,20 @@ export function HomePage() {
 
   return (
     <>
+      <div className={classes.heading}>
+        <Flex justify="space-between" align="center">
+          <Text className={classes.headingText}>
+            Discover and book the best restaurants
+          </Text>
+          <Image
+            src={require("../assets/images/home_image.png")}
+            height={"35vh"}
+            width={"auto"}
+          />
+        </Flex>
+      </div>
       <Container size="xl" my="xl">
-        <Title order={1} mt="xl" mb="sm">{t`pages.home.highlights`}</Title>
+        <Text className={classes.title}>{t`pages.home.highlights`}</Text>
         <Carousel
           slideSize="20%"
           slideGap="sm"
