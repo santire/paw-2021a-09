@@ -28,8 +28,8 @@ export default createStyles((theme) => ({
     color:
       theme.colorScheme === "dark"
         ? theme.colors.dark[2]
-        : theme.colors.gray[8],
-    fontSize: theme.fontSizes.sm,
+        : theme.colors.gray[7],
+    fontSize: theme.fontSizes.md,
     fontWeight: 500,
 
     "&:hover": {

@@ -26,8 +26,9 @@
     "description": "Unfortunately, this is only a 404 page. You may have mistyped the address, or the page has been moved to another URL.",
     "takeMeBack": "Take me back to the home page"
   },
-  "description": {
-    "part1": "To get started, edit <1>src/App.js</1> and save to reload.",
-    "part2": "Switch language between english and german using buttons above."
+  "pages": {
+    "home": {
+      "highlights": "Highlights"
+    }
   }
 }

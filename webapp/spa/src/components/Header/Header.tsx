@@ -1,4 +1,4 @@
-import { Autocomplete, Container, Flex, Grid, Group } from "@mantine/core";
+import { Autocomplete, Flex, Grid, Group } from "@mantine/core";
 import { IconSearch } from "@tabler/icons";
 import { useTranslation } from "react-i18next";
 import { Link, RelativeRoutingType } from "react-router-dom";

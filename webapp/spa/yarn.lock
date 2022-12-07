@@ -1811,6 +1811,13 @@
   resolved "https://registry.yarnpkg.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.4.tgz#b2ac626d6cb9c8718ab459166d4bb405b8ffa78b"
   integrity sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==
 
+"@mantine/carousel@^5.9.2":
+  version "5.9.2"
+  resolved "https://registry.yarnpkg.com/@mantine/carousel/-/carousel-5.9.2.tgz#0707420f490d831c96a56f374b79901c657d1f87"
+  integrity sha512-ziASnX1l06WgzYRr0TJ+fNrcWtW0E2LoU5rPU9RXoLBf4cyDnybvFwGRvcWgY4jKIIchOnjMJ49jB+oqE4AFkw==
+  dependencies:
+    "@mantine/utils" "5.9.2"
+
 "@mantine/core@^5.9.0":
   version "5.9.0"
   resolved "https://registry.yarnpkg.com/@mantine/core/-/core-5.9.0.tgz#8ae8bf6a80a79edfd65b41786378630ee96fe847"
@@ -1870,6 +1877,11 @@
   version "5.9.0"
   resolved "https://registry.yarnpkg.com/@mantine/utils/-/utils-5.9.0.tgz#f21ba4c518a6561bea079c7c909298f35f492a99"
   integrity sha512-UU5kO1VcsntrKvznJMjZ1S/ZM6arAXFkBnBqAKfCPOPJJIcwUWOfQP8u1sxp8ounAHThp9GtkpuzzGOQy1rcPA==
+
+"@mantine/utils@5.9.2":
+  version "5.9.2"
+  resolved "https://registry.yarnpkg.com/@mantine/utils/-/utils-5.9.2.tgz#d8e3b980de6cd5f7059b149c12d6ce50445b11ba"
+  integrity sha512-dvqqbdrK/nw4stFCXRCn38Ru12RqdWv8uzbywP5dQVCyTw8pW/Cq+T7YCWpbkFcKFea9UhOrPhBygJcjc13FgA==
 
 "@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1":
   version "5.1.1-v1"
@@ -4355,6 +4367,18 @@ electron-to-chromium@^1.4.251:
   version "1.4.284"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.284.tgz#61046d1e4cab3a25238f6bf7413795270f125592"
   integrity sha512-M8WEXFuKXMYMVr45fo8mq0wUrrJHheiKZf6BArTKk9ZBYCKJEOU5H8cdWgDT+qCVZf7Na4lVUaZsA+h6uA9+PA==
+
+embla-carousel-react@^7.0.5:
+  version "7.0.5"
+  resolved "https://registry.yarnpkg.com/embla-carousel-react/-/embla-carousel-react-7.0.5.tgz#c6a079e382432335e34adb16bb11558df047760c"
+  integrity sha512-qhw980gKj7G+O5d3WSwj0TyhcbpGP3DqJPiAatt1t3wEEcZqn7csaIfLh4e1N/0kna9sZfZZRzz+//NSrUodSg==
+  dependencies:
+    embla-carousel "7.0.5"
+
+embla-carousel@7.0.5:
+  version "7.0.5"
+  resolved "https://registry.yarnpkg.com/embla-carousel/-/embla-carousel-7.0.5.tgz#b43e590c072d06a5b11d4ce19d024f5f07a62862"
+  integrity sha512-loRcu0La0F7bhEMwbvgpi14iaaIEdwacH1xoplnaYfwN4KMgECkiuLgu4lx+v6MYd6lSpg/bw7ZxEuLUwYjavg==
 
 emittery@^0.10.2:
   version "0.10.2"

@@ -5,14 +5,17 @@ export default createStyles((theme) => ({
       theme.colorScheme === "dark"
         ? theme.colors.dark[6]
         : theme.colors.gray[0],
-    minWidth: theme.spacing.xl * 10,
-    maxWidth: theme.spacing.xl * 20,
+    minWidth: theme.spacing.xl * 12,
+    maxWidth: theme.spacing.xl * 15,
   },
 
   section: {
     paddingLeft: theme.spacing.md,
     paddingRight: theme.spacing.md,
     paddingBottom: theme.spacing.md,
+  },
+  tags: {
+    minHeight: theme.spacing.xl * 2,
   },
 
   label: {
@@ -22,7 +25,8 @@ export default createStyles((theme) => ({
   },
   title: {
     fontFamily: `Greycliff CF, ${theme.fontFamily}`,
-    fontSize: theme.fontSizes.lg,
+    fontSize: theme.fontSizes.md,
+    minHeight: theme.fontSizes.md * 3,
   },
 
   footer: {

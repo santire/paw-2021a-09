@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { Outlet } from "react-router-dom";
 import { Footer, FooterProps } from "../Footer/Footer";
 import { Header } from "../Header/Header";
-import { HeaderSearch } from "../HeaderSearch/HeaderSearch";
 
 const useStyles = createStyles(() => ({
   app: {
@@ -14,8 +13,8 @@ const useStyles = createStyles(() => ({
   },
   main: {
     flexGrow: 1,
-    maxWidth: 1920,
-    margin: "0 auto",
+    // maxWidth: 2560,
+    // margin: "0 auto",
   },
 }));
 

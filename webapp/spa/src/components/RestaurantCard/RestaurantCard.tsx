@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   Flex,
+  Grid,
   Group,
   Image,
   Text,
@@ -38,7 +39,7 @@ export function RestaurantCard({
 
   return (
     <Card withBorder p="lg" radius="md" className={classes.card}>
-      <Card.Section mb="xl">
+      <Card.Section mb="md">
         <Image
           src={
             image.startsWith("http") ? image : require(`../../assets/${image}`)
@@ -48,33 +49,37 @@ export function RestaurantCard({
         />
       </Card.Section>
 
-      <Card.Section mt="sm" className={classes.section}>
-        <Group position="apart">
-          <Text weight={700} className={classes.title}>
-            {name}
-          </Text>
-          <Badge size="lg" color="yellow">
-            <Group spacing="xs">
-              <Text weight={700} size="sm" align="center">
-                {rating}
-              </Text>
-              <Flex align="center" p={0} m={0}>
-                <IconStar
-                  size={18}
-                  color={theme.colors.yellow[6]}
-                  fill={theme.colors.yellow[6]}
-                />
-              </Flex>
-            </Group>
-          </Badge>
-        </Group>
+      <Card.Section mt="xs" className={classes.section}>
+        <Grid justify="space-between">
+          <Grid.Col span={8}>
+            <Text weight={700} className={classes.title} lineClamp={2}>
+              {name}
+            </Text>
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <Badge size="sm" color="yellow">
+              <Group spacing="xs">
+                <Text weight={700} size="sm" align="center">
+                  {rating}
+                </Text>
+                <Flex align="center" p={0} m={0}>
+                  <IconStar
+                    size={16}
+                    color={theme.colors.yellow[6]}
+                    fill={theme.colors.yellow[6]}
+                  />
+                </Flex>
+              </Group>
+            </Badge>
+          </Grid.Col>
+        </Grid>
       </Card.Section>
 
       <Card.Section className={classes.section}>
-        <Text mt="md" className={classes.label} color="dimmed">
+        <Text className={classes.label} color="dimmed">
           {t("restaurantCard.tagsTitle")}
         </Text>
-        <Group spacing={7} mt={5}>
+        <Group spacing={7} mt="xs" className={classes.tags}>
           {features}
         </Group>
       </Card.Section>
@@ -92,10 +97,10 @@ export function RestaurantCard({
           </Text>
           <Group spacing={0}>
             <ActionIcon>
-              <IconHeart size="md" color={theme.colors.red[6]} stroke={1.5} />
+              <IconHeart size={18} color={theme.colors.red[6]} stroke={1.5} />
             </ActionIcon>
             <ActionIcon>
-              <IconShare size={16} color={theme.colors.blue[6]} stroke={1.5} />
+              <IconShare size={18} color={theme.colors.blue[6]} stroke={1.5} />
             </ActionIcon>
           </Group>
         </Group>
