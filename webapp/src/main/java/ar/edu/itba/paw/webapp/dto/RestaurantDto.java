@@ -14,7 +14,7 @@ public class RestaurantDto {
     private String address;
     private String phoneNumber;
     private double rating;
-    private User owner;
+    private UserDto owner;
     private List<Tags> tags;
     private List<MenuItem> menu;
     private Image profileImage;
@@ -35,7 +35,7 @@ public class RestaurantDto {
         dto.phoneNumber = restaurant.getPhoneNumber();
         dto.rating = restaurant.getRating();
         dto.likes = restaurant.getLikes();
-        dto.owner = restaurant.getOwner();
+        dto.owner = UserDto.fromUser(restaurant.getOwner());
         dto.tags = restaurant.getTags();
         dto.menu = restaurant.getMenu();
         dto.ratings = restaurant.getRatings();
@@ -67,7 +67,7 @@ public class RestaurantDto {
         return ratings;
     }
 
-    public User getOwner() {
+    public UserDto getOwner() {
         return owner;
     }
 
@@ -124,7 +124,7 @@ public class RestaurantDto {
         this.phoneNumber = phoneNumber;
     }
 
-    public void setOwner(User owner) {
+    public void setOwner(UserDto owner) {
         this.owner = owner;
     }
 
