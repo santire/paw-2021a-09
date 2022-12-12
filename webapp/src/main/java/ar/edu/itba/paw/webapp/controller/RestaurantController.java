@@ -9,6 +9,7 @@ import ar.edu.itba.paw.service.RestaurantService;
 import ar.edu.itba.paw.service.SocialMediaService;
 import ar.edu.itba.paw.webapp.dto.RestaurantDto;
 import ar.edu.itba.paw.webapp.dto.UserDto;
+import ar.edu.itba.paw.webapp.utils.CachingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +22,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.text.html.HTML;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -89,9 +88,10 @@ public class RestaurantController {
         return Response.created(uri).build();
     }
 
-    @POST
+    @GET
     @Produces(value = { MediaType.APPLICATION_JSON, })
-    @Consumes(value = { MediaType.APPLICATION_JSON, })    @Path("/restaurant/{restaurantId}")
+    @Consumes(value = { MediaType.APPLICATION_JSON, })
+    @Path("/{restaurantId}")
     public Response getRestaurantById(@PathParam("restaurantId") final int restaurantId, @Context HttpServletRequest request) {
         final Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
         if(restaurant.isPresent()){
@@ -100,6 +100,35 @@ public class RestaurantController {
             return Response.status(Response.Status.ACCEPTED).header("error", "restaurant not found").build();
         }
     }
+
+    @GET
+    @Path("/{restaurantId}/image")
+    @Produces(value = { MediaType.APPLICATION_JSON, })
+    public Response getEventImage(@PathParam("restaurantId") final long restaurantId) throws IOException {
+        CacheControl cache = CachingUtils.getCaching(CachingUtils.HOUR_TO_SEC);
+        Date expireDate = CachingUtils.getExpirationDate(CachingUtils.HOUR_TO_SEC);
+        final Optional<Restaurant> maybeRestaurant = restaurantService.findById(restaurantId);
+        if (maybeRestaurant.isPresent()) {
+            Restaurant restaurant = maybeRestaurant.get();
+            final Image image = restaurant.getProfileImage();
+
+            if(image != null){
+                LOGGER.info("Found restaurant image");
+                return Response.ok(image.getData()).header(HttpHeaders.CONTENT_TYPE, "image/*")
+                        .cacheControl(cache).expires(expireDate).build();
+            }
+            else{
+                final Image defaultImage = new Image(null);
+                LOGGER.info("Restaurant Image not found. Placeholder is used");
+                return Response.ok(defaultImage.getDataFromPlaceholder()).header(HttpHeaders.CONTENT_TYPE, "image/*")
+                        .cacheControl(cache).expires(expireDate).build();
+            }
+        } else {
+            return Response.ok(null).header(HttpHeaders.CONTENT_TYPE, "image/*")
+                    .cacheControl(cache).expires(expireDate).build();
+        }
+    }
+
 
     @ModelAttribute("loggedUser")
     public Optional<User> getLoggedUser(HttpServletRequest request){

@@ -36,7 +36,7 @@ public class SessionAuthFilter extends AbstractAuthenticationProcessingFilter {
     private static final String DEFAULT_FILTER   = "/**";
 
     private static final RequestMatcher logOutEndpointMatcher
-            = new AntPathRequestMatcher("/auth/logout", HttpMethod.POST);
+            = new AntPathRequestMatcher("/logout", HttpMethod.POST);
 
     private static final String RESTAURANT_OWNER = "ROLE_RESTAURANTOWNER";
     private static final String USER = "ROLE_USER";
@@ -50,8 +50,8 @@ public class SessionAuthFilter extends AbstractAuthenticationProcessingFilter {
     @Autowired
     private RequestMatcher optionalAuthEndpointsMatcher;
 
-    @Autowired
-    private RequestMatcher restaurantOwnerEndpointsMatcher;
+//    @Autowired
+//    private RequestMatcher adminEndpointsMatcher;
 
 
     public SessionAuthFilter() {
@@ -78,11 +78,11 @@ public class SessionAuthFilter extends AbstractAuthenticationProcessingFilter {
             LOGGER.info("Provide session with JWT access");
             LOGGER.info("Provided BEARER TOKEN is: {}", token.get());
             auth = getAuthenticationManager().authenticate(token.get());
-            if(restaurantOwnerEndpointsMatcher.matches(httpServletRequest)){
-                LOGGER.info("Provide session with JWT access - RESTAURANT OWNER");
-                if(isRestaurantOwner(auth))
-                    return auth;
-            }
+//            if(adminEndpointsMatcher.matches(httpServletRequest)){
+//                LOGGER.info("Provide session with JWT access - RESTAURANT OWNER");
+//                if(isRestaurantOwner(auth))
+//                    return auth;
+//            }
             if(needAuthEndpointsMatcher.matches(httpServletRequest)){
                 LOGGER.info("Provide session with JWT access - AUTH NEEDED");
                 isAuthenticated(auth);

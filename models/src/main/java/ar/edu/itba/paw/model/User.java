@@ -45,8 +45,6 @@ public class User {
   @OneToMany(orphanRemoval = true, mappedBy = "owner")
   private List<Restaurant> ownedRestaurants;
 
-  // private List<Reservation> reservations; ?
-
   User() {
     // Just for hibernate
   }

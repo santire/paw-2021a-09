@@ -98,7 +98,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     public Filter createSessionAuthFilter() throws Exception {
         SessionAuthFilter filter = new SessionAuthFilter();
         filter.setAuthenticationManager(authenticationManager());
-        //filter.setRequiresAuthenticationRequestMatcher(needAuthEndpointsMatcher());
+        filter.setRequiresAuthenticationRequestMatcher(needAuthEndpointsMatcher());
         filter.setAuthenticationSuccessHandler(new SessionAuthSuccessHandler());
         filter.setAuthenticationFailureHandler(new SessionAuthFailureHandler());
         return filter;
@@ -109,8 +109,8 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
         return new OrRequestMatcher(
                 new AntPathRequestMatcher("/hello/me", "GET"),
                 new AntPathRequestMatcher("/users/*", "GET"),
-                optionalAuthEndpointsMatcher(),
-                restaurantOwnerEndpointsMatcher()
+                optionalAuthEndpointsMatcher()
+                //adminEndpointsMatcher()
         );
     }
 
@@ -124,83 +124,11 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
         );
     }
 
-    @Bean
-    public RequestMatcher restaurantOwnerEndpointsMatcher() {
-        return new OrRequestMatcher(
-                new AntPathRequestMatcher("/restaurant/*", "GET")
-        );
-    }
-
-
 //    @Bean
-//    public RequestMatcher needAuthEndpointsMatcher() {
+//    public RequestMatcher adminEndpointsMatcher() {
 //        return new OrRequestMatcher(
-//                new AntPathRequestMatcher("/api/users/?", "POST"),
-//                new AntPathRequestMatcher("/api/users/?", "GET"),
-//                new AntPathRequestMatcher("/api/users/**", "POST"),
-//                new AntPathRequestMatcher("/api/users/**", "GET"),
-//                new AntPathRequestMatcher("/api/events", "GET"),
-//                new AntPathRequestMatcher("/api/users", "GET"),
-//                new AntPathRequestMatcher("/api/users/profile/", "GET"),
-//                new AntPathRequestMatcher("/api/users/profile/**", "GET"),
-//                optionalAuthEndpointsMatcher(),
-//                organizerEndpointsMatcher(),
-//                racerEndpointsMatcher()
+//                new AntPathRequestMatcher("/admin/*", "GET")
 //        );
-//    }
-
-//    @Override
-//    protected void configure(HttpSecurity http) throws Exception {
-//
-//        String key ="";
-//        try {
-//            key = getFileFromResources("key.txt");
-//        } catch (Exception e) {
-//            // Ignore
-//        }
-//
-//
-//        http.sessionManagement()
-//                .invalidSessionUrl("/")
-//                .and().authorizeRequests()
-//                .antMatchers("/login", "/register").anonymous()
-//                .antMatchers("/user/*",
-//                             "/user/edit",
-//                             "/register/restaurant",
-//                             "/restaurants/user/*").hasRole("USER")
-//                .antMatchers("/reservations",
-//                             "/reservations/*/cancel",
-//                             "/reservations/history",
-//                             "/restaurant/*/rate",
-//                             "/restaurant/*/dislike",
-//                             "/restaurant/*/like",
-//                             "/restaurant/*/reviews/delete"
-//                             ).hasRole("USER")
-//                .antMatchers("/restaurant/*/edit",
-//                             "/restaurant/*/delete",
-//                             "/restaurant/*/menu",
-//                             "/restaurant/*/delete/*",
-//                             "/restaurant/*/manage/confirmed",
-//                             "/reservations/*/*/cancel",
-//                             "/reservations/*/*/reject",
-//                             "/reservations/*/*/confirm",
-//                             "/restaurant/*/manage/pending").hasRole("RESTAURANTOWNER")
-//                .antMatchers("/**").permitAll()
-//                .and().formLogin()
-//                .loginPage("/login")
-//                .usernameParameter("email")
-//                .passwordParameter("password")
-//                .defaultSuccessUrl("/", false)
-//                .and().rememberMe()
-//                .rememberMeParameter("rememberme")
-//                .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(365))
-//                .key(key)
-//                .and().logout()
-//                .logoutUrl("/logout")
-//                .logoutSuccessUrl("/login")
-//                .and().exceptionHandling()
-//                .accessDeniedPage("/403")
-//                .and().csrf().disable();
 //    }
 
     @Override

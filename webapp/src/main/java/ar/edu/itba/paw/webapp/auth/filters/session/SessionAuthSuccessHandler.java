@@ -21,6 +21,5 @@ public class SessionAuthSuccessHandler implements AuthenticationSuccessHandler {
                                         HttpServletResponse httpServletResponse, Authentication authentication)
             throws IOException, ServletException {
         LOGGER.info("THE AUTHENTICATION PROCESS HAS BEEN SUCCESSFULLY DONE");
-        //Nothing to see here
     }
 }
