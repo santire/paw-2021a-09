@@ -21,10 +21,6 @@ import java.util.*;
 import java.net.URI;
 
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-
-
 @Path("users")
 @Component
 public class UserController {
@@ -39,28 +35,24 @@ public class UserController {
     private UriInfo uriInfo;
 
     // UPDATE USER
-//    @PUT
-//    @Path("/user/edit")
-//    @Produces(value = {MediaType.APPLICATION_JSON})
-//    @Consumes(value = {MediaType.APPLICATION_JSON})
-//    public Response editUser(final UserDto userDto, @Context HttpServletRequest request){
-//        try{
-//            userService.updateUser(
-//                    userDto.getUserId(),
-//                    userDto.getUsername(),
-//                    userDto.getPassword(),
-//                    userDto.getFirstName(),
-//                    userDto.getLastName(),
-//                    userDto.getEmail(),
-//                    userDto.getPhone()
-//            );
-//        } catch (Exception e) {
-//            LOGGER.error(e.getMessage());
-//            return Response.status(Response.Status.UNAUTHORIZED).header("error", e.getMessage()).build();
-//        }
-//        return Response.status(Response.Status.OK).build();
-//    }
 
+    @PUT
+    @Path("/edit")
+    @Produces(value = { MediaType.APPLICATION_JSON})
+    @Consumes(value = { MediaType.APPLICATION_JSON})
+    public Response updateUser(final UserDto userDto, @Context HttpServletRequest request) {
+        try {
+            userService.updateUser(userDto.getUserId(), userDto.getUsername(),userDto.getPassword(), userDto.getFirstName(), userDto.getLastName(), userDto.getEmail(), userDto.getPhone());
+        } catch (Exception e) {
+            return Response.status(Response.Status.CONFLICT).header("error", e.getMessage()).build();
+        }
+        final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(userDto.getUserId())).build();
+        LOGGER.info("user updated: " + uri);
+        return Response.created(uri).build();
+    }
+
+    //READ USER
+    
     @GET
     @Path("/{userId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
@@ -73,9 +65,11 @@ public class UserController {
         }
     }
 
+    // CREATE USER
+
     @POST
-    @Produces(value = { MediaType.APPLICATION_JSON, })
-    @Consumes(value = { MediaType.APPLICATION_JSON, })
+    @Produces(value = { MediaType.APPLICATION_JSON})
+    @Consumes(value = { MediaType.APPLICATION_JSON})
     public Response registerUser(final UserDto userDto, @Context HttpServletRequest request) {
         
         final User user;
@@ -86,21 +80,9 @@ public class UserController {
         } catch (Exception e) {
             return Response.status(Response.Status.CONFLICT).header("error", e.getMessage()).build();
         }
-        final URI uri = uriInfo.getAbsolutePathBuilder()
-                .path(String.valueOf(user.getId())).build();
+        final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(user.getId())).build();
         LOGGER.info("user created: " + uri);
         return Response.created(uri).build();
     }
 
-   // @GET
-   // @Path("/user/byUsername/{username}")
-   // @Produces(value = {MediaType.APPLICATION_JSON})
-   // public Response getUserByUsername(@PathParam("username") final String username, @Context HttpServletRequest request) {
-    //    final Optional<User> user = userService.findByUsername(username);
-     //   if(user.isPresent()){
-      //      return Response.ok(UserDto.fromUser(user.get(), request.getRequestURL().toString())).build();
-       // } else {
-        //    return Response.status(Response.Status.ACCEPTED).header("error", "user not found").build();
-       // }
-    //}
 }
