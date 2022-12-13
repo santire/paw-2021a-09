@@ -11,15 +11,16 @@ public interface UserService {
 
   // CREATE
   public User register(final String username,
-      final String password,
-      final String firstName,
-      final String lastName,
-      final String email, 
-      final String phone,
-      String baseUrl) throws EmailInUseException, TokenCreationException;
+                       final String password,
+                       final String firstName,
+                       final String lastName,
+                       final String email,
+                       final String phone,
+                       String baseUrl) throws EmailInUseException, TokenCreationException;
 
   // READ
   public Optional<User> findById(long id);
+  public Optional<User> findByUsername(String username);
   public Optional<User> findByEmail(String email);
   public boolean isRestaurantOwner(long userId);
   public boolean isTheRestaurantOwner(long userId,long restaurantId);

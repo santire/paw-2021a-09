@@ -1,11 +1,13 @@
 package ar.edu.itba.paw.webapp.dto;
 
 
+
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.Tags;
 
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+
 import java.util.List;
 
 public class RestaurantDto {
@@ -20,7 +22,6 @@ public class RestaurantDto {
     private String instagram;
     private String twitter;
     private List<Tags> tags;
-
 
     private URI menu;
     private URI reviews;
@@ -40,7 +41,6 @@ public class RestaurantDto {
         dto.instagram = restaurant.getInstagram();
         dto.twitter = restaurant.getTwitter();
         dto.likes = restaurant.getLikes();
-
         dto.tags = restaurant.getTags();
 
         dto.menu = uriInfo.getAbsolutePathBuilder().path("menu").build();
@@ -71,8 +71,8 @@ public class RestaurantDto {
         return rating;
     }
 
-    public URI getMenu() {
-        return menu;
+    public Integer getLikes() {
+        return likes;
     }
 
     public String getFacebook() {
@@ -87,16 +87,25 @@ public class RestaurantDto {
         return twitter;
     }
 
-    public URI getReviews() { return reviews; }
+    public List<Tags> getTags() {
+        return tags;
+    }
 
-    public URI getImage() { return image; }
+    public URI getMenu() {
+        return menu;
+    }
 
-    public URI getOwner() { return owner; }
+    public URI getReviews() {
+        return reviews;
+    }
 
-    public List<Tags> getTags() { return tags; }
+    public URI getImage() {
+        return image;
+    }
 
-    public Integer getLikes() { return likes; }
-
+    public URI getOwner() {
+        return owner;
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -118,11 +127,13 @@ public class RestaurantDto {
         this.rating = rating;
     }
 
-    public void setMenu(URI menu) {
-        this.menu = menu;
+    public void setLikes(Integer likes) {
+        this.likes = likes;
     }
 
-    public void setFacebook(String facebook) { this.facebook = facebook; }
+    public void setFacebook(String facebook) {
+        this.facebook = facebook;
+    }
 
     public void setInstagram(String instagram) {
         this.instagram = instagram;
@@ -132,13 +143,26 @@ public class RestaurantDto {
         this.twitter = twitter;
     }
 
-    public void setReviews(URI reviews) { this.reviews = reviews; }
+    public void setTags(List<Tags> tags) {
+        this.tags = tags;
+    }
 
-    public void setImage(URI image) { this.image = image; }
+    public void setMenu(URI menu) {
+        this.menu = menu;
+    }
 
-    public void setOwner(URI owner) { this.owner = owner; }
+    public void setReviews(URI reviews) {
+        this.reviews = reviews;
+    }
 
-    public void setTags(List<Tags> tags) { this.tags = tags; }
+    public void setImage(URI image) {
+        this.image = image;
+    }
 
-    public void setLikes(Integer likes) { this.likes = likes; }
+    public void setOwner(URI owner) {
+        this.owner = owner;
+    }
+
 }
+
+

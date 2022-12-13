@@ -18,6 +18,7 @@ public interface UserDao {
 
   // READ
   public Optional<User> findById(long id);
+  public Optional<User> findByUsername(String username);
   public Optional<User> findByEmail(String email);
   public Optional<VerificationToken> getToken(String token);
   public Optional<PasswordToken> getPasswordToken(String token);
