@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import ar.edu.itba.paw.model.Sorting;
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.exceptions.*;
 import ar.edu.itba.paw.service.RestaurantService;
 import ar.edu.itba.paw.service.UserService;
 import ar.edu.itba.paw.webapp.auth.PawUserDetailsService;
@@ -58,7 +59,7 @@ public class HomeController {
         User user;
         try {
             user = userService.updatePasswordByToken(recoveryDto.getToken(),recoveryDto.getPassword());
-        } catch (Exception e) {
+        } catch ( TokenExpiredException | TokenDoesNotExistException e) {
             return Response.status(Response.Status.UNAUTHORIZED).header("error", e.getMessage()).build();
         }
         LOGGER.info("password recovered by user " + user.getUsername());

@@ -134,7 +134,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public User updatePasswordByToken(String token, String password) throws TokenExpiredException {
+  public User updatePasswordByToken(String token, String password) throws TokenExpiredException, TokenDoesNotExistException {
 
     Optional<PasswordToken> maybeToken = userDao.getPasswordToken(token);
     LOGGER.debug("GOT TOKEN {}", maybeToken.get().getToken());
