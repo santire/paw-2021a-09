@@ -1,54 +1,47 @@
 package ar.edu.itba.paw.webapp.controller;
 
 
-import ar.edu.itba.paw.model.*;
+import java.net.URI;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.validation.Valid;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.stereotype.Component;
 
-import ar.edu.itba.paw.model.Restaurant;
+import ar.edu.itba.paw.model.Sorting;
 import ar.edu.itba.paw.model.User;
-import ar.edu.itba.paw.model.exceptions.EmailInUseException;
-import ar.edu.itba.paw.model.exceptions.TokenCreationException;
-import ar.edu.itba.paw.model.exceptions.TokenDoesNotExistException;
-import ar.edu.itba.paw.model.exceptions.TokenExpiredException;
 import ar.edu.itba.paw.service.RestaurantService;
 import ar.edu.itba.paw.service.UserService;
 import ar.edu.itba.paw.webapp.auth.PawUserDetailsService;
-import ar.edu.itba.paw.webapp.forms.UserForm;
+import ar.edu.itba.paw.webapp.dto.RecoveryDto;
+import ar.edu.itba.paw.webapp.dto.UserDto;
 
 
 
-@Controller
+@Path("/")
+@Component
 public class HomeController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HomeController.class);
-    private static final int AMOUNT_OF_RESTAURANTS = 6;
+/*     private static final int AMOUNT_OF_RESTAURANTS = 6;
     private static final int AMOUNT_OF_POPULAR_RESTAURANTS = 10;
     private static final int POPULAR_MIN_RATING = 1;
     private static final Sorting DEFAULT_SORT = Sorting.NAME;
-    private static final String DEFAULT_ORDER = "asc";
+    private static final String DEFAULT_ORDER = "asc"; */
 
     @Autowired
     private UserService userService;
 
-    @Autowired
+/*     @Autowired
     private RestaurantService restaurantService;
 
     @Autowired
@@ -56,9 +49,25 @@ public class HomeController {
 
     @Autowired
     private CommonAttributes ca;
+ */
+    @PUT
+    @Path("/password-reset")
+    @Produces(value = { MediaType.APPLICATION_JSON})
+    @Consumes(value = { MediaType.APPLICATION_JSON})
+    public Response resetPasswordByToken(final RecoveryDto recoveryDto, @Context HttpServletRequest request) {
+        User user;
+        try {
+            user = userService.updatePasswordByToken(recoveryDto.getToken(),recoveryDto.getPassword());
+        } catch (Exception e) {
+            return Response.status(Response.Status.UNAUTHORIZED).header("error", e.getMessage()).build();
+        }
+        LOGGER.info("password recovered by user " + user.getUsername());
+        return Response.status(Response.Status.ACCEPTED).build();
+    }
 
 
-    @RequestMapping("/")
+
+/*     @RequestMapping("/")
     public ModelAndView home(@RequestParam(defaultValue = "1") Integer page) {
         final ModelAndView mav = new ModelAndView("home");
         User loggedUser = ca.loggedUser();
@@ -81,9 +90,9 @@ public class HomeController {
             mav.addObject("likedRestaurants", likedRestaurants);
         }
         return mav;
-    }
+    } */
 
-    @RequestMapping(path ={"/restaurants"}, method = RequestMethod.GET)
+/*     @RequestMapping(path ={"/restaurants"}, method = RequestMethod.GET)
     public ModelAndView restaurants(@RequestParam(defaultValue = "1") Integer page,
                                     @RequestParam(required = false) String search, @RequestParam(required = false) int[] tags,
                                     @RequestParam(defaultValue = "1") int min, @RequestParam(defaultValue = "10000") int max,
@@ -153,12 +162,10 @@ public class HomeController {
         mav.addObject("order", order);
         mav.addObject("desc", desc);
         return mav;
-    }
+    } */
 
 
-
-
-    @RequestMapping(path ={"/register"}, method = RequestMethod.GET)
+/*     @RequestMapping(path ={"/register"}, method = RequestMethod.GET)
     public ModelAndView registerForm(@ModelAttribute("userForm") final UserForm form,
             final BindingResult errors) {
        return new ModelAndView("register");
@@ -226,6 +233,6 @@ public class HomeController {
         mav.addObject("code", 403);
 
         return mav;
-    }
+    } */
 
 }
