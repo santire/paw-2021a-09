@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import javax.swing.text.html.Option;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ public class UserJpaDao implements UserDao {
 
     @Override
     public User register(String username, String password, String firstName, String lastName, String email,
-            String phone) throws EmailInUseException {
+                         String phone) throws EmailInUseException {
         final User user = new User(username, password, firstName, lastName, email, phone);
         try {
             em.persist(user);
@@ -65,6 +66,9 @@ public class UserJpaDao implements UserDao {
     public Optional<User> findById(long id) {
         return Optional.ofNullable(em.find(User.class, id));
     }
+
+    @Override
+    public Optional<User> findByUsername(String username) { return Optional.ofNullable(em.find(User.class, username)); }
 
     @Override
     public Optional<User> findByEmail(String email) {

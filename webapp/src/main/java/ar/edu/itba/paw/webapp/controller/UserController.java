@@ -2,31 +2,31 @@ package ar.edu.itba.paw.webapp.controller;
 
 
 import ar.edu.itba.paw.model.User;
-import ar.edu.itba.paw.model.exceptions.TokenCreationException;
-import ar.edu.itba.paw.model.exceptions.TokenDoesNotExistException;
-import ar.edu.itba.paw.model.exceptions.TokenExpiredException;
-import ar.edu.itba.paw.webapp.auth.PawUserDetailsService;
-import ar.edu.itba.paw.webapp.forms.EmailForm;
-import ar.edu.itba.paw.webapp.forms.PasswordForm;
-import ar.edu.itba.paw.webapp.forms.UserForm;
+import ar.edu.itba.paw.webapp.dto.UserDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.stereotype.Component;
 
 
 import ar.edu.itba.paw.service.UserService;
 
-import javax.validation.Valid;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import java.util.*;
+import java.net.URI;
 
-@Controller
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+
+
+@Path("users")
+@Component
 public class UserController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
@@ -34,118 +34,73 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private PawUserDetailsService pawUserDetailsService;
 
-    @Autowired
-    private CommonAttributes ca;
+    @Context
+    private UriInfo uriInfo;
 
     // UPDATE USER
+//    @PUT
+//    @Path("/user/edit")
+//    @Produces(value = {MediaType.APPLICATION_JSON})
+//    @Consumes(value = {MediaType.APPLICATION_JSON})
+//    public Response editUser(final UserDto userDto, @Context HttpServletRequest request){
+//        try{
+//            userService.updateUser(
+//                    userDto.getUserId(),
+//                    userDto.getUsername(),
+//                    userDto.getPassword(),
+//                    userDto.getFirstName(),
+//                    userDto.getLastName(),
+//                    userDto.getEmail(),
+//                    userDto.getPhone()
+//            );
+//        } catch (Exception e) {
+//            LOGGER.error(e.getMessage());
+//            return Response.status(Response.Status.UNAUTHORIZED).header("error", e.getMessage()).build();
+//        }
+//        return Response.status(Response.Status.OK).build();
+//    }
 
-    @RequestMapping(path = { "/user/edit" }, method = RequestMethod.GET)
-    public ModelAndView editUser(
-            @ModelAttribute("updateUserForm") final UserForm form) {
-
-        final ModelAndView mav = new ModelAndView("editUser");
-        return mav;
+    @GET
+    @Path("/{userId}")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    public Response getUser(@PathParam("userId") final int userId, @Context HttpServletRequest request) {
+        final Optional<User> user = userService.findById(userId);
+        if(user.isPresent()){
+            return Response.ok(UserDto.fromUser(user.get(), request.getRequestURL().toString())).build();
+        } else {
+            return Response.status(Response.Status.ACCEPTED).header("error", "user not found").build();
+        }
     }
 
-    @RequestMapping(path = { "/user/edit" }, method = RequestMethod.POST)
-    public ModelAndView editUser(
-            @Valid @ModelAttribute("updateUserForm") final UserForm form,
-            final BindingResult errors,
-            RedirectAttributes redirectAttributes) {
+    @POST
+    @Produces(value = { MediaType.APPLICATION_JSON, })
+    @Consumes(value = { MediaType.APPLICATION_JSON, })
+    public Response registerUser(final UserDto userDto, @Context HttpServletRequest request) {
+        
+        final User user;
 
-        User loggedUser = ca.loggedUser();
-
-        if (errors.hasErrors()) {
-            LOGGER.debug("Form has errors at /user/edit for user {}", loggedUser.getId());
-            return editUser(form);
-        }
         try {
-            userService.updateUser(
-                    loggedUser.getId(),
-                    form.getUsername(),
-                    loggedUser.getPassword(),
-                    form.getFirstName(),
-                    form.getLastName(),
-                    loggedUser.getEmail(),
-                    form.getPhone());
-
+            LOGGER.info("POST /users -> attempt to create user");
+            user = userService.register(userDto.getUsername(),userDto.getPassword(),userDto.getFirstName(),userDto.getLastName(),userDto.getEmail(),userDto.getPhone(),request.getRequestURL().toString());
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("somethingWrong", true);
-            return new ModelAndView("redirect:/user/edit");
+            return Response.status(Response.Status.CONFLICT).header("error", e.getMessage()).build();
         }
-
-        redirectAttributes.addFlashAttribute("editedUser", true);
-        return new ModelAndView("redirect:/");
+        final URI uri = uriInfo.getAbsolutePathBuilder()
+                .path(String.valueOf(user.getId())).build();
+        LOGGER.info("user created: " + uri);
+        return Response.created(uri).build();
     }
 
-    @RequestMapping(path = { "/forgot-password" }, method = RequestMethod.GET)
-    public ModelAndView forgotPasswordForm(
-            @ModelAttribute("emailForm") final EmailForm form,
-            final BindingResult errors) {
-        return new ModelAndView("resetPassword");
-    }
-
-    @RequestMapping(path = { "/forgot-password" }, method = RequestMethod.POST)
-    public ModelAndView forgotPassword(
-            @Valid @ModelAttribute("emailForm") final EmailForm form,
-            final BindingResult errors) {
-
-        if (errors != null && errors.hasErrors()) {
-            return forgotPasswordForm(form, errors);
-        }
-
-        try {
-            userService.requestPasswordReset(form.getEmail(), ca.getUri());
-            return new ModelAndView("requestedResetPassword");
-        } catch (TokenCreationException e) {
-            LOGGER.error("Could not generate token");
-            return forgotPasswordForm(form, errors).addObject("tokenError", true);
-        }
-    }
-
-    @RequestMapping(path = { "/reset-password" }, method = RequestMethod.GET)
-    public ModelAndView updatePasswordForm(
-            @RequestParam(name="token", required=true) final String token,
-            @ModelAttribute("passwordForm") final PasswordForm form,
-            final BindingResult errors) {
-
-        return new ModelAndView("updatePassword");
-    }
-
-    @RequestMapping(path = { "/reset-password" }, method = RequestMethod.POST)
-    public ModelAndView updatePassword(
-            @RequestParam(name="token", required=true) final String token,
-            @Valid @ModelAttribute("passwordForm") final PasswordForm form,
-            final BindingResult errors) {
-
-        if (errors != null && errors.hasErrors()) {
-            return updatePasswordForm(token, form, errors);
-        }
-
-        User user;
-        try {
-            user = userService.updatePasswordByToken(token, form.getPassword());
-        } catch (TokenExpiredException e) {
-            LOGGER.error("token {} is expired", token);
-            return new ModelAndView("redirect:/forgot-password").addObject("expiredToken", true);
-        } catch (TokenDoesNotExistException e) {
-            LOGGER.warn("token {} does not exist", token);
-            return new ModelAndView("requestedResetPassword").addObject("invalidToken", true);
-        } catch (Exception e) {
-            // Ignore
-            // Unexpected error happened, showing register screen with generic error message
-            return new ModelAndView("redirect:/login").addObject("tokenError", true);
-        }
-
-        UserDetails userDetails = pawUserDetailsService.loadUserByUsername(user.getEmail());
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,
-                userDetails.getPassword(), userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        return new ModelAndView("redirect:/");
-
-    }
+   // @GET
+   // @Path("/user/byUsername/{username}")
+   // @Produces(value = {MediaType.APPLICATION_JSON})
+   // public Response getUserByUsername(@PathParam("username") final String username, @Context HttpServletRequest request) {
+    //    final Optional<User> user = userService.findByUsername(username);
+     //   if(user.isPresent()){
+      //      return Response.ok(UserDto.fromUser(user.get(), request.getRequestURL().toString())).build();
+       // } else {
+        //    return Response.status(Response.Status.ACCEPTED).header("error", "user not found").build();
+       // }
+    //}
 }

@@ -48,7 +48,7 @@ public class Restaurant {
     private float rating;
     
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "user_id")
     private User owner;
 
