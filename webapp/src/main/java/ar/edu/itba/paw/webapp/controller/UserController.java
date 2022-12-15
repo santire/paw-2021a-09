@@ -80,6 +80,7 @@ public class UserController {
         
         final User user;
 
+        // TODO: Exception handling should be done by a general exception manager instead of handled in controller
         try {
             LOGGER.info("POST /users -> attempt to create user");
             user = userService.register(userDto.getUsername(),userDto.getPassword(),userDto.getFirstName(),userDto.getLastName(),userDto.getEmail(),userDto.getPhone(),request.getRequestURL().toString());

@@ -4,6 +4,8 @@ import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.service.UserService;
 import ar.edu.itba.paw.webapp.auth.token.JWTUtility;
 import ar.edu.itba.paw.webapp.dto.LoginDto;
+import ar.edu.itba.paw.webapp.dto.UserDto;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,12 +38,34 @@ public class LoginAuthSuccessHandler implements AuthenticationSuccessHandler {
         User user = userService.findByEmail(authentication.getName()).get();
         String jwt = jwtUtility.createToken(user);
 
-        httpServletResponse.addHeader("Authorization" , jwt);
+        httpServletResponse.addHeader("Authorization", jwt);
         httpServletResponse.setStatus(HttpStatus.OK.value());
         httpServletResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
         LOGGER.info("Token is: {}", jwt);
-        String username = user.getUsername();
 
-        new ObjectMapper().writeValue(httpServletResponse.getOutputStream(), LoginDto.from(username,jwt));
+        UserDto userDto = UserDto.fromUser(user);
+        TokenResponse responseObject = new TokenResponse(userDto, jwt);
+
+//        new ObjectMapper().writeValue(httpServletResponse.getOutputStream(), LoginDto.from(username,jwt));
+        new ObjectMapper().writeValue(httpServletResponse.getOutputStream(), responseObject);
+
+    }
+
+    private static class TokenResponse {
+        UserDto user;
+        String token;
+
+        public TokenResponse(UserDto user, String token) {
+            this.user = user;
+            this.token = token;
+        }
+
+        public UserDto getUser() {
+            return user;
+        }
+
+        public String getToken() {
+            return token;
+        }
     }
 }
