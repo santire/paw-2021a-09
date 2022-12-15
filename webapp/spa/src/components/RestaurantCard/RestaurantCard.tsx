@@ -57,7 +57,7 @@ export function RestaurantCard({
             </Text>
           </Grid.Col>
           <Grid.Col span={4}>
-            <Badge size="sm" color="yellow">
+            <Badge size="sm" color="yellow" py={10}>
               <Group spacing="xs">
                 <Text weight={700} size="sm" align="center">
                   {rating}

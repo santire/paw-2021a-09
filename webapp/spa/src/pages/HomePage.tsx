@@ -25,9 +25,15 @@ const useStyles = createStyles((theme) => ({
     paddingLeft: theme.spacing.md,
     paddingRight: theme.spacing.md,
   },
+  headingWrapper: {
+    maxWidth: 1920,
+    margin: "0 auto",
+  },
   headingText: {
-    fontSize: "5vw",
-    paddingLeft: theme.spacing.xl,
+    fontSize: "5vh",
+    maxWidth: "50%",
+    paddingLeft: theme.spacing.xl * 2,
+    paddingRight: theme.spacing.xl * 2,
     color:
       theme.colorScheme === "dark"
         ? theme.colors.dark[0]
@@ -86,7 +92,11 @@ export function HomePage() {
   return (
     <>
       <div className={classes.heading}>
-        <Flex justify="space-between" align="center">
+        <Flex
+          justify="space-between"
+          align="center"
+          className={classes.headingWrapper}
+        >
           <Text className={classes.headingText}>
             Discover and book the best restaurants
           </Text>
