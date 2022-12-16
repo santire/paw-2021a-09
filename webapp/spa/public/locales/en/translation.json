@@ -10,7 +10,20 @@
     "restaurants": "My Restaurants",
     "search": "Search",
     "login": "Log In",
-    "register": "Register"
+    "register": "Register",
+    "userMenu": {
+      "restaurants": {
+        "title": "Restaurants",
+        "register": "Register your restaurant",
+        "restaurants": "Manage your restaurants",
+        "reservations": "Administer reservations"
+      },
+      "settings": {
+        "title": "settings",
+        "account": "Account settings",
+        "logout": "Logout"
+      }
+    }
   },
   "footer": {
     "copyright": "All rights reserved",

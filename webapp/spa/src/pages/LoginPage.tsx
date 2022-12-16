@@ -74,12 +74,7 @@ export function LoginPage() {
       </Title>
       <Text color="dimmed" size="sm" align="center" my={5}>
         {t("pages.login.createAccount.title")}{" "}
-        <Anchor<"a">
-          href="#"
-          size="sm"
-          onClick={(event) => event.preventDefault()}
-          color="orange"
-        >
+        <Anchor size="sm" color="orange" onClick={() => navigate("/register")}>
           {t("pages.login.createAccount.prompt")}
         </Anchor>
       </Text>
@@ -112,13 +107,12 @@ export function LoginPage() {
             {...register("password")}
           />
           <Group position="apart" mt="lg">
-            <Checkbox
-              label={t("pages.login.rememberMe.label")}
-              sx={{ lineHeight: 1 }}
-            />
-            <Anchor<"a">
-              onClick={(event) => event.preventDefault()}
-              href="#"
+            {/* <Checkbox */}
+            {/*   label={t("pages.login.rememberMe.label")} */}
+            {/*   sx={{ lineHeight: 1 }} */}
+            {/* /> */}
+            <Anchor
+              onClick={() => navigate("/forgot")}
               size="sm"
               color="orange"
             >

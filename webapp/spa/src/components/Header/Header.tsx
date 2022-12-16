@@ -16,12 +16,16 @@ import {
   IconSquarePlus,
   IconToolsKitchen2,
 } from "@tabler/icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, LinkProps, RelativeRoutingType } from "react-router-dom";
-import { getLoggedUser, logout } from "../../api/services/AuthService";
+import {
+  Link,
+  LinkProps,
+  Navigate,
+  RelativeRoutingType,
+  useNavigate,
+} from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { User } from "../../types";
 import { GourmetableLogo } from "../GourmetableLogo/GourmetableLogo";
 import useStyles from "./Header.styles";
 
@@ -61,7 +65,7 @@ function SearchBar() {
               ? theme.colors.dark[4]
               : theme.colors.gray[0],
           color:
-            theme.colorScheme == "dark"
+            theme.colorScheme === "dark"
               ? theme.colors.dark[1]
               : theme.colors.gray[8],
         },
@@ -75,6 +79,7 @@ export function Header() {
   const { t } = useTranslation();
   const [userMenuOpened, setUserMenuOpened] = useState(false);
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const UserMenu = (
     <Menu
@@ -97,37 +102,48 @@ export function Header() {
         </UnstyledButton>
       </Menu.Target>
       <Menu.Dropdown>
-        <Menu.Label>Restaurants</Menu.Label>
-        <Menu.Item icon={<IconSquarePlus size={14} stroke={1.5} />}>
-          Register your restaurant
+        <Menu.Label>{t("header.userMenu.restaurants.title")}</Menu.Label>
+        <Menu.Item
+          icon={<IconSquarePlus size={14} stroke={1.5} />}
+          onClick={() => navigate("/restaurants/register")}
+        >
+          {t("header.userMenu.restaurants.register")}
         </Menu.Item>
-        <Menu.Item icon={<IconToolsKitchen2 size={14} stroke={1.5} />}>
-          My restaurants
+        <Menu.Item
+          icon={<IconToolsKitchen2 size={14} stroke={1.5} />}
+          onClick={() => navigate(`/users/${user?.userId}/restaurants`)}
+        >
+          {t("header.userMenu.restaurants.restaurants")}
         </Menu.Item>
-
+        <Menu.Item
+          icon={<IconMessagePlus size={14} stroke={1.5} />}
+          onClick={() => navigate(`/users/${user?.userId}/reservations`)}
+        >
+          {t("header.userMenu.restaurants.reservations")}
+        </Menu.Item>
         <Menu.Divider />
-        <Menu.Label>Reservations</Menu.Label>
-
-        <Menu.Item icon={<IconMessagePlus size={14} stroke={1.5} />}>
-          Your comments
-        </Menu.Item>
-        <Menu.Divider />
-        <Menu.Label>Settings</Menu.Label>
-        <Menu.Item icon={<IconSettings size={14} stroke={1.5} />}>
-          Account settings
+        <Menu.Label>{t("header.userMenu.settings.title")}</Menu.Label>
+        <Menu.Item
+          icon={<IconSettings size={14} stroke={1.5} />}
+          onClick={() => navigate(`/users/${user?.userId}`)}
+        >
+          {t("header.userMenu.settings.account")}
         </Menu.Item>
         <Menu.Item
           icon={<IconLogout size={14} stroke={1.5} />}
-          onClick={() => logout()}
+          onClick={() => {
+            logout();
+            navigate("/");
+          }}
         >
-          Logout
+          {t("header.userMenu.settings.logout")}
         </Menu.Item>
       </Menu.Dropdown>
     </Menu>
   );
   return (
     <div className={classes.header}>
-      <Grid justify="center" p={0} m={0} align="center">
+      <Grid justify="center" px="sm" m={0} align="center">
         <Grid.Col span={6}>
           <Flex justify="left">
             <Group spacing={0}>
@@ -135,12 +151,7 @@ export function Header() {
               <NavItem label={t("header.browse")} to="restaurants" />
               <NavItem
                 label={t("header.reservations")}
-                to={`users/${user?.id}/reservations`}
-                hidden={!user}
-              />
-              <NavItem
-                label={t("header.restaurants")}
-                to={`users/${user?.id}/restaurants`}
+                to={`users/${user?.userId}/reservations`}
                 hidden={!user}
               />
             </Group>
