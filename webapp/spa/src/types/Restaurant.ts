@@ -1,8 +1,17 @@
 export interface Restaurant {
   id?: string;
   name: string;
-  tags: string[];
+  address: string;
+  phoneNumber: string;
   likes: number;
   rating: number;
-  imgUrl: string;
+  facebook: string;
+  instagram: string;
+  twitter: string;
+  tags: string[];
+
+  menu: string;
+  reviews: string;
+  image: string;
+  owner: string;
 }

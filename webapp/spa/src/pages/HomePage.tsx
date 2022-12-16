@@ -63,7 +63,7 @@ export function HomePage() {
   const restaurants =
     data?.map((rest) => (
       <RestaurantCard
-        image={rest.imgUrl}
+        image={rest.image}
         tags={rest.tags}
         name={rest.name}
         rating={rest.rating}
@@ -77,7 +77,7 @@ export function HomePage() {
     for (let i = 0; i < data.length; i++) {
       const rest = (
         <RestaurantCard
-          image={data[i].imgUrl}
+          image={data[i].image}
           tags={data[i].tags}
           name={data[i].name}
           rating={data[i].rating}
