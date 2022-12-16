@@ -54,6 +54,8 @@ public class LoginAuthSuccessHandler implements AuthenticationSuccessHandler {
     private static class TokenResponse {
         UserDto user;
         String token;
+        //TODO: add ROLES
+        // List<String> roles;
 
         public TokenResponse(UserDto user, String token) {
             this.user = user;

@@ -3,12 +3,13 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "./components/Layout/Layout";
 import { ThemeProvider } from "./components/ThemeProvider/ThemeProvider";
+import { AuthProvider } from "./context/AuthContext";
 import { ErrorPage } from "./pages/ErrorPage";
 import { HomePage } from "./pages/HomePage";
+import { LoginPage } from "./pages/LoginPage";
 
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
-  
   {
     path: "/",
     element: <Layout />,
@@ -18,10 +19,14 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
+        path: "/login",
+        element: <LoginPage />,
+      },
+      {
         path: "*",
         // TODO: Change this to NotFound
-        element: <ErrorPage />
-      }
+        element: <ErrorPage />,
+      },
     ],
   },
 ]);
@@ -31,7 +36,9 @@ export function App() {
     <QueryClientProvider client={queryClient}>
       <Suspense fallback="loading">
         <ThemeProvider>
-          <RouterProvider router={router} />
+          <AuthProvider>
+            <RouterProvider router={router} />
+          </AuthProvider>
         </ThemeProvider>
       </Suspense>
     </QueryClientProvider>

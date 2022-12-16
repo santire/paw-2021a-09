@@ -1,23 +1,44 @@
-import { Autocomplete, Flex, Grid, Group } from "@mantine/core";
-import { IconSearch } from "@tabler/icons";
+import {
+  Autocomplete,
+  Flex,
+  Grid,
+  Group,
+  Menu,
+  UnstyledButton,
+  Text,
+} from "@mantine/core";
+import {
+  IconChevronDown,
+  IconLogout,
+  IconMessagePlus,
+  IconSearch,
+  IconSettings,
+  IconSquarePlus,
+  IconToolsKitchen2,
+} from "@tabler/icons";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, RelativeRoutingType } from "react-router-dom";
+import { Link, LinkProps, RelativeRoutingType } from "react-router-dom";
+import { getLoggedUser, logout } from "../../api/services/AuthService";
+import { useAuth } from "../../context/AuthContext";
+import { User } from "../../types";
 import { GourmetableLogo } from "../GourmetableLogo/GourmetableLogo";
 import useStyles from "./Header.styles";
 
-interface NavItemProps {
+interface NavItemProps extends LinkProps {
   label: string;
-  path: string;
+  to: string;
   relative?: RelativeRoutingType;
 }
-function NavItem({ label, path, relative }: NavItemProps) {
+function NavItem({ label, to, relative, hidden }: NavItemProps) {
   const { classes } = useStyles();
   return (
     <Link
       key={label}
-      to={path}
+      to={to}
       className={classes.link}
       relative={relative ?? "route"}
+      hidden={hidden}
     >
       {label}
     </Link>
@@ -50,9 +71,60 @@ function SearchBar() {
 }
 
 export function Header() {
-  const { classes } = useStyles();
+  const { classes, cx } = useStyles();
   const { t } = useTranslation();
+  const [userMenuOpened, setUserMenuOpened] = useState(false);
+  const { user, logout } = useAuth();
 
+  const UserMenu = (
+    <Menu
+      width={260}
+      position="bottom-end"
+      transition="pop-top-right"
+      onClose={() => setUserMenuOpened(false)}
+      onOpen={() => setUserMenuOpened(true)}
+    >
+      <Menu.Target>
+        <UnstyledButton
+          className={cx(classes.user, { [classes.userActive]: userMenuOpened })}
+        >
+          <Group spacing={7}>
+            <Text weight={500} sx={{ lineHeight: 1 }} mr={3}>
+              {user?.firstName}
+            </Text>
+            <IconChevronDown size={12} stroke={1.5} />
+          </Group>
+        </UnstyledButton>
+      </Menu.Target>
+      <Menu.Dropdown>
+        <Menu.Label>Restaurants</Menu.Label>
+        <Menu.Item icon={<IconSquarePlus size={14} stroke={1.5} />}>
+          Register your restaurant
+        </Menu.Item>
+        <Menu.Item icon={<IconToolsKitchen2 size={14} stroke={1.5} />}>
+          My restaurants
+        </Menu.Item>
+
+        <Menu.Divider />
+        <Menu.Label>Reservations</Menu.Label>
+
+        <Menu.Item icon={<IconMessagePlus size={14} stroke={1.5} />}>
+          Your comments
+        </Menu.Item>
+        <Menu.Divider />
+        <Menu.Label>Settings</Menu.Label>
+        <Menu.Item icon={<IconSettings size={14} stroke={1.5} />}>
+          Account settings
+        </Menu.Item>
+        <Menu.Item
+          icon={<IconLogout size={14} stroke={1.5} />}
+          onClick={() => logout()}
+        >
+          Logout
+        </Menu.Item>
+      </Menu.Dropdown>
+    </Menu>
+  );
   return (
     <div className={classes.header}>
       <Grid justify="center" p={0} m={0} align="center">
@@ -60,18 +132,31 @@ export function Header() {
           <Flex justify="left">
             <Group spacing={0}>
               <GourmetableLogo />
-              <NavItem label={t("header.browse")} path="restaurants" />
-              <NavItem label={t("header.reservations")} path="reservations" />
+              <NavItem label={t("header.browse")} to="restaurants" />
+              <NavItem
+                label={t("header.reservations")}
+                to={`users/${user?.id}/reservations`}
+                hidden={!user}
+              />
+              <NavItem
+                label={t("header.restaurants")}
+                to={`users/${user?.id}/restaurants`}
+                hidden={!user}
+              />
             </Group>
           </Flex>
         </Grid.Col>
         <Grid.Col span={6}>
           <Flex justify="right">
             <SearchBar />
-            <Group spacing={0}>
-              <NavItem label={t("header.register")} path="register" />
-              <NavItem label={t("header.login")} path="login" />
-            </Group>
+            {user ? (
+              <Group spacing={0}>{UserMenu}</Group>
+            ) : (
+              <Group spacing={0}>
+                <NavItem label={t("header.register")} to="register" />
+                <NavItem label={t("header.login")} to="login" />
+              </Group>
+            )}
           </Flex>
         </Grid.Col>
       </Grid>

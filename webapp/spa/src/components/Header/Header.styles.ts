@@ -39,4 +39,34 @@ export default createStyles((theme) => ({
           : theme.colors.gray[2],
     },
   },
+  user: {
+    color:
+      theme.colorScheme === "dark"
+        ? theme.colors.dark[2]
+        : theme.colors.gray[7],
+    fontSize: theme.fontSizes.md,
+    padding: `${theme.spacing.xs}px ${theme.spacing.sm}px`,
+    borderRadius: theme.radius.sm,
+    transition: "background-color 100ms ease",
+
+    "&:hover": {
+      backgroundColor:
+        theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.white,
+    },
+
+    [theme.fn.smallerThan("xs")]: {
+      display: "none",
+    },
+  },
+
+  burger: {
+    [theme.fn.largerThan("xs")]: {
+      display: "none",
+    },
+  },
+
+  userActive: {
+    backgroundColor:
+      theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.white,
+  },
 }));

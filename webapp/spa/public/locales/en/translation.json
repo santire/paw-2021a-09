@@ -7,6 +7,7 @@
   "header": {
     "browse": "Browse",
     "reservations": "My Reservations",
+    "restaurants": "My Restaurants",
     "search": "Search",
     "login": "Log In",
     "register": "Register"
@@ -29,6 +30,27 @@
   "pages": {
     "home": {
       "highlights": "Highlights"
+    },
+    "login": {
+      "alert": "Invalid username or password",
+      "welcomeBack": "Welcome back!",
+      "createAccount": {
+        "title": "Do not have an account yet?",
+        "prompt": "Create account"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "you@gourmetable.com"
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "Your password",
+        "forgot": "Forgot password?"
+      },
+      "rememberMe": {
+        "label": "Remember me"
+      },
+      "signIn": "Sign In"
     }
   }
 }

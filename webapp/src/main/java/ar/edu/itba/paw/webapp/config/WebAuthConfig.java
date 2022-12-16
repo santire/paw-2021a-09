@@ -25,6 +25,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
@@ -56,7 +57,12 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
-        }
+    }
+
+    @Bean
+    public CorsFilter getCorsFilter(){
+        return new CorsFilter();
+    }
 
     @Override
     @Bean
@@ -75,6 +81,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity http) throws Exception {
         // Configure filters
         http.userDetailsService(userDetails)
+               .addFilterBefore(new CorsFilter(), (Class<? extends Filter>) ChannelProcessingFilter.class)
                 .addFilterBefore(createLoginAuthFilter(), (Class<? extends Filter>) UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(createSessionAuthFilter(), (Class<? extends Filter>) UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement()
