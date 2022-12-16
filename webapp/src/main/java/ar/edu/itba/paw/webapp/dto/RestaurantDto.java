@@ -1,10 +1,13 @@
 package ar.edu.itba.paw.webapp.dto;
 
-import ar.edu.itba.paw.model.*;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
-import javax.persistence.*;
+
+import ar.edu.itba.paw.model.Restaurant;
+import ar.edu.itba.paw.model.Tags;
+
+import javax.ws.rs.core.UriInfo;
+import java.net.URI;
+
 import java.util.List;
 
 public class RestaurantDto {
@@ -13,43 +16,44 @@ public class RestaurantDto {
     private String name;
     private String address;
     private String phoneNumber;
-    private double rating;
-    private UserDto owner;
-    private List<Tags> tags;
-    private List<MenuItem> menu;
-    private Image profileImage;
-    private int likes;
-    private boolean userLikesRestaurant;
-    private List<Rating> ratings;
+    private Double rating;
+    private Integer likes;
     private String facebook;
     private String instagram;
     private String twitter;
-    private List<MenuItem> menuPage;
-    private String url;
+    private List<Tags> tags;
 
-    public static RestaurantDto fromRestaurant(Restaurant restaurant, String url){
+    private URI menu;
+    private URI reviews;
+    private URI image;
+    private URI owner;
+
+
+    public static RestaurantDto fromRestaurant(Restaurant restaurant, UriInfo uriInfo){
         final RestaurantDto dto = new RestaurantDto();
+
         dto.id = restaurant.getId();
         dto.name = restaurant.getName();
         dto.address = restaurant.getAddress();
         dto.phoneNumber = restaurant.getPhoneNumber();
         dto.rating = restaurant.getRating();
-        dto.likes = restaurant.getLikes();
-        dto.owner = UserDto.fromUser(restaurant.getOwner());
-        dto.tags = restaurant.getTags();
-        dto.menu = restaurant.getMenu();
-        dto.ratings = restaurant.getRatings();
-        dto.instagram = restaurant.getInstagram();
         dto.facebook = restaurant.getFacebook();
+        dto.instagram = restaurant.getInstagram();
         dto.twitter = restaurant.getTwitter();
-        dto.url = url;
+        dto.likes = restaurant.getLikes();
+        dto.tags = restaurant.getTags();
 
-        return dto;
+        dto.menu = uriInfo.getAbsolutePathBuilder().path("menu").build();
+        dto.reviews = uriInfo.getAbsolutePathBuilder().path("reviews").build();
+        dto.image = uriInfo.getAbsolutePathBuilder().path("image").build();
+        dto.owner = uriInfo.getBaseUriBuilder().path("users/"+restaurant.getOwner().getId().toString()).build();
+
+        return  dto;
     }
 
-
-
-    public Long getId() {return id;}
+    public Long getId() {
+        return id;
+    }
 
     public String getName() {
         return name;
@@ -63,37 +67,12 @@ public class RestaurantDto {
         return phoneNumber;
     }
 
-    public List<Rating> getRatings() {
-        return ratings;
-    }
-
-    public UserDto getOwner() {
-        return owner;
-    }
-
-    public List<Tags> getTags() {
-        return tags;
-    }
-
-    public List<MenuItem> getMenu() {
-        return menu;
-    }
-
-    public double getRating() {
+    public Double getRating() {
         return rating;
     }
 
-
-    public Image getProfileImage() {
-        return profileImage;
-    }
-
-    public int getLikes() {
+    public Integer getLikes() {
         return likes;
-    }
-
-    public List<MenuItem> getMenuPage() {
-        return menuPage;
     }
 
     public String getFacebook() {
@@ -106,6 +85,26 @@ public class RestaurantDto {
 
     public String getTwitter() {
         return twitter;
+    }
+
+    public List<Tags> getTags() {
+        return tags;
+    }
+
+    public URI getMenu() {
+        return menu;
+    }
+
+    public URI getReviews() {
+        return reviews;
+    }
+
+    public URI getImage() {
+        return image;
+    }
+
+    public URI getOwner() {
+        return owner;
     }
 
     public void setId(Long id) {
@@ -124,49 +123,46 @@ public class RestaurantDto {
         this.phoneNumber = phoneNumber;
     }
 
-    public void setOwner(UserDto owner) {
-        this.owner = owner;
-    }
-
-    public void setMenu(List<MenuItem> menu) {
-        this.menu = menu;
-    }
-
-    public void setLikes(int likes) {
-        this.likes = likes;
-    }
-
-    public void setRating(float rating) {
+    public void setRating(Double rating) {
         this.rating = rating;
     }
 
-    public void setRatings(List<Rating> ratings) {
-        this.ratings = ratings;
-    }
-
-    public void setProfileImage(Image profileImage) {
-        this.profileImage = profileImage;
-    }
-
-    public void setTags(List<Tags> tags) {
-        this.tags = tags;
-    }
-
-    public void setInstagram(String instagram) {
-        this.instagram = instagram;
+    public void setLikes(Integer likes) {
+        this.likes = likes;
     }
 
     public void setFacebook(String facebook) {
         this.facebook = facebook;
     }
 
+    public void setInstagram(String instagram) {
+        this.instagram = instagram;
+    }
+
     public void setTwitter(String twitter) {
         this.twitter = twitter;
     }
 
-    public void setMenuPage(List<MenuItem> menuPage) {
-        this.menuPage = menuPage;
+    public void setTags(List<Tags> tags) {
+        this.tags = tags;
     }
+
+    public void setMenu(URI menu) {
+        this.menu = menu;
+    }
+
+    public void setReviews(URI reviews) {
+        this.reviews = reviews;
+    }
+
+    public void setImage(URI image) {
+        this.image = image;
+    }
+
+    public void setOwner(URI owner) {
+        this.owner = owner;
+    }
+
 }
 
 
