@@ -1,422 +1,336 @@
 package ar.edu.itba.paw.webapp.controller;
-
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
-import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
-
-import javax.validation.Valid;
-
-
-import ar.edu.itba.paw.service.MenuService;
-import ar.edu.itba.paw.service.ReservationService;
-
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
 import ar.edu.itba.paw.service.*;
-import ar.edu.itba.paw.webapp.forms.CommentForm;
-import ar.edu.itba.paw.webapp.forms.MenuItemForm;
-import ar.edu.itba.paw.webapp.forms.RatingForm;
-import ar.edu.itba.paw.webapp.forms.ReservationForm;
-import ar.edu.itba.paw.webapp.forms.RestaurantForm;
-
-
+import ar.edu.itba.paw.webapp.dto.CommentDto;
+import ar.edu.itba.paw.webapp.dto.MenuItemDto;
+import ar.edu.itba.paw.webapp.dto.RestaurantDto;
+import ar.edu.itba.paw.webapp.utils.CachingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-
+import org.springframework.stereotype.Component;
+import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
+import ar.edu.itba.paw.service.UserService;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
-@Controller
+
+
+@Component
+@Path("/restaurants")
 public class RestaurantController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private static final int AMOUNT_OF_MENU_ITEMS = 8;
     private static final int AMOUNT_OF_RESTAURANTS = 10;
     private static final int AMOUNT_OF_REVIEWS = 4;
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private ReservationService reservationService;
-
     @Autowired
     private RestaurantService restaurantService;
-
     @Autowired
-    private RatingService ratingService;
-
-    @Autowired
-    private LikesService likesService;
-
+    private CommentService commentService;
     @Autowired
     private MenuService menuService;
-
     @Autowired
     private SocialMediaService socialMediaService;
 
-    @Autowired
-    private CommentService commentService;
+    @Context
+    private UriInfo uriInfo;
 
-    @Autowired
-    private CommonAttributes ca;
+    //Like
+    //rating
+    //updatesocialmedia
+    //delete restaurant
+    //reservation require dto? reservationService.addReservation(loggedUser.getId(), restaurantId, dateAt, Long.parseLong(form.getQuantity()), ca.getUri());
+
+    @GET
+    @Produces( value = {MediaType.APPLICATION_JSON})
+    public Response getRestaurants(@QueryParam("page") @DefaultValue("1") Integer page,
+                                   @QueryParam("search")@DefaultValue("") String search,
+                                   @QueryParam("tags") List<Integer> tags,
+                                   @QueryParam("min") @DefaultValue("1") Integer min,
+                                   @QueryParam("max") @DefaultValue("10000") Integer max,
+                                   @QueryParam("search")@DefaultValue("name") String sortBy,
+                                   @QueryParam("order")@DefaultValue("asc") String order ) {
+
+        if (search != "")
+            search = search.trim().replaceAll("[^a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]+", "");
+
+        List<Tags> tagsSelected = new ArrayList<>();
+        List<Integer> tagsChecked = new ArrayList<>();
+        if(tags!=null){
+            for( int i : tags){
+                // TODO: fix this, should throw some exception
+                if(Tags.valueOf(i) == null)
+                    return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
+                tagsSelected.add(Tags.valueOf(i));
+                tagsChecked.add(i);
+            }
+        }
+
+        Sorting sort = Sorting.NAME;
+        try {
+            sort = Sorting.valueOf(sortBy.toUpperCase());
+        } catch (Exception e) {
+            LOGGER.warn("Caught illegal sorting option {}, defaulting to NAME", sortBy);
+        }
+
+        boolean desc = false;
+        if(order != null && order.equals("DESC"))
+            desc = true;
+        order = desc ? "DESC" : "ASC";
 
 
-    @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.GET)
-    public ModelAndView restaurant(@ModelAttribute("reservationForm") final ReservationForm form,
-            @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
-            @ModelAttribute("ratingForm") final RatingForm ratingForm,
-            @RequestParam(defaultValue="1") Integer page,
-            @PathVariable("restaurantId") final long restaurantId) {
-        final ModelAndView mav = new ModelAndView("restaurant");
+        int maxPages = restaurantService.getRestaurantsFilteredByPageCount(AMOUNT_OF_RESTAURANTS, search, tagsSelected, min, max);
+        List<RestaurantDto> restaurants = restaurantService.getRestaurantsFilteredBy(page, AMOUNT_OF_RESTAURANTS, search, tagsSelected,min,max, Sorting.NAME, true, 7).stream().map(u -> RestaurantDto.fromRestaurant(u, uriInfo)).collect(Collectors.toList());
 
-        User loggedUser = ca.loggedUser();
+        return Response.ok(new GenericEntity<List<RestaurantDto>>(restaurants){})
+                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
+                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", maxPages).build(), "last")
+                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.max((page - 1), 1)).build(), "prev")
+                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.min((page + 1), maxPages)).build(), "next")
+                .build();
+    }
+
+    @GET
+    @Path("/{restaurantId}")
+    @Produces( value = {MediaType.APPLICATION_JSON})
+    public Response findRestaurantByID(@PathParam("restaurantId") final long restaurantId) {
+
+        final Optional<Restaurant> maybeRestaurant = restaurantService.findById(restaurantId);
+
+        if(!maybeRestaurant.isPresent())
+            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
+
+        final RestaurantDto restaurant = maybeRestaurant.map(u -> RestaurantDto.fromRestaurant(u, uriInfo)).orElseThrow(RestaurantNotFoundException::new);
+
+        return Response.ok(new GenericEntity<RestaurantDto>(restaurant){}).build();
+    }
+
+    @GET
+    @Path("/{restaurantId}/menu")
+    @Produces( value = {MediaType.APPLICATION_JSON})
+    public Response findRestaurantMenu(@PathParam("restaurantId") final long restaurantId, @QueryParam("page") @DefaultValue("1") Integer page) {
 
         int maxPages = restaurantService.findByIdWithMenuPagesCount(AMOUNT_OF_MENU_ITEMS, restaurantId);
 
-        if(page == null || page <1) {
-            page=1;
-        }else if (page > maxPages) {
-            page = maxPages;
-        }
-        mav.addObject("maxPages", maxPages);
+        final Optional<Restaurant> maybeRestaurant = restaurantService.findByIdWithMenu(restaurantId,page,AMOUNT_OF_MENU_ITEMS);
+
+        if(!maybeRestaurant.isPresent())
+            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
+
+        List<MenuItemDto> menu = maybeRestaurant.orElseThrow(RestaurantNotFoundException::new).getMenu().stream().map(MenuItemDto::fromMenuItem).collect(Collectors.toList());
 
 
-        Restaurant restaurant = restaurantService.findByIdWithMenu(restaurantId, page, AMOUNT_OF_MENU_ITEMS).orElseThrow(RestaurantNotFoundException::new);
-
-        mav.addObject("facebook", false);
-        mav.addObject("instagram", false);
-        mav.addObject("twitter", false);
-
-
-        if(restaurant.getFacebook() != null && !restaurant.getFacebook().isEmpty()){
-            mav.addObject("facebook", true);
-        }
-        if(restaurant.getInstagram() != null && !restaurant.getInstagram().isEmpty()){
-            mav.addObject("instagram", true);
-        }
-        if(restaurant.getTwitter() != null && !restaurant.getTwitter().isEmpty()){
-            mav.addObject("twitter", true);
-        }
-
-
-        if(loggedUser != null){
-            Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
-            boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
-            if (isTheRestaurantOwner) {
-                mav.addObject("isTheOwner", true);
-            }
-
-            mav.addObject("userRatingToRestaurant", 0);
-
-
-            if(userRating.isPresent()){
-                mav.addObject("rated", true);
-                mav.addObject("userRatingToRestaurant", userRating.get().getRating());
-            }
-
-            mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
-            List<String> times = restaurantService.availableStringTime(restaurantId);
-            mav.addObject("times", times);
-        }
-
-
-        LOGGER.error("page value: {}", page);
-        mav.addObject("restaurant", restaurant);
-
-        return mav;
+        return Response.ok(new GenericEntity<List<MenuItemDto>>(menu){})
+                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
+                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", maxPages).build(), "last")
+                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.max((page - 1), 1)).build(), "prev")
+                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.min((page + 1), maxPages)).build(), "next")
+                .build();
     }
 
-    @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.POST)
-    public ModelAndView reservationAndMenu(@Valid @ModelAttribute("reservationForm") final ReservationForm form,
-                                           final BindingResult errors,
-                                           @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
-                                           final BindingResult menuErrors,
-                                           @ModelAttribute("ratingForm") final RatingForm ratingForm,
-                                           final BindingResult ratingError,
-                                           @RequestParam(defaultValue="1") Integer page,
-                                           @PathVariable("restaurantId") final long restaurantId,
-                                           RedirectAttributes redirectAttributes) {
-
-        User loggedUser = ca.loggedUser();
-        if (errors.hasErrors()) {
-            return restaurant(form, menuForm, ratingForm, page, restaurantId);
-        }
-
-        if (loggedUser != null) {
-            LocalTime time = form.getTime();
-            LocalDate date = form.getDate();
-            LocalDateTime dateAt = date.atTime(time.getHour(), time.getMinute());
-            reservationService.addReservation(loggedUser.getId(), restaurantId, dateAt, Long.parseLong(form.getQuantity()), ca.getUri());
-            redirectAttributes.addFlashAttribute("madeReservation", true);
-        } else {
-            return new ModelAndView("redirect:/login");
-        }
-
-        return new ModelAndView("redirect:/restaurant/" + restaurantId);
-    }
-
-    @RequestMapping(path = { "/restaurant/{restaurantId}/reviews" }, method = RequestMethod.GET)
-    public ModelAndView restaurantReviews(@ModelAttribute("reservationForm") final ReservationForm form,
-                                          @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
-                                   @ModelAttribute("ratingForm") final RatingForm ratingForm,
-                                   @ModelAttribute("commentForm") final CommentForm commentForm,
-                                   @RequestParam(defaultValue="1") Integer page,
-                                   @PathVariable("restaurantId") final long restaurantId) {
-        final ModelAndView mav = new ModelAndView("restaurantReviews");
-        User loggedUser = ca.loggedUser();
-        //int maxPages = restaurantService.findByIdWithMenuPagesCount(AMOUNT_OF_MENU_ITEMS, restaurantId);
+    @GET
+    @Path("/{restaurantId}/reviews")
+    @Produces( value = {MediaType.APPLICATION_JSON})
+    public Response findRestaurantReviews(@PathParam("restaurantId") final long restaurantId, @QueryParam("page") @DefaultValue("1") Integer page) {
         int maxPages = commentService.findByRestaurantPageCount(AMOUNT_OF_REVIEWS, restaurantId);
 
-        if(page == null || page <1) {
-            page=1;
-        }else if (page > maxPages) {
-            page = maxPages;
-        }
-        mav.addObject("maxPages", maxPages);
+        List<CommentDto> reviews = commentService.findByRestaurant(page, AMOUNT_OF_REVIEWS, restaurantId).stream().map(u -> CommentDto.fromComment(u, uriInfo)).collect(Collectors.toList());
 
-        Restaurant restaurant = restaurantService.findByIdWithMenu(restaurantId, page, AMOUNT_OF_MENU_ITEMS).orElseThrow(RestaurantNotFoundException::new);
-
-        mav.addObject("facebook", false);
-        mav.addObject("instagram", false);
-        mav.addObject("twitter", false);
-
-
-        if(restaurant.getFacebook() != null && !restaurant.getFacebook().isEmpty()){
-            mav.addObject("facebook", true);
-        }
-        if(restaurant.getInstagram() != null && !restaurant.getInstagram().isEmpty()){
-            mav.addObject("instagram", true);
-        }
-        if(restaurant.getTwitter() != null && !restaurant.getTwitter().isEmpty()){
-            mav.addObject("twitter", true);
-        }
-
-        if(loggedUser != null){
-            Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
-            boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
-            if (isTheRestaurantOwner) {
-                mav.addObject("isTheOwner", true);
-            }
-
-            mav.addObject("userRatingToRestaurant", 0);
-
-            if(userRating.isPresent()){
-                mav.addObject("rated", true);
-                mav.addObject("userRatingToRestaurant", userRating.get().getRating());
-            }
-
-            mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
-            List<String> times = restaurantService.availableStringTime(restaurantId);
-            mav.addObject("times", times);
-
-            Optional<Comment> maybeComment = commentService.findByUserAndRestaurantId(loggedUser.getId(), restaurantId);
-            if(maybeComment.isPresent()){
-                mav.addObject("userMadeComment", true);
-                mav.addObject("userReview", maybeComment.get());
-            }
-            else{
-                mav.addObject("userMadeComment", false);
-            }
-            mav.addObject("hasOnceReserved", true);
-        }
-
-        LOGGER.error("page value: {}", page);
-        mav.addObject("restaurant", restaurant);
-        mav.addObject("reviews", commentService.findByRestaurant(page, AMOUNT_OF_REVIEWS, restaurantId));
-        return mav;
+        return Response.ok(new GenericEntity<List<CommentDto>>(reviews){})
+                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
+                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", maxPages).build(), "last")
+                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.max((page - 1), 1)).build(), "prev")
+                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.min((page + 1), maxPages)).build(), "next")
+                .build();
     }
 
-    @RequestMapping(path = { "/restaurant/{restaurantId}/reviews" }, method = RequestMethod.POST)
-    public ModelAndView addRestaurantReview(@PathVariable("restaurantId") final long restaurantId,
-                                            @Valid @ModelAttribute("commentForm") final CommentForm commentForm,
-                                            final BindingResult errors,
-                                            @ModelAttribute("reservationForm") final ReservationForm form,
-                                            @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
-                                            @ModelAttribute("ratingForm") final RatingForm ratingForm,
-                                            @RequestParam(defaultValue="1") Integer page
-                                            ) {
-        if(errors.hasErrors()) {
-            return(restaurantReviews(form, menuForm, ratingForm, commentForm, page, restaurantId));
+
+    @POST
+    @Path("/{restaurantId}/reviews/create")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @Consumes(value = { MediaType.APPLICATION_JSON})
+    public Response addRestaurantReview(@PathParam("restaurantId") final long restaurantId, final CommentDto comment, @Context HttpServletRequest request){
+
+        Optional<User> user = getLoggedUser(request);
+        if(!user.isPresent()){
+            LOGGER.error("anon user attempt to register a restaurant");
+            return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
         }
-        User loggedUser = ca.loggedUser();
-        if (loggedUser == null) {
-            throw new UserNotFoundException();
-        }
-        commentService.addComment(loggedUser.getId(), restaurantId, commentForm.getReview());
-        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/reviews");
+
+        final Comment rev = commentService.addComment(user.get().getId(), restaurantId, comment.getUserComment());
+
+        final URI uri = uriInfo.getBaseUriBuilder().path("/"+restaurantId+"/reviews").build();
+        return Response.created(uri).build();
     }
 
-    @RequestMapping(path = { "/restaurant/{restaurantId}/reviews/{reviewId}/delete" }, method = RequestMethod.POST)
-    @PreAuthorize("@authComponent.isReviewOwner(#reviewId)")
-    public ModelAndView deleteReview(@PathVariable("restaurantId") final long restaurantId,
-                                     @PathVariable("reviewId") final long reviewId) {
+    @DELETE
+    @Path("/{restaurantId}/reviews/{reviewId}/delete")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    public Response deleteRestaurantReview(@PathParam("restaurantId") final long restaurantId, @PathParam("reviewId") final long reviewId, @Context HttpServletRequest request){
+
+        Optional<User> user = getLoggedUser(request);
+        if(!user.isPresent()){
+            LOGGER.error("anon user attempt to register a restaurant");
+            return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
+        }
+
+        Optional<Comment> review = commentService.findById(reviewId);
+
+        if(!review.isPresent())
+            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
+        if(!user.get().getId().equals(review.get().getUser().getId()))
+            return Response.status(Response.Status.FORBIDDEN.getStatusCode()).build();
+
         commentService.deleteComment(reviewId);
-        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/reviews");
+
+        final URI uri = uriInfo.getBaseUriBuilder().path("/"+restaurantId+"/reviews").build();
+        return Response.created(uri).build();
     }
 
+    @POST
+    @Path("/{restaurantId}/menu/create")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @Consumes(value = { MediaType.APPLICATION_JSON})
+    public Response addRestaurantMenuItem(@PathParam("restaurantId") final long restaurantId, final MenuItemDto menuItem, @Context HttpServletRequest request){
 
-    @RequestMapping(path = { "/restaurant/{restaurantId}/menu" }, method = RequestMethod.POST)
-    @PreAuthorize("@authComponent.isRestaurantOwner(#restaurantId)")
-    public ModelAndView addMenu(@ModelAttribute("reservationForm") final ReservationForm form,
-             @Valid @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
-             final BindingResult errors,
-             @ModelAttribute("ratingForm") final RatingForm ratingForm,
-             final BindingResult ratingErrors,
-             @RequestParam(defaultValue="1") Integer page,
-             @PathVariable("restaurantId") final long restaurantId,
-             RedirectAttributes redirectAttributes) {
-        if(errors.hasErrors()) {
-            return restaurant(form, menuForm, ratingForm, page, restaurantId);
+        Optional<User> user = getLoggedUser(request);
+        if(!user.isPresent()){
+            LOGGER.error("anon user attempt to register a restaurant");
+            return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
         }
-        MenuItem item = new MenuItem(
-                menuForm.getName(),
-                menuForm.getDescription(),
-                menuForm.getPrice());
+
+        if (!userService.isTheRestaurantOwner(user.get().getId(), restaurantId))
+            return Response.status(Response.Status.FORBIDDEN.getStatusCode()).build();
+
+        final MenuItem item = new MenuItem(menuItem.getId(), menuItem.getName(), menuItem.getDescription(), menuItem.getPrice());
         menuService.addItemToRestaurant(restaurantId, item);
-        return new ModelAndView("redirect:/restaurant/" + restaurantId);
-    }
-    
 
-    @RequestMapping(path = { "/register/restaurant" }, method = RequestMethod.GET)
-    public ModelAndView registerRestaurant(@ModelAttribute("RestaurantForm") final RestaurantForm form) {
-
-        ModelAndView mav =  new ModelAndView("registerRestaurant");
-        mav.addObject("tags", Tags.allTags());
-        return mav;
+        final URI uri = uriInfo.getBaseUriBuilder().path("/"+restaurantId+"/menu").build();
+        return Response.created(uri).build();
     }
 
+    @DELETE
+    @Path("/{restaurantId}/menu/{menuId}/delete")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    public Response deleteRestaurantMenuItem(@PathParam("restaurantId") final long restaurantId, @PathParam("menuId") final long menuId, @Context HttpServletRequest request){
 
-
-    @RequestMapping(path = { "/register/restaurant" }, method = RequestMethod.POST)
-    public ModelAndView registerRestaurant(@Valid @ModelAttribute("RestaurantForm") final RestaurantForm form, final BindingResult errors) {
-
-        User loggedUser = ca.loggedUser();
-
-        if (errors.hasErrors()) {
-            LOGGER.debug("Form has errors at /register/restaurant");
-            return registerRestaurant(form);
+        Optional<User> user = getLoggedUser(request);
+        if(!user.isPresent()){
+            LOGGER.error("anon user attempt to register a restaurant");
+            return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
         }
-        LOGGER.debug("Creating restaurant for user {}", loggedUser.getName());
-        List<Tags> tagList = Arrays.asList(form.getTags()).stream().map((i) -> Tags.valueOf(i)).collect(Collectors.toList());
-        LOGGER.debug("tags: {}", tagList);
-        final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
-                form.getPhoneNumber(), tagList, loggedUser);
-        updateAuthorities();
 
-                if (form.getFacebook() != null){
-                    socialMediaService.updateFacebook(form.getFacebook(), restaurant.getId());
-                }
-                if (form.getInstagram() != null){
-                    socialMediaService.updateInstagram(form.getInstagram(), restaurant.getId());
-                }
-                if (form.getTwitter() != null){
-                    socialMediaService.updateTwitter(form.getTwitter(), restaurant.getId());
-                }
-
-        if (form.getProfileImage() != null && !form.getProfileImage().isEmpty()) {
-            try {
-            Image image = new Image(form.getProfileImage().getBytes());
-            restaurantService.setImageByRestaurantId(image, restaurant.getId());
-            } catch (IOException e) {
-                LOGGER.error("error while setting restaurant profile image");
-            }
-        }
-        return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
-    }
-
-    @RequestMapping(path = {"restaurant/{restaurantId}/like"}, method = RequestMethod.POST)
-    public ModelAndView like(@PathVariable("restaurantId") final long restaurantId){
-        User loggedUser = ca.loggedUser();
-        long userId = loggedUser.getId();
-        likesService.like(userId, restaurantId);
-        return new ModelAndView("redirect:/restaurant/" + restaurantId);
-    }
-
-    @RequestMapping(path = {"restaurant/{restaurantId}/dislike"}, method = RequestMethod.POST)
-    public ModelAndView dislike(@PathVariable("restaurantId") final long restaurantId){
-        User loggedUser = ca.loggedUser();
-        long userId = loggedUser.getId();
-        likesService.dislike(userId, restaurantId);
-        return new ModelAndView("redirect:/restaurant/" + restaurantId);
-    }
-
-    @RequestMapping(path ={  "/restaurant/{restaurantId}/delete/{menuId}" }, method=RequestMethod.POST)
-    @PreAuthorize("@authComponent.isRestaurantAndMenuOwner(#restaurantId, #menuId)")
-    public ModelAndView deleteMenuItem(@PathVariable("restaurantId") final long restaurantId,
-            @PathVariable("menuId") final long menuId) {
+        if (!userService.isTheRestaurantOwner(user.get().getId(), restaurantId))
+            return Response.status(Response.Status.FORBIDDEN.getStatusCode()).build();
 
         menuService.deleteItemById(menuId);
-        return new ModelAndView("redirect:/restaurant/" + restaurantId);
+
+        final URI uri = uriInfo.getBaseUriBuilder().path("/"+restaurantId+"/menu").build();
+        return Response.created(uri).build();
     }
 
 
-    @RequestMapping(path={ "/restaurants/user/{userId}" }, method=RequestMethod.GET)
-    public ModelAndView userRestaurants(@PathVariable("userId") final long userId,
-            @RequestParam(defaultValue = "1") Integer page) {
-
-        final ModelAndView mav = new ModelAndView("myRestaurants");
-        int maxPages = restaurantService.getRestaurantsFromOwnerPagesCount(AMOUNT_OF_RESTAURANTS, userId);
-
-        if(page == null || page <1) {
-            page=1;
-        }else if (page > maxPages) {
-            page = maxPages;
+    @POST
+    @Path("/register")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @Consumes(value = { MediaType.APPLICATION_JSON})
+    public Response registerRestaurant(final RestaurantDto restaurantDto, @Context HttpServletRequest request) {
+        Optional<User> user = getLoggedUser(request);
+        if(!user.isPresent()){
+            LOGGER.error("anon user attempt to register a restaurant");
+            return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
         }
-        mav.addObject("maxPages", maxPages);
-        List<Restaurant> restaurants = restaurantService.getRestaurantsFromOwner(page, AMOUNT_OF_RESTAURANTS, userId);
-        mav.addObject("userHasRestaurants", !restaurants.isEmpty());
-        mav.addObject("restaurants", restaurants);
-        return mav;
-    }
 
+        LOGGER.debug("Creating restaurant for user {}", user.get().getUsername());
+        List<Tags> tagList = restaurantDto.getTags().stream().map(t -> Tags.valueOf(t.getValue())).collect(Collectors.toList());
+        LOGGER.debug("tags: {}", tagList);
+        final Restaurant restaurant = restaurantService.registerRestaurant(restaurantDto.getName(), restaurantDto.getAddress(),
+                restaurantDto.getPhoneNumber(), tagList, user.get());
+        //updateAuthorities();
 
-
-
-    @RequestMapping(path = { "/restaurant/{restaurantId}/rate" }, method = RequestMethod.POST)
-    public ModelAndView rateRestaurant(@PathVariable("restaurantId") final long restaurantId,
-                                        @Valid @ModelAttribute("ratingForm") final RatingForm ratingForm,
-                                        final BindingResult errors) {
-        User loggedUser = ca.loggedUser();
-        if(errors.hasErrors()) {
-            return new ModelAndView("redirect:/restaurant/" + restaurantId);
+        if (restaurantDto.getFacebook() != null){
+            socialMediaService.updateFacebook(restaurantDto.getFacebook(), restaurant.getId());
         }
-        ratingService.rateRestaurant(loggedUser.getId(), restaurantId, ratingForm.getRating());
-        return new ModelAndView("redirect:/restaurant/" + restaurantId);
+        if (restaurantDto.getInstagram() != null){
+            socialMediaService.updateInstagram(restaurantDto.getInstagram(), restaurant.getId());
+        }
+        if (restaurantDto.getTwitter() != null){
+            socialMediaService.updateTwitter(restaurantDto.getTwitter(), restaurant.getId());
+        }
+
+        if (restaurantDto.getImage() != null) {
+            //TODO post to /image and dto cointains just the URI
+            //Image image = new Image(restaurantDto.getImage().getData());
+            //restaurantService.setImageByRestaurantId(image, restaurant.getId());
+        }
+        final URI uri = uriInfo.getAbsolutePathBuilder()
+                .path(String.valueOf(restaurant.getId())).build();
+        LOGGER.info("Restaurant created in : " + uri);
+        return Response.created(uri).build();
     }
+    /*
+    @GET
+    @Produces(value = { MediaType.APPLICATION_JSON, })
+    @Consumes(value = { MediaType.APPLICATION_JSON, })
+    @Path("/{restaurantId}")
+    public Response getRestaurantById(@PathParam("restaurantId") final int restaurantId, @Context HttpServletRequest request) {
+        final Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
+        if(restaurant.isPresent()){
+            return Response.ok(RestaurantDto.fromRestaurant(restaurant.get(), uriInfo)).build();
+        } else {
+            return Response.status(Response.Status.ACCEPTED).header("error", "restaurant not found").build();
+        }
+    }
+     */
 
+    @GET
+    @Path("/{restaurantId}/image")
+    @Produces("image/jpg")
+    public Response getEventImage(@PathParam("restaurantId") final long restaurantId) throws IOException {
+        CacheControl cache = CachingUtils.getCaching(CachingUtils.HOUR_TO_SEC);
+        Date expireDate = CachingUtils.getExpirationDate(CachingUtils.HOUR_TO_SEC);
+        final Optional<Restaurant> maybeRestaurant = restaurantService.findById(restaurantId);
+        if (maybeRestaurant.isPresent()) {
+            Restaurant restaurant = maybeRestaurant.get();
+            final Image image = restaurant.getProfileImage();
 
-
-
-
-    public void updateAuthorities() {
-        User loggedUser = ca.loggedUser();
-        if(loggedUser!=null){
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            Collection<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
-            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-            if(userService.isRestaurantOwner(loggedUser.getId())){
-                authorities.add(new SimpleGrantedAuthority("ROLE_RESTAURANTOWNER"));
+            if(image != null){
+                LOGGER.info("Found restaurant image");
+                return Response.ok(image.getData())
+                        .cacheControl(cache).expires(expireDate).build();
             }
-            Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
-            SecurityContextHolder.getContext().setAuthentication(newAuth);
+            else{
+                final Image defaultImage = new Image(null);
+                LOGGER.info("Restaurant Image not found. Placeholder is used");
+                return Response.ok(defaultImage.getDataFromPlaceholder())
+                        .cacheControl(cache).expires(expireDate).build();
+            }
+        } else {
+            return Response.ok(null)
+                    .cacheControl(cache).expires(expireDate).build();
         }
     }
+
+
+
+
+    @ModelAttribute("loggedUser")
+    public Optional<User> getLoggedUser(HttpServletRequest request){
+        return userService.findByUsername(request.getRemoteUser());
+    }
+
 
 }

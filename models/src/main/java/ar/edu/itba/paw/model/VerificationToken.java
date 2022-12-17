@@ -30,7 +30,7 @@ public class VerificationToken {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     private User user;

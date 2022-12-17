@@ -2,11 +2,50 @@
   "restaurants": [
     {
       "id": 1,
-      "name": "test",
-      "owner": {
-        "id": 1,
-        "firstName": "John"
-      }
+      "name": "Bian Food",
+      "tags": [
+        "Local",
+        "French",
+        "Latin"
+      ],
+      "likes": 6,
+      "rating": 4.2,
+      "imgUrl": "images/restaurants/1.jpg"
+    },
+    {
+      "id": 2,
+      "name": "Amada Cocina Mexicana",
+      "tags": [
+        "Latin",
+        "Mexican"
+      ],
+      "likes": 6,
+      "rating": 3.88,
+      "imgUrl": "images/restaurants/2.jpg"
+    },
+    {
+      "id": 3,
+      "name": "Fancys",
+      "tags": [
+        "Argentinian",
+        "Bodegon",
+        "Homemade"
+      ],
+      "likes": 5,
+      "rating": 3.5,
+      "imgUrl": "images/restaurants/3.jpg"
+    },
+    {
+      "id": 4,
+      "name": "Blossom (San Isidro)",
+      "tags": [
+        "American",
+        "Picadas",
+        "Pizzeria"
+      ],
+      "likes": 4,
+      "rating": 2.88,
+      "imgUrl": "images/restaurants/4.jpg"
     }
   ]
 }

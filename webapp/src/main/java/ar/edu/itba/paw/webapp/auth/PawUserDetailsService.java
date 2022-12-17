@@ -32,11 +32,6 @@ public class PawUserDetailsService implements UserDetailsService {
         Collection<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 
-        if(userService.isRestaurantOwner(user.getId())) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_RESTAURANTOWNER"));
-        }
-
-
         return new org.springframework.security.core.userdetails.User(email, user.getPassword(), authorities);
     }
 }

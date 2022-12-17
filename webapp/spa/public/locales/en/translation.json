@@ -1,7 +1,69 @@
 {
   "title": "Welcome to react using react-i18next",
-  "description": {
-    "part1": "To get started, edit <1>src/App.js</1> and save to reload.",
-    "part2": "Switch language between english and german using buttons above."
+  "theme": {
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "header": {
+    "browse": "Browse",
+    "reservations": "My Reservations",
+    "restaurants": "My Restaurants",
+    "search": "Search",
+    "login": "Log In",
+    "register": "Register",
+    "userMenu": {
+      "restaurants": {
+        "title": "Restaurants",
+        "register": "Register your restaurant",
+        "restaurants": "Manage your restaurants",
+        "reservations": "Administer reservations"
+      },
+      "settings": {
+        "title": "settings",
+        "account": "Account settings",
+        "logout": "Logout"
+      }
+    }
+  },
+  "footer": {
+    "copyright": "All rights reserved",
+    "weAre": "We are",
+    "contactUs": "Contact us"
+  },
+  "restaurantCard": {
+    "more": "See more",
+    "liked": "{{likes}} people liked this",
+    "tagsTitle": "Perfect for you, if you enjoy"
+  },
+  "error": {
+    "title": "You have found a secret place.",
+    "description": "Unfortunately, this is only a 404 page. You may have mistyped the address, or the page has been moved to another URL.",
+    "takeMeBack": "Take me back to the home page"
+  },
+  "pages": {
+    "home": {
+      "highlights": "Highlights"
+    },
+    "login": {
+      "alert": "Invalid username or password",
+      "welcomeBack": "Welcome back!",
+      "createAccount": {
+        "title": "Do not have an account yet?",
+        "prompt": "Create account"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "you@gourmetable.com"
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "Your password",
+        "forgot": "Forgot password?"
+      },
+      "rememberMe": {
+        "label": "Remember me"
+      },
+      "signIn": "Sign In"
+    }
   }
 }

@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -34,6 +35,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @Service
+@Component
 public class UserServiceImpl implements UserService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
@@ -46,7 +48,7 @@ public class UserServiceImpl implements UserService {
 
   @Autowired
   private EmailService emailService;
-  
+
   @Autowired
   private MessageSource messageSource;
 
@@ -58,28 +60,28 @@ public class UserServiceImpl implements UserService {
   @Transactional
   @Override
   public User register(String username, String password, String firstName, String lastName, String email,
-      String phone, String baseUrl) throws EmailInUseException, TokenCreationException {
-      Locale locale = LocaleContextHolder.getLocale();
+                       String phone, String baseUrl) throws EmailInUseException, TokenCreationException {
+    Locale locale = LocaleContextHolder.getLocale();
 
-      User user = userDao.register(username,encoder.encode(password), firstName, lastName, email, phone);
-      String url = baseUrl + "/activate?token=";
+    User user = userDao.register(username,encoder.encode(password), firstName, lastName, email, phone);
+    String url = baseUrl + "/activate?token=";
 
-      String token = UUID.randomUUID().toString();
-      LocalDateTime createdAt = LocalDateTime.now();
+    String token = UUID.randomUUID().toString();
+    LocalDateTime createdAt = LocalDateTime.now();
 
-      userDao.assignTokenToUser(token, createdAt, user.getId());
-        String plainText = messageSource.getMessage("mail.register.plain",new Object[]{user.getFirstName()},locale)+"\n"+url+token+"\n";
-        Email myemail = new Email();
-        myemail.setMailTo(user.getEmail());
-        myemail.setMailSubject(messageSource.getMessage("mail.register.subject",null,locale));
-        Map<String, Object> args = new HashMap<>();
-        args.put("titleMessage", "");
-        args.put("bodyMessage",messageSource.getMessage("mail.register.body",new Object[]{user.getFirstName()},locale));
-        args.put("buttonMessage",messageSource.getMessage("mail.register.button",null,locale));
-        args.put("link", url+token);
+    userDao.assignTokenToUser(token, createdAt, user.getId());
+    String plainText = messageSource.getMessage("mail.register.plain",new Object[]{user.getFirstName()},locale)+"\n"+url+token+"\n";
+    Email myemail = new Email();
+    myemail.setMailTo(user.getEmail());
+    myemail.setMailSubject(messageSource.getMessage("mail.register.subject",null,locale));
+    Map<String, Object> args = new HashMap<>();
+    args.put("titleMessage", "");
+    args.put("bodyMessage",messageSource.getMessage("mail.register.body",new Object[]{user.getFirstName()},locale));
+    args.put("buttonMessage",messageSource.getMessage("mail.register.button",null,locale));
+    args.put("link", url+token);
 
-        emailService.sendEmail(myemail,plainText, args, EmailTemplate.BUTTON);
-    
+    emailService.sendEmail(myemail,plainText, args, EmailTemplate.BUTTON);
+
     return  user;
   }
 
@@ -132,7 +134,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public User updatePasswordByToken(String token, String password) throws TokenExpiredException {
+  public User updatePasswordByToken(String token, String password) throws TokenExpiredException, TokenDoesNotExistException {
 
     Optional<PasswordToken> maybeToken = userDao.getPasswordToken(token);
     LOGGER.debug("GOT TOKEN {}", maybeToken.get().getToken());
@@ -147,17 +149,20 @@ public class UserServiceImpl implements UserService {
 
     User user = passwordToken.getUser();
 
-    updateUser(user.getId(), 
-                user.getName(),
-                encoder.encode(password),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getPhone());
+    updateUser(user.getId(),
+            user.getName(),
+            encoder.encode(password),
+            user.getFirstName(),
+            user.getLastName(),
+            user.getEmail(),
+            user.getPhone());
 
     userDao.deleteAssociatedPasswordTokens(user);
     return user;
   }
+
+  @Override
+  public Optional<User> findByUsername(String username) { return userDao.findByUsername(username); }
 
   @Override
   public Optional<User> findByEmail(String email) {
@@ -168,17 +173,17 @@ public class UserServiceImpl implements UserService {
   public boolean isTheRestaurantOwner(long userId, long restaurantId) {
     User user = userDao.findById(userId).orElseThrow(UserNotFoundException::new);
     return user
-      .getOwnedRestaurants()
-      .stream()
-      .filter((r) -> r.getId().equals(restaurantId))
-      .findFirst()
-      .isPresent();
+            .getOwnedRestaurants()
+            .stream()
+            .filter((r) -> r.getId().equals(restaurantId))
+            .findFirst()
+            .isPresent();
   }
 
   @Override
   public boolean isRestaurantOwner(long userId) {
     User user = userDao.findById(userId).orElseThrow(UserNotFoundException::new);
-     return user.getOwnedRestaurants().size() > 0;
+    return user.getOwnedRestaurants().size() > 0;
   }
 
 

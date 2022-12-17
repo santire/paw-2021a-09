@@ -1,10 +1,13 @@
 package ar.edu.itba.paw.webapp.dto;
 
 import ar.edu.itba.paw.model.User;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
     private Long userId;
     private String username;
@@ -26,6 +29,19 @@ public class UserDto {
         dto.phone =user.getPhone();
 
         dto.url = url;
+
+        // Warning! Never return Password to user!
+        return dto;
+    }
+
+    public static UserDto fromUser(User user){
+        final UserDto dto = new UserDto();
+        dto.userId = user.getId();
+        dto.username = user.getUsername();
+        dto.firstName = user.getFirstName();
+        dto.lastName = user.getLastName();
+        dto.email= user.getEmail();
+        dto.phone =user.getPhone();
 
         // Warning! Never return Password to user!
         return dto;
