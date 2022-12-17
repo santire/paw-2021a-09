@@ -43,9 +43,9 @@ public class RestaurantDto {
         dto.likes = restaurant.getLikes();
         dto.tags = restaurant.getTags();
 
-        dto.menu = uriInfo.getAbsolutePathBuilder().path("menu").build();
-        dto.reviews = uriInfo.getAbsolutePathBuilder().path("reviews").build();
-        dto.image = uriInfo.getAbsolutePathBuilder().path("image").build();
+        dto.menu = uriInfo.getAbsolutePathBuilder().path(restaurant.getId()+"/menu").build();
+        dto.reviews = uriInfo.getAbsolutePathBuilder().path(restaurant.getId()+"/reviews").build();
+        dto.image = uriInfo.getAbsolutePathBuilder().path(restaurant.getId()+"/image").build();
         dto.owner = uriInfo.getBaseUriBuilder().path("users/"+restaurant.getOwner().getId().toString()).build();
 
         return  dto;

@@ -298,7 +298,7 @@ public class RestaurantController {
 
     @GET
     @Path("/{restaurantId}/image")
-    @Produces(value = { MediaType.APPLICATION_JSON, })
+    @Produces("image/jpg")
     public Response getEventImage(@PathParam("restaurantId") final long restaurantId) throws IOException {
         CacheControl cache = CachingUtils.getCaching(CachingUtils.HOUR_TO_SEC);
         Date expireDate = CachingUtils.getExpirationDate(CachingUtils.HOUR_TO_SEC);
@@ -309,17 +309,17 @@ public class RestaurantController {
 
             if(image != null){
                 LOGGER.info("Found restaurant image");
-                return Response.ok(image.getData()).header(HttpHeaders.CONTENT_TYPE, "image/*")
+                return Response.ok(image.getData())
                         .cacheControl(cache).expires(expireDate).build();
             }
             else{
                 final Image defaultImage = new Image(null);
                 LOGGER.info("Restaurant Image not found. Placeholder is used");
-                return Response.ok(defaultImage.getDataFromPlaceholder()).header(HttpHeaders.CONTENT_TYPE, "image/*")
+                return Response.ok(defaultImage.getDataFromPlaceholder())
                         .cacheControl(cache).expires(expireDate).build();
             }
         } else {
-            return Response.ok(null).header(HttpHeaders.CONTENT_TYPE, "image/*")
+            return Response.ok(null)
                     .cacheControl(cache).expires(expireDate).build();
         }
     }
