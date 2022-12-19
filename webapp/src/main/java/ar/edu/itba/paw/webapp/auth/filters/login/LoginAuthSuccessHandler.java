@@ -4,8 +4,8 @@ import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.service.UserService;
 import ar.edu.itba.paw.webapp.auth.token.JWTUtility;
 import ar.edu.itba.paw.webapp.dto.LoginDto;
+import ar.edu.itba.paw.webapp.dto.TokenResponseDto;
 import ar.edu.itba.paw.webapp.dto.UserDto;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,30 +44,10 @@ public class LoginAuthSuccessHandler implements AuthenticationSuccessHandler {
         LOGGER.info("Token is: {}", jwt);
 
         UserDto userDto = UserDto.fromUser(user);
-        TokenResponse responseObject = new TokenResponse(userDto, jwt);
+        TokenResponseDto responseObject = new TokenResponseDto(userDto, jwt);
 
 //        new ObjectMapper().writeValue(httpServletResponse.getOutputStream(), LoginDto.from(username,jwt));
         new ObjectMapper().writeValue(httpServletResponse.getOutputStream(), responseObject);
 
-    }
-
-    private static class TokenResponse {
-        UserDto user;
-        String token;
-        //TODO: add ROLES
-        // List<String> roles;
-
-        public TokenResponse(UserDto user, String token) {
-            this.user = user;
-            this.token = token;
-        }
-
-        public UserDto getUser() {
-            return user;
-        }
-
-        public String getToken() {
-            return token;
-        }
     }
 }

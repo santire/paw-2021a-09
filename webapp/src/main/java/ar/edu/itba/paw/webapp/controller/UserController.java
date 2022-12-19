@@ -47,7 +47,7 @@ public class UserController {
             return Response.status(Response.Status.CONFLICT).header("error", e.getMessage()).build();
         }
         final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(userDto.getUserId())).build();
-        LOGGER.info("user updated: " + uri);
+        LOGGER.info("user updated: {}", uri);
         return Response.created(uri).build();
     }
 
@@ -61,7 +61,7 @@ public class UserController {
         } catch (Exception e) {
             return Response.status(Response.Status.CONFLICT).header("error", e.getMessage()).build();
         }
-        LOGGER.info("paswword recovery requested by: " + userDto.getUsername());
+        LOGGER.info("paswword recovery requested by: {}", userDto.getUsername());
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
@@ -81,23 +81,6 @@ public class UserController {
 
     // CREATE USER
 
-    @POST
-    @Produces(value = { MediaType.APPLICATION_JSON})
-    @Consumes(value = { MediaType.APPLICATION_JSON})
-    public Response registerUser(final UserDto userDto, @Context HttpServletRequest request) {
-        
-        final User user;
-
-        // TODO: Exception handling should be done by a general exception manager instead of handled in controller
-        try {
-            LOGGER.info("POST /users -> attempt to create user");
-            user = userService.register(userDto.getUsername(),userDto.getPassword(),userDto.getFirstName(),userDto.getLastName(),userDto.getEmail(),userDto.getPhone(),request.getRequestURL().toString());
-        } catch (Exception e) {
-            return Response.status(Response.Status.CONFLICT).header("error", e.getMessage()).build();
-        }
-        final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(user.getId())).build();
-        LOGGER.info("user created: " + uri);
-        return Response.created(uri).build();
-    }
+    
 
 }

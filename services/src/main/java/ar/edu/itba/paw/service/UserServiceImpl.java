@@ -64,7 +64,8 @@ public class UserServiceImpl implements UserService {
     Locale locale = LocaleContextHolder.getLocale();
 
     User user = userDao.register(username,encoder.encode(password), firstName, lastName, email, phone);
-    String url = baseUrl + "/activate?token=";
+    if (user == null) return null;
+    String url = baseUrl + "/register?token=";
 
     String token = UUID.randomUUID().toString();
     LocalDateTime createdAt = LocalDateTime.now();
@@ -114,8 +115,8 @@ public class UserServiceImpl implements UserService {
 
 
     Optional<VerificationToken> maybeToken = userDao.getToken(token);
-    LOGGER.debug("GOT TOKEN {}", maybeToken.get().getToken());
-    LOGGER.debug("WITH UID {}", maybeToken.get().getUser().getId());
+    LOGGER.debug("GOT TOKEN {}", maybeToken.isPresent() ? maybeToken.get().getToken() : null);
+    LOGGER.debug("WITH UID {}", maybeToken.isPresent() ? maybeToken.get().getUser().getId(): null);
     VerificationToken verificationToken = maybeToken.orElseThrow(TokenDoesNotExistException::new);
     LocalDateTime expiryDate = verificationToken.getCreatedAt().plusDays(1);
 

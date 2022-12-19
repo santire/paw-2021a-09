@@ -19,8 +19,8 @@
         "reservations": "Administer reservations"
       },
       "settings": {
-        "title": "settings",
-        "account": "Account settings",
+        "title": "Settings",
+        "account": "Profile",
         "logout": "Logout"
       }
     }
@@ -46,6 +46,7 @@
     },
     "login": {
       "alert": "Invalid username or password",
+      "confirmAlert": "User verified, please log in!",
       "welcomeBack": "Welcome back!",
       "createAccount": {
         "title": "Do not have an account yet?",
@@ -64,6 +65,45 @@
         "label": "Remember me"
       },
       "signIn": "Sign In"
+    },
+    "register": {
+      "loginDivider": "Login Information",
+      "contactDivider": "Contact Information",
+      "title": "Welcome to Gourmetable!",
+      "subtitle": "Please register",
+      "confirmation": {
+        "title": "You're almost done!",
+        "subtitle": "Follow the instructions sent to your email to activate your account"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "you@gourmetable.com"
+      },
+      "username": {
+        "label": "Username",
+        "placeholder": "johndoe123"
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "Your password"
+      },
+      "confirmPassword": {
+        "label": "Confirm password",
+        "placeholder": "Confirm Password"
+      },
+      "firstName": {
+        "label": "First name",
+        "placeholder": "John"
+      },
+      "lastName": {
+        "label": "Last name",
+        "placeholder": "Doe"
+      },
+      "phone": {
+        "label": "Phone number",
+        "placeholder": "1123456789"
+      },
+      "submit": "Register"
     }
   },
   "tags": {

@@ -4,9 +4,11 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "./components/Layout/Layout";
 import { ThemeProvider } from "./components/ThemeProvider/ThemeProvider";
 import { AuthProvider } from "./context/AuthContext";
+import { ConfirmationPage } from "./pages/ConfirmationPage";
 import { ErrorPage } from "./pages/ErrorPage";
 import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage";
 
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
@@ -21,6 +23,14 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <LoginPage />,
+      },
+      {
+        path: "/register",
+        element: <RegisterPage />,
+      },
+      {
+        path: "/confirm",
+        element: <ConfirmationPage />,
       },
       {
         path: "*",
