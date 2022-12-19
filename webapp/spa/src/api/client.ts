@@ -4,8 +4,9 @@ export const apiClient = axios.create({
 });
 
 apiClient.defaults.headers.common["Content-Type"] = "application/json";
+apiClient.defaults.headers.common["Authorization"] = authHeader().Authorization;
 
-export default function authHeader() {
+function authHeader() {
   const authStr = localStorage.getItem("auth");
   let auth = null;
   if (authStr) auth = JSON.parse(authStr);

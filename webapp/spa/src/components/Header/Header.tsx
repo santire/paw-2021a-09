@@ -24,6 +24,7 @@ import {
   RelativeRoutingType,
   useNavigate,
 } from "react-router-dom";
+import { logout } from "../../api/services/AuthService";
 import { useAuth } from "../../context/AuthContext";
 import { GourmetableLogo } from "../GourmetableLogo/GourmetableLogo";
 import useStyles from "./Header.styles";
@@ -77,7 +78,7 @@ export function Header() {
   const { classes, cx } = useStyles();
   const { t } = useTranslation();
   const [userMenuOpened, setUserMenuOpened] = useState(false);
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const UserMenu = (

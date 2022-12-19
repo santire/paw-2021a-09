@@ -3,7 +3,6 @@ import {
   Alert,
   Anchor,
   Button,
-  Checkbox,
   Container,
   Group,
   Paper,
@@ -12,13 +11,14 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
-import { IconAlertCircle } from "@tabler/icons";
+import { IconAlertCircle, IconCheck } from "@tabler/icons";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import * as z from "zod";
+import { login } from "../api/services/AuthService";
 import { useAuth } from "../context/AuthContext";
 
 const loginSchema = z.object({
@@ -37,14 +37,19 @@ export function LoginPage() {
     resetField,
     formState: { errors },
   } = useForm<ILogin>({ mode: "onBlur", resolver: zodResolver(loginSchema) });
-  const [showAlert, setShowAlert] = useState(false);
-  const { authed, login } = useAuth();
+  const [showAlert, setShowAlert] = useState("");
+  const { authed } = useAuth();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     if (authed) {
       navigate("/");
     }
-  }, []);
+    const alert = searchParams.get("alert") ?? "";
+    if (["", "confirmed", "error", "updated"].includes(alert)) {
+      setShowAlert(alert);
+    }
+  }, [authed, setShowAlert, searchParams]);
 
   const processForm = async (data: ILogin) => {
     try {
@@ -53,7 +58,7 @@ export function LoginPage() {
       navigate("/");
     } catch (e) {
       if (axios.isAxiosError(e) && e.response?.status === 401) {
-        setShowAlert(true);
+        setShowAlert("error");
         resetField("password");
       }
     }
@@ -84,10 +89,22 @@ export function LoginPage() {
         mt={30}
         color="red"
         withCloseButton
-        hidden={!showAlert}
-        onClose={() => setShowAlert(false)}
+        hidden={showAlert !== "error"}
+        onClose={() => setShowAlert("")}
       >
         {t("pages.login.alert")}
+      </Alert>
+      <Alert
+        icon={<IconCheck size={16} />}
+        mt={30}
+        color="green"
+        withCloseButton
+        hidden={showAlert !== "confirmed" && showAlert !== "updated"}
+        onClose={() => setShowAlert("")}
+      >
+        {showAlert === "confirmed"
+          ? t("pages.login.confirmAlert")
+          : t("pages.login.updatedAlert")}
       </Alert>
       <Paper withBorder shadow="md" p={30} mt={showAlert ? 10 : 30} radius="md">
         <form onSubmit={handleSubmit(processForm)}>
