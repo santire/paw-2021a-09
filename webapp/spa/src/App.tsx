@@ -5,8 +5,11 @@ import Layout from "./components/Layout/Layout";
 import { ThemeProvider } from "./components/ThemeProvider/ThemeProvider";
 import { AuthProvider } from "./context/AuthContext";
 import { ErrorPage } from "./pages/ErrorPage";
+import { ForgotPage } from "./pages/ForgotPage";
 import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage";
+import { ResetPage } from "./pages/ResetPage";
 
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
@@ -21,6 +24,18 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <LoginPage />,
+      },
+      {
+        path: "/register",
+        element: <RegisterPage />,
+      },
+      {
+        path: "/forgot",
+        element: <ForgotPage />,
+      },
+      {
+        path: "/reset",
+        element: <ResetPage />,
       },
       {
         path: "*",

@@ -25,11 +25,19 @@ const useStyles = createStyles(() => ({
     alignSelf: "center",
   },
 }));
-export function GourmetableLogo() {
+interface LogoProps {
+  variant?: "simple" | "default";
+}
+export function GourmetableLogo({ variant }: LogoProps) {
   const { classes } = useStyles();
   return (
     <Link to="" style={{ textDecoration: "none" }}>
-      <Group p={0} spacing={3} className={classes.wrapper}>
+      <Group
+        p={0}
+        spacing={3}
+        className={classes.wrapper}
+        style={{ filter: variant === "simple" ? "grayscale(100%)" : "none" }}
+      >
         <Logo className={classes.logo} />
         <div className={classes.title}>
           <span style={{ color: "rgb(153, 40, 59)" }}>Gourme</span>

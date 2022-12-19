@@ -10,6 +10,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.swing.text.html.Option;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
@@ -37,11 +38,16 @@ public class UserJpaDao implements UserDao {
         final User user = new User(username, password, firstName, lastName, email, phone);
         try {
             em.persist(user);
+            em.flush();
+            return user;
         } catch (DuplicateKeyException e) {
             LOGGER.warn("Can't register, email: {} already in use", email);
             throw new EmailInUseException("Email "+ email +" already in use", email);
+        } catch( ConstraintViolationException e) {
+            LOGGER.warn("Can't register, user: {} already in use", username);
+            // TODO: add custom exception
+            throw e;
         }
-        return user;
     }
 
 
