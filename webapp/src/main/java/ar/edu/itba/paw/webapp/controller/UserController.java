@@ -51,19 +51,7 @@ public class UserController {
         return Response.created(uri).build();
     }
 
-    @PUT
-    @Path("/forgot")
-    @Produces(value = { MediaType.APPLICATION_JSON})
-    @Consumes(value = { MediaType.APPLICATION_JSON})
-    public Response forgotPassword(final UserDto userDto, @Context HttpServletRequest request) {
-        try {
-            userService.requestPasswordReset(userDto.getEmail(),request.getRemoteHost().toString());
-        } catch (Exception e) {
-            return Response.status(Response.Status.CONFLICT).header("error", e.getMessage()).build();
-        }
-        LOGGER.info("paswword recovery requested by: {}", userDto.getUsername());
-        return Response.status(Response.Status.ACCEPTED).build();
-    }
+   
 
     //READ USER
     

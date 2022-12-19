@@ -47,6 +47,7 @@
     "login": {
       "alert": "Invalid username or password",
       "confirmAlert": "User verified, please log in!",
+      "updatedAlert": "Password updated, please log in!",
       "welcomeBack": "Welcome back!",
       "createAccount": {
         "title": "Do not have an account yet?",
@@ -65,6 +66,46 @@
         "label": "Remember me"
       },
       "signIn": "Sign In"
+    },
+    "forgot": {
+      "title": "Reset password",
+      "confirmation": {
+        "title": "Password reset requested",
+        "subtitle": "Follow the instructions sent to your email to update your password"
+      },
+      "account": {
+        "title": "Already have an account?",
+        "prompt": "Login here"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "you@gourmetable.com"
+      },
+      "submit": "Send email"
+    },
+    "reset": {
+      "title": "Set a new password",
+      "confirmation": {
+        "title": "Password reset requested",
+        "subtitle": "Follow the instructions sent to your email to update your password"
+      },
+      "account": {
+        "title": "Already have an account?",
+        "prompt": "Login here"
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "Your password"
+      },
+      "confirmPassword": {
+        "label": "Confirm password",
+        "placeholder": "Confirm Password"
+      },
+      "error": {
+        "title": "Oops!",
+        "subtitle": "Something went wrong, make sure you have the right link"
+      },
+      "submit": "Update password"
     },
     "register": {
       "loginDivider": "Login Information",

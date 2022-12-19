@@ -29,6 +29,7 @@ import ar.edu.itba.paw.model.exceptions.*;
 import ar.edu.itba.paw.service.RestaurantService;
 import ar.edu.itba.paw.service.UserService;
 import ar.edu.itba.paw.webapp.auth.PawUserDetailsService;
+import ar.edu.itba.paw.webapp.dto.ForgotDto;
 import ar.edu.itba.paw.webapp.dto.RecoveryDto;
 import ar.edu.itba.paw.webapp.dto.TokenResponseDto;
 import ar.edu.itba.paw.webapp.dto.UserDto;
@@ -46,7 +47,7 @@ public class HomeController {
     private UriInfo uriInfo;
 
     @PUT
-    @Path("/password-reset")
+    @Path("/reset")
     @Produces(value = { MediaType.APPLICATION_JSON})
     @Consumes(value = { MediaType.APPLICATION_JSON})
     public Response resetPasswordByToken(final RecoveryDto recoveryDto, @Context HttpServletRequest request) {
@@ -55,11 +56,30 @@ public class HomeController {
             user = userService.updatePasswordByToken(recoveryDto.getToken(),recoveryDto.getPassword());
         } catch ( TokenExpiredException | TokenDoesNotExistException e) {
             return Response.status(Response.Status.UNAUTHORIZED).header("error", e.getMessage()).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.BAD_REQUEST).header("error", e.getMessage()).build();
         }
         LOGGER.info("password recovered by user {}", user.getUsername());
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
+    @POST
+    @Path("/forgot")
+    @Produces(value = { MediaType.APPLICATION_JSON})
+    @Consumes(value = { MediaType.APPLICATION_JSON})
+    public Response forgotPassword(final ForgotDto forgotDto, @Context HttpServletRequest request) {
+        try {
+            String baseUrl = request.getHeader("Origin");
+            if (baseUrl == null) {
+                baseUrl = uriInfo.getBaseUri().toString();
+            }
+            userService.requestPasswordReset(forgotDto.getEmail(), baseUrl);
+        } catch (Exception e) {
+            return Response.status(Response.Status.BAD_REQUEST).header("error", e.getMessage()).build();
+        }
+        LOGGER.info("paswword recovery requested by: {}", forgotDto.getEmail());
+        return Response.status(Response.Status.ACCEPTED).build();
+    }
     @POST
     @Path("/register")
     @Produces(value = { MediaType.APPLICATION_JSON})

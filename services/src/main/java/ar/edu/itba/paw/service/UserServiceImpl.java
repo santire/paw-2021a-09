@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public void requestPasswordReset(String email, String baseUrl) throws TokenCreationException {
     User user = userDao.findByEmail(email).orElseThrow(UserNotFoundException::new);
-    String url = baseUrl + "/reset-password?token=";
+    String url = baseUrl + "/reset?token=";
     String token = UUID.randomUUID().toString();
     LocalDateTime createdAt = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.systemDefault());
     Locale locale = LocaleContextHolder.getLocale();

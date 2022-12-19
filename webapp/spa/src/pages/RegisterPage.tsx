@@ -26,7 +26,7 @@ export function RegisterPage() {
         await activateUser(token);
         navigate({
           pathname: "/login",
-          search: `${createSearchParams({ confirm: "true" })}`,
+          search: `${createSearchParams({ alert: "confirmed" })}`,
         });
       } catch (e) {
         // TODO: handle error

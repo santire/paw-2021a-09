@@ -37,7 +37,7 @@ export function LoginPage() {
     resetField,
     formState: { errors },
   } = useForm<ILogin>({ mode: "onBlur", resolver: zodResolver(loginSchema) });
-  const [showAlert, setShowAlert] = useState<"" | "confirm" | "error">("");
+  const [showAlert, setShowAlert] = useState("");
   const { authed } = useAuth();
   const [searchParams] = useSearchParams();
 
@@ -45,8 +45,9 @@ export function LoginPage() {
     if (authed) {
       navigate("/");
     }
-    if (searchParams.get("confirm")) {
-      setShowAlert("confirm");
+    const alert = searchParams.get("alert") ?? "";
+    if (["", "confirmed", "error", "updated"].includes(alert)) {
+      setShowAlert(alert);
     }
   }, [authed, setShowAlert, searchParams]);
 
@@ -98,10 +99,12 @@ export function LoginPage() {
         mt={30}
         color="green"
         withCloseButton
-        hidden={showAlert !== "confirm"}
+        hidden={showAlert !== "confirmed" && showAlert !== "updated"}
         onClose={() => setShowAlert("")}
       >
-        {t("pages.login.confirmAlert")}
+        {showAlert === "confirmed"
+          ? t("pages.login.confirmAlert")
+          : t("pages.login.updatedAlert")}
       </Alert>
       <Paper withBorder shadow="md" p={30} mt={showAlert ? 10 : 30} radius="md">
         <form onSubmit={handleSubmit(processForm)}>

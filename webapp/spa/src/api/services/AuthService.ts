@@ -5,7 +5,16 @@ import { apiClient } from "../client";
 const tokenProvider = TokenProvider.getInstance();
 
 export async function activateUser(token: string) {
-  const response = await apiClient.post("/activate", { token: token });
+  const response = await apiClient.post("/activate", { token });
+  return response.data;
+}
+export async function resetUser(email: string) {
+  const response = await apiClient.post("/forgot", { email });
+  return response.data;
+}
+
+export async function resetPassword(token: string, password: string) {
+  const response = await apiClient.put("/reset", { password, token });
   return response.data;
 }
 

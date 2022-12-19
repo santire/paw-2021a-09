@@ -59,7 +59,7 @@ type RegisterForm = z.infer<typeof registerSchema>;
 export function RegisterForm() {
   const { classes } = useStyles();
   const { t } = useTranslation();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [_, setSearchParams] = useSearchParams();
 
   const {
     register,
