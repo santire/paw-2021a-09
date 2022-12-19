@@ -5,6 +5,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import ar.edu.itba.paw.service.*;
 import ar.edu.itba.paw.webapp.dto.CommentDto;
+import ar.edu.itba.paw.webapp.dto.ImageDto;
 import ar.edu.itba.paw.webapp.dto.MenuItemDto;
 import ar.edu.itba.paw.webapp.dto.RestaurantDto;
 import ar.edu.itba.paw.webapp.utils.CachingUtils;
@@ -44,16 +45,15 @@ public class RestaurantController {
     private MenuService menuService;
     @Autowired
     private SocialMediaService socialMediaService;
+    @Autowired
+    private RatingService ratingService;
+    @Autowired
+    private LikesService likesService;
 
     @Context
     private UriInfo uriInfo;
 
-    //Like
-    //rating
-    //updatesocialmedia
-    //delete restaurant
-    //reservation require dto? reservationService.addReservation(loggedUser.getId(), restaurantId, dateAt, Long.parseLong(form.getQuantity()), ca.getUri());
-
+    
     @GET
     @Produces( value = {MediaType.APPLICATION_JSON})
     public Response getRestaurants(@QueryParam("page") @DefaultValue("1") Integer page,
@@ -159,7 +159,7 @@ public class RestaurantController {
 
 
     @POST
-    @Path("/{restaurantId}/reviews/create")
+    @Path("/{restaurantId}/reviews")
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = { MediaType.APPLICATION_JSON})
     public Response addRestaurantReview(@PathParam("restaurantId") final long restaurantId, final CommentDto comment, @Context HttpServletRequest request){
@@ -177,7 +177,7 @@ public class RestaurantController {
     }
 
     @DELETE
-    @Path("/{restaurantId}/reviews/{reviewId}/delete")
+    @Path("/{restaurantId}/reviews/{reviewId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
     public Response deleteRestaurantReview(@PathParam("restaurantId") final long restaurantId, @PathParam("reviewId") final long reviewId, @Context HttpServletRequest request){
 
@@ -201,7 +201,7 @@ public class RestaurantController {
     }
 
     @POST
-    @Path("/{restaurantId}/menu/create")
+    @Path("/{restaurantId}/menu")
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = { MediaType.APPLICATION_JSON})
     public Response addRestaurantMenuItem(@PathParam("restaurantId") final long restaurantId, final MenuItemDto menuItem, @Context HttpServletRequest request){
@@ -223,7 +223,7 @@ public class RestaurantController {
     }
 
     @DELETE
-    @Path("/{restaurantId}/menu/{menuId}/delete")
+    @Path("/{restaurantId}/menu/{menuId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
     public Response deleteRestaurantMenuItem(@PathParam("restaurantId") final long restaurantId, @PathParam("menuId") final long menuId, @Context HttpServletRequest request){
 
@@ -244,7 +244,6 @@ public class RestaurantController {
 
 
     @POST
-    @Path("/register")
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = { MediaType.APPLICATION_JSON})
     public Response registerRestaurant(final RestaurantDto restaurantDto, @Context HttpServletRequest request) {
@@ -271,11 +270,10 @@ public class RestaurantController {
             socialMediaService.updateTwitter(restaurantDto.getTwitter(), restaurant.getId());
         }
 
-        if (restaurantDto.getImage() != null) {
-            //TODO post to /image and dto cointains just the URI
-            //Image image = new Image(restaurantDto.getImage().getData());
-            //restaurantService.setImageByRestaurantId(image, restaurant.getId());
-        }
+        //if (imageDto.getData() != null) {
+        //    Image image = new Image(imageDto.getData());
+        //    restaurantService.setImageByRestaurantId(image, restaurant.getId());
+        //}
         final URI uri = uriInfo.getAbsolutePathBuilder()
                 .path(String.valueOf(restaurant.getId())).build();
         LOGGER.info("Restaurant created in : " + uri);
@@ -295,6 +293,29 @@ public class RestaurantController {
         }
     }
      */
+    @PUT
+    @Path("/{restaurantId}/image")
+    @Consumes(value = { MediaType.APPLICATION_JSON})
+    public Response getEventImage(@PathParam("restaurantId") final long restaurantId, final ImageDto imageDto,  @Context HttpServletRequest request) {
+
+        final Optional<Restaurant> maybeRestaurant = restaurantService.findById(restaurantId);
+        if (!maybeRestaurant.isPresent())
+            return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
+
+        Optional<User> user = getLoggedUser(request);
+        if(!user.isPresent()){
+            LOGGER.error("anon user attempt to register a restaurant");
+            return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
+        }
+
+        if (!userService.isTheRestaurantOwner(user.get().getId(), restaurantId))
+            return Response.status(Response.Status.FORBIDDEN.getStatusCode()).build();
+
+        Image image = new Image(imageDto.getData());
+        restaurantService.setImageByRestaurantId(image, maybeRestaurant.get().getId());
+
+        return Response.status(Response.Status.ACCEPTED).build();
+    }
 
     @GET
     @Path("/{restaurantId}/image")
@@ -324,7 +345,67 @@ public class RestaurantController {
         }
     }
 
+    @DELETE
+    @Path("/{restaurantId}")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    public Response deleteRestaurant(@PathParam("restaurantId") final long restaurantId, @Context HttpServletRequest request){
 
+        Optional<User> user = getLoggedUser(request);
+        if(!user.isPresent()){
+            LOGGER.error("anon user attempt to register a restaurant");
+            return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
+        }
+
+        if (!userService.isTheRestaurantOwner(user.get().getId(), restaurantId))
+            return Response.status(Response.Status.FORBIDDEN.getStatusCode()).build();
+
+        restaurantService.deleteRestaurantById(restaurantId);
+
+        final URI uri = uriInfo.getAbsolutePathBuilder().path("users/"+user.get().getId()).build();
+        return Response.created(uri).build();
+    }
+
+
+    @GET
+    @Path("/tags")
+    @Produces( value = {MediaType.APPLICATION_JSON})
+    public Response getRestautantsTags() {
+        return Response.ok(new GenericEntity<Collection<Tags>>(Tags.allTags().values()){}).build();
+    }
+
+    @PUT
+    @Path("/{restaurantId}/like")
+    @Produces( value = {MediaType.APPLICATION_JSON})
+    public Response likeRestaurant(@PathParam("restaurantId") final long restaurantId, @Context HttpServletRequest request) {
+
+        Optional<User> user = getLoggedUser(request);
+        if(!user.isPresent()){
+            LOGGER.error("anon user attempt to register a restaurant");
+            return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
+        }
+        long userId = user.get().getId();
+        if (likesService.userLikesRestaurant(userId,restaurantId))
+            likesService.dislike(userId,restaurantId);
+        else
+            likesService.like(userId, restaurantId);
+        return Response.status(Response.Status.ACCEPTED).build();
+    }
+
+    @PUT
+    @Path("/{restaurantId}/rate")
+    @Produces( value = {MediaType.APPLICATION_JSON})
+    public Response rateRestaurant(@PathParam("restaurantId") final long restaurantId, @QueryParam("rating") Double rating, @Context HttpServletRequest request) {
+
+        Optional<User> user = getLoggedUser(request);
+        if(!user.isPresent()){
+            LOGGER.error("anon user attempt to register a restaurant");
+            return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
+        }
+        long userId = user.get().getId();
+        ratingService.rateRestaurant(userId,restaurantId,rating);
+
+        return Response.status(Response.Status.ACCEPTED).build();
+    }
 
 
     @ModelAttribute("loggedUser")
