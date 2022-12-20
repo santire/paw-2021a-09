@@ -47,33 +47,24 @@ public class ReservationServiceImpl implements ReservationService{
     User user = userService.findById(userId).orElseThrow(UserNotFoundException::new);
     User owner = restaurant.getOwner();
     Reservation reservation = reservationDao.addReservation(user, restaurant,date,quantity);
-    Locale locale = LocaleContextHolder.getLocale();
     String url =baseUrl+"/restaurant/"+restaurant.getId()+"/manage/pending";
-  
-    //owner Email
-    String plainText = messageSource.getMessage("mail.newReservation.owner.plain",new Object[]{owner.getFirstName(),user.getName(),restaurant.getName()},locale)+"\n"+url+"\n";
-    Email myemail = new Email();
-    myemail.setMailTo(owner.getEmail());
-    myemail.setMailSubject(messageSource.getMessage("mail.newReservation.owner.subject",null,locale));
-    Map<String, Object> args = new HashMap<>();
-    args.put("titleMessage", "");
-    args.put("bodyMessage", messageSource.getMessage("mail.newReservation.owner.body",new Object[]{owner.getFirstName(),user.getName(),restaurant.getName()},locale));
-    args.put("buttonMessage", messageSource.getMessage("mail.newReservation.owner.button",null,locale));
-    args.put("link", url);
 
-    emailService.sendEmail(myemail,plainText, args, EmailTemplate.BUTTON);
+    emailService.sendNewReservationOwnerEmail(
+            owner.getEmail(),
+            owner.getFirstName(),
+            user.getName(),
+            restaurant.getName(),
+            url
+    );
 
+    emailService.sendNewReservationUserEmail(
+            user.getEmail(),
+            user.getName(),
+            owner.getName(),
+            restaurant.getName(),
+            url
+    );
 
-    //customer Email
-    myemail = new Email();
-    myemail.setMailTo(user.getEmail());
-    myemail.setMailSubject(messageSource.getMessage("mail.newReservation.customer.subject",null,locale));
-
-    Map<String, Object> args2 = new HashMap<>();
-    args2.put("titleMessage", "");
-    args2.put("bodyMessage", messageSource.getMessage("mail.newReservation.customer.body",new Object[]{user.getName(),restaurant.getName()},locale));
-    
-    emailService.sendEmail(myemail,plainText, args2, EmailTemplate.BASIC);
     return reservation;
     }
 
@@ -171,19 +162,13 @@ public class ReservationServiceImpl implements ReservationService{
         Reservation reservation = findById(reservationId).orElseThrow(ReservationNotFoundException::new);
         Restaurant restaurant = reservation.getRestaurant();
         User user = reservation.getUser();
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
     
-        String body=messageSource.getMessage("mail.newReservation.body",new Object[]{restaurant.getName(),reservation.getQuantity(),reservation.getDate().format(formatter)},locale);
-        Email email = new Email();
-        email.setMailTo(user.getEmail());
-        email.setMailSubject(messageSource.getMessage("mail.newReservation.subject",null,locale));
-
-        Map<String, Object> args2 = new HashMap<>();
-        args2.put("titleMessage", messageSource.getMessage("mail.newReservation.title",null,locale));
-        args2.put("bodyMessage", body);
-    
-        emailService.sendEmail(email,body, args2, EmailTemplate.BASIC);
+        emailService.sendReservationConfirmationEmail(
+                user.getEmail(),
+                restaurant.getName(),
+                reservation.getDate(),
+                reservation.getQuantity()
+        );
         reservation.setConfirmed(true);
         return true;
      }
@@ -193,22 +178,20 @@ public class ReservationServiceImpl implements ReservationService{
 
     @Transactional
     public boolean userCancelReservation(long reservationId) {
-        Locale locale = LocaleContextHolder.getLocale();
         Reservation reservation = findById(reservationId).orElseThrow(ReservationNotFoundException::new);
         Restaurant restaurant = reservation.getRestaurant();
         User owner = restaurant.getOwner();
         User user = reservation.getUser();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
-        String body = messageSource.getMessage("mail.userCancelReservation.body",new Object[]{owner.getFirstName(),user.getName(),restaurant.getName(),reservation.getDate().format(formatter),reservation.getQuantity()},locale);
-        Email email = new Email();
-        email.setMailTo(owner.getEmail());
-        email.setMailSubject(messageSource.getMessage("mail.userCancelReservation.subject",null,locale));
 
-        Map<String, Object> args2 = new HashMap<>();
-        args2.put("titleMessage", messageSource.getMessage("mail.userCancelReservation.title",null,locale));
-        args2.put("bodyMessage", body);
-    
-        emailService.sendEmail(email,body, args2, EmailTemplate.BASIC);
+        emailService.sendUserReservationCancelEmail(
+                user.getEmail(),
+                owner.getEmail(),
+                user.getName(),
+                owner.getName(),
+                restaurant.getName(),
+                reservation.getDate(),
+                reservation.getQuantity()
+        );
                                   
         return reservationDao.cancelReservation(reservationId);
     }
@@ -216,23 +199,18 @@ public class ReservationServiceImpl implements ReservationService{
     @Override
     @Transactional
     public boolean ownerCancelReservation(long reservationId, String message) {
-        Locale locale = LocaleContextHolder.getLocale();
         Reservation reservation = findById(reservationId).orElseThrow(ReservationNotFoundException::new);
         Restaurant restaurant = reservation.getRestaurant();
         User user = reservation.getUser();
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
-        String body = messageSource.getMessage("mail.ownerCancelReservation.body",new Object[]{user.getName(),restaurant.getName(),reservation.getDate().format(formatter),reservation.getQuantity()},locale)+" "+messageSource.getMessage("mail.ownerCancelReservation.reason",null,locale)+": "+message;
-        Email email = new Email();
-        email.setMailTo(user.getEmail());
-        email.setMailSubject(messageSource.getMessage("mail.ownerCancelReservation.subject",null,locale));
-
-        Map<String, Object> args2 = new HashMap<>();
-        args2.put("titleMessage", messageSource.getMessage("mail.ownerCancelReservation.title",null,locale));
-        args2.put("bodyMessage", body);
-    
-        emailService.sendEmail(email,body, args2, EmailTemplate.BASIC);
-                                  
+        emailService.sendOwnerReservationCancelEmail(
+                user.getEmail(),
+                user.getName(),
+                restaurant.getName(),
+                reservation.getDate(),
+                reservation.getQuantity(),
+                message
+        );
         return reservationDao.cancelReservation(reservationId);
     }
 

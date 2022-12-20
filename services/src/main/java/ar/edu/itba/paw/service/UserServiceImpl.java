@@ -61,8 +61,6 @@ public class UserServiceImpl implements UserService {
   @Override
   public User register(String username, String password, String firstName, String lastName, String email,
                        String phone, String baseUrl) throws EmailInUseException, TokenCreationException {
-    Locale locale = LocaleContextHolder.getLocale();
-
     User user = userDao.register(username,encoder.encode(password), firstName, lastName, email, phone);
     if (user == null) return null;
     String url = baseUrl + "/register?token=";
@@ -71,17 +69,7 @@ public class UserServiceImpl implements UserService {
     LocalDateTime createdAt = LocalDateTime.now();
 
     userDao.assignTokenToUser(token, createdAt, user.getId());
-    String plainText = messageSource.getMessage("mail.register.plain",new Object[]{user.getFirstName()},locale)+"\n"+url+token+"\n";
-    Email myemail = new Email();
-    myemail.setMailTo(user.getEmail());
-    myemail.setMailSubject(messageSource.getMessage("mail.register.subject",null,locale));
-    Map<String, Object> args = new HashMap<>();
-    args.put("titleMessage", "");
-    args.put("bodyMessage",messageSource.getMessage("mail.register.body",new Object[]{user.getFirstName()},locale));
-    args.put("buttonMessage",messageSource.getMessage("mail.register.button",null,locale));
-    args.put("link", url+token);
-
-    emailService.sendEmail(myemail,plainText, args, EmailTemplate.BUTTON);
+    emailService.sendRegistrationEmail(user.getEmail(), user.getFirstName(), url+token);
 
     return  user;
   }
@@ -93,20 +81,9 @@ public class UserServiceImpl implements UserService {
     String url = baseUrl + "/reset?token=";
     String token = UUID.randomUUID().toString();
     LocalDateTime createdAt = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.systemDefault());
-    Locale locale = LocaleContextHolder.getLocale();
 
     userDao.assignPasswordTokenToUser(token, createdAt, user.getId());
-    String plainText = messageSource.getMessage("mail.forgot.plain",new Object[]{user.getFirstName()},locale)+"\n"+url+token+"\n";
-    Email myemail = new Email();
-    myemail.setMailTo(user.getEmail());
-    myemail.setMailSubject(messageSource.getMessage("mail.forgot.subject",null,locale));
-    Map<String, Object> args = new HashMap<>();
-    args.put("titleMessage", "");
-    args.put("bodyMessage",messageSource.getMessage("mail.forgot.body",new Object[]{user.getFirstName()},locale));
-    args.put("buttonMessage",messageSource.getMessage("mail.forgot.button",null,locale));
-    args.put("link", url+token);
-
-    emailService.sendEmail(myemail,plainText, args, EmailTemplate.BUTTON);
+    emailService.sendPasswordResetEmail(user.getEmail(), user.getFirstName(), url+token);
   }
 
   @Override
