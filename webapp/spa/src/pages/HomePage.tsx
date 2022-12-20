@@ -119,7 +119,7 @@ export function HomePage() {
           ]}
           align="start"
           controlSize={40}
-          loop
+          //loop
         >
           {restaurants?.map((r) => (
             <Carousel.Slide key={r.key}>
