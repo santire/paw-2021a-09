@@ -398,8 +398,23 @@ public class RestaurantController {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
+    @GET
+    @Path("/{restaurantId}/like")
+    @Produces( value = {MediaType.APPLICATION_JSON})
+    public Response getRestaurantlike(@PathParam("restaurantId") final long restaurantId, @Context HttpServletRequest request) {
+
+        Optional<User> user = getLoggedUser(request);
+        if(!user.isPresent()){
+            LOGGER.error("anon user attempt to register a restaurant");
+            return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
+        }
+        long userId = user.get().getId();
+        Boolean like = likesService.userLikesRestaurant(userId,restaurantId);
+        return Response.ok(new GenericEntity<Boolean>(like){}).build();
+    }
+
     @PUT
-    @Path("/{restaurantId}/rate")
+    @Path("/{restaurantId}/rating")
     @Produces( value = {MediaType.APPLICATION_JSON})
     public Response rateRestaurant(@PathParam("restaurantId") final long restaurantId, @QueryParam("rating") Double rating, @Context HttpServletRequest request) {
 
@@ -412,6 +427,21 @@ public class RestaurantController {
         ratingService.rateRestaurant(userId,restaurantId,rating);
 
         return Response.status(Response.Status.ACCEPTED).build();
+    }
+
+    @GET
+    @Path("/{restaurantId}/rating")
+    @Produces( value = {MediaType.APPLICATION_JSON})
+    public Response getRestaurantRate(@PathParam("restaurantId") final long restaurantId, @Context HttpServletRequest request) {
+
+        Optional<User> user = getLoggedUser(request);
+        if(!user.isPresent()){
+            LOGGER.error("anon user attempt to register a restaurant");
+            return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
+        }
+        long userId = user.get().getId();
+        Double rate = ratingService.getRating(userId, restaurantId).get().getRating();
+        return Response.ok(new GenericEntity<Double>(rate){}).build();
     }
 
     @GET

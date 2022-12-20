@@ -17,8 +17,10 @@ public class UserDto {
     private String lastName;
     private String email;
     private String phone;
+    private URI reservations;
+    private URI restaurants;
 
-    public static UserDto fromUser(User user, String url){
+    public static UserDto fromUser(User user, String url, UriInfo uriInfo){
         final UserDto dto = new UserDto();
 
         dto.userId = user.getId();
@@ -30,6 +32,8 @@ public class UserDto {
 
         dto.url = url;
 
+        dto.reservations = uriInfo.getAbsolutePathBuilder().path("/reservations").build();
+        dto.restaurants = uriInfo.getAbsolutePathBuilder().path("/restaurants").build();
         // Warning! Never return Password to user!
         return dto;
     }
@@ -69,6 +73,10 @@ public class UserDto {
 
     public String getPhone() {return phone;}
 
+    public URI getReservations() {return reservations;}
+
+    public URI getRestaurants() {return restaurants;}
+
     public void setUserId(Long userId) {
         this.userId = userId;
     }
@@ -92,4 +100,8 @@ public class UserDto {
     public void setEmail(String email) { this.email = email; }
 
     public void setPhone(String phone) { this.phone = phone; }
+
+    public void setReservations(URI reservations) {this.reservations = reservations;}
+
+    public void setRestaurants(URI restaurants) {this.restaurants = restaurants;}
 }
