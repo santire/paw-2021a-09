@@ -51,10 +51,10 @@ public class UserController {
         return Response.created(uri).build();
     }
 
-   
+
 
     //READ USER
-    
+
     @GET
     @Path("/{userId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
@@ -69,6 +69,6 @@ public class UserController {
 
     // CREATE USER
 
-    
+
 
 }
