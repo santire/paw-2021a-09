@@ -63,7 +63,17 @@ public class RestaurantController {
                                    @QueryParam("min") @DefaultValue("1") Integer min,
                                    @QueryParam("max") @DefaultValue("10000") Integer max,
                                    @QueryParam("search")@DefaultValue("name") String sortBy,
-                                   @QueryParam("order")@DefaultValue("asc") String order ) {
+                                   @QueryParam("order")@DefaultValue("asc") String order,
+                                   @QueryParam("filterby")@DefaultValue("") String filterby) {
+
+        if(filterby == "hot"){
+            List<RestaurantDto> restaurants = restaurantService.getHotRestaurants(AMOUNT_OF_RESTAURANTS, 7).stream().map(u -> RestaurantDto.fromRestaurant(u, uriInfo)).collect(Collectors.toList());
+            return Response.ok(new GenericEntity<List<RestaurantDto>>(restaurants){}).build();
+        }
+        if(filterby == "popular"){
+            List<RestaurantDto> restaurants = restaurantService.getPopularRestaurants(AMOUNT_OF_RESTAURANTS, 2).stream().map(u -> RestaurantDto.fromRestaurant(u, uriInfo)).collect(Collectors.toList());
+            return Response.ok(new GenericEntity<List<RestaurantDto>>(restaurants){}).build();
+        }
 
         if (search != "")
             search = search.trim().replaceAll("[^a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]+", "");
@@ -91,7 +101,6 @@ public class RestaurantController {
         if(order != null && order.equals("DESC"))
             desc = true;
         order = desc ? "DESC" : "ASC";
-
 
         int maxPages = restaurantService.getRestaurantsFilteredByPageCount(AMOUNT_OF_RESTAURANTS, search, tagsSelected, min, max);
         List<RestaurantDto> restaurants = restaurantService.getRestaurantsFilteredBy(page, AMOUNT_OF_RESTAURANTS, search, tagsSelected,min,max, Sorting.NAME, true, 7).stream().map(u -> RestaurantDto.fromRestaurant(u, uriInfo)).collect(Collectors.toList());
@@ -503,7 +512,6 @@ public class RestaurantController {
             reservationService.confirmReservation(reservationId);
         else
             return Response.status(Response.Status.FORBIDDEN.getStatusCode()).build();
-
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
