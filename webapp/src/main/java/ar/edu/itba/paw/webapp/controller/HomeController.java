@@ -136,46 +136,5 @@ public class HomeController {
         return Response.status(Response.Status.OK).entity(body).build();
     }
 
-/* 
-
-    @RequestMapping(value={"/activate"}, method = RequestMethod.GET)
-    public ModelAndView activate(@RequestParam(name="token", required=true) final String token) {
-        User user;
-        try {
-            user = userService.activateUserByToken(token);
-        } catch(TokenExpiredException e) {
-            LOGGER.error("token {} is expired", token);
-            return new ModelAndView("redirect:/register").addObject("expiredToken", true);
-        }catch(TokenDoesNotExistException e) {
-            LOGGER.warn("token {} does not exist", token);
-            return new ModelAndView("activate").addObject("invalidToken", true);
-        } catch(Exception e) {
-            // Unexpected error happened, showing register screen with generic error message
-            return new ModelAndView("redirect:/register").addObject("tokenError", true);
-        }
-
-        UserDetails userDetails = pawUserDetailsService.loadUserByUsername(user.getEmail());
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, userDetails.getPassword(), userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        return new ModelAndView("redirect:/");
-    }
-
-    @RequestMapping(value={ "/login" }, method=RequestMethod.GET)
-    public ModelAndView login(@RequestParam(value = "error", required = false) final String error) {
-        final ModelAndView mav = new ModelAndView("login");
-        mav.addObject("error", error!=null);
-
-        return mav;
-    }
-
-    @RequestMapping("/403")
-    public ModelAndView forbidden() {
-        final ModelAndView mav = new ModelAndView("error");
-        mav.addObject("code", 403);
-
-        return mav;
-    } */
 
 }
