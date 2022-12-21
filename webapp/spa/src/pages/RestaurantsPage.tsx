@@ -96,7 +96,6 @@ export function RestaurantsPage() {
   }, [searchParams]);
 
   const apply = () => {
-    // setSearchParams(makeSearchParams(params));
     setSearchParams(qs.stringify(params, { arrayFormat: "repeat" }));
   };
 
@@ -143,6 +142,12 @@ export function RestaurantsPage() {
                 onChange={(e) => {
                   setParams((prev) => ({ ...prev, page: e }));
                   setApiParams((prev) => ({ ...prev, page: e }));
+                  setSearchParams(
+                    qs.stringify(
+                      { ...params, page: e },
+                      { arrayFormat: "repeat" }
+                    )
+                  );
                 }}
                 align="center"
                 color="orange"
