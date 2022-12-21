@@ -70,14 +70,14 @@ public class WebConfig {
 
     final SimpleDriverDataSource ds = new SimpleDriverDataSource();
     ds.setDriverClass(org.postgresql.Driver.class);
-      ds.setUrl("jdbc:postgresql://localhost/paw");
-      ds.setUsername("root");
-      ds.setPassword("root");
+     ds.setUrl("jdbc:postgresql://localhost/paw");
+     ds.setUsername("root");
+     ds.setPassword("root");
 
     // paw server
-//    ds.setUrl("jdbc:postgresql://10.16.1.110/paw-2021a-09");
-//    ds.setUsername("paw-2021a-09");
-//    ds.setPassword("6jnqLFj1g");
+    // ds.setUrl("jdbc:postgresql://10.16.1.110/paw-2021a-09");
+    // ds.setUsername("paw-2021a-09");
+    // ds.setPassword("6jnqLFj1g");
 
     // remote testing database (very slow)
 
@@ -152,7 +152,7 @@ public class WebConfig {
 
     
     // Local Machine only, don't deploy!
-    props.put("mail.debug", "false");
+    // props.put("mail.debug", "false");
 
 
     return mailSender;
@@ -200,8 +200,8 @@ public class WebConfig {
     jpaProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQL92Dialect");
 
     // Local Machine only, don't deploy!
-    jpaProperties.setProperty("hibernate.show_sql", "true");
-    jpaProperties.setProperty("format_sql", "true");
+    // jpaProperties.setProperty("hibernate.show_sql", "true");
+    // jpaProperties.setProperty("format_sql", "true");
 
     entityFactory.setJpaProperties(jpaProperties);
     return entityFactory;

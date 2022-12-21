@@ -10,8 +10,10 @@ import java.net.URI;
 
 import java.util.List;
 
-public class RestaurantDto {
 
+public class RestaurantDto {
+    
+    private static final String PATH = "restaurants/";
     private Long id;
     private String name;
     private String address;
@@ -28,7 +30,7 @@ public class RestaurantDto {
     private URI image;
     private URI owner;
 
-
+   
     public static RestaurantDto fromRestaurant(Restaurant restaurant, UriInfo uriInfo){
         final RestaurantDto dto = new RestaurantDto();
 
@@ -43,10 +45,10 @@ public class RestaurantDto {
         dto.likes = restaurant.getLikes();
         dto.tags = restaurant.getTags();
 
-        dto.menu = uriInfo.getAbsolutePathBuilder().path(restaurant.getId()+"/menu").build();
-        dto.reviews = uriInfo.getAbsolutePathBuilder().path(restaurant.getId()+"/reviews").build();
-        dto.image = uriInfo.getAbsolutePathBuilder().path(restaurant.getId()+"/image").build();
-        dto.owner = uriInfo.getBaseUriBuilder().path("users/"+restaurant.getOwner().getId().toString()).build();
+        dto.menu = uriInfo.getBaseUriBuilder().path(PATH + restaurant.getId()+"/menu").build();
+        dto.reviews = uriInfo.getBaseUriBuilder().path(PATH + restaurant.getId()+"/reviews").build();
+        dto.image = uriInfo.getBaseUriBuilder().path(PATH + restaurant.getId()+"/image").build();
+        dto.owner = uriInfo.getBaseUriBuilder().path(PATH + "users/"+restaurant.getOwner().getId().toString()).build();
 
         return  dto;
     }

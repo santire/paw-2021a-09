@@ -19,7 +19,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.*;
 import java.net.URI;
-
+import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
 
 @Path("users")
 @Component
@@ -43,8 +43,8 @@ public class UserController {
     public Response updateUser(final UserDto userDto, @Context HttpServletRequest request) {
         try {
             userService.updateUser(userDto.getUserId(), userDto.getUsername(),userDto.getPassword(), userDto.getFirstName(), userDto.getLastName(), userDto.getEmail(), userDto.getPhone());
-        } catch (Exception e) {
-            return Response.status(Response.Status.CONFLICT).header("error", e.getMessage()).build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.CONFLICT).header("error", "user does not exist").build();
         }
         final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(userDto.getUserId())).build();
         LOGGER.info("user updated: {}", uri);

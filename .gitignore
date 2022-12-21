@@ -7,6 +7,9 @@
 node_modules/
 dist/
 
+webapp/spa/node/
+webapp/src/main/webapp/build/
+
 # Compiled Java class files
 *.class
 
