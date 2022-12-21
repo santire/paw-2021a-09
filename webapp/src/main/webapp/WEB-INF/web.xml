@@ -29,19 +29,31 @@
     </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
+
   <servlet-mapping>
     <servlet-name>jersey-servlet</servlet-name>
+    <url-pattern>/api/*</url-pattern>
+  </servlet-mapping>
+
+  <welcome-file-list>
+    <welcome-file>
+      /index.html
+    </welcome-file>
+  </welcome-file-list>
+
+
+<!--  <servlet-mapping>-->
+<!--    <servlet-name>jersey-servlet</servlet-name>-->
+<!--    <url-pattern>/resources/*</url-pattern>-->
+<!--  </servlet-mapping>-->
+<!--  <servlet-mapping>-->
+<!--    <servlet-name>jersey-servlet</servlet-name>-->
+<!--    <url-pattern>/favicon.ico</url-pattern>-->
+<!--  </servlet-mapping>-->
+
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
     <url-pattern>/*</url-pattern>
-  </servlet-mapping>
-
-
-  <servlet-mapping>
-    <servlet-name>jersey-servlet</servlet-name>
-    <url-pattern>/resources/*</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>jersey-servlet</servlet-name>
-    <url-pattern>/favicon.ico</url-pattern>
   </servlet-mapping>
 
   <filter>
@@ -51,7 +63,7 @@
 
   <filter-mapping>
     <filter-name>openEntityManagerInViewFilter</filter-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>/api/*</url-pattern>
   </filter-mapping>
 
   <filter>
@@ -61,7 +73,7 @@
 
   <filter-mapping>
     <filter-name>springSecurityFilterChain</filter-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>/api/*</url-pattern>
   </filter-mapping>
 
 
