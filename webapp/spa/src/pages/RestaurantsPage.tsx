@@ -87,21 +87,10 @@ export function RestaurantsPage() {
     return auxParams;
   };
 
-  const makeSearchParams = (params: FilterParams) => {
-    let property: keyof typeof params;
-    let searchParams: any = {};
-    for (property in params) {
-      if (property !== "pageAmount" && params[property]) {
-        searchParams[property] = `${params[property]}`;
-      }
-    }
-    return searchParams;
-  };
-
   useEffect(() => {
     // first time loading use paremeters in url, otherwise set on change
     const parsedParams = parseSearchParams();
-    setParams(parseSearchParams);
+    setParams(parsedParams);
     setApiParams(parsedParams);
   }, [searchParams]);
 

@@ -55,10 +55,6 @@ export function Filter({ params, setParams, apply, clear }: FilterParamsProps) {
   const { t: en } = useTranslation();
   const { t: es } = useTranslation("es");
 
-  const [order, setOrder] = useState(t("pages.restaurants.filter.order.asc"));
-  const [sort, setSort] = useState(t("pages.restaurants.filter.sort.name"));
-  const [tags, setTags] = useState<string[]>([]);
-
   const setParam = <T extends FilterParams, U extends keyof T>(
     key: U,
     value: T[U]
@@ -75,7 +71,6 @@ export function Filter({ params, setParams, apply, clear }: FilterParamsProps) {
       : "desc";
   };
 
-  // TODO ojo es values
   const getTagValue = (values: string[]) => {
     const tagOptions: { [key: string]: string[] } = {};
     for (let tag of TAGS) {
@@ -111,12 +106,6 @@ export function Filter({ params, setParams, apply, clear }: FilterParamsProps) {
     return toReturn;
   };
 
-  useEffect(() => {
-    if (params.sort) setSort(t(`pages.restaurants.filter.sort.${params.sort}`));
-    if (params.order)
-      setOrder(t(`pages.restaurants.filter.order.${params.order}`));
-  }, []);
-
   return (
     <Paper shadow="md" radius="lg">
       <div className={classes.wrapper}>
@@ -133,9 +122,8 @@ export function Filter({ params, setParams, apply, clear }: FilterParamsProps) {
               clearable
               mb="sm"
               maxSelectedValues={6}
-              value={tags}
+              value={params.tags?.map((i) => t(`tags.${TAGS[parseInt(i)]}`))}
               onChange={(e) => {
-                setTags(e ?? "");
                 setParam("tags", getTagValue(e ?? "[]"));
               }}
             />
@@ -185,9 +173,8 @@ export function Filter({ params, setParams, apply, clear }: FilterParamsProps) {
               searchable
               clearable
               mb="sm"
-              value={sort}
+              value={t(`pages.restaurants.filter.sort.${params.sort}`)}
               onChange={(e) => {
-                setSort(e ?? "");
                 setParam("sort", getSortValue(e ?? ""));
               }}
             />
@@ -204,9 +191,8 @@ export function Filter({ params, setParams, apply, clear }: FilterParamsProps) {
               searchable
               clearable
               mb="sm"
-              value={order}
+              value={t(`pages.restaurants.filter.order.${params.order}`)}
               onChange={(e) => {
-                setOrder(e ?? "");
                 setParam("order", getOrderValue(e ?? ""));
               }}
             />
