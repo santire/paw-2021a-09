@@ -102,6 +102,7 @@ export function RestaurantsPage() {
   const clear = () => {
     setSearchParams({});
     setParams({});
+    setApiParams({});
   };
 
   const restaurantCards =
