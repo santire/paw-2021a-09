@@ -16,48 +16,49 @@ import { RestaurantPage } from "./pages/RestaurantPage";
 const queryClient = new QueryClient();
 const basename = process.env.REACT_APP_CONTEXT || "";
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Layout />,
-    children: [
-      {
-        path: "/",
-        element: <HomePage />,
-      },
-      {
-        path: "/restaurants",
-        element: <RestaurantsPage />,
-      },
-      {
-        path: "/restaurants/:restaurantId",
-        element: <RestaurantPage />,
-      },
-      {
-        path: "/login",
-        element: <LoginPage />,
-      },
-      {
-        path: "/register",
-        element: <RegisterPage />,
-      },
-      {
-        path: "/forgot",
-        element: <ForgotPage />,
-      },
-      {
-        path: "/reset",
-        element: <ResetPage />,
-      },
-      {
-        path: "*",
-        // TODO: Change this to NotFound
-        element: <ErrorPage />,
-      },
-    ],
-  },
-],
-    {basename : basename}
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <Layout />,
+      children: [
+        {
+          path: "/",
+          element: <HomePage />,
+        },
+        {
+          path: "/restaurants",
+          element: <RestaurantsPage />,
+        },
+        {
+          path: "/restaurants/:restaurantId",
+          element: <RestaurantPage />,
+        },
+        {
+          path: "/login",
+          element: <LoginPage />,
+        },
+        {
+          path: "/register",
+          element: <RegisterPage />,
+        },
+        {
+          path: "/forgot",
+          element: <ForgotPage />,
+        },
+        {
+          path: "/reset",
+          element: <ResetPage />,
+        },
+        {
+          path: "*",
+          // TODO: Change this to NotFound
+          element: <ErrorPage />,
+        },
+      ],
+    },
+  ],
+  { basename: basename }
 );
 
 export function App() {
