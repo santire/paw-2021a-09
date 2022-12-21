@@ -36,9 +36,7 @@
   </servlet-mapping>
 
   <welcome-file-list>
-    <welcome-file>
-      /index.html
-    </welcome-file>
+    <welcome-file>index.html</welcome-file>
   </welcome-file-list>
 
 
@@ -64,6 +62,11 @@
   <filter-mapping>
     <filter-name>openEntityManagerInViewFilter</filter-name>
     <url-pattern>/api/*</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>openEntityManagerInViewFilter</filter-name>
+    <url-pattern>/*</url-pattern>
   </filter-mapping>
 
   <filter>
