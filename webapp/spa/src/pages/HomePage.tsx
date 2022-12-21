@@ -11,7 +11,8 @@ import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { getRestaurants } from "../api/services";
 import { RestaurantCard } from "../components/RestaurantCard/RestaurantCard";
-import { Restaurant } from "../types";
+import { PaginatedRestaurants, Restaurant } from "../types";
+import { Page } from "../types/Page";
 
 const useStyles = createStyles((theme) => ({
   heading: {
@@ -46,9 +47,9 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export function HomePage() {
-  const { status, data, error } = useQuery<Restaurant[], Error>(
+  const { status, data, error } = useQuery<Page<Restaurant>, Error>(
     [],
-    getRestaurants
+    async () => getRestaurants()
   );
   const { t } = useTranslation();
   const { classes } = useStyles();
@@ -61,7 +62,7 @@ export function HomePage() {
   }
 
   const restaurants =
-    data?.map((rest) => (
+    data?.data?.map((rest) => (
       <RestaurantCard
         image={rest.image}
         tags={rest.tags}
@@ -72,17 +73,18 @@ export function HomePage() {
       />
     )) || [];
 
-  if (data?.length && data.length > 0 && data.length < 5) {
+  if (data?.data?.length && data?.data?.length > 0 && data?.data?.length < 5) {
     // duplicate data to fix carousel
-    for (let i = 0; i < data.length; i++) {
+    for (let i = 0; i < data.data?.length; i++) {
+      const restaurant = data.data[i];
       const rest = (
         <RestaurantCard
-          image={data[i].image}
-          tags={data[i].tags}
-          name={data[i].name}
-          rating={data[i].rating}
-          likes={data[i].likes}
-          key={data[i].name + i}
+          image={restaurant.image}
+          tags={restaurant.tags}
+          name={restaurant.name}
+          rating={restaurant.rating}
+          likes={restaurant.likes}
+          key={restaurant.name + i}
         />
       );
       restaurants.push(rest);
@@ -97,9 +99,7 @@ export function HomePage() {
           align="center"
           className={classes.headingWrapper}
         >
-          <Text className={classes.headingText}>
-            Discover and book the best restaurants
-          </Text>
+          <Text className={classes.headingText}>{t("pages.home.heading")}</Text>
           <Image
             src={require("../assets/images/home_image.png")}
             height={"35vh"}

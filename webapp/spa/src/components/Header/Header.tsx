@@ -23,6 +23,7 @@ import {
   LinkProps,
   RelativeRoutingType,
   useNavigate,
+  useSearchParams,
 } from "react-router-dom";
 import { logout } from "../../api/services/AuthService";
 import { useAuth } from "../../context/AuthContext";
@@ -52,12 +53,28 @@ function NavItem({ label, to, relative, hidden }: NavItemProps) {
 function SearchBar() {
   const { classes } = useStyles();
   const { t } = useTranslation();
+  const [search, setSearch] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   return (
     <Autocomplete
       className={classes.search}
       placeholder={t("header.search") || ""}
       icon={<IconSearch size={16} stroke={1.5} />}
-      data={["teest", "test"]}
+      value={search}
+      onChange={(e) => setSearch(e.trim())}
+      data={[]}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          searchParams.set("search", search);
+          setSearchParams(searchParams);
+          setSearch("");
+          navigate({
+            pathname: "restaurants",
+            search: searchParams.toString(),
+          });
+        }
+      }}
       styles={(theme) => ({
         input: {
           background:
