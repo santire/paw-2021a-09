@@ -106,14 +106,7 @@ export function RestaurantsPage() {
 
   const restaurantCards =
     data?.data?.map((rest) => (
-      <RestaurantCard
-        image={rest.image}
-        tags={rest.tags}
-        name={rest.name}
-        rating={rest.rating}
-        likes={rest.likes}
-        key={rest.name}
-      />
+      <RestaurantCard restaurant={rest} key={rest.name} />
     )) || [];
 
   return (

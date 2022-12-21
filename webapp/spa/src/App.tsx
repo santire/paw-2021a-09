@@ -11,6 +11,7 @@ import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { ResetPage } from "./pages/ResetPage";
+import { RestaurantPage } from "./pages/RestaurantPage";
 
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
       {
         path: "/restaurants",
         element: <RestaurantsPage />,
+      },
+      {
+        path: "/restaurants/:restaurantId",
+        element: <RestaurantPage />,
       },
       {
         path: "/login",

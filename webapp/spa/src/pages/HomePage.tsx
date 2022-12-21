@@ -63,14 +63,7 @@ export function HomePage() {
 
   const restaurants =
     data?.data?.map((rest) => (
-      <RestaurantCard
-        image={rest.image}
-        tags={rest.tags}
-        name={rest.name}
-        rating={rest.rating}
-        likes={rest.likes}
-        key={rest.name}
-      />
+      <RestaurantCard restaurant={rest} key={rest.name} />
     )) || [];
 
   if (data?.data?.length && data?.data?.length > 0 && data?.data?.length < 5) {
@@ -78,14 +71,7 @@ export function HomePage() {
     for (let i = 0; i < data.data?.length; i++) {
       const restaurant = data.data[i];
       const rest = (
-        <RestaurantCard
-          image={restaurant.image}
-          tags={restaurant.tags}
-          name={restaurant.name}
-          rating={restaurant.rating}
-          likes={restaurant.likes}
-          key={restaurant.name + i}
-        />
+        <RestaurantCard restaurant={restaurant} key={restaurant.name + i} />
       );
       restaurants.push(rest);
     }
