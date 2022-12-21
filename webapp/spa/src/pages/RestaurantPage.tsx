@@ -1,4 +1,4 @@
-import { Flex, Grid, Image, Loader } from "@mantine/core";
+import { Container, Flex, Grid, Image, Loader, Text } from "@mantine/core";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useRestaurant } from "../hooks/useRestaurant";
@@ -22,12 +22,16 @@ export function RestaurantPage() {
   }
 
   const { image, name } = data;
-  console.log(data);
   return (
-    <Grid justify="center">
-      <Grid.Col span={4}>
-        <Image src={image} alt={name} height={180} />
-      </Grid.Col>
-    </Grid>
+    <Container size={1920}>
+      <Grid justify="center">
+        <Grid.Col span={4}>
+          <Image src={image} alt={name} height={180} />
+        </Grid.Col>
+        <Grid.Col span={8}>
+          <Text>{name}</Text>
+        </Grid.Col>
+      </Grid>
+    </Container>
   );
 }
