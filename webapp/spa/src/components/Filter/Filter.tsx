@@ -74,6 +74,7 @@ export function Filter({ params, setParams, apply, clear }: FilterParamsProps) {
   const getTagValue = (values: string[]) => {
     const tagOptions: { [key: string]: string[] } = {};
     for (let tag of TAGS) {
+      console.log("ag: " + es(`tags.${tag}`));
       tagOptions[tag] = getOptionsArr(`tags.${tag}`);
     }
     const toReturn: string[] = [];
@@ -122,7 +123,11 @@ export function Filter({ params, setParams, apply, clear }: FilterParamsProps) {
               clearable
               mb="sm"
               maxSelectedValues={6}
-              value={params.tags?.map((i) => t(`tags.${TAGS[parseInt(i)]}`))}
+              value={
+                params.tags
+                  ? params.tags?.map((i) => t(`tags.${TAGS[parseInt(i)]}`))
+                  : []
+              }
               onChange={(e) => {
                 setParam("tags", getTagValue(e ?? "[]"));
               }}
@@ -173,7 +178,11 @@ export function Filter({ params, setParams, apply, clear }: FilterParamsProps) {
               searchable
               clearable
               mb="sm"
-              value={t(`pages.restaurants.filter.sort.${params.sort}`)}
+              value={
+                params.sort
+                  ? t(`pages.restaurants.filter.sort.${params.sort}`)
+                  : ""
+              }
               onChange={(e) => {
                 setParam("sort", getSortValue(e ?? ""));
               }}
@@ -191,7 +200,11 @@ export function Filter({ params, setParams, apply, clear }: FilterParamsProps) {
               searchable
               clearable
               mb="sm"
-              value={t(`pages.restaurants.filter.order.${params.order}`)}
+              value={
+                params.order
+                  ? t(`pages.restaurants.filter.order.${params.order}`)
+                  : ""
+              }
               onChange={(e) => {
                 setParam("order", getOrderValue(e ?? ""));
               }}

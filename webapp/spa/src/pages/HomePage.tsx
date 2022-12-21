@@ -6,6 +6,7 @@ import {
   Flex,
   Text,
   Image,
+  Loader,
 } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
@@ -54,9 +55,6 @@ export function HomePage() {
   const { t } = useTranslation();
   const { classes } = useStyles();
 
-  if (status === "loading") {
-    return <div>...</div>;
-  }
   if (status === "error") {
     return <div>{error!.message}</div>;
   }
@@ -94,27 +92,35 @@ export function HomePage() {
         </Flex>
       </div>
       <Container size="xl" my="xl">
-        <Text className={classes.title}>{t`pages.home.highlights`}</Text>
-        <Carousel
-          slideSize="20%"
-          slideGap="sm"
-          breakpoints={[
-            { maxWidth: "lg", slideSize: "33.333333333%" },
-            { maxWidth: "md", slideSize: "50%" },
-            { maxWidth: "sm", slideSize: "100%", slideGap: 0 },
-          ]}
-          align="start"
-          controlSize={40}
-          //loop
-        >
-          {restaurants?.map((r) => (
-            <Carousel.Slide key={r.key}>
-              <Center p={0} m={0}>
-                {r}
-              </Center>
-            </Carousel.Slide>
-          ))}
-        </Carousel>
+        {status === "loading" ? (
+          <Flex justify="center" align="center" h={"100%"}>
+            <Loader color="orange" />
+          </Flex>
+        ) : (
+          <>
+            <Text className={classes.title}>{t`pages.home.highlights`}</Text>
+            <Carousel
+              slideSize="20%"
+              slideGap="sm"
+              breakpoints={[
+                { maxWidth: "lg", slideSize: "33.333333333%" },
+                { maxWidth: "md", slideSize: "50%" },
+                { maxWidth: "sm", slideSize: "100%", slideGap: 0 },
+              ]}
+              align="start"
+              controlSize={40}
+              //loop
+            >
+              {restaurants?.map((r) => (
+                <Carousel.Slide key={r.key}>
+                  <Center p={0} m={0}>
+                    {r}
+                  </Center>
+                </Carousel.Slide>
+              ))}
+            </Carousel>
+          </>
+        )}
       </Container>
     </>
   );

@@ -1,5 +1,4 @@
 {
-  "title": "Welcome to react using react-i18next",
   "theme": {
     "light": "Light",
     "dark": "Dark"
@@ -44,6 +43,9 @@
     "home": {
       "highlights": "Highlights",
       "heading": "Discover and book the best restaurants"
+    },
+    "restaurant": {
+      "reservationButton": "Make a Reservation"
     },
     "restaurants": {
       "title": "Browse restaurants",

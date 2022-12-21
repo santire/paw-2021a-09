@@ -3,6 +3,7 @@ import {
   createStyles,
   Flex,
   Grid,
+  Loader,
   Pagination,
   SimpleGrid,
   Text,
@@ -95,13 +96,13 @@ export function RestaurantsPage() {
   }, [searchParams]);
 
   const apply = () => {
-    // setSearchParams(makeSearchParams(params));
     setSearchParams(qs.stringify(params, { arrayFormat: "repeat" }));
   };
 
   const clear = () => {
     setSearchParams({});
     setParams({});
+    setApiParams({});
   };
 
   const restaurantCards =
@@ -125,23 +126,35 @@ export function RestaurantsPage() {
           />
         </Grid.Col>
         <Grid.Col span={9}>
-          <Flex direction="column" align="center">
-            <SimpleGrid cols={3} spacing="xl" mb="xl">
-              {restaurantCards}
-            </SimpleGrid>
-            <Pagination
-              total={data?.meta.maxPages ?? 0}
-              siblings={3}
-              initialPage={params.page ?? 1}
-              page={params.page}
-              onChange={(e) => {
-                setParams((prev) => ({ ...prev, page: e }));
-                setApiParams((prev) => ({ ...prev, page: e }));
-              }}
-              align="center"
-              color="orange"
-            />
-          </Flex>
+          {status === "loading" ? (
+            <Flex justify="center" align="center" h={"100%"}>
+              <Loader color="orange" />
+            </Flex>
+          ) : (
+            <Flex direction="column" align="center">
+              <SimpleGrid cols={3} spacing="xl" mb="xl">
+                {restaurantCards}
+              </SimpleGrid>
+              <Pagination
+                total={data?.meta.maxPages ?? 0}
+                siblings={3}
+                initialPage={params.page ?? 1}
+                page={params.page}
+                onChange={(e) => {
+                  setParams((prev) => ({ ...prev, page: e }));
+                  setApiParams((prev) => ({ ...prev, page: e }));
+                  setSearchParams(
+                    qs.stringify(
+                      { ...params, page: e },
+                      { arrayFormat: "repeat" }
+                    )
+                  );
+                }}
+                align="center"
+                color="orange"
+              />
+            </Flex>
+          )}
         </Grid.Col>
       </Grid>
     </Container>
