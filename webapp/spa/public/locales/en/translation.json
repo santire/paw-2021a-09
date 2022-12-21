@@ -42,7 +42,46 @@
   },
   "pages": {
     "home": {
-      "highlights": "Highlights"
+      "highlights": "Highlights",
+      "heading": "Discover and book the best restaurants"
+    },
+    "restaurants": {
+      "title": "Browse restaurants",
+      "filter": {
+        "title": "Filters",
+        "min": {
+          "label": "Min average price",
+          "placeholder": "1"
+        },
+        "max": {
+          "label": "Max average price",
+          "placeholder": "10000"
+        },
+        "max": {
+          "label": "Max average price",
+          "placeholder": "10000"
+        },
+        "sort": {
+          "label": "Sort",
+          "placeholder": "Select sorting",
+          "name": "Name",
+          "hot": "Hot",
+          "price": "Price",
+          "likes": "Likes"
+        },
+        "order": {
+          "label": "Order",
+          "placeholder": "Select ordering",
+          "asc": "ascending",
+          "desc": "descending"
+        },
+        "tags": {
+          "label": "Categories",
+          "placeholder": "Select categories"
+        },
+        "submit": "Apply",
+        "clear": "Clear filters"
+      }
     },
     "login": {
       "alert": "Invalid username or password",

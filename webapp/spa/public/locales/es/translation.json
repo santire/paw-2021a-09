@@ -1,3 +1,12 @@
 {
-  "title": "Bienvenido a usar react 18n"
+  "title": "Bienvenido a usar react 18n",
+  "pages": {
+    "restaurants": {
+      "filter": {
+        "order": {
+          "asc": "ascendiente"
+        }
+      }
+    }
+  }
 }

@@ -11,29 +11,27 @@ import {
 } from "@mantine/core";
 import { IconHeart, IconShare, IconStar } from "@tabler/icons";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { Restaurant } from "../../types";
 import useStyles from "./RestaurantCard.styles";
 
 interface RestaurantCardProps {
-  image: string;
-  tags: string[];
-  name: string;
-  rating: number;
-  likes: number;
+  restaurant: Restaurant;
+  likedByUser?: boolean;
 }
 
 export function RestaurantCard({
-  image,
-  tags,
-  name,
-  rating,
-  likes,
+  restaurant,
+  likedByUser,
 }: RestaurantCardProps) {
+  const { id, image, tags, name, rating, likes } = restaurant;
   const { classes, theme } = useStyles();
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const features = tags.map((tag, idx) => (
     <Badge color="orange" key={tag + "" + idx}>
-      {t("tags."+tag.toLowerCase())}
+      {t("tags." + tag.toLowerCase())}
     </Badge>
   ));
 
@@ -85,7 +83,13 @@ export function RestaurantCard({
       </Card.Section>
 
       <Flex justify="center" align="center" mt="md">
-        <Button color="orange" variant="outline" size="md" fullWidth>
+        <Button
+          color="orange"
+          variant="outline"
+          size="md"
+          fullWidth
+          onClick={() => navigate(`/restaurants/${id}`)}
+        >
           {t("restaurantCard.more")}
         </Button>
       </Flex>

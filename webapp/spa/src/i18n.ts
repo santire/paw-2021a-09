@@ -4,11 +4,18 @@ import { initReactI18next } from "react-i18next";
 import Backend from "i18next-http-backend";
 import LanguageDetector from "i18next-browser-languagedetector";
 
-i18n.use(Backend)
+const CONTEXT = process.env.REACT_APP_CONTEXT || "/paw-2021a-09";
+
+i18n
+  .use(Backend)
   .use(LanguageDetector)
-  .use(initReactI18next).init({
+  .use(initReactI18next)
+  .init({
     fallbackLng: "en",
     debug: true,
+    backend: {
+      loadPath: CONTEXT + "/locales/{{lng}}/{{ns}}.json",
+    },
   });
 
 export default i18n;
