@@ -6,6 +6,7 @@ import { ThemeProvider } from "./components/ThemeProvider/ThemeProvider";
 import { AuthProvider } from "./context/AuthContext";
 import { ErrorPage } from "./pages/ErrorPage";
 import { ForgotPage } from "./pages/ForgotPage";
+import { RestaurantsPage } from "./pages/RestaurantsPage";
 import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <HomePage />,
+      },
+      {
+        path: "/restaurants",
+        element: <RestaurantsPage />,
       },
       {
         path: "/login",
