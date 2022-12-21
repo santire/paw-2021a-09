@@ -81,7 +81,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity http) throws Exception {
         // Configure filters
         http.userDetailsService(userDetails)
-               .addFilterBefore(new CorsFilter(), (Class<? extends Filter>) ChannelProcessingFilter.class)
+               .addFilterBefore((Filter) new CorsFilter(), (Class<? extends Filter>) ChannelProcessingFilter.class)
                 .addFilterBefore(createLoginAuthFilter(), (Class<? extends Filter>) UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(createSessionAuthFilter(), (Class<? extends Filter>) UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement()
@@ -94,7 +94,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public Filter createLoginAuthFilter() throws Exception {
         LoginAuthFilter filter = new LoginAuthFilter();
-        filter.setRequiresAuthenticationRequestMatcher(new RegexRequestMatcher("/login", "POST"));
+        filter.setRequiresAuthenticationRequestMatcher(new RegexRequestMatcher("/api/login", "POST"));
         filter.setAuthenticationManager(authenticationManager());
         filter.setAuthenticationSuccessHandler(loginAuthSuccessHandler);
         filter.setAuthenticationFailureHandler(loginAuthFailureHandler);
@@ -114,8 +114,8 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public RequestMatcher needAuthEndpointsMatcher() {
         return new OrRequestMatcher(
-                new AntPathRequestMatcher("/hello/me", "GET"),
-                new AntPathRequestMatcher("/users/*", "GET"),
+                new AntPathRequestMatcher("/api/hello/me", "GET"),
+                new AntPathRequestMatcher("/api/users/*", "GET"),
                 optionalAuthEndpointsMatcher()
                 //adminEndpointsMatcher()
         );
@@ -124,10 +124,10 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public RequestMatcher optionalAuthEndpointsMatcher() {
         return new OrRequestMatcher(
-                new AntPathRequestMatcher("/", "GET"),
-                new AntPathRequestMatcher("/hello", "GET"),
-                new AntPathRequestMatcher("/login", "POST"),
-                new AntPathRequestMatcher("/login", "GET")
+                new AntPathRequestMatcher("/api/", "GET"),
+                new AntPathRequestMatcher("/api/hello", "GET"),
+                new AntPathRequestMatcher("/api/login", "POST"),
+                new AntPathRequestMatcher("/api/login", "GET")
         );
     }
 
@@ -141,7 +141,8 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception{
               web.ignoring()
-                      .antMatchers("/css/**", "/images/**", "/js/**", "/favicon.ico" );
+                      .antMatchers("/static/**", "/index.html", "/", "/locales/**" )
+                      .antMatchers("/**.png", "/**.json", "/**.ico", "/**.txt");
             }
 
 
