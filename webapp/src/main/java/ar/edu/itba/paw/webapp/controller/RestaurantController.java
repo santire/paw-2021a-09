@@ -15,11 +15,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 import ar.edu.itba.paw.service.UserService;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 
 
 
@@ -29,7 +28,7 @@ public class RestaurantController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private static final int AMOUNT_OF_MENU_ITEMS = 8;
-    private static final int AMOUNT_OF_RESTAURANTS = 10;
+    private static final int MAX_AMOUNT_PER_PAGE = 10;
     private static final int AMOUNT_OF_REVIEWS = 4;
     private static final int AMOUNT_OF_RESERVATIONS = 10;
 
@@ -58,20 +57,21 @@ public class RestaurantController {
     @GET
     @Produces( value = {MediaType.APPLICATION_JSON})
     public Response getRestaurants(@QueryParam("page") @DefaultValue("1") Integer page,
+                                        @QueryParam("pageAmount") @DefaultValue("10") Integer pageAmount,
                                    @QueryParam("search")@DefaultValue("") String search,
                                    @QueryParam("tags") List<Integer> tags,
                                    @QueryParam("min") @DefaultValue("1") Integer min,
                                    @QueryParam("max") @DefaultValue("10000") Integer max,
-                                   @QueryParam("search")@DefaultValue("name") String sortBy,
+                                   @QueryParam("sort")@DefaultValue("name") String sortBy,
                                    @QueryParam("order")@DefaultValue("asc") String order,
                                    @QueryParam("filterby")@DefaultValue("") String filterby) {
 
         if(filterby == "hot"){
-            List<RestaurantDto> restaurants = restaurantService.getHotRestaurants(AMOUNT_OF_RESTAURANTS, 7).stream().map(u -> RestaurantDto.fromRestaurant(u, uriInfo)).collect(Collectors.toList());
+            List<RestaurantDto> restaurants = restaurantService.getHotRestaurants(pageAmount, 7).stream().map(u -> RestaurantDto.fromRestaurant(u, uriInfo)).collect(Collectors.toList());
             return Response.ok(new GenericEntity<List<RestaurantDto>>(restaurants){}).build();
         }
         if(filterby == "popular"){
-            List<RestaurantDto> restaurants = restaurantService.getPopularRestaurants(AMOUNT_OF_RESTAURANTS, 2).stream().map(u -> RestaurantDto.fromRestaurant(u, uriInfo)).collect(Collectors.toList());
+            List<RestaurantDto> restaurants = restaurantService.getPopularRestaurants(pageAmount, 2).stream().map(u -> RestaurantDto.fromRestaurant(u, uriInfo)).collect(Collectors.toList());
             return Response.ok(new GenericEntity<List<RestaurantDto>>(restaurants){}).build();
         }
 
@@ -98,12 +98,14 @@ public class RestaurantController {
         }
 
         boolean desc = false;
-        if(order != null && order.equals("DESC"))
+        if(order != null && order.equalsIgnoreCase("DESC"))
             desc = true;
-        order = desc ? "DESC" : "ASC";
+        if(pageAmount > MAX_AMOUNT_PER_PAGE) {
+            pageAmount = MAX_AMOUNT_PER_PAGE;
+        }
 
-        int maxPages = restaurantService.getRestaurantsFilteredByPageCount(AMOUNT_OF_RESTAURANTS, search, tagsSelected, min, max);
-        List<RestaurantDto> restaurants = restaurantService.getRestaurantsFilteredBy(page, AMOUNT_OF_RESTAURANTS, search, tagsSelected,min,max, Sorting.NAME, true, 7).stream().map(u -> RestaurantDto.fromRestaurant(u, uriInfo)).collect(Collectors.toList());
+        int maxPages = restaurantService.getRestaurantsFilteredByPageCount(pageAmount, search, tagsSelected, min, max);
+        List<RestaurantDto> restaurants = restaurantService.getRestaurantsFilteredBy(page, pageAmount, search, tagsSelected,min,max, sort, desc, 7).stream().map(u -> RestaurantDto.fromRestaurant(u, uriInfo)).collect(Collectors.toList());
 
         return Response.ok(new GenericEntity<List<RestaurantDto>>(restaurants){})
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")

@@ -15,3 +15,8 @@ export interface Restaurant {
   image: string;
   owner: string;
 }
+
+export interface PaginatedRestaurants {
+  restaurants: Restaurant[];
+  maxPages: number;
+}
