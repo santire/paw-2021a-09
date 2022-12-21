@@ -14,6 +14,8 @@ import { ResetPage } from "./pages/ResetPage";
 import { RestaurantPage } from "./pages/RestaurantPage";
 
 const queryClient = new QueryClient();
+const basename = process.env.REACT_APP_CONTEXT || "";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -54,7 +56,9 @@ const router = createBrowserRouter([
       },
     ],
   },
-]);
+],
+    {basename : basename}
+);
 
 export function App() {
   return (

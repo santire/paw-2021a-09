@@ -53,7 +53,7 @@ public class RestaurantController {
     @Context
     private UriInfo uriInfo;
 
-
+    //READ RESTAURANTS
     @GET
     @Produces( value = {MediaType.APPLICATION_JSON})
     public Response getRestaurants(@QueryParam("page") @DefaultValue("1") Integer page,
@@ -115,6 +115,7 @@ public class RestaurantController {
                 .build();
     }
 
+    //READ A RESTAURANT
     @GET
     @Path("/{restaurantId}")
     @Produces( value = {MediaType.APPLICATION_JSON})
@@ -130,6 +131,7 @@ public class RestaurantController {
         return Response.ok(new GenericEntity<RestaurantDto>(restaurant){}).build();
     }
 
+    //READ RESTAURANT MENU
     @GET
     @Path("/{restaurantId}/menu")
     @Produces( value = {MediaType.APPLICATION_JSON})
@@ -153,6 +155,7 @@ public class RestaurantController {
                 .build();
     }
 
+    //READ RESTAURANT REVIEWS
     @GET
     @Path("/{restaurantId}/reviews")
     @Produces( value = {MediaType.APPLICATION_JSON})
@@ -169,7 +172,7 @@ public class RestaurantController {
                 .build();
     }
 
-
+    //CREATE REVIEW
     @POST
     @Path("/{restaurantId}/reviews")
     @Produces(value = {MediaType.APPLICATION_JSON})
@@ -188,6 +191,7 @@ public class RestaurantController {
         return Response.created(uri).build();
     }
 
+    //DELETE REVIEW
     @DELETE
     @Path("/{restaurantId}/reviews/{reviewId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
@@ -211,6 +215,7 @@ public class RestaurantController {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
+    //ADD MENU ITEM
     @POST
     @Path("/{restaurantId}/menu")
     @Produces(value = {MediaType.APPLICATION_JSON})
@@ -233,6 +238,7 @@ public class RestaurantController {
         return Response.created(uri).build();
     }
 
+    //DELETE MENU ITEM
     @DELETE
     @Path("/{restaurantId}/menu/{menuId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
@@ -252,7 +258,7 @@ public class RestaurantController {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
-
+    //REGISTER RESTAURANT
     @POST
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = { MediaType.APPLICATION_JSON})
@@ -289,20 +295,8 @@ public class RestaurantController {
         LOGGER.info("Restaurant created in : " + uri);
         return Response.created(uri).build();
     }
-    /*
-    @GET
-    @Produces(value = { MediaType.APPLICATION_JSON, })
-    @Consumes(value = { MediaType.APPLICATION_JSON, })
-    @Path("/{restaurantId}")
-    public Response getRestaurantById(@PathParam("restaurantId") final int restaurantId, @Context HttpServletRequest request) {
-        final Optional<Restaurant> restaurant = restaurantService.findById(restaurantId);
-        if(restaurant.isPresent()){
-            return Response.ok(RestaurantDto.fromRestaurant(restaurant.get(), uriInfo)).build();
-        } else {
-            return Response.status(Response.Status.ACCEPTED).header("error", "restaurant not found").build();
-        }
-    }
-     */
+
+    //SET IMAGE
     @PUT
     @Path("/{restaurantId}/image")
     @Consumes(value = { MediaType.APPLICATION_JSON})
@@ -327,6 +321,7 @@ public class RestaurantController {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
+    //GET IMAGE
     @GET
     @Path("/{restaurantId}/image")
     @Produces("image/jpg")
@@ -355,6 +350,7 @@ public class RestaurantController {
         }
     }
 
+    //DELETE RESTAURANT
     @DELETE
     @Path("/{restaurantId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
@@ -374,7 +370,7 @@ public class RestaurantController {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
-
+    //READ ALL TAGS
     @GET
     @Path("/tags")
     @Produces( value = {MediaType.APPLICATION_JSON})
@@ -382,6 +378,7 @@ public class RestaurantController {
         return Response.ok(new GenericEntity<Collection<Tags>>(Tags.allTags().values()){}).build();
     }
 
+    //LIKE RESTAURANT
     @PUT
     @Path("/{restaurantId}/like")
     @Produces( value = {MediaType.APPLICATION_JSON})
@@ -400,6 +397,7 @@ public class RestaurantController {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
+    //GET USER LIKE
     @GET
     @Path("/{restaurantId}/like")
     @Produces( value = {MediaType.APPLICATION_JSON})
@@ -415,6 +413,7 @@ public class RestaurantController {
         return Response.ok(new GenericEntity<Boolean>(like){}).build();
     }
 
+    //RATE RESTAURANT
     @PUT
     @Path("/{restaurantId}/rating")
     @Produces( value = {MediaType.APPLICATION_JSON})
@@ -431,6 +430,7 @@ public class RestaurantController {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
+    //READ USER RATING
     @GET
     @Path("/{restaurantId}/rating")
     @Produces( value = {MediaType.APPLICATION_JSON})
@@ -446,6 +446,7 @@ public class RestaurantController {
         return Response.ok(new GenericEntity<Double>(rate){}).build();
     }
 
+    //READ RESTAURANT RESERVATIONS
     @GET
     @Path("/{restaurantId}/reservation")
     @Produces( value = {MediaType.APPLICATION_JSON})
@@ -480,7 +481,7 @@ public class RestaurantController {
                 .build();
     }
 
-
+    //ADD RESERVATION
     @POST
     @Path("/{restaurantId}/reservation")
     @Produces(value = {MediaType.APPLICATION_JSON})
@@ -502,6 +503,7 @@ public class RestaurantController {
         return Response.created(uri).build();
     }
 
+    //DELETE RESERVATION
     @DELETE
     @Path("/{restaurantId}/reservation/{reservationId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
@@ -526,6 +528,7 @@ public class RestaurantController {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
+    //CONFIRM RESERVATION
     @PUT
     @Path("/{restaurantId}/reservation/{reservationId}")
     @Produces(value = {MediaType.APPLICATION_JSON})

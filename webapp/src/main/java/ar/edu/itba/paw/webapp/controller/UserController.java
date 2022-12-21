@@ -24,6 +24,7 @@ import javax.ws.rs.core.*;
 import java.util.*;
 import java.net.URI;
 import java.util.stream.Collectors;
+import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
 
 
 @Path("users")
@@ -46,7 +47,6 @@ public class UserController {
     private UriInfo uriInfo;
 
     // UPDATE USER
-
     @PUT
     @Path("/edit")
     @Produces(value = { MediaType.APPLICATION_JSON})
@@ -54,8 +54,8 @@ public class UserController {
     public Response updateUser(final UserDto userDto, @Context HttpServletRequest request) {
         try {
             userService.updateUser(userDto.getUserId(), userDto.getUsername(),userDto.getPassword(), userDto.getFirstName(), userDto.getLastName(), userDto.getEmail(), userDto.getPhone());
-        } catch (Exception e) {
-            return Response.status(Response.Status.CONFLICT).header("error", e.getMessage()).build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.CONFLICT).header("error", "user does not exist").build();
         }
         final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(userDto.getUserId())).build();
         LOGGER.info("user updated: {}", uri);
@@ -65,7 +65,6 @@ public class UserController {
 
 
     //READ USER
-
     @GET
     @Path("/{userId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
@@ -78,6 +77,7 @@ public class UserController {
         }
     }
 
+    //READ USER RESTAURANTS
     @GET
     @Path("/restaurants")
     @Produces(value = {MediaType.APPLICATION_JSON})
@@ -99,6 +99,7 @@ public class UserController {
                 .build();
     }
 
+    //READ USER RESERVATIONS
     @GET
     @Path("/reservations")
     @Produces(value = {MediaType.APPLICATION_JSON})
