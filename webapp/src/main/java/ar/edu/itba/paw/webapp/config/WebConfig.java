@@ -21,18 +21,18 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.servlet.i18n.CookieLocaleResolver;
-import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
-import org.springframework.web.servlet.view.JstlView;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+//import org.springframework.web.servlet.LocaleResolver;
+//import org.springframework.web.servlet.ViewResolver;
+//import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+//import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+//import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+//import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+////import org.springframework.web.servlet.i18n.CookieLocaleResolver;
+//import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+//import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+////import org.springframework.web.servlet.view.InternalResourceViewResolver;
+////import org.springframework.web.servlet.view.JstlView;
+//import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
@@ -54,16 +54,16 @@ public class WebConfig {
   @Value("classpath:schema.sql")
   private Resource schemaSql;
 
-  @Bean
-  public ViewResolver viewResolver() {
-    final InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
-
-    viewResolver.setViewClass(JstlView.class);
-    viewResolver.setPrefix("/WEB-INF/jsp/");
-    viewResolver.setSuffix(".jsp");
-
-    return viewResolver;
-  }
+//  @Bean
+//  public ViewResolver viewResolver() {
+//    final InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
+//
+//    viewResolver.setViewClass(JstlView.class);
+//    viewResolver.setPrefix("/WEB-INF/jsp/");
+//    viewResolver.setSuffix(".jsp");
+//
+//    return viewResolver;
+//  }
 
   @Bean
   public DataSource dataSource() {
@@ -77,13 +77,7 @@ public class WebConfig {
     // paw server
 //    ds.setUrl("jdbc:postgresql://10.16.1.110/paw-2021a-09");
 //    ds.setUsername("paw-2021a-09");
-//    ds.setPassword("6jnqLFj1g");
-
-    // remote testing database (very slow)
-
-    // ds.setUrl("jdbc:postgresql://santire.heliohost.us/santire_paw");
-    // ds.setUsername("santire_root");
-    // ds.setPassword("santire_root");
+//    ds.setPassword("6jnqLFj1g"
 
     return ds;
   }
@@ -167,23 +161,23 @@ public class WebConfig {
 
 
 
-  @Bean
-  public LocaleResolver localeResolver() {
-    CookieLocaleResolver clr = new CookieLocaleResolver();
-    return clr;
-  }
+//  @Bean
+//  public LocaleResolver localeResolver() {
+//    CookieLocaleResolver clr = new CookieLocaleResolver();
+//    return clr;
+//  }
 
-  @Bean
-  public WebMvcConfigurer configurer(){
-    return new WebMvcConfigurerAdapter() {
-      @Override
-      public void addInterceptors (InterceptorRegistry registry) {
-        LocaleChangeInterceptor l = new LocaleChangeInterceptor();
-        l.setParamName("lang");
-        registry.addInterceptor(l);
-      }
-    };
-  }
+//  @Bean
+//  public WebMvcConfigurer configurer(){
+//    return new WebMvcConfigurerAdapter() {
+//      @Override
+//      public void addInterceptors (InterceptorRegistry registry) {
+//        LocaleChangeInterceptor l = new LocaleChangeInterceptor();
+//        l.setParamName("lang");
+//        registry.addInterceptor(l);
+//      }
+//    };
+//  }
 
   @Bean
   public LocalContainerEntityManagerFactoryBean entityManagerFactory() {

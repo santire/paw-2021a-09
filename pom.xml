@@ -20,28 +20,28 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <spring.version>4.2.5.RELEASE</spring.version>
-        <thymeleaf.version>3.0.12.RELEASE</thymeleaf.version>
+        <thymeleaf.version>3.0.13.RELEASE</thymeleaf.version>
         <email.version>1.6.4</email.version>
         <servlet-api.version>2.5</servlet-api.version>
         <validation-api.version>1.0.0.GA</validation-api.version>
-        <hibernate-validator.version>4.3.1.Final</hibernate-validator.version>
+        <hibernate-validator.version>4.3.2.Final</hibernate-validator.version>
         <jstl.version>1.2</jstl.version>
-        <org.postgresql.version>42.2.5</org.postgresql.version>
+        <org.postgresql.version>42.2.27</org.postgresql.version>
         <org.hibernate.version>5.1.0.Final</org.hibernate.version>
         <org.hibernate.jpa.version>1.0.0.Final</org.hibernate.jpa.version>
         <mockito.version>2.25.1</mockito.version>
-        <junit.version>4.11</junit.version>
+        <junit.version>4.13.1</junit.version>
         <hsqldb.version>2.3.1</hsqldb.version>
         <org.slf4j.version>1.7.5</org.slf4j.version>
         <logback.version>1.1.2</logback.version>
         <logback-ext-spring.version>0.1.1</logback-ext-spring.version>
-        <spring-security.version>4.0.4.RELEASE</spring-security.version>
+        <spring-security.version>4.1.1.RELEASE</spring-security.version>
         <commons-fileupload.version>1.4</commons-fileupload.version>
         <jersey.version>3.0-SNAPSHOT</jersey.version>
         <jwt.version>0.11.1</jwt.version>
         <io.jsonwebtoken.jjwt.version>0.7.0</io.jsonwebtoken.jjwt.version>
-        <org.json>20171018</org.json>
-        <jackson.version>2.8.7</jackson.version>
+        <org.json>20220320</org.json>
+        <jackson.version>2.14.0</jackson.version>
     </properties>
 
     <modules>
@@ -125,22 +125,22 @@
 
 
 
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-webmvc</artifactId>
-                <version>${spring.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.springframework</groupId>-->
+<!--                <artifactId>spring-context</artifactId>-->
+<!--                <version>${spring.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.springframework</groupId>-->
+<!--                <artifactId>spring-webmvc</artifactId>-->
+<!--                <version>${spring.version}</version>-->
+<!--                <exclusions>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>commons-logging</groupId>-->
+<!--                        <artifactId>commons-logging</artifactId>-->
+<!--                    </exclusion>-->
+<!--                </exclusions>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-jdbc</artifactId>
@@ -233,11 +233,11 @@
                 <artifactId>servlet-api</artifactId>
                 <version>${servlet-api.version}</version>
             </dependency>
-            <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>jstl</artifactId>
-                <version>${jstl.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>javax.servlet</groupId>-->
+<!--                <artifactId>jstl</artifactId>-->
+<!--                <version>${jstl.version}</version>-->
+<!--            </dependency>-->
             <!-- Testing -->
             <dependency>
                 <groupId>org.mockito</groupId>
