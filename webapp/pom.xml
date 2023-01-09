@@ -216,7 +216,7 @@
               <arguments>install</arguments>
             </configuration>
           </execution>
-          <execution>
+          <!-- <execution>
             <id>yarn build</id>
             <goals>
               <goal>yarn</goal>
@@ -224,7 +224,7 @@
             <configuration>
               <arguments>build</arguments>
             </configuration>
-          </execution>
+          </execution> -->
         </executions>
         <configuration>
           <workingDirectory>${basedir}/spa/</workingDirectory>

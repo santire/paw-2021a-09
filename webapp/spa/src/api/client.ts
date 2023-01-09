@@ -1,4 +1,5 @@
 import axios from "axios";
+import { TokenProvider } from "../utils/TokenProvider";
 export const apiClient = axios.create({
   baseURL: process.env.REACT_APP_HOST_API || "http://localhost:8080",
   paramsSerializer: {
@@ -10,12 +11,10 @@ apiClient.defaults.headers.common["Content-Type"] = "application/json";
 apiClient.defaults.headers.common["Authorization"] = authHeader().Authorization;
 
 function authHeader() {
-  const authStr = localStorage.getItem("auth");
-  let auth = null;
-  if (authStr) auth = JSON.parse(authStr);
+  const token = TokenProvider.getInstance().getToken();
 
-  if (auth && auth.token) {
-    return { Authorization: "Bearer " + auth.token };
+  if (token) {
+    return { Authorization: "Bearer " + token };
   } else {
     return { Authorization: "" };
   }

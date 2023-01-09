@@ -12,6 +12,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { ResetPage } from "./pages/ResetPage";
 import { RestaurantPage } from "./pages/RestaurantPage";
+import { RegisterRestaurantPage } from "./pages/RegisterRestaurantPage";
 
 const queryClient = new QueryClient();
 const basename = process.env.REACT_APP_CONTEXT || "";
@@ -33,6 +34,10 @@ const router = createBrowserRouter(
         {
           path: "/restaurants/:restaurantId",
           element: <RestaurantPage />,
+        },
+        {
+          path: "/restaurants/register",
+          element: <RegisterRestaurantPage />
         },
         {
           path: "/login",

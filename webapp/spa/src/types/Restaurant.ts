@@ -3,17 +3,17 @@ export interface Restaurant {
   name: string;
   address: string;
   phoneNumber: string;
-  likes: number;
-  rating: number;
+  likes?: number;
+  rating?: number;
   facebook: string;
   instagram: string;
   twitter: string;
   tags: string[];
 
-  menu: string;
-  reviews: string;
+  menu?: string;
+  reviews?: string;
   image: string;
-  owner: string;
+  owner?: string;
 }
 
 export interface PaginatedRestaurants {

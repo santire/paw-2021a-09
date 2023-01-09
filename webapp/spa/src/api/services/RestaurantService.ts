@@ -19,6 +19,12 @@ export const NO_FILTER: FilterParams = {
   pageAmount: 10,
 };
 
+export async function registerRestaurant(restaurant : Restaurant) {
+  const url = `${BASE_PATH}`;
+  const response = await apiClient.post<Restaurant>(url);
+  return response.data;
+}
+
 export async function getRestaurantById(id: string) {
   const url = `${BASE_PATH}/${id}`;
   const response = await apiClient.get<Restaurant>(url);
