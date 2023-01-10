@@ -186,6 +186,38 @@
         "placeholder": "1123456789"
       },
       "submit": "Register"
+    },
+    "registerRestaurant" : {
+      "loginDivider": "Basic information",
+      "contactDivider": "Contact Information",
+      "socialMediaDivider": "Social Media",
+      "title": "Register a restaurant",
+      "tagsDivider": "Tags",
+      "profileImage": "Profile Image",
+      "name": {
+        "label": "Restaurant name",
+        "placeholder": "Your restaurant name"
+      },
+      "address": {
+        "label": "Address",
+        "placeholder": "Av. Siempreviva 123"
+      },
+      "phone": {
+        "label": "Phone number",
+        "placeholder": "1123456789"
+      },
+      "facebook": {
+        "label": "Facebook",
+        "placeholder": "facebook.com/yourSite"
+      },
+      "instagram": {
+        "label": "Instagram",
+        "placeholder": "instagram.com/yourSite"
+      },
+      "twitter": {
+        "label": "Twitter",
+        "placeholder": "twitter.com/yourSite"
+      }
     }
   },
   "tags": {

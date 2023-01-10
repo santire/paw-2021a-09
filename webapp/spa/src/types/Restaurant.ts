@@ -5,9 +5,9 @@ export interface Restaurant {
   phoneNumber: string;
   likes?: number;
   rating?: number;
-  facebook: string;
-  instagram: string;
-  twitter: string;
+  facebook?: string;
+  instagram?: string;
+  twitter?: string;
   tags: string[];
 
   menu?: string;
