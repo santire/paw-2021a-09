@@ -3,8 +3,10 @@ export default createStyles((theme) => {
   const BREAKPOINT = theme.fn.smallerThan("sm");
 
   return {
+
     wrapper: {
       display: "flex",
+      maxWidth: '1000px',
       backgroundColor:
         theme.colorScheme === "dark" ? theme.colors.dark[6] : theme.white,
       borderRadius: theme.radius.lg,
@@ -20,6 +22,12 @@ export default createStyles((theme) => {
       },
     },
 
+    imageContainer: {
+      display: "flex",
+      alignItems: "center"
+    },
+    
+
     form: {
       boxSizing: "border-box",
       flex: 1,
@@ -34,7 +42,7 @@ export default createStyles((theme) => {
     },
 
     fields: {
-      marginTop: -12,
+      marginTop: 30,
     },
 
     fieldInput: {

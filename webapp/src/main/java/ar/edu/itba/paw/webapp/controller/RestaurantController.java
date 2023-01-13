@@ -15,7 +15,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import ar.edu.itba.paw.service.UserService;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -263,6 +262,7 @@ public class RestaurantController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = { MediaType.APPLICATION_JSON})
     public Response registerRestaurant(final RestaurantDto restaurantDto, @Context HttpServletRequest request) {
+        LOGGER.info("Registering restaurant: " + restaurantDto);
         Optional<User> user = getLoggedUser(request);
         if(!user.isPresent()){
             LOGGER.error("anon user attempt to register a restaurant");

@@ -20,8 +20,9 @@ export const NO_FILTER: FilterParams = {
 };
 
 export async function registerRestaurant(restaurant : Restaurant) {
+  console.log(restaurant);
   const url = `${BASE_PATH}`;
-  const response = await apiClient.post<Restaurant>(url);
+  const response = await apiClient.post<Restaurant>(url, restaurant);
   return response.data;
 }
 
