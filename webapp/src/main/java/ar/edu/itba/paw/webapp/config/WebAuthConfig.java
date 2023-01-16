@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -116,8 +115,9 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
         return new OrRequestMatcher(
                 new AntPathRequestMatcher("/api/hello/me", "GET"),
                 new AntPathRequestMatcher("/api/users/*", "GET"),
-                optionalAuthEndpointsMatcher()
-                //adminEndpointsMatcher()
+                new AntPathRequestMatcher("/api/restaurants", "POST"),
+                optionalAuthEndpointsMatcher(),
+                adminEndpointsMatcher()
         );
     }
 
@@ -132,12 +132,12 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
         );
     }
 
-//    @Bean
-//    public RequestMatcher adminEndpointsMatcher() {
-//        return new OrRequestMatcher(
-//                new AntPathRequestMatcher("/admin/*", "GET")
-//        );
-//    }
+   @Bean
+   public RequestMatcher adminEndpointsMatcher() {
+       return new OrRequestMatcher(
+               new AntPathRequestMatcher("/api/admin/*", "GET")
+       );
+   }
 
     @Override
     public void configure(WebSecurity web) throws Exception{

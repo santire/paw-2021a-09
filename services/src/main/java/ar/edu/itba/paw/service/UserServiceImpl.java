@@ -144,6 +144,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public Optional<User> findByEmail(String email) {
+    if (email == null) return Optional.empty();
     return userDao.findByEmail(email);
   }
 

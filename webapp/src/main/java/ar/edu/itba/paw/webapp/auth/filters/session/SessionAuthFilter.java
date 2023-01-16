@@ -38,8 +38,8 @@ public class SessionAuthFilter extends AbstractAuthenticationProcessingFilter {
     private static final RequestMatcher logOutEndpointMatcher
             = new AntPathRequestMatcher("/api/logout", HttpMethod.POST);
 
-    private static final String RESTAURANT_OWNER = "ROLE_RESTAURANTOWNER";
     private static final String USER = "ROLE_USER";
+    private static final String ADMIN = "ROLE_ADMIN";
 
     @Autowired
     private JWTUtility jwtUtility;
@@ -50,8 +50,8 @@ public class SessionAuthFilter extends AbstractAuthenticationProcessingFilter {
     @Autowired
     private RequestMatcher optionalAuthEndpointsMatcher;
 
-//    @Autowired
-//    private RequestMatcher adminEndpointsMatcher;
+    @Autowired
+    private RequestMatcher adminEndpointsMatcher;
 
 
     public SessionAuthFilter() {
@@ -65,6 +65,7 @@ public class SessionAuthFilter extends AbstractAuthenticationProcessingFilter {
         Authentication auth;
         Optional<JWTUsernamePasswordAuthToken> token = getRequestToken(httpServletRequest);
         if (!token.isPresent()) {
+            LOGGER.info("TOKEN IS NOT PRESENT");
             if (optionalAuthEndpointsMatcher.matches(httpServletRequest)) {
                 LOGGER.info("Anonymous access is given");
                 auth = new AnonymousAuthenticationToken("ANONYMOUS",
@@ -76,13 +77,12 @@ public class SessionAuthFilter extends AbstractAuthenticationProcessingFilter {
         }
         else {
             LOGGER.info("Provide session with JWT access");
-            LOGGER.info("Provided BEARER TOKEN is: {}", token.get());
+            LOGGER.info("Provided BEARER TOKEN is: {}", token.get().getToken());
             auth = getAuthenticationManager().authenticate(token.get());
-//            if(adminEndpointsMatcher.matches(httpServletRequest)){
-//                LOGGER.info("Provide session with JWT access - RESTAURANT OWNER");
-//                if(isRestaurantOwner(auth))
-//                    return auth;
-//            }
+            if(adminEndpointsMatcher.matches(httpServletRequest)){
+                LOGGER.info("Provide session with JWT access - ADMIN AUTH NEEDED");
+                isAdmin(auth);
+            }
             if(needAuthEndpointsMatcher.matches(httpServletRequest)){
                 LOGGER.info("Provide session with JWT access - AUTH NEEDED");
                 isAuthenticated(auth);
@@ -90,16 +90,18 @@ public class SessionAuthFilter extends AbstractAuthenticationProcessingFilter {
         }
         return auth;
     }
+
     private boolean isAuthenticated(Authentication auth){
-        if(!auth.getAuthorities().contains(new SimpleGrantedAuthority(RESTAURANT_OWNER))
-                && !auth.getAuthorities().contains(new SimpleGrantedAuthority(USER))){
+        if(!auth.getAuthorities().contains(new SimpleGrantedAuthority(USER))
+                && !auth.getAuthorities().contains(new SimpleGrantedAuthority(ADMIN))){
             throw new UnauthorizedException("User not authenticated");
         }
         return true;
     }
-    private boolean isRestaurantOwner(Authentication auth){
-        if(!auth.getAuthorities().contains(new SimpleGrantedAuthority(RESTAURANT_OWNER))){
-            throw new UnauthorizedException("It is not a restaurant owner");
+
+    private boolean isAdmin(Authentication auth){
+        if(!auth.getAuthorities().contains(new SimpleGrantedAuthority(ADMIN))){
+            throw new UnauthorizedException("User not admin");
         }
         return true;
     }

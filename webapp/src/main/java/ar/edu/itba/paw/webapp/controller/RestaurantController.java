@@ -6,9 +6,11 @@ import javax.ws.rs.core.*;
 import ar.edu.itba.paw.service.*;
 import ar.edu.itba.paw.webapp.dto.*;
 import ar.edu.itba.paw.webapp.utils.CachingUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import java.net.URI;
 import java.util.*;
@@ -25,7 +27,7 @@ import java.io.IOException;
 @Path("/restaurants")
 public class RestaurantController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
     private static final int AMOUNT_OF_MENU_ITEMS = 8;
     private static final int MAX_AMOUNT_PER_PAGE = 10;
     private static final int AMOUNT_OF_REVIEWS = 4;
@@ -262,7 +264,7 @@ public class RestaurantController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = { MediaType.APPLICATION_JSON})
     public Response registerRestaurant(final RestaurantDto restaurantDto, @Context HttpServletRequest request) {
-        LOGGER.info("Registering restaurant: " + restaurantDto);
+        LOGGER.info("Registering restaurant: " + restaurantDto.toString());
         Optional<User> user = getLoggedUser(request);
         if(!user.isPresent()){
             LOGGER.error("anon user attempt to register a restaurant");
@@ -270,8 +272,12 @@ public class RestaurantController {
         }
 
         LOGGER.debug("Creating restaurant for user {}", user.get().getUsername());
-        List<Tags> tagList = restaurantDto.getTags().stream().map(t -> Tags.valueOf(t.getValue())).collect(Collectors.toList());
-        LOGGER.debug("tags: {}", tagList);
+        List<Tags> tagList = new ArrayList<>();
+        if(restaurantDto.getTags() != null){
+            tagList = restaurantDto.getTags().stream().map(t -> Tags.valueOf(t)).collect(Collectors.toList());
+            LOGGER.debug("tags: {}", tagList);
+        }
+        
         final Restaurant restaurant = restaurantService.registerRestaurant(restaurantDto.getName(), restaurantDto.getAddress(),
                 restaurantDto.getPhoneNumber(), tagList, user.get());
         //updateAuthorities();
@@ -554,8 +560,8 @@ public class RestaurantController {
 
     @ModelAttribute("loggedUser")
     public Optional<User> getLoggedUser(HttpServletRequest request){
-        return userService.findByUsername(request.getRemoteUser());
+        LOGGER.info("USER: " + SecurityContextHolder.getContext().getAuthentication().getName());
+        return userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
     }
-
 
 }

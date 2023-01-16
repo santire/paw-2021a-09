@@ -9,9 +9,13 @@ import org.springframework.security.authentication.dao.AbstractUserDetailsAuthen
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class JWTUserDetailsAuthProvider extends AbstractUserDetailsAuthenticationProvider {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JWTUserDetailsAuthProvider.class);
+
     @Autowired
     private JWTUtility jwtUtility;
 
@@ -46,6 +50,7 @@ public class JWTUserDetailsAuthProvider extends AbstractUserDetailsAuthenticatio
         if (username == null) {
             throw new MalformedTokenException("The TOKEN username is not present");
         }
+        LOGGER.info("Username from token is: " + username);
         return pawUserDetailsService.loadUserByUsername(username);
     }
 }

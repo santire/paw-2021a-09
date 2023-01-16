@@ -21,8 +21,8 @@ import * as z from "zod";
 import { registerRestaurant } from "../../api/services";
 import { register as registerUser } from "../../api/services/AuthService";
 import useStyles from "./RegisterRestaurantForm.styles";
-import { useRef, useState } from "react";
-import { Restaurant, tags } from "../../types";
+import { useEffect, useRef, useState } from "react";
+import { getTags, Restaurant } from "../../types";
 
 const registerSchema = z
   .object({
@@ -54,6 +54,12 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
   const { t } = useTranslation();
   const [_, setSearchParams] = useSearchParams();
   const [selectedChips, setSelectedChips] = useState<string[]>([]);
+  const [allTags, setAllTags] = useState<string[]>([]);
+
+  useEffect(() => {
+    getTags().then((tags) => setAllTags(tags));
+  }, []);
+
 
   const [files, setFiles] = useState<FileWithPath[]>([]);
 
@@ -77,6 +83,7 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
     reset,
     resetField,
     formState: { errors },
+    setValue
   } = useForm<RegisterRestaurantForm>({
     mode: "onTouched",
     resolver: zodResolver(registerSchema),
@@ -93,14 +100,11 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
     }
   };
 
-  // const processForm = async () => {
-  //   console.log("Hello from processForm");
-  // };
-
   const handleChipChange = (chipValues: string[]) => {
     setSelectedChips(chipValues);
-    register('tags');
+    setValue("tags", chipValues);
   };
+
   
 
   return (
@@ -172,7 +176,6 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
               onReject={(files) => console.log('rejected files', files)}
               maxSize={3 * 1024 ** 2}
               accept={IMAGE_MIME_TYPE}
-              {...props}
               {...register("image")}
             >
               <SimpleGrid
@@ -184,8 +187,8 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
             </Dropzone>
             <Divider my="xs" label={t("pages.registerRestaurant.tagsDivider")} />
             <Chip.Group position="center" multiple mt={15} mb="xl" onChange={handleChipChange}>
-              {tags.map(tag => (
-                <Chip value={tag}>{t(`tags.${tag}`)}</Chip>
+              {allTags.map(tag => (
+                <Chip value={tag}>{t(`${tag}`)}</Chip>
               ))}
             </Chip.Group>
           </div>

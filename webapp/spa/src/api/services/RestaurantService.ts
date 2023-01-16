@@ -32,6 +32,12 @@ export async function getRestaurantById(id: string) {
   return response.data;
 }
 
+export async function getRestaurantTags() {
+  const url = `${BASE_PATH}/tags`;
+  const response = await apiClient.get<string[]>(url);
+  return response.data;
+}
+
 export async function getRestaurants(params = NO_FILTER) {
   const url = `${BASE_PATH}/`;
   const response = await apiClient.get<Restaurant[]>(url, { params });
