@@ -62,21 +62,7 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
 
 
   const [files, setFiles] = useState<FileWithPath[]>([]);
-
-
-  const previews = files.map((file, index) => {
-    const imageUrl = URL.createObjectURL(file);
-    return (
-      <div className={classes.imageContainer}>
-        <Image
-          key={index}
-          src={imageUrl}
-          imageProps={{ onLoad: () => URL.revokeObjectURL(imageUrl) }}
-        />
-      </div>
-    );
-  });
-
+  
   const {
     register,
     handleSubmit,
@@ -88,6 +74,27 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
     mode: "onTouched",
     resolver: zodResolver(registerSchema),
   });
+  
+  const previews = files.map((file, index) => {
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const imageUrl = reader.result;
+      setValue("image", imageUrl);
+    }
+    const imageURL = URL.createObjectURL(file);
+    return (
+      <div className={classes.imageContainer}>
+        <Image
+          key={index}
+          src={imageURL}
+          className="imageMaxSize"
+          imageProps={{ onLoad: () => URL.revokeObjectURL(imageURL) }}
+        />
+      </div>
+    );
+  });
+
 
   const processForm = async (data: RegisterRestaurantForm) => {
     const {...restaurant } = data;
@@ -175,8 +182,9 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
               onDrop={setFiles}
               onReject={(files) => console.log('rejected files', files)}
               maxSize={3 * 1024 ** 2}
+              maxFiles={1}
+              multiple={false}
               accept={IMAGE_MIME_TYPE}
-              {...register("image")}
             >
               <SimpleGrid
                 breakpoints={[{ maxWidth: 'sm', cols: 1}]}

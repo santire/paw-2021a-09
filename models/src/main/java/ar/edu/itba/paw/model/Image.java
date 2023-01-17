@@ -51,6 +51,12 @@ public class Image {
         this.data = data;
     }
 
+    public Image(final String base64) throws UnsupportedEncodingException{
+        this.imageId = null;
+        byte[] temp = Base64.getEncoder().encode(base64.getBytes());
+        this.data = Base64.getDecoder().decode(new String(temp).getBytes("UTF-8"));
+    }
+
     public Long getImageId(){ return this.imageId; }
     public byte[] getData(){ return this.data; }
     public String getImageEncoded() throws IOException{
@@ -68,5 +74,7 @@ public class Image {
     public void setImageId(Long imageId) { this.imageId = imageId; }
     public void setData(byte[] data) { this.data = data; }
     public void setRestaurant(Restaurant restaurant) { this.restaurant = restaurant; }
+
+
 
 }

@@ -22,6 +22,12 @@ export default createStyles((theme) => {
       },
     },
 
+    imageMaxSize: {
+      width: '10px',
+      height: '10px',
+      objectFit: 'contain'
+    },
+
     imageContainer: {
       display: "flex",
       alignItems: "center"
@@ -98,5 +104,6 @@ export default createStyles((theme) => {
         flex: 1,
       },
     },
+    
   };
 });

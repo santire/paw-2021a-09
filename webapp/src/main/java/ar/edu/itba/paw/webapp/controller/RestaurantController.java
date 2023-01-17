@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 
 
@@ -280,7 +281,6 @@ public class RestaurantController {
         
         final Restaurant restaurant = restaurantService.registerRestaurant(restaurantDto.getName(), restaurantDto.getAddress(),
                 restaurantDto.getPhoneNumber(), tagList, user.get());
-        //updateAuthorities();
 
         if (restaurantDto.getFacebook() != null){
             socialMediaService.updateFacebook(restaurantDto.getFacebook(), restaurant.getId());
@@ -292,10 +292,16 @@ public class RestaurantController {
             socialMediaService.updateTwitter(restaurantDto.getTwitter(), restaurant.getId());
         }
 
-        //if (imageDto.getData() != null) {
-        //    Image image = new Image(imageDto.getData());
-        //    restaurantService.setImageByRestaurantId(image, restaurant.getId());
-        //}
+        if(restaurantDto.getImage() != null){
+            Image image = null;
+            try {
+                image = new Image(restaurantDto.getImage());
+                restaurantService.setImageByRestaurantId(image, restaurant.getId());
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        } 
+
         final URI uri = uriInfo.getAbsolutePathBuilder()
                 .path(String.valueOf(restaurant.getId())).build();
         LOGGER.info("Restaurant created in : " + uri);
@@ -331,7 +337,7 @@ public class RestaurantController {
     @GET
     @Path("/{restaurantId}/image")
     @Produces("image/jpg")
-    public Response getEventImage(@PathParam("restaurantId") final long restaurantId) throws IOException {
+    public Response getRestaurantImage(@PathParam("restaurantId") final long restaurantId) throws IOException {
         CacheControl cache = CachingUtils.getCaching(CachingUtils.HOUR_TO_SEC);
         Date expireDate = CachingUtils.getExpirationDate(CachingUtils.HOUR_TO_SEC);
         final Optional<Restaurant> maybeRestaurant = restaurantService.findById(restaurantId);
@@ -345,7 +351,7 @@ public class RestaurantController {
                         .cacheControl(cache).expires(expireDate).build();
             }
             else{
-                final Image defaultImage = new Image(null);
+                final Image defaultImage = new Image((byte[])null);
                 LOGGER.info("Restaurant Image not found. Placeholder is used");
                 return Response.ok(defaultImage.getDataFromPlaceholder())
                         .cacheControl(cache).expires(expireDate).build();
