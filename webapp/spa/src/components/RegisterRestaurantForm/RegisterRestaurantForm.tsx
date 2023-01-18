@@ -16,13 +16,18 @@ import { IconUpload, IconPhoto, IconX } from '@tabler/icons';
 import { Dropzone, DropzoneProps, IMAGE_MIME_TYPE, FileWithPath } from '@mantine/dropzone';
 
 import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import * as z from "zod";
-import { registerRestaurant } from "../../api/services";
+import { isRestaurantNameAvailable, registerRestaurant } from "../../api/services";
 import { register as registerUser } from "../../api/services/AuthService";
 import useStyles from "./RegisterRestaurantForm.styles";
 import { useEffect, useRef, useState } from "react";
 import { getTags, Restaurant } from "../../types";
+
+
+const facebookRegex = /^(https?:\/\/)?facebook\.com\/.*$/;
+const instagramRegex = /^(https?:\/\/)?instagram\.com\/.*$/;
+const twitterRegex = /^(https?:\/\/)?twitter\.com\/.*$/;
 
 const registerSchema = z
   .object({
@@ -34,17 +39,48 @@ const registerSchema = z
       .max(15)
       .regex(/[0-9]+/),
       facebook: z.string().max(100)
-        .regex(/^(https?:\/\/)?facebook\.com\/.*$/)
         .optional(),
       instagram: z.string().max(100)
-        .regex(/^(https?:\/\/)?instagram\.com\/.*$/)
         .optional(),
       twitter: z.string().max(100)
-        .regex(/^(https?:\/\/)?twitter\.com\/.*$/)
         .optional(),
       image: z.any(),
       tags: z.string().array().min(3)
-  });
+  })
+  .superRefine(async ({ facebook, instagram, twitter }, ctx) => {
+    if (facebook && !facebookRegex.test(facebook)) {
+      ctx.addIssue({
+        path: ["facebook"],
+        code: "custom",
+        message: "Invalid Facebook URL",
+      });
+    }
+    if (instagram && !instagramRegex.test(instagram)) {
+      ctx.addIssue({
+        path: ["instagram"],
+        code: "custom",
+        message: "Invalid Instagram URL",
+      });
+    }
+    if (twitter && !twitterRegex.test(twitter)) {
+      ctx.addIssue({
+        path: ["twitter"],
+        code: "custom",
+        message: "Invalid Twitter URL",
+      });
+    }
+  })
+  // .superRefine(async ({ name }, ctx) => {
+  //   const isNameAvailable = await isRestaurantNameAvailable(name);
+  //   if (!isNameAvailable) {
+  //     ctx.addIssue({
+  //       path: ["name"],
+  //       code: "custom",
+  //       message: "The restaurant name is already taken",
+  //     });
+  //   }
+  // })
+  ;
 
 type RegisterRestaurantForm = z.infer<typeof registerSchema>;
 
@@ -52,7 +88,8 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
   const theme = useMantineTheme();
   const { classes } = useStyles();
   const { t } = useTranslation();
-  const [_, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+
   const [selectedChips, setSelectedChips] = useState<string[]>([]);
   const [allTags, setAllTags] = useState<string[]>([]);
 
@@ -62,6 +99,8 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
 
 
   const [files, setFiles] = useState<FileWithPath[]>([]);
+  const [showMessage, setShowMessage] = useState(true);
+
   
   const {
     register,
@@ -69,7 +108,8 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
     reset,
     resetField,
     formState: { errors },
-    setValue
+    setValue,
+    setError
   } = useForm<RegisterRestaurantForm>({
     mode: "onTouched",
     resolver: zodResolver(registerSchema),
@@ -86,9 +126,10 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
     return (
       <div className={classes.imageContainer}>
         <Image
+          width='200px'
+          height='200px'
           key={index}
           src={imageURL}
-          className="imageMaxSize"
           imageProps={{ onLoad: () => URL.revokeObjectURL(imageURL) }}
         />
       </div>
@@ -98,12 +139,25 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
 
   const processForm = async (data: RegisterRestaurantForm) => {
     const {...restaurant } = data;
-    console.log({...restaurant})
     try {
-      await registerRestaurant({...restaurant})
-      reset();
+      const isNameAvailable = await isRestaurantNameAvailable(restaurant.name);
+      if (isNameAvailable) {
+        console.log(isNameAvailable)
+        console.log({...restaurant})
+        await registerRestaurant({...restaurant})
+        reset();
+        // TODO: Navigate to restaurant page
+        navigate('/');
+      }
+      else{
+        setError("name", {
+          type: "custom",
+          message: "The restaurant name is already taken"
+        });    
+        setValue("name", restaurant.name);
+      }
     } catch (e) {
-      console.error(e);
+      //console.error(e);
     }
   };
 
@@ -111,6 +165,14 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
     setSelectedChips(chipValues);
     setValue("tags", chipValues);
   };
+
+  const uploadMsg = () => {
+    <IconUpload
+    size={50}
+    stroke={1.5}
+    color={theme.colors[theme.primaryColor][theme.colorScheme === 'dark' ? 4 : 6]}
+  />
+  }
 
   
 
@@ -177,23 +239,52 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
               />
             </SimpleGrid>
             <Divider my="xs" label={t("pages.registerRestaurant.profileImage")} />
+
             <Dropzone
               mb="md"
-              onDrop={setFiles}
+              onDrop={(files) => {
+                setFiles(files);
+                setShowMessage(false);
+              }}
               onReject={(files) => console.log('rejected files', files)}
               maxSize={3 * 1024 ** 2}
               maxFiles={1}
               multiple={false}
               accept={IMAGE_MIME_TYPE}
+              sx={(theme) => ({
+                minHeight: 120,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                border: 0,
+                backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+        
+                '&[data-accept]': {
+                  color: theme.white,
+                  backgroundColor: theme.colors.blue[6],
+                },
+        
+                '&[data-reject]': {
+                  color: theme.white,
+                  backgroundColor: theme.colors.red[6],
+                },
+              })}
             >
-              <SimpleGrid
-                breakpoints={[{ maxWidth: 'sm', cols: 1}]}
-                mt={previews.length > 0 ? 'sm' : 0}
-              >
-                {previews}
-              </SimpleGrid>
+              {showMessage && 
+              <div className={classes.imageContainer}>
+                <IconPhoto size={70} stroke={1.5}/>
+                <Text size="lg" inline  >
+                  {t("pages.registerRestaurant.dropImage")}
+                </Text>
+              </div>
+              }
+              {previews}
             </Dropzone>
+
             <Divider my="xs" label={t("pages.registerRestaurant.tagsDivider")} />
+            <Text size="xl" inline className={classes.tagsText}>
+                  {t("pages.registerRestaurant.tagsSelection")}
+            </Text>
             <Chip.Group position="center" multiple mt={15} mb="xl" onChange={handleChipChange}>
               {allTags.map(tag => (
                 <Chip value={tag}>{t(`${tag}`)}</Chip>

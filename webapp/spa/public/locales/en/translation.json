@@ -194,6 +194,8 @@
       "title": "Register a restaurant",
       "tagsDivider": "Tags",
       "profileImage": "Profile Image",
+      "dropImage": "Drop images here ir click to select files",
+      "tagsSelection": "At least 3 tags are required",
       "name": {
         "label": "Restaurant name",
         "placeholder": "Your restaurant name"

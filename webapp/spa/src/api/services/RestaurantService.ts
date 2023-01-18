@@ -26,6 +26,13 @@ export async function registerRestaurant(restaurant : Restaurant) {
   return response.data;
 }
 
+export async function isRestaurantNameAvailable(name : string){
+  const url = `${BASE_PATH}/` + name;
+  const response = await apiClient.head<string>(url);
+  //console.log(response.status);
+  return response.status === 204;
+}
+
 export async function getRestaurantById(id: string) {
   const url = `${BASE_PATH}/${id}`;
   const response = await apiClient.get<Restaurant>(url);

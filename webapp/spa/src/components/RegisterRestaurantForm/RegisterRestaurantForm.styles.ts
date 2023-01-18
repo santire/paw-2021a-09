@@ -23,14 +23,15 @@ export default createStyles((theme) => {
     },
 
     imageMaxSize: {
-      width: '10px',
-      height: '10px',
-      objectFit: 'contain'
+      width: '100px',
+      height: '100px',
     },
 
     imageContainer: {
       display: "flex",
-      alignItems: "center"
+      alignItems: "center",
+      maxHeight:'200px',
+      maxWidth:'1000px'
     },
     
 
@@ -104,6 +105,13 @@ export default createStyles((theme) => {
         flex: 1,
       },
     },
+
+    tagsText : {
+      fontSize: 14,
+      color: 'grey',
+      fontFamily: 'sans-serif',
+      marginBottom: 20
+    }
     
   };
 });

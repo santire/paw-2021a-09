@@ -14,6 +14,8 @@ public interface RestaurantDao {
 
     // READ
     public Optional<Restaurant> findById(long id);
+    public Boolean findByName(String name);
+
     public Optional<Restaurant> findByIdWithMenu(int page, int amountOnPage, long id);
     public int findByIdWithMenuPageCount(int amountOnPage, long id);
 
