@@ -95,6 +95,7 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
   const [allTags, setAllTags] = useState<string[]>([]);
 
   useEffect(() => {
+    if(allTags.length === 0)
     getTags().then((tags) => setAllTags(tags));
   }, []);
 
@@ -136,6 +137,7 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
       </div>
     );
   });
+
 
 
   const processForm = async (data: RegisterRestaurantForm) => {
@@ -296,7 +298,7 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
             </Text>
             <Chip.Group position="center" multiple mt={15} mb="xl" onChange={handleChipChange}>
               {allTags.map(tag => (
-                <Chip value={tag}>{t(`${tag}`)}</Chip>
+                <Chip>{t("tags." + tag)}</Chip>
               ))}
             </Chip.Group>
           </div>

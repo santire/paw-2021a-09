@@ -28,7 +28,7 @@ export const getTags = async () => {
     const data = await getRestaurantTags()
     return data;
   } catch (e) {
-    console.error(e);
+    //console.error(e);
     return [];
   }
 }
