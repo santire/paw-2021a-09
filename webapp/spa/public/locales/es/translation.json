@@ -181,44 +181,40 @@
         "label": "Número de teléfono",
         "placeholder": "1123456789"
       },
-      "submit": "Regitrarse"
+      "submit": "Registrarse"
     },
     "registerRestaurant" : {
-      "loginDivider": "Login Information",
-      "contactDivider": "Contact Information",
-      "title": "Register a restaurant",
-      "subtitle": "Please register",
-      "confirmation": {
-        "title": "You're almost done!",
-        "subtitle": "Follow the instructions sent to your email to activate your account"
+      "loginDivider": "General",
+      "contactDivider": "Información de contacto",
+      "socialMediaDivider": "Redes Sociales",
+      "title": "Registre su restaurante",
+      "tagsDivider": "Categoría",
+      "profileImage": "Imagen de perfil",
+      "dropImage": "Arrastre las imagenes aquí o haga click para seleccionar un archivo",
+      "tagsSelection": "Al menos 3 categorías son requeridas",
+      "name": {
+        "label": "Nombre del restaurante",
+        "placeholder": "Mi restaurante"
       },
-      "email": {
-        "label": "Email",
-        "placeholder": "you@gourmetable.com"
-      },
-      "username": {
-        "label": "Username",
-        "placeholder": "johndoe123"
-      },
-      "password": {
-        "label": "Password",
-        "placeholder": "Your password"
-      },
-      "confirmPassword": {
-        "label": "Confirm password",
-        "placeholder": "Confirm Password"
-      },
-      "firstName": {
-        "label": "First name",
-        "placeholder": "John"
-      },
-      "lastName": {
-        "label": "Last name",
-        "placeholder": "Doe"
+      "address": {
+        "label": "Dirección",
+        "placeholder": "Av. Siempreviva 123"
       },
       "phone": {
-        "label": "Phone number",
+        "label": "Número de teléfono",
         "placeholder": "1123456789"
+      },
+      "facebook": {
+        "label": "Facebook",
+        "placeholder": "facebook.com/suSitio"
+      },
+      "instagram": {
+        "label": "Instagram",
+        "placeholder": "instagram.com/suSitio"
+      },
+      "twitter": {
+        "label": "Twitter",
+        "placeholder": "twitter.com/suSitio"
       }
     }
   },

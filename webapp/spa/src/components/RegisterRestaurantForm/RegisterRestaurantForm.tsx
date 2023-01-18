@@ -9,7 +9,8 @@ import {
   Image,
   TextInput,
   useMantineTheme,
-  Chip
+  Chip,
+  Grid
 } from "@mantine/core";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { IconUpload, IconPhoto, IconX } from '@tabler/icons';
@@ -166,14 +167,6 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
     setValue("tags", chipValues);
   };
 
-  const uploadMsg = () => {
-    <IconUpload
-    size={50}
-    stroke={1.5}
-    color={theme.colors[theme.primaryColor][theme.colorScheme === 'dark' ? 4 : 6]}
-  />
-  }
-
   
 
   return (
@@ -217,7 +210,7 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
               />
             </SimpleGrid>
             <Divider my="xs" label={t("pages.registerRestaurant.socialMediaDivider")} />
-            <SimpleGrid cols={2} mt="md" breakpoints={[{ maxWidth: "sm", cols: 1}]}>
+            <SimpleGrid cols={1} mt="md" breakpoints={[{ maxWidth: "sm", cols: 1}]}>
               <TextInput
                 label={t("pages.registerRestaurant.facebook.label")}
                 placeholder={t("pages.registerRestaurant.facebook.placeholder") || ""}
@@ -240,46 +233,62 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
             </SimpleGrid>
             <Divider my="xs" label={t("pages.registerRestaurant.profileImage")} />
 
-            <Dropzone
-              mb="md"
-              onDrop={(files) => {
-                setFiles(files);
-                setShowMessage(false);
-              }}
-              onReject={(files) => console.log('rejected files', files)}
-              maxSize={3 * 1024 ** 2}
-              maxFiles={1}
-              multiple={false}
-              accept={IMAGE_MIME_TYPE}
-              sx={(theme) => ({
-                minHeight: 120,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                border: 0,
-                backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
-        
-                '&[data-accept]': {
-                  color: theme.white,
-                  backgroundColor: theme.colors.blue[6],
-                },
-        
-                '&[data-reject]': {
-                  color: theme.white,
-                  backgroundColor: theme.colors.red[6],
-                },
-              })}
-            >
-              {showMessage && 
-              <div className={classes.imageContainer}>
-                <IconPhoto size={70} stroke={1.5}/>
-                <Text size="lg" inline  >
-                  {t("pages.registerRestaurant.dropImage")}
-                </Text>
-              </div>
-              }
-              {previews}
-            </Dropzone>
+            <Grid align="center">
+              <Grid.Col span={9}>
+                <Dropzone
+                  mb="md"
+                  onDrop={(files) => {
+                    setFiles(files);
+                    setShowMessage(false);
+                  }}
+                  onReject={(files) => console.log('rejected files', files)}
+                  maxSize={3 * 1024 ** 2}
+                  maxFiles={1}
+                  multiple={false}
+                  accept={IMAGE_MIME_TYPE}
+                  sx={(theme) => ({
+                    minHeight: 120,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    border: 0,
+                    backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+            
+                    '&[data-accept]': {
+                      color: theme.white,
+                      backgroundColor: theme.colors.blue[6],
+                    },
+            
+                    '&[data-reject]': {
+                      color: theme.white,
+                      backgroundColor: theme.colors.red[6],
+                    },
+                  })}
+                >
+                  {showMessage && 
+                  <div className={classes.imageContainer}>
+                    <IconPhoto size={70} stroke={1.5}/>
+                    <Text size="lg" inline  >
+                      {t("pages.registerRestaurant.dropImage")}
+                    </Text>
+                  </div>
+                  }
+                  {previews}
+                </Dropzone>
+              </Grid.Col >
+              <Grid.Col span={3}>
+                {!showMessage && 
+                  <div>
+                    <Button variant="outline" color={"gray"} onClick={() => {
+                      setFiles([]);
+                      setShowMessage(true)
+                    }}>
+                      <IconX size={20} stroke={2} />
+                    </Button>
+                  </div>
+                }
+              </Grid.Col >
+            </Grid>
 
             <Divider my="xs" label={t("pages.registerRestaurant.tagsDivider")} />
             <Text size="xl" inline className={classes.tagsText}>

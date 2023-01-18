@@ -30,7 +30,7 @@ export default createStyles((theme) => {
     imageContainer: {
       display: "flex",
       alignItems: "center",
-      maxHeight:'200px',
+      maxHeight:'300px',
       maxWidth:'1000px'
     },
     
