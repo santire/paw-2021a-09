@@ -12,6 +12,7 @@ import ar.edu.itba.paw.webapp.dto.UserDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 
@@ -84,8 +85,8 @@ public class UserController {
     public Response getUserRestaurants(@QueryParam("page") @DefaultValue("1") Integer page, @Context HttpServletRequest request) {
         Optional<User> user = getLoggedUser(request);
         if(!user.isPresent()){
-            LOGGER.error("anon user attempt to register a restaurant");
-            return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
+            LOGGER.error("Anon user attempt to get restaurants");
+            return Response.status(Response.Status.OK).header("error", "error user not logged").build();
         }
         Long userId = user.get().getId();
         int maxPages = restaurantService.getRestaurantsFromOwnerPagesCount(AMOUNT_OF_RESTAURANTS,userId);
@@ -106,7 +107,7 @@ public class UserController {
     public Response getLikedRestaurants(@QueryParam("page") @DefaultValue("1") Integer page, @Context HttpServletRequest request) {
         Optional<User> user = getLoggedUser(request);
         if(!user.isPresent()){
-            LOGGER.error("anon user attempt to register a restaurant");
+            LOGGER.error("Anon user attempt to see reservations");
             return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
         }
         Long userId = user.get().getId();
@@ -122,7 +123,7 @@ public class UserController {
 
     @ModelAttribute("loggedUser")
     public Optional<User> getLoggedUser(HttpServletRequest request){
-        return userService.findByUsername(request.getRemoteUser());
-    }
+        LOGGER.info("USER: " + SecurityContextHolder.getContext().getAuthentication().getName());
+        return userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());    }
 
 }

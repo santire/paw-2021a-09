@@ -34,6 +34,13 @@
     "liked": "A {{likes}} personas les gusta esto",
     "tagsTitle": "Ideal para vos, si te gusta"
   },
+  "UserRestaurantCard": {
+    "more": "Ver más",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "liked": "A {{likes}} personas les gusta esto",
+    "tagsTitle": "Ideal para vos, si te gusta"
+  },
   "error": {
     "title": "Encontraste un lugar secreto",
     "description": "Lamentablemente esto es solo una página de 404. Es posible que hayas escrito mal la dirección o que la página se haya movido",
@@ -109,6 +116,9 @@
         "submit": "Aplicar",
         "clear": "Limpiar filtros"
       }
+    },
+    "userRestaurants": {
+      "title": "Sus restaurantes"
     },
     "login": {
       "alert": "Usuario o contraseña inválido",

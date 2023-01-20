@@ -13,6 +13,7 @@ import { RegisterPage } from "./pages/RegisterPage";
 import { ResetPage } from "./pages/ResetPage";
 import { RestaurantPage } from "./pages/RestaurantPage";
 import { RegisterRestaurantPage } from "./pages/RegisterRestaurantPage";
+import { UserRestaurantsPage } from "./pages/UserRestaurantsPage";
 
 const queryClient = new QueryClient();
 const basename = process.env.REACT_APP_CONTEXT || "";
@@ -54,6 +55,10 @@ const router = createBrowserRouter(
         {
           path: "/reset",
           element: <ResetPage />,
+        },
+        {
+          path: "/users/:userId/restaurants",
+          element: <UserRestaurantsPage />
         },
         {
           path: "*",

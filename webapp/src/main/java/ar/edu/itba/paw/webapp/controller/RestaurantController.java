@@ -323,7 +323,7 @@ public class RestaurantController {
     @PUT
     @Path("/{restaurantId}/image")
     @Consumes(value = { MediaType.APPLICATION_JSON})
-    public Response getEventImage(@PathParam("restaurantId") final long restaurantId, final ImageDto imageDto,  @Context HttpServletRequest request) {
+    public Response getRestaurantImage(@PathParam("restaurantId") final long restaurantId, final ImageDto imageDto,  @Context HttpServletRequest request) {
 
         final Optional<Restaurant> maybeRestaurant = restaurantService.findById(restaurantId);
         if (!maybeRestaurant.isPresent())
@@ -534,7 +534,7 @@ public class RestaurantController {
 
         Optional<User> user = getLoggedUser(request);
         if(!user.isPresent()){
-            LOGGER.error("anon user attempt to register a restaurant");
+            LOGGER.error("Anon user attempt to delete a restaurant");
             return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
         }
         Optional<Reservation> reservation = reservationService.findById(reservationId);

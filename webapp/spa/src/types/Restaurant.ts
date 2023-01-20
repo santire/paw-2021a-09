@@ -1,7 +1,7 @@
 import { getRestaurantTags } from "../api/services";
 
 export interface Restaurant {
-  id?: number;
+  id?: string;
   name: string;
   address: string;
   phoneNumber: string;

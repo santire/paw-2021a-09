@@ -71,16 +71,6 @@ const registerSchema = z
       });
     }
   })
-  // .superRefine(async ({ name }, ctx) => {
-  //   const isNameAvailable = await isRestaurantNameAvailable(name);
-  //   if (!isNameAvailable) {
-  //     ctx.addIssue({
-  //       path: ["name"],
-  //       code: "custom",
-  //       message: "The restaurant name is already taken",
-  //     });
-  //   }
-  // })
   ;
 
 type RegisterRestaurantForm = z.infer<typeof registerSchema>;
@@ -123,6 +113,7 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
     reader.onload = () => {
       const imageUrl = reader.result;
       setValue("image", imageUrl);
+      //register("image", imageURL);
     }
     const imageURL = URL.createObjectURL(file);
     return (
@@ -141,6 +132,7 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
 
 
   const processForm = async (data: RegisterRestaurantForm) => {
+    console.log("process form")
     const {...restaurant } = data;
     try {
       const isNameAvailable = await isRestaurantNameAvailable(restaurant.name);
@@ -165,9 +157,13 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
   };
 
   const handleChipChange = (chipValues: string[]) => {
-    setSelectedChips(chipValues);
-    setValue("tags", chipValues);
+    console.log(chipValues);
+    const filteredChips = chipValues.filter(chip => chip !== "");
+    console.log(filteredChips);
+    setSelectedChips(filteredChips);
+    setValue("tags", filteredChips);
   };
+
 
   
 
@@ -296,9 +292,14 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
             <Text size="xl" inline className={classes.tagsText}>
                   {t("pages.registerRestaurant.tagsSelection")}
             </Text>
-            <Chip.Group position="center" multiple mt={15} mb="xl" onChange={handleChipChange}>
+            <Chip.Group position="center" multiple mt={15} mb="xl" 
+            onChange={handleChipChange}
+            >
               {allTags.map(tag => (
-                <Chip>{t("tags." + tag)}</Chip>
+                <Chip key={tag} value={tag}
+                //onClick={() => handleChipClick(tag)}
+                >
+                  {t("tags." + tag)}</Chip>
               ))}
             </Chip.Group>
           </div>
