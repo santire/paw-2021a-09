@@ -48,7 +48,7 @@ export async function getRestaurantTags() {
 export async function deleteRestaurantById(id: string) {
   const url = `${BASE_PATH}/${id}`;
   const response = await apiClient.delete(url);
-  return response.data;
+  return response.status;
 }
 
 export async function getRestaurants(params = NO_FILTER) {

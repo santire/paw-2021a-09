@@ -19,11 +19,13 @@ import { deleteRestaurantById } from "../../api/services";
   interface UserRestaurantCardProps {
     restaurant: Restaurant;
     likedByUser?: boolean;
+    onDelete?: (id?: string) => void;
   }
   
   export function UserRestaurantCard({
     restaurant,
     likedByUser,
+    onDelete
   }: UserRestaurantCardProps) {
     const { id, image, tags, name, rating, likes } = restaurant;
     const { classes, theme } = useStyles();
@@ -35,6 +37,7 @@ import { deleteRestaurantById } from "../../api/services";
         {t("tags." + tag)}
       </Badge>
     ));
+
 
     return (
       <Card withBorder p="lg" radius="md" className={classes.card}>
@@ -118,7 +121,16 @@ import { deleteRestaurantById } from "../../api/services";
                 console.log("null restaurant id");
               }
               else{
-                deleteRestaurantById(restaurant.id);
+                deleteRestaurantById(restaurant.id).then((response) => {
+                  console.log(response)
+                  if (response === 202) {
+                    console.log("Status code is OK")
+                    if (onDelete) {
+                      console.log("On delete function detected, refetching...")
+                      onDelete(restaurant.id);
+                    }
+                  }
+                });
               }
             }
             }

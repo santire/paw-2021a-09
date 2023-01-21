@@ -24,6 +24,7 @@ import { register as registerUser } from "../../api/services/AuthService";
 import useStyles from "./RegisterRestaurantForm.styles";
 import { useEffect, useRef, useState } from "react";
 import { getTags, Restaurant } from "../../types";
+import { userInfo } from "os";
 
 
 const facebookRegex = /^(https?:\/\/)?facebook\.com\/.*$/;
@@ -142,7 +143,7 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
         await registerRestaurant({...restaurant})
         reset();
         // TODO: Navigate to restaurant page
-        navigate('/');
+        navigate('/users/:userId/restaurants' );
       }
       else{
         setError("name", {

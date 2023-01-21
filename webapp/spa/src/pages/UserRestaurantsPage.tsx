@@ -49,7 +49,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export function UserRestaurantsPage() {
-  const { status, data, error } = useQuery<Page<Restaurant>, Error>(
+  const { status, data, error, refetch } = useQuery<Page<Restaurant>, Error>(
     [],
     async () => getUserRestaurants()
   );
@@ -59,22 +59,25 @@ export function UserRestaurantsPage() {
   if (status === "error") {
     return <div>{error!.message}</div>;
   }
+  
 
   const restaurants =
-    data?.data?.map((rest) => (
-      <UserRestaurantCard restaurant={rest} key={rest.name} />
-    )) || [];
+  data?.data?.map((rest) => (
+    <UserRestaurantCard restaurant={rest} key={rest.name} onDelete={(id) => refetch()} />
+  )) || [];
 
-  if (data?.data?.length && data?.data?.length > 0 && data?.data?.length < 5) {
-    // duplicate data to fix carousel
-    for (let i = 0; i < data.data?.length; i++) {
-      const restaurant = data.data[i];
-      const rest = (
-        <UserRestaurantCard restaurant={restaurant} key={restaurant.name + i} />
-      );
-      restaurants.push(rest);
-    }
-  }
+
+
+  // if (data?.data?.length && data?.data?.length > 0 && data?.data?.length < 5) {
+  //   // duplicate data to fix carousel
+  //   for (let i = 0; i < data.data?.length; i++) {
+  //     const restaurant = data.data[i];
+  //     const rest = (
+  //       <UserRestaurantCard restaurant={restaurant} key={restaurant.name + i} />
+  //     );
+  //     restaurants.push(rest);
+  //   }
+  // }
 
   return (
     <>
