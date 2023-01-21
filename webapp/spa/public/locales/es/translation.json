@@ -39,7 +39,12 @@
     "edit": "Editar",
     "delete": "Eliminar",
     "liked": "A {{likes}} personas les gusta esto",
-    "tagsTitle": "Ideal para vos, si te gusta"
+    "tagsTitle": "Ideal para vos, si te gusta",
+    "deleteModal": {
+      "title": "¿Seguro quieres eliminar?",
+      "text": "Esta acción no podrá ser deshecha y la información de tu restaurante se perderá.",
+      "confirm": "Confirmar"
+    }
   },
   "error": {
     "title": "Encontraste un lugar secreto",
@@ -118,7 +123,9 @@
       }
     },
     "userRestaurants": {
-      "title": "Sus restaurantes"
+      "title": "Tus restaurantes",
+      "notFound": "Parece que no tienes ningún restaurante",
+      "createOne": "Crea tu restaurante"
     },
     "login": {
       "alert": "Usuario o contraseña inválido",

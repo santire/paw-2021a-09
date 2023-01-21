@@ -7,9 +7,11 @@ import {
   Text,
   Image,
   Loader,
+  Button,
 } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
+import { Navigate, useNavigate } from "react-router-dom";
 import { getUserRestaurants } from "../api/services/UserService"
 //import { getRestaurants } from "../api/services";
 import { UserRestaurantCard } from "../components/UserRestaurantCard/UserRestaurantCard";
@@ -46,6 +48,11 @@ const useStyles = createStyles((theme) => ({
     fontSize: theme.fontSizes.xl * 1.8,
     paddingLeft: theme.spacing.sm,
   },
+  empty: {
+    align: "center",
+    fontSize: 30,
+    marginTop: 100
+  }
 }));
 
 export function UserRestaurantsPage() {
@@ -55,6 +62,8 @@ export function UserRestaurantsPage() {
   );
   const { t } = useTranslation();
   const { classes } = useStyles();
+  const navigate = useNavigate();
+
 
   if (status === "error") {
     return <div>{error!.message}</div>;
@@ -66,19 +75,6 @@ export function UserRestaurantsPage() {
     <UserRestaurantCard restaurant={rest} key={rest.name} onDelete={(id) => refetch()} />
   )) || [];
 
-
-
-  // if (data?.data?.length && data?.data?.length > 0 && data?.data?.length < 5) {
-  //   // duplicate data to fix carousel
-  //   for (let i = 0; i < data.data?.length; i++) {
-  //     const restaurant = data.data[i];
-  //     const rest = (
-  //       <UserRestaurantCard restaurant={restaurant} key={restaurant.name + i} />
-  //     );
-  //     restaurants.push(rest);
-  //   }
-  // }
-
   return (
     <>
       <Container size="xl" my="xl">
@@ -89,26 +85,44 @@ export function UserRestaurantsPage() {
         ) : (
           <>
             <Text className={classes.title} mb={"xl"} mt={"xl"}>{t`pages.userRestaurants.title`}</Text>
-            <Carousel
-              slideSize="20%"
-              slideGap="sm"
-              breakpoints={[
-                { maxWidth: "lg", slideSize: "33.333333333%" },
-                { maxWidth: "md", slideSize: "50%" },
-                { maxWidth: "sm", slideSize: "100%", slideGap: 0 },
-              ]}
-              align="start"
-              controlSize={40}
-              //loop
-            >
-              {restaurants?.map((r) => (
-                <Carousel.Slide key={r.key}>
-                  <Center p={0} m={0}>
-                    {r}
-                  </Center>
-                </Carousel.Slide>
-              ))}
-            </Carousel>
+
+            {
+              restaurants.length === 0 ? (
+                <Flex justify="center" align="center" h={"100%"}>
+                  <div className={classes.empty}>
+                    <Text mb={50}>
+                      {t("pages.userRestaurants.notFound")}
+                    </Text>
+                    <Button color="orange" mx={170} onClick={() => navigate("/restaurants/register")}>
+                      {t("pages.userRestaurants.createOne")}
+                    </Button>
+                  </div>
+                </Flex>
+              ) 
+              : (
+              <Carousel
+                slideSize="20%"
+                slideGap="sm"
+                breakpoints={[
+                  { maxWidth: "lg", slideSize: "33.333333333%" },
+                  { maxWidth: "md", slideSize: "50%" },
+                  { maxWidth: "sm", slideSize: "100%", slideGap: 0 },
+                ]}
+                align="start"
+                controlSize={40}
+                //loop
+              >
+                {restaurants?.map((r) => (
+                  <Carousel.Slide key={r.key}>
+                    <Center p={0} m={0}>
+                      {r}
+                    </Center>
+                  </Carousel.Slide>
+                ))}
+              </Carousel>
+              )
+            }
+            
           </>
         )}
       </Container>

@@ -7,9 +7,11 @@ import {
     Grid,
     Group,
     Image,
+    Modal,
     Text,
   } from "@mantine/core";
   import { IconHeart, IconShare, IconStar } from "@tabler/icons";
+import { useState } from "react";
   import { useTranslation } from "react-i18next";
   import { useNavigate } from "react-router-dom";
 import { deleteRestaurantById } from "../../api/services";
@@ -31,6 +33,8 @@ import { deleteRestaurantById } from "../../api/services";
     const { classes, theme } = useStyles();
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const [opened, setOpened] = useState(false);
+
   
     const features = tags?.map((tag, idx) => (
       <Badge color="orange" key={tag + "" + idx}>
@@ -116,6 +120,25 @@ import { deleteRestaurantById } from "../../api/services";
             variant="outline"
             size="md"
             fullWidth
+            onClick={() => setOpened(true)}
+          >
+            {t("UserRestaurantCard.delete")}
+          </Button>
+        </Flex>
+
+        <Modal centered
+        opened={opened}
+        onClose={() => setOpened(false)}
+        title={t("UserRestaurantCard.deleteModal.title")}
+        >
+          <Text mb={50} size={15}>
+            {t("UserRestaurantCard.deleteModal.text")}
+          </Text>
+          <Button
+            color="red"
+            variant="outline"
+            size="md"
+            fullWidth
             onClick={() => {
               if(restaurant.id === undefined){
                 console.log("null restaurant id");
@@ -135,9 +158,9 @@ import { deleteRestaurantById } from "../../api/services";
             }
             }
           >
-            {t("UserRestaurantCard.delete")}
+            {t("UserRestaurantCard.deleteModal.confirm")}
           </Button>
-        </Flex>
+        </Modal>
   
         <Card.Section className={classes.footer}>
           <Group position="apart">

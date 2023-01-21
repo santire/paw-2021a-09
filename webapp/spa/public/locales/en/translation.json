@@ -39,7 +39,12 @@
     "edit": "Edit",
     "delete": "Delete",
     "liked": "{{likes}} people liked this",
-    "tagsTitle": "Perfect for you, if you enjoy"
+    "tagsTitle": "Perfect for you, if you enjoy",
+    "deleteModal": {
+      "title": "Are you sure you want to delete?",
+      "text": "This action cannot be undone and all your restaurant information will be lost.",
+      "confirm": "Confirm"
+    }
   },
   "error": {
     "title": "You have found a secret place.",
@@ -122,7 +127,9 @@
       }
     },
     "userRestaurants": {
-      "title": "Your restaurants"
+      "title": "Your restaurants",
+      "notFound": "Looks like you do not own any restaurant",
+      "createOne": "Create your restaurant"
     },
     "login": {
       "alert": "Invalid username or password",
