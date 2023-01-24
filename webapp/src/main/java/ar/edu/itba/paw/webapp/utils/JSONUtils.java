@@ -1,11 +1,9 @@
 package ar.edu.itba.paw.webapp.utils;
 
-import ar.edu.itba.paw.model.exceptions.ApiException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.json.JSONObject;
-import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 
@@ -18,7 +16,8 @@ public class JSONUtils {
             return OBJECT_MAPPER.readValue(jsonObjectFrom(json).toString(), classToConvertTo);
         } catch (IOException e) {
             LOGGER.error("An Error occurred when trying to convert JSON to " + classToConvertTo.getName() + " object", e);
-            throw ApiException.of(HttpStatus.INTERNAL_SERVER_ERROR, "We are sorry, an unexpected error occurred, try again later" /*MessageConstants.SERVER_ERROR_GENERIC_MESSAGE*/);
+//            throw ApiException.of(HttpStatus.INTERNAL_SERVER_ERROR, "We are sorry, an unexpected error occurred, try again later" /*MessageConstants.SERVER_ERROR_GENERIC_MESSAGE*/);
+            throw new RuntimeException("Unexpected server error");
         }
     }
 

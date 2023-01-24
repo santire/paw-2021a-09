@@ -76,8 +76,8 @@ public class TestConfig {
     jpaProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
 
     // Local Machine only, don't deploy!
-    jpaProperties.setProperty("hibernate.show_sql", "false");
-    jpaProperties.setProperty("format_sql", "false");
+    jpaProperties.setProperty("hibernate.show_sql", "true");
+    jpaProperties.setProperty("format_sql", "true");
 
     entityFactory.setJpaProperties(jpaProperties);
     return entityFactory;
