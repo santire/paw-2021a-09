@@ -108,7 +108,7 @@ public class RestaurantController {
 
         int maxPages = restaurantService.getRestaurantsFilteredByPageCount(pageAmount, search, tagsSelected, min, max);
         List<RestaurantDto> restaurants = restaurantService.getRestaurantsFilteredBy(page, pageAmount, search, tagsSelected,min,max, sort, desc, 7).stream().map(u -> RestaurantDto.fromRestaurant(u, uriInfo)).collect(Collectors.toList());
-
+        LOGGER.info(String.valueOf(restaurants.size()));
         return Response.ok(new GenericEntity<List<RestaurantDto>>(restaurants){})
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", maxPages).build(), "last")
@@ -318,6 +318,68 @@ public class RestaurantController {
         LOGGER.info("Restaurant created in : " + uri);
         return Response.created(uri).build();
     }
+
+        @POST
+        @Path("/{restaurantId}")
+        @Produces(value = {MediaType.APPLICATION_JSON})
+        @Consumes(value = { MediaType.APPLICATION_JSON})
+        public Response updateRestaurant(final RestaurantDto restaurantDto, 
+                                        @PathParam("restaurantId") final long restaurantId,
+                                        @Context HttpServletRequest request) {                        
+            LOGGER.info("Updating restaurant: " + restaurantDto.toString());
+            Optional<User> user = getLoggedUser(request);
+            if(!user.isPresent()){
+                LOGGER.error("anon user attempt to register a restaurant");
+                return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
+            }
+
+            // get the current restaurant
+            Optional<Restaurant> maybeRestaurant = restaurantService.findById(restaurantId);
+            if(!maybeRestaurant.isPresent()){
+                LOGGER.error("Restaurant with id " + restaurantId + " do not exist");
+                return Response.status(Response.Status.BAD_REQUEST).header("error", "non-existent restaurante").build();
+            }
+        
+            if(!user.get().getOwnedRestaurants().contains(maybeRestaurant.get())){
+                LOGGER.error("another user attempt to update a restaurant");
+                return Response.status(Response.Status.BAD_REQUEST).header("error", "Wrong user attempt to update a restaurant").build();
+            }
+    
+            LOGGER.debug("Updating restaurant for user {}", user.get().getUsername());
+            List<Tags> tagList = new ArrayList<>();
+            if(restaurantDto.getTags() != null){
+                tagList = restaurantDto.getTags().stream().map(t -> Tags.valueOf(t)).collect(Collectors.toList());
+                LOGGER.debug("tags: {}", tagList);
+            }
+            
+            restaurantService.updateRestaurant(restaurantId, restaurantDto.getName(), restaurantDto.getAddress(),
+                    restaurantDto.getPhoneNumber(), tagList);
+    
+            if (restaurantDto.getFacebook() != null){
+                socialMediaService.updateFacebook(restaurantDto.getFacebook(), restaurantId);
+            }
+            if (restaurantDto.getInstagram() != null){
+                socialMediaService.updateInstagram(restaurantDto.getInstagram(), restaurantId);
+            }
+            if (restaurantDto.getTwitter() != null){
+                socialMediaService.updateTwitter(restaurantDto.getTwitter(), restaurantId);
+            }
+    
+            if(restaurantDto.getImage() != null){
+                Image image = null;
+                try {
+                    image = new Image(restaurantDto.getImage());
+                    restaurantService.setImageByRestaurantId(image, restaurantId);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            } 
+    
+            final URI uri = uriInfo.getAbsolutePathBuilder()
+                    .path(String.valueOf(restaurantId)).build();
+            LOGGER.info("Restaurant created in : " + uri);
+            return Response.created(uri).build();
+        }
 
     //SET IMAGE
     @PUT
@@ -578,7 +640,8 @@ public class RestaurantController {
     @ModelAttribute("loggedUser")
     public Optional<User> getLoggedUser(HttpServletRequest request){
         LOGGER.info("USER: " + SecurityContextHolder.getContext().getAuthentication().getName());
-        return userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+        return userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());  
     }
+
 
 }

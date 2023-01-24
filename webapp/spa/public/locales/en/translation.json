@@ -266,6 +266,40 @@
         "label": "Twitter",
         "placeholder": "twitter.com/yourSite"
       }
+    },
+    "editRestaurant": {
+      "loginDivider": "General",
+      "contactDivider": "Contact Information",
+      "socialMediaDivider": "Social Media",
+      "title": "Edit restaurant",
+      "tagsDivider": "Categories",
+      "profileImage": "Profile Image",
+      "dropImage": "Change profile image",
+      "tagsSelection": "At least 3 tags are required",
+      "name": {
+        "label": "Restaurant name",
+        "placeholder": "My resturant"
+      },
+      "address": {
+        "label": "Address",
+        "placeholder": "Av. Siempreviva 123"
+      },
+      "phone": {
+        "label": "Phone number",
+        "placeholder": "1123456789"
+      },
+      "facebook": {
+        "label": "Facebook",
+        "placeholder": "facebook.com/yourSite"
+      },
+      "instagram": {
+        "label": "Instagram",
+        "placeholder": "instagram.com/yourSite"
+      },
+      "twitter": {
+        "label": "Twitter",
+        "placeholder": "twitter.com/yourSite"
+      }
     }
   }
 }

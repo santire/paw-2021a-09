@@ -108,7 +108,7 @@ import { deleteRestaurantById } from "../../api/services";
             variant="outline"
             size="md"
             fullWidth
-            onClick={() => navigate(`/restaurants/${id}`)}
+            onClick={() => navigate(`/restaurants/${id}/edit`)}
           >
             {t("UserRestaurantCard.edit")}
           </Button>

@@ -262,6 +262,40 @@
         "label": "Twitter",
         "placeholder": "twitter.com/suSitio"
       }
+    },
+    "editRestaurant": {
+      "loginDivider": "General",
+      "contactDivider": "Información de contacto",
+      "socialMediaDivider": "Redes Sociales",
+      "title": "Editar restaurante",
+      "tagsDivider": "Categoría",
+      "profileImage": "Imagen de perfil",
+      "dropImage": "Arrastre las imagenes aquí o haga click para seleccionar un archivo",
+      "tagsSelection": "Al menos 3 categorías son requeridas",
+      "name": {
+        "label": "Nombre del restaurante",
+        "placeholder": "Mi restaurante"
+      },
+      "address": {
+        "label": "Dirección",
+        "placeholder": "Av. Siempreviva 123"
+      },
+      "phone": {
+        "label": "Número de teléfono",
+        "placeholder": "1123456789"
+      },
+      "facebook": {
+        "label": "Facebook",
+        "placeholder": "facebook.com/suSitio"
+      },
+      "instagram": {
+        "label": "Instagram",
+        "placeholder": "instagram.com/suSitio"
+      },
+      "twitter": {
+        "label": "Twitter",
+        "placeholder": "twitter.com/suSitio"
+      }
     }
   }
 }
