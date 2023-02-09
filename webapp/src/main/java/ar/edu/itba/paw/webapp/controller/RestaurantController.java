@@ -303,14 +303,11 @@ public class RestaurantController {
             socialMediaService.updateTwitter(restaurantDto.getTwitter(), restaurant.getId());
         }
 
+        Image image = null;
         if(restaurantDto.getImage() != null){
-            Image image = null;
-            try {
-                image = new Image(restaurantDto.getImage());
-                restaurantService.setImageByRestaurantId(image, restaurant.getId());
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
+            //LOGGER.info(restaurantDto.getImage());
+            image = new Image(restaurantDto.getImage());
+            restaurantService.setImageByRestaurantId(image, restaurant.getId());
         } 
 
         final URI uri = uriInfo.getAbsolutePathBuilder()
@@ -367,12 +364,8 @@ public class RestaurantController {
     
             if(restaurantDto.getImage() != null){
                 Image image = null;
-                try {
-                    image = new Image(restaurantDto.getImage());
-                    restaurantService.setImageByRestaurantId(image, restaurantId);
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+                image = new Image(restaurantDto.getImage());
+                restaurantService.setImageByRestaurantId(image, restaurantId);
             } 
     
             final URI uri = uriInfo.getAbsolutePathBuilder()
@@ -420,7 +413,7 @@ public class RestaurantController {
 
             if(image != null){
                 LOGGER.info("Found restaurant image");
-                return Response.ok(image.getData())
+                return Response.ok(image.getImageEncoded())
                         .cacheControl(cache).expires(expireDate).build();
             }
             else{

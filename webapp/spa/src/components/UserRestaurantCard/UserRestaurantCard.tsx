@@ -11,10 +11,10 @@ import {
     Text,
   } from "@mantine/core";
   import { IconHeart, IconShare, IconStar } from "@tabler/icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
   import { useTranslation } from "react-i18next";
   import { useNavigate } from "react-router-dom";
-import { deleteRestaurantById } from "../../api/services";
+import { deleteRestaurantById, getRestaurantImage } from "../../api/services";
   import { Restaurant } from "../../types";
   import useStyles from "./UserRestaurantCard.styles";
   
@@ -34,7 +34,17 @@ import { deleteRestaurantById } from "../../api/services";
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [opened, setOpened] = useState(false);
+    const [imageUrl, setImageUrl] = useState<string>("");
 
+    useEffect(() => {
+      restaurant.id?
+      getRestaurantImage(restaurant.id).then((data) => {
+        setImageUrl(data);
+      }) : console.log("holis")
+    }, []);
+
+    console.log(image)
+    
   
     const features = tags?.map((tag, idx) => (
       <Badge color="orange" key={tag + "" + idx}>
@@ -48,7 +58,7 @@ import { deleteRestaurantById } from "../../api/services";
         <Card.Section mb="md">
           <Image
             src={
-              image?.startsWith("http") ? image : require(`../../assets/${image}`)
+              image?.startsWith("http") ? image : imageUrl
             }
             alt={name}
             height={180}

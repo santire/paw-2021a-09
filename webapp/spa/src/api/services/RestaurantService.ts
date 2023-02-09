@@ -52,6 +52,12 @@ export async function getRestaurantTags() {
   return response.data;
 }
 
+export async function getRestaurantImage(id: string) {
+  const url = `${BASE_PATH}/${id}/image`;
+  const response = await apiClient.get<string>(url);
+  return response.data;
+}
+
 export async function deleteRestaurantById(id: string) {
   const url = `${BASE_PATH}/${id}`;
   const response = await apiClient.delete(url);
