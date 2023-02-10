@@ -130,7 +130,6 @@ export function EditRestaurantForm(props: Partial<DropzoneProps>) {
       </Flex>
     );
   } 
-  setDataLoaded(true);
 
   const {
     image,
