@@ -95,8 +95,9 @@ export function EditRestaurantForm(props: Partial<DropzoneProps>) {
 
   const [files, setFiles] = useState<FileWithPath[]>([]);
   const [showMessage, setShowMessage] = useState(true);
-  
-  // const [currentData, setCurrentData] = useState<Restaurant>();
+
+  const [dataLoaded, setDataLoaded] = useState(false);
+    
 
   useEffect(() => {
     if(allTags.length === 0)
@@ -116,15 +117,21 @@ export function EditRestaurantForm(props: Partial<DropzoneProps>) {
     resolver: zodResolver(registerSchema),
   });
 
+  useEffect(() => {
+    if (data) {
+      setSelectedChips(data.tags);
+    }
+  }, [status, data]);
+
   if (status === "loading" || !data) {
     return (
       <Flex justify="center" align="center" h={"100vh"}>
         <Loader color="orange" />
       </Flex>
     );
-  }
+  } 
+  setDataLoaded(true);
 
-  
   const {
     image,
     name,
@@ -135,9 +142,6 @@ export function EditRestaurantForm(props: Partial<DropzoneProps>) {
     instagram,
     tags,
   } = data;
-  
-  
-  // setCurrentData(data);
   
   const previews = files.map((file, index) => {
     var reader = new FileReader();
@@ -200,7 +204,6 @@ export function EditRestaurantForm(props: Partial<DropzoneProps>) {
   };
 
 
-
   return (
     <Paper shadow="md" radius="lg">
       <div className={classes.wrapper}>
@@ -217,7 +220,7 @@ export function EditRestaurantForm(props: Partial<DropzoneProps>) {
                 placeholder={t("pages.editRestaurant.name.placeholder") || ""}
                 required
                 error={errors.name?.message}
-                value={name}
+                defaultValue={name}
                 {...register("name")}
               />
             </SimpleGrid>
@@ -241,7 +244,7 @@ export function EditRestaurantForm(props: Partial<DropzoneProps>) {
                 required
                 error={errors.phoneNumber?.message}
                 {...register("phoneNumber")}
-                value={phoneNumber}
+                defaultValue={phoneNumber}
               />
             </SimpleGrid>
             <Divider my="xs" label={t("pages.editRestaurant.socialMediaDivider")} />
@@ -251,14 +254,14 @@ export function EditRestaurantForm(props: Partial<DropzoneProps>) {
                 placeholder={t("pages.editRestaurant.facebook.placeholder") || ""}
                 error={errors.facebook?.message}
                 {...register("facebook")}
-                value={facebook}
+                defaultValue={facebook}
               />
                 <TextInput
                 label={t("pages.editRestaurant.instagram.label")}
                 placeholder={t("pages.editRestaurant.instagram.placeholder") || ""}
                 error={errors.instagram?.message}
                 {...register("instagram")}
-                value={instagram}
+                defaultValue={instagram}
               />
                 <TextInput
                 mb="md"
@@ -266,7 +269,7 @@ export function EditRestaurantForm(props: Partial<DropzoneProps>) {
                 placeholder={t("pages.editRestaurant.twitter.placeholder") || ""}
                 error={errors.twitter?.message}
                 {...register("twitter")}
-                value={twitter}
+                defaultValue={twitter}
               />
             </SimpleGrid>
             <Divider my="xs" label={t("pages.editRestaurant.profileImage")} />
@@ -368,7 +371,7 @@ export function EditRestaurantForm(props: Partial<DropzoneProps>) {
           </div>
             <Group position="center" mt="md">
               <Button type="submit" color="orange" fullWidth px="xl">
-                {t("pages.register.submit")}
+                {t("pages.editRestaurant.submit")}
               </Button>
             </Group>
         </form>

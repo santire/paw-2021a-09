@@ -295,7 +295,8 @@
       "twitter": {
         "label": "Twitter",
         "placeholder": "twitter.com/suSitio"
-      }
+      },
+      "submit": "Editar"
     }
   }
 }

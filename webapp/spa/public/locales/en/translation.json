@@ -299,7 +299,8 @@
       "twitter": {
         "label": "Twitter",
         "placeholder": "twitter.com/yourSite"
-      }
+      },
+      "submit": "Edit"
     }
   }
 }
