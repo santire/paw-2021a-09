@@ -1,4 +1,4 @@
-package ar.edu.itba.paw.webapp.config;
+package ar.edu.itba.paw.webapp.auth.filters;
 
 import java.io.IOException;
 
