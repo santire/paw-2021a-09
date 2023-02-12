@@ -241,7 +241,7 @@
       "tagsDivider": "Tags",
       "profileImage": "Profile Image",
       "dropImage": "Drop images here ir click to select files",
-      "tagsSelection": "At least 3 tags are required",
+      "tagsSelection": "At least 1 tag1 is required",
       "name": {
         "label": "Restaurant name",
         "placeholder": "Your restaurant name"
@@ -275,7 +275,7 @@
       "tagsDivider": "Categories",
       "profileImage": "Profile Image",
       "dropImage": "Change profile image",
-      "tagsSelection": "At least 3 tags are required",
+      "tagsSelection": "At least 1 tag is required",
       "name": {
         "label": "Restaurant name",
         "placeholder": "My resturant"

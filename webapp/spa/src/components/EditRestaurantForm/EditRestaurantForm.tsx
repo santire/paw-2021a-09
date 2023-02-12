@@ -95,9 +95,12 @@ export function EditRestaurantForm(props: Partial<DropzoneProps>) {
 
   const [files, setFiles] = useState<FileWithPath[]>([]);
   const [showMessage, setShowMessage] = useState(true);
-
-  const [dataLoaded, setDataLoaded] = useState(false);
     
+  const handleChipChange = (chipValues: string[]) => {
+    const filteredChips = chipValues.filter(chip => chip !== "");
+    setSelectedChips(filteredChips);
+    setValue("tags", filteredChips);
+  };
 
   useEffect(() => {
     if(allTags.length === 0)
@@ -120,6 +123,7 @@ export function EditRestaurantForm(props: Partial<DropzoneProps>) {
   useEffect(() => {
     if (data) {
       setSelectedChips(data.tags);
+      handleChipChange(data.tags);
     }
   }, [status, data]);
 
@@ -167,7 +171,6 @@ export function EditRestaurantForm(props: Partial<DropzoneProps>) {
 
 
   const processForm = async (data: EditRestaurantForm) => {
-    console.log("process form")
     const {...restaurant } = data;
     try {
       const isNameAvailable = true;
@@ -175,8 +178,6 @@ export function EditRestaurantForm(props: Partial<DropzoneProps>) {
         const isNameAvailable = await isRestaurantNameAvailable(restaurant.name);
       }
       if (isNameAvailable && restaurantId) {
-        console.log(isNameAvailable)
-        console.log({...restaurant})
         await updateRestaurant({...restaurant}, restaurantId)
         reset();
         // TODO: Navigate to restaurant page
@@ -192,14 +193,6 @@ export function EditRestaurantForm(props: Partial<DropzoneProps>) {
     } catch (e) {
       //console.error(e);
     }
-  };
-
-  const handleChipChange = (chipValues: string[]) => {
-    console.log(chipValues);
-    const filteredChips = chipValues.filter(chip => chip !== "");
-    console.log(filteredChips);
-    setSelectedChips(filteredChips);
-    setValue("tags", filteredChips);
   };
 
 

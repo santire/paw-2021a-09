@@ -40,10 +40,8 @@ import { deleteRestaurantById, getRestaurantImage } from "../../api/services";
       restaurant.id?
       getRestaurantImage(restaurant.id).then((data) => {
         setImageUrl(data);
-      }) : console.log("holis")
+      }) : console.log("")
     }, []);
-
-    console.log(image)
     
   
     const features = tags?.map((tag, idx) => (
@@ -155,11 +153,8 @@ import { deleteRestaurantById, getRestaurantImage } from "../../api/services";
               }
               else{
                 deleteRestaurantById(restaurant.id).then((response) => {
-                  console.log(response)
                   if (response === 202) {
-                    console.log("Status code is OK")
                     if (onDelete) {
-                      console.log("On delete function detected, refetching...")
                       onDelete(restaurant.id);
                     }
                   }
