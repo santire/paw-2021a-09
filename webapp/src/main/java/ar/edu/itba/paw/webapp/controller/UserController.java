@@ -49,12 +49,14 @@ public class UserController {
 
     // UPDATE USER
     @PUT
-    @Path("/edit")
+    @Path("/{userId}")
     @Produces(value = { MediaType.APPLICATION_JSON})
     @Consumes(value = { MediaType.APPLICATION_JSON})
     public Response updateUser(final UserDto userDto, @Context HttpServletRequest request) {
         try {
-            userService.updateUser(userDto.getUserId(), userDto.getUsername(),userDto.getPassword(), userDto.getFirstName(), userDto.getLastName(), userDto.getEmail(), userDto.getPhone());
+            User user = userService.findById(userDto.getUserId()).orElseThrow(UserNotFoundException::new);
+
+            userService.updateUser(userDto.getUserId(), userDto.getUsername(),user.getPassword(), userDto.getFirstName(), userDto.getLastName(), userDto.getEmail(), userDto.getPhone());
         } catch (UserNotFoundException e) {
             return Response.status(Response.Status.CONFLICT).header("error", "user does not exist").build();
         }

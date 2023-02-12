@@ -297,6 +297,26 @@
         "placeholder": "twitter.com/suSitio"
       },
       "submit": "Editar"
+    },
+    "profile": {
+      "profile": "Profile",
+      "username": {
+        "label": "Nombre de usuario",
+        "placeholder": "Nombre de usuario"
+      },
+      "firstName": {
+        "label": "Nombre",
+        "placeholder": "Nombre"
+      },
+      "lastName": {
+        "label": "Apellido",
+        "placeholder": "Apellido"
+      },
+      "phoneNumber": {
+        "label": "Número de teléfono",
+        "placeholder": "Número de teléfono"
+      },
+      "submit": "Confirmar"
     }
   }
 }

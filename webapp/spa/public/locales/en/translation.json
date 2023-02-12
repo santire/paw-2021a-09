@@ -301,6 +301,26 @@
         "placeholder": "twitter.com/yourSite"
       },
       "submit": "Edit"
+    },
+    "profile": {
+      "profile": "Profile",
+      "username": {
+        "label": "Username",
+        "placeholder": "Your username"
+      },
+      "firstName": {
+        "label": "First name",
+        "placeholder": "Your name"
+      },
+      "lastName": {
+        "label": "Last name",
+        "placeholder": "Your last name"
+      },
+      "phoneNumber": {
+        "label": "Phone number",
+        "placeholder": "Your phone number"
+      },
+      "submit": "Submit"
     }
   }
 }
