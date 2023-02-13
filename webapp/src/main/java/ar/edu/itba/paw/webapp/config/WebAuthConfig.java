@@ -1,12 +1,14 @@
 package ar.edu.itba.paw.webapp.config;
 
 
+import ar.edu.itba.paw.webapp.auth.ApiEntryPoint;
 import ar.edu.itba.paw.webapp.auth.filters.BasicAuthenticationWithJwtHeaderFilter;
 import ar.edu.itba.paw.webapp.auth.filters.CorsFilter;
 import ar.edu.itba.paw.webapp.auth.filters.JwtRequestFilter;
 
 import ar.edu.itba.paw.webapp.utils.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -22,15 +24,20 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
+import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
+
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@ComponentScan({"ar.edu.itba.paw.webapp.auth", "ar.edu.itba.paw.webapp.utils"})
+@ComponentScan({"ar.edu.itba.paw.webapp.auth", "ar.edu.itba.paw.webapp.utils", "ar.edu.itba.paw.webapp.controller"})
 @Configuration
 public class WebAuthConfig extends WebSecurityConfigurerAdapter {
 
@@ -40,6 +47,9 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
+
+    @Bean
+     public HandlerExceptionResolver handlerExceptionResolver() { return new ExceptionHandlerExceptionResolver(); }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -84,6 +94,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/**").authenticated()
                 .and()
                 .exceptionHandling()
+                .authenticationEntryPoint(new ApiEntryPoint())
                 .and()
                 .httpBasic();
 

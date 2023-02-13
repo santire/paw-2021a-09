@@ -12,6 +12,7 @@ import ar.edu.itba.paw.webapp.dto.UserDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 
@@ -68,13 +69,11 @@ public class UserController {
     @GET
     @Path("/{userId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("@authComponent.isUser(#userId)")
     public Response getUser(@PathParam("userId") final int userId, @Context HttpServletRequest request) {
-        final Optional<User> user = userService.findById(userId);
-        if(user.isPresent()){
-            return Response.ok(UserDto.fromUser(user.get(), request.getRequestURL().toString(), uriInfo)).build();
-        } else {
-            return Response.status(Response.Status.ACCEPTED).header("error", "user not found").build();
-        }
+        final User user = userService.findById(userId).orElseThrow(UserNotFoundException::new);
+        return Response.ok(UserDto.fromUser(user, request.getRequestURL().toString(), uriInfo)).build();
+
     }
 
     //READ USER RESTAURANTS
