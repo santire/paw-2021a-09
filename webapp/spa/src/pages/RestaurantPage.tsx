@@ -10,6 +10,7 @@ import {
   Group,
   Image,
   Loader,
+  Table,
   Tabs,
   Text,
 } from "@mantine/core";
@@ -67,31 +68,32 @@ export function RestaurantPage() {
   const { status, data, error } = useRestaurant(restaurantId || "");
 
   const [menuStatus, setMenuStatus] = useState("idle");
-  const [menuData, setMenuData] = useState<Page<MenuItem>>();
   const [menuError, setMenuError] = useState<Error>();
+  const [rows, setRows] = useState<React.ReactElement[]>([]);
+
   
   useEffect(() => {
     if (restaurantId) {
-      let isCancelled = false;
       setMenuStatus("loading");
   
       getRestaurantMenu(restaurantId)
-        .then(data => {
-          if (!isCancelled) {
-            setMenuData(data);
+        .then(menuItems => {
             setMenuStatus("success");
-          }
+            if(menuItems){
+              setRows(menuItems.data.map((item: MenuItem) => (
+                <tr key={item.name}>
+                  <td>{item.name}</td>
+                  <td>{item.description}</td>
+                  <td>{item.price}</td>
+                </tr>
+              )));
+            }
         })
         .catch(error => {
-          if (!isCancelled) {
+            console.log(error);
             setMenuError(error);
             setMenuStatus("error");
-          }
         });
-  
-      return () => {
-        isCancelled = true;
-      };
     }
   }, [restaurantId]);
 
@@ -165,7 +167,7 @@ export function RestaurantPage() {
 
   const features = tags?.map((tag, idx) => (
     <Badge color="orange" key={tag + "" + idx}>
-      {t("tags." + tag.toLowerCase())}
+      {t("tags." + tag)}
     </Badge>
   ));
 
@@ -220,7 +222,7 @@ export function RestaurantPage() {
           <Divider m="xl" orientation="horizontal"/>
         </Grid.Col>
 
-        <Grid.Col span={4}>
+        <Grid.Col span={6}>
           <Tabs defaultValue="Menu">
             <Tabs.List>
               <Tabs.Tab value="Menu" icon={<IconMenu size={14} />}>Menu</Tabs.Tab>
@@ -228,7 +230,16 @@ export function RestaurantPage() {
             </Tabs.List>
 
             <Tabs.Panel value="Menu" pt="xs">
-              Menu tab content
+              <Table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody>{rows}</tbody>
+              </Table>
             </Tabs.Panel>
 
             <Tabs.Panel value="Reviews" pt="xs">
@@ -238,7 +249,7 @@ export function RestaurantPage() {
         </Grid.Col>
         
 
-        <Grid.Col span={7} px={"5%"}>
+        <Grid.Col span={4} px={"5%"}>
           <Divider orientation="vertical"/>
           <Flex direction="column" justify="space-between" h={"100%"}>
             <Button mt="xl" color="orange" variant="outline" size="xl">

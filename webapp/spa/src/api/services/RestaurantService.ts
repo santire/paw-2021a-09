@@ -1,6 +1,7 @@
 import { apiClient } from "../client";
 import { Restaurant } from "../../types";
 import { Page } from "../../types/Page";
+import { MenuItem } from "../../types/MenuItem";
 
 export interface FilterParams {
   page?: number;
@@ -51,6 +52,12 @@ export async function getRestaurantTags() {
   const response = await apiClient.get<string[]>(url);
   return response.data;
 }
+
+// export async function getRestaurantMenu(id: string) {
+//   const url = `${BASE_PATH}/${id}/menu`;
+//   const response = await apiClient.get<MenuItem[]>(url);
+//   return response.data;
+// }
 
 export async function getRestaurantImage(id: string) {
   const url = `${BASE_PATH}/${id}/image`;
@@ -105,6 +112,53 @@ export async function getRestaurants(params = NO_FILTER) {
   });
 
   const page: Page<Restaurant> = {
+    data: response.data,
+    meta: {
+      perPage: response.data.length,
+      maxPages: links?.hasOwnProperty("last") ? links.last : 0,
+    },
+  };
+  return page;
+}
+
+export async function getRestaurantMenu(id: string, params = NO_FILTER) {
+  const url = `${BASE_PATH}/${id}/menu`;
+  const response = await apiClient.get<MenuItem[]>(url, { params });
+  const links = {
+    first: 0,
+    last: 0,
+    next: 0,
+    prev: 0,
+  };
+
+  response.headers.link?.split(",").forEach((str) => {
+    const linkInfo = /<([^>]+)>;\s+rel="([^"]+)"/gi.exec(str);
+    if (linkInfo != null) {
+      const pageInfo = /page=([^&]*)/gi.exec(linkInfo[1]);
+      if (pageInfo != null) {
+        switch (linkInfo[2]) {
+          case "first": {
+            links["first"] = parseInt(pageInfo[1]);
+            break;
+          }
+          case "last": {
+            links["last"] = parseInt(pageInfo[1]);
+            break;
+          }
+          case "next": {
+            links["next"] = parseInt(pageInfo[1]);
+            break;
+          }
+          case "prev": {
+            links["prev"] = parseInt(pageInfo[1]);
+            break;
+          }
+        }
+      }
+    }
+  });
+
+  const page: Page<MenuItem> = {
     data: response.data,
     meta: {
       perPage: response.data.length,
