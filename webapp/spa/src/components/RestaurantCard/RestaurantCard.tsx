@@ -31,7 +31,7 @@ export function RestaurantCard({
 
   const features = tags?.map((tag, idx) => (
     <Badge color="orange" key={tag + "" + idx}>
-      {t("tags." + tag.toLowerCase())}
+      {t("tags." + tag)}
     </Badge>
   ));
 

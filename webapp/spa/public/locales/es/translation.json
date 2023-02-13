@@ -86,7 +86,12 @@
       "heading": "Descubra y reserve los mejores restaurantes"
     },
     "restaurant": {
-      "reservationButton": "Hacer una reserva"
+      "reservationButton": "Hacer una reserva",
+      "menu.title": "Menu",
+      "menu.name": "Nombre",
+      "menu.description": "Descripción",
+      "menu.price": "Precio",
+      "reviews.title": "Reseñas"
     },
     "restaurants": {
       "title": "Todos los restaurantes",

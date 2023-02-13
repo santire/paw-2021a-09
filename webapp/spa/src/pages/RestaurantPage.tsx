@@ -254,17 +254,17 @@ export function RestaurantPage() {
         <Grid.Col span={6}>
           <Tabs defaultValue="Menu">
             <Tabs.List>
-              <Tabs.Tab value="Menu" icon={<IconMenu size={14} />}>Menu</Tabs.Tab>
-              <Tabs.Tab value="Reviews" icon={<IconMessageCircle size={14} />}>Reviews</Tabs.Tab>
+              <Tabs.Tab value="Menu" icon={<IconMenu size={14} />}>{t("pages.restaurant.menu.title")}</Tabs.Tab>
+              <Tabs.Tab value="Reviews" icon={<IconMessageCircle size={14} />}>{t("pages.restaurant.reviews.title")}</Tabs.Tab>
             </Tabs.List>
 
             <Tabs.Panel value="Menu" pt="xs">
               <Table>
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Price</th>
+                    <th>{t("pages.restaurant.menu.name")}</th>
+                    <th>{t("pages.restaurant.menu.description")}</th>
+                    <th>{t("pages.restaurant.menu.price")}</th>
                   </tr>
                 </thead>
                 <tbody>{rows}</tbody>
@@ -281,7 +281,7 @@ export function RestaurantPage() {
                         <div>
                           <Text size="sm">{review.username}</Text>
                           <Text size="xs" color="dimmed">
-                            2022-07-07
+                            {review.date}
                           </Text>
                         </div>
                       </Group>
