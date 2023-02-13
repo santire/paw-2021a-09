@@ -47,7 +47,7 @@ const registerSchema = z
       twitter: z.string().max(100)
         .optional(),
       image: z.any(),
-      tags: z.string().array().min(3)
+      tags: z.string().array().min(1)
   })
   .superRefine(async ({ facebook, instagram, twitter }, ctx) => {
     if (facebook && !facebookRegex.test(facebook)) {
@@ -114,7 +114,6 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
     reader.onload = () => {
       const imageUrl = reader.result;
       setValue("image", imageUrl);
-      //register("image", imageURL);
     }
     const imageURL = URL.createObjectURL(file);
     return (

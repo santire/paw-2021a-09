@@ -159,7 +159,6 @@ public class RestaurantController {
 
         List<MenuItemDto> menu = maybeRestaurant.orElseThrow(RestaurantNotFoundException::new).getMenu().stream().map(MenuItemDto::fromMenuItem).collect(Collectors.toList());
 
-
         return Response.ok(new GenericEntity<List<MenuItemDto>>(menu){})
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", maxPages).build(), "last")
