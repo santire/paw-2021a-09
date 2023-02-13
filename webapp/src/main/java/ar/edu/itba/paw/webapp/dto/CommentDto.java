@@ -13,6 +13,7 @@ public class CommentDto {
     private Long id;
     private String userComment;
     private LocalDate date;
+    private String username;
 
     private URI user;
     private URI restaurant;
@@ -23,6 +24,7 @@ public class CommentDto {
         dto.id = comment.getId();
         dto.userComment = comment.getUserComment();
         dto.date = comment.getDate();
+        dto.username = comment.getUser().getUsername();
 
         dto.user = uriInfo.getBaseUriBuilder().path("users/"+ comment.getUser().getId()).build();
         dto.restaurant = uriInfo.getBaseUriBuilder().path("restaurants/"+comment.getRestaurant().getId()).build();
@@ -41,6 +43,8 @@ public class CommentDto {
 
     public URI getRestaurant() { return restaurant; }
 
+    public String getUsername() { return username; }
+
 
     public void setId(Long id) { this.id = id; }
 
@@ -51,5 +55,7 @@ public class CommentDto {
     public void setUser(URI user) { this.user = user; }
 
     public void setRestaurant(URI restaurant) { this.restaurant = restaurant; }
+
+    public void setUsername(String username) { this.username = username; }
 
 }

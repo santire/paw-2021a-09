@@ -1,5 +1,6 @@
 import {
   ActionIcon,
+  Avatar,
   Badge,
   Box,
   Button,
@@ -10,9 +11,11 @@ import {
   Group,
   Image,
   Loader,
+  Paper,
   Table,
   Tabs,
   Text,
+  TypographyStylesProvider
 } from "@mantine/core";
 import {
   IconBrandFacebook,
@@ -24,16 +27,18 @@ import {
   IconPhone,
   IconPhoto,
   IconSettings,
+  IconUser,
 } from "@tabler/icons";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { getRestaurantMenu } from "../api/services";
+import { getRestaurantMenu, getRestaurantReviews } from "../api/services";
 import { useRestaurant } from "../hooks/useRestaurant";
 import { Restaurant } from "../types";
 import { MenuItem } from "../types/MenuItem";
 import { Page } from "../types/Page";
+import { Review } from "../types/Review";
 
 const useStyles = createStyles((theme) => ({
   title: {
@@ -58,6 +63,21 @@ const useStyles = createStyles((theme) => ({
   tags: {
     minHeight: theme.spacing.xl * 2,
   },
+  comment: {
+    padding: `${theme.spacing.lg}px ${theme.spacing.xl}px`,
+  },
+
+  body: {
+    paddingLeft: 0,
+    paddingTop: theme.spacing.sm,
+    fontSize: theme.fontSizes.sm,
+  },
+
+  content: {
+    '& > p:last-child': {
+      marginBottom: 0,
+    },
+  },
 }));
 
 export function RestaurantPage() {
@@ -70,6 +90,8 @@ export function RestaurantPage() {
   const [menuStatus, setMenuStatus] = useState("idle");
   const [menuError, setMenuError] = useState<Error>();
   const [rows, setRows] = useState<React.ReactElement[]>([]);
+  const [reviewRows, setReviewRows] = useState<Review[]>([]);
+
 
   
   useEffect(() => {
@@ -94,6 +116,13 @@ export function RestaurantPage() {
             setMenuError(error);
             setMenuStatus("error");
         });
+
+        getRestaurantReviews(restaurantId)
+          .then(reviews => {
+            if(reviews){
+              setReviewRows(reviews.data)
+            }
+          })
     }
   }, [restaurantId]);
 
@@ -243,8 +272,28 @@ export function RestaurantPage() {
             </Tabs.Panel>
 
             <Tabs.Panel value="Reviews" pt="xs">
-              Reviews tab content
+              {reviewRows.length > 0 && (
+                <>
+                  {reviewRows.map((review, index) => (
+                    <Paper withBorder radius="md" className={classes.comment} key={index} mb={20}>
+                      <Group>
+                        <IconUser/>
+                        <div>
+                          <Text size="sm">{review.username}</Text>
+                          <Text size="xs" color="dimmed">
+                            2022-07-07
+                          </Text>
+                        </div>
+                      </Group>
+                      <TypographyStylesProvider className={classes.body}>
+                        <div className={classes.content} dangerouslySetInnerHTML={{ __html: review.userComment }} />
+                      </TypographyStylesProvider>
+                    </Paper>
+                  ))}
+                </>
+              )}
             </Tabs.Panel>
+
           </Tabs>
         </Grid.Col>
         
