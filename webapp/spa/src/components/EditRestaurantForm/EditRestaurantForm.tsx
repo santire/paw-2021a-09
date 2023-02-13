@@ -174,7 +174,9 @@ export function EditRestaurantForm(props: Partial<DropzoneProps>) {
   const processForm = async (data: EditRestaurantForm) => {
     const {...restaurant } = data;
     try {
-      await isRestaurantNameAvailable(restaurant.name);
+      if(name !== restaurant.name){
+        await isRestaurantNameAvailable(restaurant.name);
+      }
     } catch (e) {
       setError("name", {
         type: "custom",
