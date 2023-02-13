@@ -279,7 +279,8 @@
       "tagsSelection": "Al menos 1 categoría es requerida",
       "name": {
         "label": "Nombre del restaurante",
-        "placeholder": "Mi restaurante"
+        "placeholder": "Mi restaurante",
+        "taken": "El nombre del restaurante ya ha sido elegido"
       },
       "address": {
         "label": "Dirección",

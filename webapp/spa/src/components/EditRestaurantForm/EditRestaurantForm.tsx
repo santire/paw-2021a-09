@@ -174,23 +174,21 @@ export function EditRestaurantForm(props: Partial<DropzoneProps>) {
   const processForm = async (data: EditRestaurantForm) => {
     const {...restaurant } = data;
     try {
-      const isNameAvailable = true;
-      if(name !== restaurant.name){
-        const isNameAvailable = await isRestaurantNameAvailable(restaurant.name);
-      }
-      if (isNameAvailable && restaurantId) {
+      await isRestaurantNameAvailable(restaurant.name);
+    } catch (e) {
+      setError("name", {
+        type: "custom",
+        message: t("pages.editRestaurant.name.taken") || ""
+      });
+      setValue("name", restaurant.name);
+      return;
+    }
+    try {
+      if (restaurantId) {
         await updateRestaurant({...restaurant}, restaurantId)
         queryClient.invalidateQueries("restaurant")
-        //reset();
         // TODO: Navigate to restaurant page
         navigate('/users/:userId/restaurants' );
-      }
-      else{
-        setError("name", {
-          type: "custom",
-          message: "The restaurant name is already taken"
-        });    
-        setValue("name", restaurant.name);
       }
     } catch (e) {
       //console.error(e);

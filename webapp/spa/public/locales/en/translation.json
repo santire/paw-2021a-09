@@ -283,7 +283,8 @@
       "tagsSelection": "At least 1 tag is required",
       "name": {
         "label": "Restaurant name",
-        "placeholder": "My resturant"
+        "placeholder": "My resturant",
+        "taken": "The restaurant name is already taken"
       },
       "address": {
         "label": "Address",
