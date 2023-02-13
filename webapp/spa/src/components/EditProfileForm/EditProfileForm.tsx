@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Dropzone, DropzoneProps, IMAGE_MIME_TYPE, FileWithPath } from '@mantine/dropzone';
-
+import { useMutation, useQueryClient } from "react-query";
 import { useTranslation } from "react-i18next";
 import {useNavigate, useParams, useSearchParams} from "react-router-dom";
 import * as z from "zod";
@@ -44,6 +44,7 @@ type EditProfileForm = z.infer<typeof registerSchema>;
 export function EditProfileForm(props: Partial<DropzoneProps>) {
     const theme = useMantineTheme();
     const { classes } = useStyles();
+    const queryClient = useQueryClient();
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { userId } = useParams();
@@ -82,8 +83,7 @@ export function EditProfileForm(props: Partial<DropzoneProps>) {
         try {
             console.log({...user})
             await updateProfile({userId: userId, email: email, ...user})
-            reset();
-            //navigate('/' );
+            queryClient.invalidateQueries("user")
         } catch (e) {
             //console.error(e);
         }
