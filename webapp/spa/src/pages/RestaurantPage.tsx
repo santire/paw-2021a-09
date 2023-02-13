@@ -1,6 +1,7 @@
 import {
   ActionIcon,
   Badge,
+  Box,
   Button,
   createStyles,
   Divider,
@@ -9,6 +10,7 @@ import {
   Group,
   Image,
   Loader,
+  Tabs,
   Text,
 } from "@mantine/core";
 import {
@@ -16,11 +18,21 @@ import {
   IconBrandInstagram,
   IconBrandTwitter,
   IconMapPin,
+  IconMenu,
+  IconMessageCircle,
   IconPhone,
+  IconPhoto,
+  IconSettings,
 } from "@tabler/icons";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
+import { getRestaurantMenu } from "../api/services";
 import { useRestaurant } from "../hooks/useRestaurant";
+import { Restaurant } from "../types";
+import { MenuItem } from "../types/MenuItem";
+import { Page } from "../types/Page";
 
 const useStyles = createStyles((theme) => ({
   title: {
@@ -53,6 +65,35 @@ export function RestaurantPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { status, data, error } = useRestaurant(restaurantId || "");
+
+  const [menuStatus, setMenuStatus] = useState("idle");
+  const [menuData, setMenuData] = useState<Page<MenuItem>>();
+  const [menuError, setMenuError] = useState<Error>();
+  
+  useEffect(() => {
+    if (restaurantId) {
+      let isCancelled = false;
+      setMenuStatus("loading");
+  
+      getRestaurantMenu(restaurantId)
+        .then(data => {
+          if (!isCancelled) {
+            setMenuData(data);
+            setMenuStatus("success");
+          }
+        })
+        .catch(error => {
+          if (!isCancelled) {
+            setMenuError(error);
+            setMenuStatus("error");
+          }
+        });
+  
+      return () => {
+        isCancelled = true;
+      };
+    }
+  }, [restaurantId]);
 
   if (!restaurantId) {
     navigate("/404");
@@ -171,13 +212,42 @@ export function RestaurantPage() {
                 {features}
               </Group>
             </div>
+          </Flex>
+        </Grid.Col>
+
+        
+        <Grid.Col span={12}>
+          <Divider m="xl" orientation="horizontal"/>
+        </Grid.Col>
+
+        <Grid.Col span={4}>
+          <Tabs defaultValue="Menu">
+            <Tabs.List>
+              <Tabs.Tab value="Menu" icon={<IconMenu size={14} />}>Menu</Tabs.Tab>
+              <Tabs.Tab value="Reviews" icon={<IconMessageCircle size={14} />}>Reviews</Tabs.Tab>
+            </Tabs.List>
+
+            <Tabs.Panel value="Menu" pt="xs">
+              Menu tab content
+            </Tabs.Panel>
+
+            <Tabs.Panel value="Reviews" pt="xs">
+              Reviews tab content
+            </Tabs.Panel>
+          </Tabs>
+        </Grid.Col>
+        
+
+        <Grid.Col span={7} px={"5%"}>
+          <Divider orientation="vertical"/>
+          <Flex direction="column" justify="space-between" h={"100%"}>
             <Button mt="xl" color="orange" variant="outline" size="xl">
               {t("pages.restaurant.reservationButton")}
             </Button>
           </Flex>
         </Grid.Col>
       </Grid>
-      <Divider m="xl" />
+
     </>
   );
 }

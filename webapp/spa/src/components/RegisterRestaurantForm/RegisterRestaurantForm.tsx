@@ -114,7 +114,6 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
     reader.onload = () => {
       const imageUrl = reader.result;
       setValue("image", imageUrl);
-      //register("image", imageURL);
     }
     const imageURL = URL.createObjectURL(file);
     return (
