@@ -40,6 +40,12 @@ public class RestaurantServiceImpl implements RestaurantService {
         return restaurantDao.findById(id);
     }
 
+    @Override 
+    @Transactional
+    public Boolean findByName(String name){
+        return restaurantDao.findByName(name);
+    }
+
     @Override
     @Transactional
     public List<Restaurant> getPopularRestaurants(int limit, int minValue) {

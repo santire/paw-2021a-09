@@ -1,9 +1,6 @@
 package ar.edu.itba.paw.webapp.dto;
 
 import ar.edu.itba.paw.model.MenuItem;
-import ar.edu.itba.paw.model.Restaurant;
-
-import javax.ws.rs.core.UriInfo;
 
 public class MenuItemDto {
 

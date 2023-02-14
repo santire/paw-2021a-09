@@ -76,6 +76,10 @@ public class AuthComponent {
         LOGGER.debug("path id: {}", userId);
         return loggedUser.getId() == userId;
     }
+    public boolean isUserByEmail(String email) {
+        User loggedUser = loggedUser();
+        return loggedUser.getEmail().equalsIgnoreCase(email);
+    }
 
     private User loggedUser() {
         final Authentication auth = SecurityContextHolder.getContext().getAuthentication();

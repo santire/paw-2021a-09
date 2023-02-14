@@ -34,10 +34,51 @@
     "liked": "A {{likes}} personas les gusta esto",
     "tagsTitle": "Ideal para vos, si te gusta"
   },
+  "UserRestaurantCard": {
+    "more": "Ver más",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "liked": "A {{likes}} personas les gusta esto",
+    "tagsTitle": "Ideal para vos, si te gusta",
+    "deleteModal": {
+      "title": "¿Seguro quieres eliminar?",
+      "text": "Esta acción no podrá ser deshecha y la información de tu restaurante se perderá.",
+      "confirm": "Confirmar"
+    }
+  },
   "error": {
     "title": "Encontraste un lugar secreto",
     "description": "Lamentablemente esto es solo una página de 404. Es posible que hayas escrito mal la dirección o que la página se haya movido",
     "takeMeBack": "Volver al inicio"
+  },
+  "tags":{
+    "ARABE": "ARABE",
+    "AMERICANO": "AMERICANO",
+    "ARGENTINO": "ARGENTINO",
+    "ARMENIO": "ARMENIO",
+    "ASIATICO": "ASIATICO",
+    "AUTOCTONO": "AUTOCTONO",
+    "BODEGON": "BODEGON",
+    "CHINO": "CHINO",
+    "COCINACASERA": "COCINA CASERA",
+    "CONTEMPORANEA": "CONTEMPORANEA",
+    "DEAUTOR": "DE AUTOR",
+    "DEFUSION": "DE FUSION",
+    "ESPAÑOL": "ESPAÑOL",
+    "FRANCES": "FRANCES",
+    "INDIO": "INDIO",
+    "INTERNACIONAL": "INTERNACIONAL",
+    "ITALIANO": "ITALIANO",
+    "JAPONES": "JAPONES",
+    "LATINO": "LATINO",
+    "MEDITERRANEO": "MEDITERRANEO",
+    "MEXICANO": "MEXICANO",
+    "PARRILLA": "PARRILLA",
+    "PERUANO": "PERUANO",
+    "PESCADOSYMARISCOS": "PESCADOS Y MARISCOS",
+    "PICADAS": "PICADAS",
+    "PIZZERIA": "PIZZERIA",
+    "VEGETARIANO": "VEGETARIANO"
   },
   "pages": {
     "home": {
@@ -45,7 +86,15 @@
       "heading": "Descubra y reserve los mejores restaurantes"
     },
     "restaurant": {
-      "reservationButton": "Hacer una reserva"
+      "reservationButton": "Hacer una reserva",
+      "menu.title": "Menu",
+      "menu.name": "Nombre",
+      "menu.description": "Descripción",
+      "menu.price": "Precio",
+      "reviews.title": "Reseñas",
+      "reviews.leaveTitle": "Deje su reseña",
+      "reviews.writeHere": "Escriba aquí",
+      "reviews.send": "Enviar"
     },
     "restaurants": {
       "title": "Todos los restaurantes",
@@ -80,6 +129,11 @@
         "submit": "Aplicar",
         "clear": "Limpiar filtros"
       }
+    },
+    "userRestaurants": {
+      "title": "Tus restaurantes",
+      "notFound": "Parece que no tienes ningún restaurante",
+      "createOne": "Crea tu restaurante"
     },
     "login": {
       "alert": "Usuario o contraseña inválido",
@@ -155,7 +209,8 @@
       },
       "email": {
         "label": "Email",
-        "placeholder": "tu@gourmetable.com"
+        "placeholder": "tu@gourmetable.com",
+        "taken": "El correo electronico ya fue registrado"
       },
       "username": {
         "label": "Usuario",
@@ -181,36 +236,97 @@
         "label": "Número de teléfono",
         "placeholder": "1123456789"
       },
-      "submit": "Regitrarse"
+      "submit": "Registrarse"
+    },
+    "registerRestaurant" : {
+      "loginDivider": "General",
+      "contactDivider": "Información de contacto",
+      "socialMediaDivider": "Redes Sociales",
+      "title": "Registre su restaurante",
+      "tagsDivider": "Categoría",
+      "profileImage": "Imagen de perfil",
+      "dropImage": "Arrastre las imagenes aquí o haga click para seleccionar un archivo",
+      "tagsSelection": "Al menos 1 categoría es requerida",
+      "name": {
+        "label": "Nombre del restaurante",
+        "placeholder": "Mi restaurante"
+      },
+      "address": {
+        "label": "Dirección",
+        "placeholder": "Av. Siempreviva 123"
+      },
+      "phone": {
+        "label": "Número de teléfono",
+        "placeholder": "1123456789"
+      },
+      "facebook": {
+        "label": "Facebook",
+        "placeholder": "facebook.com/suSitio"
+      },
+      "instagram": {
+        "label": "Instagram",
+        "placeholder": "instagram.com/suSitio"
+      },
+      "twitter": {
+        "label": "Twitter",
+        "placeholder": "twitter.com/suSitio"
+      }
+    },
+    "editRestaurant": {
+      "loginDivider": "General",
+      "contactDivider": "Información de contacto",
+      "socialMediaDivider": "Redes Sociales",
+      "title": "Editar restaurante",
+      "tagsDivider": "Categoría",
+      "profileImage": "Imagen de perfil",
+      "dropImage": "Arrastre las imagenes aquí o haga click para seleccionar un archivo",
+      "tagsSelection": "Al menos 1 categoría es requerida",
+      "name": {
+        "label": "Nombre del restaurante",
+        "placeholder": "Mi restaurante",
+        "taken": "El nombre del restaurante ya ha sido elegido"
+      },
+      "address": {
+        "label": "Dirección",
+        "placeholder": "Av. Siempreviva 123"
+      },
+      "phone": {
+        "label": "Número de teléfono",
+        "placeholder": "1123456789"
+      },
+      "facebook": {
+        "label": "Facebook",
+        "placeholder": "facebook.com/suSitio"
+      },
+      "instagram": {
+        "label": "Instagram",
+        "placeholder": "instagram.com/suSitio"
+      },
+      "twitter": {
+        "label": "Twitter",
+        "placeholder": "twitter.com/suSitio"
+      },
+      "submit": "Editar"
+    },
+    "profile": {
+      "profile": "Mi información",
+      "username": {
+        "label": "Nombre de usuario",
+        "placeholder": "Nombre de usuario"
+      },
+      "firstName": {
+        "label": "Nombre",
+        "placeholder": "Nombre"
+      },
+      "lastName": {
+        "label": "Apellido",
+        "placeholder": "Apellido"
+      },
+      "phoneNumber": {
+        "label": "Número de teléfono",
+        "placeholder": "Número de teléfono"
+      },
+      "submit": "Confirmar"
     }
-  },
-  "tags": {
-    "arabe": "Árabe",
-    "americano": "Americana",
-    "argentino": "Argentina",
-    "armenio": "Armenia",
-    "asiatico": "Asiática",
-    "autoctono": "Autóctona",
-    "bodegon": "Bodegón",
-    "chino": "China",
-    "cocinacasera": "Casera",
-    "contemporanea": "Contemporanea",
-    "deautor": "De Autor",
-    "defusion": "Fusión",
-    "español": "Española",
-    "frances": "Francesa",
-    "indio": "India",
-    "internacional": "Internacional",
-    "italiano": "Italiana",
-    "japones": "Japonesa",
-    "latino": "Latina",
-    "mediterraneo": "Mediterranea",
-    "mexicano": "Mexicana",
-    "parrilla": "Parrila",
-    "peruano": "Peruana",
-    "pescadosymariscos": "Pescado",
-    "picadas": "Picadas",
-    "pizzeria": "Pizza",
-    "vegetariano": "Vegetariana"
   }
 }

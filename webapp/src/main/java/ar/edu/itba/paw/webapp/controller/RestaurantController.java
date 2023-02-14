@@ -6,20 +6,22 @@ import javax.ws.rs.core.*;
 import ar.edu.itba.paw.service.*;
 import ar.edu.itba.paw.webapp.dto.*;
 import ar.edu.itba.paw.webapp.utils.CachingUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 import ar.edu.itba.paw.service.UserService;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 
 
@@ -27,7 +29,7 @@ import java.io.IOException;
 @Path("/restaurants")
 public class RestaurantController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
     private static final int AMOUNT_OF_MENU_ITEMS = 8;
     private static final int MAX_AMOUNT_PER_PAGE = 10;
     private static final int AMOUNT_OF_REVIEWS = 4;
@@ -107,13 +109,24 @@ public class RestaurantController {
 
         int maxPages = restaurantService.getRestaurantsFilteredByPageCount(pageAmount, search, tagsSelected, min, max);
         List<RestaurantDto> restaurants = restaurantService.getRestaurantsFilteredBy(page, pageAmount, search, tagsSelected,min,max, sort, desc, 7).stream().map(u -> RestaurantDto.fromRestaurant(u, uriInfo)).collect(Collectors.toList());
-
+        LOGGER.info(String.valueOf(restaurants.size()));
         return Response.ok(new GenericEntity<List<RestaurantDto>>(restaurants){})
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", maxPages).build(), "last")
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.max((page - 1), 1)).build(), "prev")
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.min((page + 1), maxPages)).build(), "next")
                 .build();
+    }
+
+    @HEAD
+    @Path("/{restaurantName}")
+    public Response checkRestaurantName(@PathParam("restaurantName") final String restaurantName){
+        final Boolean restaurantExists = restaurantService.findByName(restaurantName);
+        if(restaurantExists){
+            return Response.status(Response.Status.CONFLICT).build();
+        }
+        
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 
     //READ A RESTAURANT
@@ -147,7 +160,6 @@ public class RestaurantController {
 
         List<MenuItemDto> menu = maybeRestaurant.orElseThrow(RestaurantNotFoundException::new).getMenu().stream().map(MenuItemDto::fromMenuItem).collect(Collectors.toList());
 
-
         return Response.ok(new GenericEntity<List<MenuItemDto>>(menu){})
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", maxPages).build(), "last")
@@ -179,13 +191,12 @@ public class RestaurantController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = { MediaType.APPLICATION_JSON})
     public Response addRestaurantReview(@PathParam("restaurantId") final long restaurantId, final CommentDto comment, @Context HttpServletRequest request){
-
         Optional<User> user = getLoggedUser(request);
         if(!user.isPresent()){
             LOGGER.error("anon user attempt to register a restaurant");
             return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
         }
-
+        LOGGER.info(comment.getUserComment());
         final Comment rev = commentService.addComment(user.get().getId(), restaurantId, comment.getUserComment());
 
         final URI uri = uriInfo.getBaseUriBuilder().path("/"+restaurantId+"/reviews").build();
@@ -264,6 +275,7 @@ public class RestaurantController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = { MediaType.APPLICATION_JSON})
     public Response registerRestaurant(final RestaurantDto restaurantDto, @Context HttpServletRequest request) {
+        LOGGER.info("Registering restaurant: " + restaurantDto.toString());
         Optional<User> user = getLoggedUser(request);
         if(!user.isPresent()){
             LOGGER.error("anon user attempt to register a restaurant");
@@ -271,11 +283,14 @@ public class RestaurantController {
         }
 
         LOGGER.debug("Creating restaurant for user {}", user.get().getUsername());
-        List<Tags> tagList = restaurantDto.getTags().stream().map(t -> Tags.valueOf(t.getValue())).collect(Collectors.toList());
-        LOGGER.debug("tags: {}", tagList);
+        List<Tags> tagList = new ArrayList<>();
+        if(restaurantDto.getTags() != null){
+            tagList = restaurantDto.getTags().stream().map(t -> Tags.valueOf(t)).collect(Collectors.toList());
+            LOGGER.debug("tags: {}", tagList);
+        }
+        
         final Restaurant restaurant = restaurantService.registerRestaurant(restaurantDto.getName(), restaurantDto.getAddress(),
                 restaurantDto.getPhoneNumber(), tagList, user.get());
-        //updateAuthorities();
 
         if (restaurantDto.getFacebook() != null){
             socialMediaService.updateFacebook(restaurantDto.getFacebook(), restaurant.getId());
@@ -287,21 +302,82 @@ public class RestaurantController {
             socialMediaService.updateTwitter(restaurantDto.getTwitter(), restaurant.getId());
         }
 
-        //if (imageDto.getData() != null) {
-        //    Image image = new Image(imageDto.getData());
-        //    restaurantService.setImageByRestaurantId(image, restaurant.getId());
-        //}
+        Image image = null;
+        if(restaurantDto.getImage() != null){
+            //LOGGER.info(restaurantDto.getImage());
+            image = new Image(restaurantDto.getImage());
+            restaurantService.setImageByRestaurantId(image, restaurant.getId());
+        } 
+
         final URI uri = uriInfo.getAbsolutePathBuilder()
                 .path(String.valueOf(restaurant.getId())).build();
         LOGGER.info("Restaurant created in : " + uri);
         return Response.created(uri).build();
     }
 
+        @POST
+        @Path("/{restaurantId}")
+        @Produces(value = {MediaType.APPLICATION_JSON})
+        @Consumes(value = { MediaType.APPLICATION_JSON})
+        public Response updateRestaurant(final RestaurantDto restaurantDto, 
+                                        @PathParam("restaurantId") final long restaurantId,
+                                        @Context HttpServletRequest request) {                        
+            LOGGER.info("Updating restaurant: " + restaurantDto.toString());
+            Optional<User> user = getLoggedUser(request);
+            if(!user.isPresent()){
+                LOGGER.error("anon user attempt to register a restaurant");
+                return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
+            }
+
+            // get the current restaurant
+            Optional<Restaurant> maybeRestaurant = restaurantService.findById(restaurantId);
+            if(!maybeRestaurant.isPresent()){
+                LOGGER.error("Restaurant with id " + restaurantId + " do not exist");
+                return Response.status(Response.Status.BAD_REQUEST).header("error", "non-existent restaurante").build();
+            }
+        
+            if(!user.get().getOwnedRestaurants().contains(maybeRestaurant.get())){
+                LOGGER.error("another user attempt to update a restaurant");
+                return Response.status(Response.Status.BAD_REQUEST).header("error", "Wrong user attempt to update a restaurant").build();
+            }
+    
+            LOGGER.debug("Updating restaurant for user {}", user.get().getUsername());
+            List<Tags> tagList = new ArrayList<>();
+            if(restaurantDto.getTags() != null){
+                tagList = restaurantDto.getTags().stream().map(t -> Tags.valueOf(t)).collect(Collectors.toList());
+                LOGGER.debug("tags: {}", tagList);
+            }
+            
+            restaurantService.updateRestaurant(restaurantId, restaurantDto.getName(), restaurantDto.getAddress(),
+                    restaurantDto.getPhoneNumber(), tagList);
+    
+            if (restaurantDto.getFacebook() != null){
+                socialMediaService.updateFacebook(restaurantDto.getFacebook(), restaurantId);
+            }
+            if (restaurantDto.getInstagram() != null){
+                socialMediaService.updateInstagram(restaurantDto.getInstagram(), restaurantId);
+            }
+            if (restaurantDto.getTwitter() != null){
+                socialMediaService.updateTwitter(restaurantDto.getTwitter(), restaurantId);
+            }
+    
+            if(restaurantDto.getImage() != null){
+                Image image = null;
+                image = new Image(restaurantDto.getImage());
+                restaurantService.setImageByRestaurantId(image, restaurantId);
+            } 
+    
+            final URI uri = uriInfo.getAbsolutePathBuilder()
+                    .path(String.valueOf(restaurantId)).build();
+            LOGGER.info("Restaurant created in : " + uri);
+            return Response.created(uri).build();
+        }
+
     //SET IMAGE
     @PUT
     @Path("/{restaurantId}/image")
     @Consumes(value = { MediaType.APPLICATION_JSON})
-    public Response getEventImage(@PathParam("restaurantId") final long restaurantId, final ImageDto imageDto,  @Context HttpServletRequest request) {
+    public Response getRestaurantImage(@PathParam("restaurantId") final long restaurantId, final ImageDto imageDto,  @Context HttpServletRequest request) {
 
         final Optional<Restaurant> maybeRestaurant = restaurantService.findById(restaurantId);
         if (!maybeRestaurant.isPresent())
@@ -326,7 +402,7 @@ public class RestaurantController {
     @GET
     @Path("/{restaurantId}/image")
     @Produces("image/jpg")
-    public Response getEventImage(@PathParam("restaurantId") final long restaurantId) throws IOException {
+    public Response getRestaurantImage(@PathParam("restaurantId") final long restaurantId) throws IOException {
         CacheControl cache = CachingUtils.getCaching(CachingUtils.HOUR_TO_SEC);
         Date expireDate = CachingUtils.getExpirationDate(CachingUtils.HOUR_TO_SEC);
         final Optional<Restaurant> maybeRestaurant = restaurantService.findById(restaurantId);
@@ -336,11 +412,11 @@ public class RestaurantController {
 
             if(image != null){
                 LOGGER.info("Found restaurant image");
-                return Response.ok(image.getData())
+                return Response.ok(image.getImageEncoded())
                         .cacheControl(cache).expires(expireDate).build();
             }
             else{
-                final Image defaultImage = new Image(null);
+                final Image defaultImage = new Image((byte[])null);
                 LOGGER.info("Restaurant Image not found. Placeholder is used");
                 return Response.ok(defaultImage.getDataFromPlaceholder())
                         .cacheControl(cache).expires(expireDate).build();
@@ -512,7 +588,7 @@ public class RestaurantController {
 
         Optional<User> user = getLoggedUser(request);
         if(!user.isPresent()){
-            LOGGER.error("anon user attempt to register a restaurant");
+            LOGGER.error("Anon user attempt to delete a restaurant");
             return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
         }
         Optional<Reservation> reservation = reservationService.findById(reservationId);
@@ -555,7 +631,8 @@ public class RestaurantController {
 
     @ModelAttribute("loggedUser")
     public Optional<User> getLoggedUser(HttpServletRequest request){
-        return userService.findByUsername(request.getRemoteUser());
+        LOGGER.info("USER: " + SecurityContextHolder.getContext().getAuthentication().getName());
+        return userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());  
     }
 
 

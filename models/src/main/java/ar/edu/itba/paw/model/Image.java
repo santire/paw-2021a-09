@@ -51,16 +51,31 @@ public class Image {
         this.data = data;
     }
 
+    // public Image(final String base64) throws UnsupportedEncodingException{
+    //     this.imageId = null;
+    //     byte[] temp = Base64.getEncoder().encode(base64.getBytes());
+    //     this.data = Base64.getDecoder().decode(new String(temp).getBytes("UTF-8"));
+    // }
+
+    public Image(final String base64){
+        this.data = Base64.getEncoder().encode(base64.getBytes(StandardCharsets.UTF_8));
+    }
+
     public Long getImageId(){ return this.imageId; }
     public byte[] getData(){ return this.data; }
-    public String getImageEncoded() throws IOException{
-        byte[] encodeBase64 = Base64.getEncoder().encode(this.data);
-        String base64Encoded = new String(encodeBase64, StandardCharsets.UTF_8);
-        return base64Encoded;
+    public byte[] getImageEncoded() throws IOException{
+        // byte[] encodeBase64 = Base64.getEncoder().encode(this.data);
+        // String base64Encoded = new String(encodeBase64, StandardCharsets.UTF_8);
+        // return base64Encoded;x
+        String decoded = new String(Base64.getDecoder().decode(this.data), StandardCharsets.UTF_8);
+        String[] splitImage = decoded.split(",");
+        return DatatypeConverter.parseBase64Binary(splitImage[1]);
     }
 
     public byte[] getDataFromPlaceholder() throws IOException{
-        String[] splitImage = placeHolder.split(",");
+        byte[] data = Base64.getEncoder().encode(placeHolder.getBytes(StandardCharsets.UTF_8));
+        String decoded = new String(Base64.getDecoder().decode(data), StandardCharsets.UTF_8);
+        String[] splitImage = decoded.split(",");
         return DatatypeConverter.parseBase64Binary(splitImage[1]);
     }
     public Restaurant getRestaurant() { return restaurant; }
@@ -68,5 +83,7 @@ public class Image {
     public void setImageId(Long imageId) { this.imageId = imageId; }
     public void setData(byte[] data) { this.data = data; }
     public void setRestaurant(Restaurant restaurant) { this.restaurant = restaurant; }
+
+
 
 }

@@ -44,19 +44,11 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
-
-    @Bean
-     public HandlerExceptionResolver handlerExceptionResolver() { return new ExceptionHandlerExceptionResolver(); }
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public CorsFilter getCorsFilter() {
-        return new CorsFilter();
-    }
 
     @Override
     @Bean
@@ -98,7 +90,6 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic();
 
     }
-
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()

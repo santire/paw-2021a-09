@@ -13,6 +13,7 @@ public interface RestaurantService {
 
     // READ
     public Optional<Restaurant> findById(long id);
+    public Boolean findByName(String name);
 
     public Optional<Restaurant> findByIdWithMenu(long id, int menuPage, int amountOnMenuPage);
     public int findByIdWithMenuPagesCount(int amountOnMenuPage, long id);

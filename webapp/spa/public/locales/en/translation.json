@@ -34,10 +34,51 @@
     "liked": "{{likes}} people liked this",
     "tagsTitle": "Perfect for you, if you enjoy"
   },
+  "UserRestaurantCard": {
+    "more": "See more",
+    "edit": "Edit",
+    "delete": "Delete",
+    "liked": "{{likes}} people liked this",
+    "tagsTitle": "Perfect for you, if you enjoy",
+    "deleteModal": {
+      "title": "Are you sure you want to delete?",
+      "text": "This action cannot be undone and all your restaurant information will be lost.",
+      "confirm": "Confirm"
+    }
+  },
   "error": {
     "title": "You have found a secret place.",
     "description": "Unfortunately, this is only a 404 page. You may have mistyped the address, or the page has been moved to another URL.",
     "takeMeBack": "Take me back to the home page"
+  },
+  "tags":{
+    "ARABE": "ARAB",
+    "AMERICANO": "AMERICAN",
+    "ARGENTINO": "ARGENTINIAN",
+    "ARMENIO": "ARMENIAN",
+    "ASIATICO": "ASIAN",
+    "AUTOCTONO": "AUTOCHTHONOUS",
+    "BODEGON": "TABERN",
+    "CHINO": "CHINESE",
+    "COCINACASERA": "HOME MADE",
+    "CONTEMPORANEA": "CONTEMPORARY",
+    "DEAUTOR": "SIGNATURE",
+    "DEFUSION": "FUSION",
+    "ESPAÑOL": "SPANISH",
+    "FRANCES": "FRENCH",
+    "INDIO": "INDIAN",
+    "INTERNACIONAL": "INTERNATIONAL",
+    "ITALIANO": "ITALIAN",
+    "JAPONES": "JAPANESE",
+    "LATINO": "LATIN",
+    "MEDITERRANEO": "MEDITERRANEAN",
+    "MEXICANO": "MEXICAN",
+    "PARRILLA": "GRILL",
+    "PERUANO": "PERUVIAN",
+    "PESCADOSYMARISCOS": "FISH AND SEAFOOD",
+    "PICADAS": "APPETIZERS",
+    "PIZZERIA": "PIZZA",
+    "VEGETARIANO": "VEGETARIAN"
   },
   "pages": {
     "home": {
@@ -45,7 +86,15 @@
       "heading": "Discover and book the best restaurants"
     },
     "restaurant": {
-      "reservationButton": "Make a Reservation"
+      "reservationButton": "Make a Reservation",
+      "menu.title": "Menu",
+      "menu.name": "Name",
+      "menu.description": "Description",
+      "menu.price": "Price",
+      "reviews.title": "Reviews",
+      "reviews.leaveTitle": "Leave your review",
+      "reviews.writeHere": "Write here",
+      "reviews.send": "Send"
     },
     "restaurants": {
       "title": "Browse restaurants",
@@ -84,6 +133,11 @@
         "submit": "Apply",
         "clear": "Clear filters"
       }
+    },
+    "userRestaurants": {
+      "title": "Your restaurants",
+      "notFound": "Looks like you do not own any restaurant",
+      "createOne": "Create your restaurant"
     },
     "login": {
       "alert": "Invalid username or password",
@@ -159,7 +213,8 @@
       },
       "email": {
         "label": "Email",
-        "placeholder": "you@gourmetable.com"
+        "placeholder": "you@gourmetable.com",
+        "taken": "The email is already taken"
       },
       "username": {
         "label": "Username",
@@ -186,35 +241,96 @@
         "placeholder": "1123456789"
       },
       "submit": "Register"
+    },
+    "registerRestaurant" : {
+      "loginDivider": "Basic information",
+      "contactDivider": "Contact Information",
+      "socialMediaDivider": "Social Media",
+      "title": "Register a restaurant",
+      "tagsDivider": "Tags",
+      "profileImage": "Profile Image",
+      "dropImage": "Drop images here ir click to select files",
+      "tagsSelection": "At least 1 tag1 is required",
+      "name": {
+        "label": "Restaurant name",
+        "placeholder": "Your restaurant name"
+      },
+      "address": {
+        "label": "Address",
+        "placeholder": "Av. Siempreviva 123"
+      },
+      "phone": {
+        "label": "Phone number",
+        "placeholder": "1123456789"
+      },
+      "facebook": {
+        "label": "Facebook",
+        "placeholder": "facebook.com/yourSite"
+      },
+      "instagram": {
+        "label": "Instagram",
+        "placeholder": "instagram.com/yourSite"
+      },
+      "twitter": {
+        "label": "Twitter",
+        "placeholder": "twitter.com/yourSite"
+      }
+    },
+    "editRestaurant": {
+      "loginDivider": "General",
+      "contactDivider": "Contact Information",
+      "socialMediaDivider": "Social Media",
+      "title": "Edit restaurant",
+      "tagsDivider": "Categories",
+      "profileImage": "Profile Image",
+      "dropImage": "Change profile image",
+      "tagsSelection": "At least 1 tag is required",
+      "name": {
+        "label": "Restaurant name",
+        "placeholder": "My resturant",
+        "taken": "The restaurant name is already taken"
+      },
+      "address": {
+        "label": "Address",
+        "placeholder": "Av. Siempreviva 123"
+      },
+      "phone": {
+        "label": "Phone number",
+        "placeholder": "1123456789"
+      },
+      "facebook": {
+        "label": "Facebook",
+        "placeholder": "facebook.com/yourSite"
+      },
+      "instagram": {
+        "label": "Instagram",
+        "placeholder": "instagram.com/yourSite"
+      },
+      "twitter": {
+        "label": "Twitter",
+        "placeholder": "twitter.com/yourSite"
+      },
+      "submit": "Edit"
+    },
+    "profile": {
+      "profile": "Profile",
+      "username": {
+        "label": "Username",
+        "placeholder": "Your username"
+      },
+      "firstName": {
+        "label": "First name",
+        "placeholder": "Your name"
+      },
+      "lastName": {
+        "label": "Last name",
+        "placeholder": "Your last name"
+      },
+      "phoneNumber": {
+        "label": "Phone number",
+        "placeholder": "Your phone number"
+      },
+      "submit": "Submit"
     }
-  },
-  "tags": {
-    "arabe": "Arab",
-    "americano": "American",
-    "argentino": "Argentinian",
-    "armenio": "Armenian",
-    "asiatico": "Asian",
-    "autoctono": "Local",
-    "bodegon": "Bodegon",
-    "chino": "Chinese",
-    "cocinacasera": "Homemade",
-    "contemporanea": "Contemporary",
-    "deautor": "Signature",
-    "defusion": "Fusion",
-    "español": "Spanish",
-    "frances": "French",
-    "indio": "Indian",
-    "internacional": "International",
-    "italiano": "Italian",
-    "japones": "Japanese",
-    "latino": "Latino",
-    "mediterraneo": "Mediterranean",
-    "mexicano": "Mexican",
-    "parrilla": "Grill",
-    "peruano": "Peruvian",
-    "pescadosymariscos": "Seafood",
-    "picadas": "Picadas",
-    "pizzeria": "Pizza",
-    "vegetariano": "Vegetarian"
   }
 }

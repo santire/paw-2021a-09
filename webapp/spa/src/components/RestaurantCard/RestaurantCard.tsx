@@ -29,9 +29,9 @@ export function RestaurantCard({
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const features = tags.map((tag, idx) => (
+  const features = tags?.map((tag, idx) => (
     <Badge color="orange" key={tag + "" + idx}>
-      {t("tags." + tag.toLowerCase())}
+      {t("tags." + tag)}
     </Badge>
   ));
 
@@ -40,7 +40,7 @@ export function RestaurantCard({
       <Card.Section mb="md">
         <Image
           src={
-            image.startsWith("http") ? image : require(`../../assets/${image}`)
+            image?.startsWith("http") ? image : require(`../../assets/${image}`)
           }
           alt={name}
           height={180}

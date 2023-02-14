@@ -1,6 +1,8 @@
 import {
   ActionIcon,
+  Avatar,
   Badge,
+  Box,
   Button,
   createStyles,
   Divider,
@@ -8,19 +10,38 @@ import {
   Grid,
   Group,
   Image,
+  Input,
   Loader,
+  NumberInput,
+  Paper,
+  Table,
+  Tabs,
   Text,
+  Textarea,
+  TypographyStylesProvider
 } from "@mantine/core";
 import {
   IconBrandFacebook,
   IconBrandInstagram,
   IconBrandTwitter,
   IconMapPin,
+  IconMenu,
+  IconMessageCircle,
   IconPhone,
+  IconPhoto,
+  IconSettings,
+  IconUser,
 } from "@tabler/icons";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
+import { addMenuItem, getRestaurantMenu, getRestaurantReviews, reviewRestaurant } from "../api/services";
 import { useRestaurant } from "../hooks/useRestaurant";
+import { Restaurant } from "../types";
+import { MenuItem } from "../types/MenuItem";
+import { Page } from "../types/Page";
+import { Review } from "../types/Review";
 
 const useStyles = createStyles((theme) => ({
   title: {
@@ -45,6 +66,21 @@ const useStyles = createStyles((theme) => ({
   tags: {
     minHeight: theme.spacing.xl * 2,
   },
+  comment: {
+    padding: `${theme.spacing.lg}px ${theme.spacing.xl}px`,
+  },
+
+  body: {
+    paddingLeft: 0,
+    paddingTop: theme.spacing.sm,
+    fontSize: theme.fontSizes.sm,
+  },
+
+  content: {
+    '& > p:last-child': {
+      marginBottom: 0,
+    },
+  },
 }));
 
 export function RestaurantPage() {
@@ -53,6 +89,49 @@ export function RestaurantPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { status, data, error } = useRestaurant(restaurantId || "");
+
+  const [menuStatus, setMenuStatus] = useState("idle");
+  const [menuError, setMenuError] = useState<Error>();
+  const [rows, setRows] = useState<React.ReactElement[]>([]);
+  const [reviewRows, setReviewRows] = useState<Review[]>([]);
+  const [reviewText, setReviewText] = useState('');
+  const [menuItemName, setMenuItemName] = useState('');
+  const [menuItemDescription, setMenuItemDescription] = useState('');
+  const [menuItemPrice, setMenuItemPrice] = useState('');
+
+
+  
+  useEffect(() => {
+    if (restaurantId) {
+      setMenuStatus("loading");
+  
+      getRestaurantMenu(restaurantId)
+        .then(menuItems => {
+            setMenuStatus("success");
+            if(menuItems){
+              setRows(menuItems.data.map((item: MenuItem) => (
+                <tr key={item.name}>
+                  <td>{item.name}</td>
+                  <td>{item.description}</td>
+                  <td>{item.price}</td>
+                </tr>
+              )));
+            }
+        })
+        .catch(error => {
+            console.log(error);
+            setMenuError(error);
+            setMenuStatus("error");
+        });
+
+        getRestaurantReviews(restaurantId)
+          .then(reviews => {
+            if(reviews){
+              setReviewRows(reviews.data)
+            }
+          })
+    }
+  }, [restaurantId]);
 
   if (!restaurantId) {
     navigate("/404");
@@ -122,11 +201,30 @@ export function RestaurantPage() {
     }
   };
 
-  const features = tags.map((tag, idx) => (
+  const features = tags?.map((tag, idx) => (
     <Badge color="orange" key={tag + "" + idx}>
-      {t("tags." + tag.toLowerCase())}
+      {t("tags." + tag)}
     </Badge>
   ));
+
+  const handleReview = () => {
+    const rev = {
+      userComment: reviewText
+    }
+    reviewRestaurant(restaurantId, rev);
+    console.log(reviewText);
+  }
+
+  const handleAddMenu = () => {
+    const menuItem = {
+      name: menuItemName,
+      description: menuItemDescription,
+      price: menuItemPrice
+    }
+    console.log(menuItem)
+    addMenuItem(restaurantId, menuItem);
+    console.log(reviewText);
+  }
 
   return (
     <>
@@ -170,14 +268,153 @@ export function RestaurantPage() {
               <Group spacing={7} mt="xs" className={classes.tags}>
                 {features}
               </Group>
+              <Flex direction="column" justify="space-between" h={"100%"}>
+                <Button mt="xl" color="orange" variant="outline" size="xl">
+                  {t("pages.restaurant.reservationButton")}
+                </Button>
+              </Flex>
             </div>
-            <Button mt="xl" color="orange" variant="outline" size="xl">
-              {t("pages.restaurant.reservationButton")}
-            </Button>
+          </Flex>
+        </Grid.Col>
+
+        
+        <Grid.Col span={12}>
+          <Divider m="xl" orientation="horizontal"/>
+        </Grid.Col>
+
+        <Grid.Col span={12}>
+          <Flex justify={"center"}>
+            <Tabs defaultValue="Menu" style={{ width: '80%', justifyContent: "center" }}>
+              <Tabs.List>
+                <Tabs.Tab value="Menu" icon={<IconMenu size={14} />}>{t("pages.restaurant.menu.title")}</Tabs.Tab>
+                <Tabs.Tab value="Reviews" icon={<IconMessageCircle size={14} />}>{t("pages.restaurant.reviews.title")}</Tabs.Tab>
+              </Tabs.List>
+
+              <Tabs.Panel value="Menu" pt="xs">
+                <Table>
+                  <thead>
+                    <tr>
+                      <th>{t("pages.restaurant.menu.name")}</th>
+                      <th>{t("pages.restaurant.menu.description")}</th>
+                      <th>{t("pages.restaurant.menu.price")}</th>
+                    </tr>
+                  </thead>
+                  <tbody>{rows}</tbody>
+                </Table>
+
+                <Grid mt={100}>
+                  <Grid.Col span={3}>
+                    <Input
+                      onChange={(e) => {
+                        if(e != undefined){
+                          setMenuItemName(e.target.value)
+                        }
+                        else{
+                          setMenuItemName('')
+                        }
+                      }}
+                      placeholder="Name"
+                      styles={(theme) => ({
+                        input: {
+                          '&:focus-within': {
+                            borderColor: theme.colors.orange[7],
+                          },
+                        },
+                      })}
+                    />
+                  </Grid.Col>
+                  <Grid.Col span={7}>
+                    <Input
+                      onChange={(e) => {
+                        if(e != undefined){
+                          setMenuItemDescription(e.target.value)
+                        }
+                        else{
+                          setMenuItemDescription('')
+                        }
+                      }}
+                      placeholder="Description"
+                      styles={(theme) => ({
+                        input: {
+                          '&:focus-within': {
+                            borderColor: theme.colors.orange[7],
+                          },
+                        },
+                      })}
+                    />
+                  </Grid.Col>
+                  <Grid.Col span={2}>
+                    <Input
+                      placeholder="Price"
+                      onChange={(e) => {
+                        if(e != undefined){
+                          setMenuItemPrice(e.target.value)
+                        }
+                        else{
+                          setMenuItemPrice('')
+                        }
+                      }}
+                      styles={(theme) => ({
+                        input: {
+                          '&:focus-within': {
+                            borderColor: theme.colors.orange[7],
+                          },
+                        },
+                      })}
+                    />    
+                  </Grid.Col>
+                  <Grid.Col span={12}>
+                    <Flex justify={"center"}>
+                      <Button color="yellow" radius="md"
+                        onClick={handleAddMenu}>
+                        Add to menu
+                      </Button>
+                    </Flex>
+                  </Grid.Col>
+                </Grid>
+
+              </Tabs.Panel>
+
+              <Tabs.Panel value="Reviews" pt="xs">
+                {reviewRows.length > 0 && (
+                  <>
+                    {reviewRows.map((review, index) => (
+                      <>
+                      <Paper withBorder radius="md" className={classes.comment} key={index} mb={20}>
+                        <Group>
+                          <IconUser/>
+                          <div>
+                            <Text size="sm">{review.username}</Text>
+                            <Text size="xs" color="dimmed">
+                              {review.date}
+                            </Text>
+                          </div>
+                        </Group>
+                        <TypographyStylesProvider className={classes.body}>
+                          <div className={classes.content} dangerouslySetInnerHTML={{ __html: review.userComment }} />
+                        </TypographyStylesProvider>
+                      </Paper>
+
+                    </>
+                    ))}
+                  </>
+                )}
+                <Textarea
+                    label={t("pages.restaurant.reviews.leaveTitle")}
+                    mb={10}
+                    onChange={(e) => setReviewText(e.target.value)}
+                />
+                <Button color="yellow" radius="md"
+                  onClick={handleReview}>
+                  {t("pages.restaurant.reviews.send")}
+                </Button>
+              </Tabs.Panel>
+            </Tabs>
+
           </Flex>
         </Grid.Col>
       </Grid>
-      <Divider m="xl" />
+
     </>
   );
 }

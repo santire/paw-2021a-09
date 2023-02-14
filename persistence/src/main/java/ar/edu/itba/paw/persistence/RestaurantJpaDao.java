@@ -11,6 +11,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -56,6 +57,27 @@ public class RestaurantJpaDao implements RestaurantDao {
     @Override
     public Optional<Restaurant> findById(long id) {
         return Optional.ofNullable(em.find(Restaurant.class, id));
+    }
+
+    @Override
+    public Boolean findByName(String name) {
+        Query nativeQuery = em.createNativeQuery(
+            "SELECT *"
+            +
+            " FROM restaurants"
+            +
+            " WHERE name = :restaurantName"
+            );
+        nativeQuery.setParameter("restaurantName", name);
+
+        @SuppressWarnings("unchecked")
+        List<Restaurant> result = nativeQuery.getResultList();
+        if(result.isEmpty()) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 
     @Override

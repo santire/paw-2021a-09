@@ -3,12 +3,12 @@ package ar.edu.itba.paw.webapp.dto;
 
 
 import ar.edu.itba.paw.model.Restaurant;
-import ar.edu.itba.paw.model.Tags;
 
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class RestaurantDto {
@@ -23,11 +23,11 @@ public class RestaurantDto {
     private String facebook;
     private String instagram;
     private String twitter;
-    private List<Tags> tags;
+    private List<String> tags;
+    private String image;
 
     private URI menu;
     private URI reviews;
-    private URI image;
     private URI owner;
 
    
@@ -43,11 +43,12 @@ public class RestaurantDto {
         dto.instagram = restaurant.getInstagram();
         dto.twitter = restaurant.getTwitter();
         dto.likes = restaurant.getLikes();
-        dto.tags = restaurant.getTags();
-
+        dto.tags = restaurant.getTags().stream().map(tag -> tag.name()).collect(Collectors.toList());
+        
+        
+        dto.image = uriInfo.getBaseUriBuilder().path(PATH + restaurant.getId()+"/image").build().toString();
         dto.menu = uriInfo.getBaseUriBuilder().path(PATH + restaurant.getId()+"/menu").build();
         dto.reviews = uriInfo.getBaseUriBuilder().path(PATH + restaurant.getId()+"/reviews").build();
-        dto.image = uriInfo.getBaseUriBuilder().path(PATH + restaurant.getId()+"/image").build();
         dto.owner = uriInfo.getBaseUriBuilder().path(PATH + "users/"+restaurant.getOwner().getId().toString()).build();
 
         return  dto;
@@ -89,7 +90,7 @@ public class RestaurantDto {
         return twitter;
     }
 
-    public List<Tags> getTags() {
+    public List<String> getTags() {
         return tags;
     }
 
@@ -101,7 +102,7 @@ public class RestaurantDto {
         return reviews;
     }
 
-    public URI getImage() {
+    public String getImage() {
         return image;
     }
 
@@ -145,7 +146,7 @@ public class RestaurantDto {
         this.twitter = twitter;
     }
 
-    public void setTags(List<Tags> tags) {
+    public void setTags(List<String> tags) {
         this.tags = tags;
     }
 
@@ -157,7 +158,7 @@ public class RestaurantDto {
         this.reviews = reviews;
     }
 
-    public void setImage(URI image) {
+    public void setImage(String image) {
         this.image = image;
     }
 

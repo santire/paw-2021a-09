@@ -14,7 +14,7 @@ React:
 
 Para levantar el servidor `cd webapp/spa` y correr `yarn start`
 
-Si no existe el archivo `webapp/spa/env.local` debera crearlo con el siguiente contenido
+Si no existe el archivo `webapp/spa/.env.local` debera crearlo con el siguiente contenido
 
 ```
 REACT_APP_HOST_API="http://localhost:8080/api"

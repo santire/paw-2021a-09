@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
@@ -65,7 +66,7 @@ public class UserController {
             baseUrl = uriInfo.getBaseUri().toString();
         }
 
-        if(forgotEmail != null && !forgotEmail.isEmpty()) {
+        if (forgotEmail != null && !forgotEmail.isEmpty()) {
             userService.requestPasswordReset(forgotEmail, baseUrl);
             return Response.status(Response.Status.ACCEPTED).build();
         }
@@ -87,12 +88,13 @@ public class UserController {
         LOGGER.info("user created: {}", uri);
         return Response.created(uri).build();
     }
+
     @PUT
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = {MediaType.APPLICATION_JSON})
     public Response activateOrReset(@QueryParam("token") final String token, @QueryParam("type") final String type,
-                             @Valid PasswordResetForm passwordForm, @Context HttpServletRequest request) {
-        if(type != null && type.equalsIgnoreCase("activation")) {
+                                    @Valid PasswordResetForm passwordForm, @Context HttpServletRequest request) {
+        if (type != null && type.equalsIgnoreCase("activation")) {
             userService.activateUserByToken(token);
         } else if (type != null && type.equalsIgnoreCase("reset")) {
             if (passwordForm == null) throw new EmptyBodyException();
@@ -131,6 +133,13 @@ public class UserController {
         return Response.ok(UserDto.fromUser(user, request.getRequestURL().toString(), uriInfo)).build();
 
     }
+    @GET
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("@authComponent.isUserByEmail(#email)")
+    public Response getUserByEmail(@QueryParam("email") final String email, @Context HttpServletRequest request) {
+        final User user = userService.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        return Response.ok(UserDto.fromUser(user, request.getRequestURL().toString(), uriInfo)).build();
+    }
 
     //READ USER RESTAURANTS
     @GET
@@ -139,9 +148,12 @@ public class UserController {
     @PreAuthorize("@authComponent.isUser(#userId)")
     public Response getUserRestaurants(
             @PathParam("userId") final Long userId, @QueryParam("page") @DefaultValue("1") Integer page,
-                                       @Context HttpServletRequest request) {
+            @Context HttpServletRequest request) {
         int maxPages = restaurantService.getRestaurantsFromOwnerPagesCount(AMOUNT_OF_RESTAURANTS, userId);
-        List<RestaurantDto> restaurants = restaurantService.getRestaurantsFromOwner(page, AMOUNT_OF_RESTAURANTS, userId).stream().map(u -> RestaurantDto.fromRestaurant(u, uriInfo)).collect(Collectors.toList());
+        List<RestaurantDto> restaurants = restaurantService.getRestaurantsFromOwner(page, AMOUNT_OF_RESTAURANTS, userId)
+                .stream()
+                .map(u -> RestaurantDto.fromRestaurant(u, uriInfo))
+                .collect(Collectors.toList());
 
         return Response.ok(new GenericEntity<List<RestaurantDto>>(restaurants) {
                 })
@@ -160,9 +172,11 @@ public class UserController {
     public Response getLikedRestaurants(
             @PathParam("userId") final Long userId,
             @QueryParam("page") @DefaultValue("1") Integer page, @Context HttpServletRequest request) {
-
         int maxPages = reservationService.findByUserPageCount(AMOUNT_OF_RESERVATIONS, userId);
-        List<ReservationDto> reservation = reservationService.findByUser(page, AMOUNT_OF_RESERVATIONS, userId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
+        List<ReservationDto> reservation = reservationService.findByUser(page, AMOUNT_OF_RESERVATIONS, userId)
+                .stream()
+                .map(u -> ReservationDto.fromReservation(u, uriInfo))
+                .collect(Collectors.toList());
         return Response.ok(new GenericEntity<List<ReservationDto>>(reservation) {
                 })
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
@@ -171,5 +185,4 @@ public class UserController {
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.min((page + 1), maxPages)).build(), "next")
                 .build();
     }
-
 }
