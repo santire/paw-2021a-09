@@ -4,16 +4,13 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
-import javax.swing.text.html.Option;
+import javax.persistence.*;
 
-import org.hibernate.exception.ConstraintViolationException;
+import ar.edu.itba.paw.model.exceptions.UsernameInUseException;
+import org.postgresql.util.PSQLException;
+import org.postgresql.util.ServerErrorMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 
 import ar.edu.itba.paw.model.PasswordToken;
@@ -34,36 +31,57 @@ public class UserJpaDao implements UserDao {
 
     @Override
     public User register(String username, String password, String firstName, String lastName, String email,
-                         String phone) throws EmailInUseException {
+                         String phone) {
         final User user = new User(username, password, firstName, lastName, email, phone);
         try {
             em.persist(user);
             em.flush();
             return user;
-        } catch (DuplicateKeyException e) {
-            LOGGER.warn("Can't register, email: {} already in use", email);
-            throw new EmailInUseException("Email "+ email +" already in use", email);
-        } catch( ConstraintViolationException e) {
-            LOGGER.warn("Can't register, user: {} already in use", username);
-            // TODO: add custom exception
+        } catch (PersistenceException e) {
+            Throwable ex = e.getCause().getCause();
+            if (ex instanceof PSQLException) {
+                PSQLException psqlEx = (PSQLException) ex;
+                if ("23505".equals(psqlEx.getSQLState())) {
+                    ServerErrorMessage postgresError = psqlEx.getServerErrorMessage();
+                    if (postgresError != null) {
+                        String constraint = postgresError.getConstraint();
+                        switch (constraint.toLowerCase()) {
+                            case "users_email_key":
+                                throw new EmailInUseException("Email " + email + " already in use", email);
+                            case "user_name_unq":
+                                throw new UsernameInUseException("Username " + username + " already in use", username);
+                        }
+                    }
+                }
+            }
+
+            // If it gets here without throwing something else catch and release :)
             throw e;
         }
     }
 
 
     @Override
-    public void assignTokenToUser(String token, LocalDateTime createdAt, long userId) throws TokenCreationException {
+    public void assignTokenToUser(String token, LocalDateTime createdAt, long userId) {
         User user = findById(userId).orElseThrow(UserNotFoundException::new);
         VerificationToken verificationToken = new VerificationToken(token, createdAt, user);
-        em.persist(verificationToken);
+        try {
+            em.persist(verificationToken);
+        } catch (Exception e) {
+            throw new TokenCreationException();
+        }
+
     }
 
     @Override
-    public void assignPasswordTokenToUser(String token, LocalDateTime createdAt, long userId)
-            throws TokenCreationException {
+    public void assignPasswordTokenToUser(String token, LocalDateTime createdAt, long userId) {
         User user = findById(userId).orElseThrow(UserNotFoundException::new);
         PasswordToken passwordToken = new PasswordToken(token, createdAt, user);
-        em.persist(passwordToken);
+        try {
+            em.persist(passwordToken);
+        } catch (Exception e) {
+            throw new TokenCreationException();
+        }
     }
 
     // READ
@@ -74,7 +92,9 @@ public class UserJpaDao implements UserDao {
     }
 
     @Override
-    public Optional<User> findByUsername(String username) { return Optional.ofNullable(em.find(User.class, username)); }
+    public Optional<User> findByUsername(String username) {
+        return Optional.ofNullable(em.find(User.class, username));
+    }
 
     @Override
     public Optional<User> findByEmail(String email) {

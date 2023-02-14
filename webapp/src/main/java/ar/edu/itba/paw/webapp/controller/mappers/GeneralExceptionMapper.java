@@ -21,7 +21,7 @@ public class GeneralExceptionMapper extends AbstractExceptionMapper implements E
         String message = (localizedMessage != null && !localizedMessage.isEmpty() ? localizedMessage : status.getReasonPhrase());
 
         // ResponseEntity class's Member Integer code, String message, Object data. For response format.
-        ResponseEntity re = getExceptionResponseEntity(e, status, Collections.singletonList(message));
+        ResponseEntity re = getExceptionResponseEntity(e, status, message);
 
         return this.errorResponse(status.value(), re, e);
     }

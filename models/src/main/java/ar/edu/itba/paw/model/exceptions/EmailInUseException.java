@@ -1,6 +1,6 @@
 package ar.edu.itba.paw.model.exceptions;
 
-public class EmailInUseException extends Exception {
+public class EmailInUseException extends RuntimeException {
     private static final long serialVersionUID = 1L;
     private final String email;
 

@@ -23,8 +23,8 @@
         <thymeleaf.version>3.0.13.RELEASE</thymeleaf.version>
         <email.version>1.6.4</email.version>
         <servlet-api.version>2.5</servlet-api.version>
-        <validation-api.version>1.0.0.GA</validation-api.version>
-        <hibernate-validator.version>4.3.2.Final</hibernate-validator.version>
+        <validation-api.version>1.1.0.Final</validation-api.version>
+        <hibernate-validator.version>5.3.1.Final</hibernate-validator.version>
         <jstl.version>1.2</jstl.version>
         <org.postgresql.version>42.2.27</org.postgresql.version>
         <org.hibernate.version>5.1.0.Final</org.hibernate.version>
@@ -87,6 +87,25 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>org.glassfish.jersey.ext</groupId>
+                <artifactId>jersey-bean-validation</artifactId>
+                <version>${jersey.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-validator</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>javax.validation</groupId>
+                        <artifactId>validation-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>javax.el</groupId>
+                        <artifactId>javax.el-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
                 <groupId>org.glassfish.jersey.media</groupId>
                 <artifactId>jersey-media-json-jackson</artifactId>
                 <version>2.22.2</version>
@@ -95,6 +114,23 @@
                 <groupId>org.glassfish.jersey.ext</groupId>
                 <artifactId>jersey-spring4</artifactId>
                 <version>${jersey.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.glassfish.hk2</groupId>
+                        <artifactId>hk2</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.hk2</groupId>
+                <artifactId>hk2</artifactId>
+                <version>2.5.0-b05</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.glassfish.hk2.external</groupId>
+                        <artifactId>bean-validator</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
             <dependency>

@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 
+import ar.edu.itba.paw.model.exceptions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +23,6 @@ import ar.edu.itba.paw.model.Email;
 import ar.edu.itba.paw.model.EmailTemplate;
 import ar.edu.itba.paw.model.PasswordToken;
 import ar.edu.itba.paw.model.VerificationToken;
-import ar.edu.itba.paw.model.exceptions.EmailInUseException;
-import ar.edu.itba.paw.model.exceptions.TokenCreationException;
-import ar.edu.itba.paw.model.exceptions.TokenDoesNotExistException;
-import ar.edu.itba.paw.model.exceptions.TokenExpiredException;
-import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
 import ar.edu.itba.paw.persistence.UserDao;
 import org.springframework.context.MessageSource;
 
@@ -57,13 +53,14 @@ public class UserServiceImpl implements UserService {
     return userDao.findById(id);
   }
 
-  @Transactional
+  @Transactional(rollbackFor = {UsernameInUseException.class, EmailInUseException.class, TokenCreationException.class})
   @Override
   public User register(String username, String password, String firstName, String lastName, String email,
-                       String phone, String baseUrl) throws EmailInUseException, TokenCreationException {
+                       String phone, String baseUrl)
+          throws UsernameInUseException, EmailInUseException, TokenCreationException {
     User user = userDao.register(username,encoder.encode(password), firstName, lastName, email, phone);
     if (user == null) return null;
-    String url = baseUrl + "/register?token=";
+    String url = baseUrl + "/register?type=activate&token=";
 
     String token = UUID.randomUUID().toString();
     LocalDateTime createdAt = LocalDateTime.now();
@@ -77,8 +74,9 @@ public class UserServiceImpl implements UserService {
   @Transactional
   @Override
   public void requestPasswordReset(String email, String baseUrl) throws TokenCreationException {
+    LOGGER.debug("Requesting reset for {}", email);
     User user = userDao.findByEmail(email).orElseThrow(UserNotFoundException::new);
-    String url = baseUrl + "/reset?token=";
+    String url = baseUrl + "/reset?type=reset&token=";
     String token = UUID.randomUUID().toString();
     LocalDateTime createdAt = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.systemDefault());
 
@@ -115,9 +113,10 @@ public class UserServiceImpl implements UserService {
   public User updatePasswordByToken(String token, String password) throws TokenExpiredException, TokenDoesNotExistException {
 
     Optional<PasswordToken> maybeToken = userDao.getPasswordToken(token);
-    LOGGER.debug("GOT TOKEN {}", maybeToken.get().getToken());
-    LOGGER.debug("WITH UID {}", maybeToken.get().getUser().getId());
     PasswordToken passwordToken = maybeToken.orElseThrow(TokenDoesNotExistException::new);
+    LOGGER.debug("GOT TOKEN {}", passwordToken.getToken());
+    LOGGER.debug("WITH UID {}", passwordToken.getUser().getId());
+
     LocalDateTime expiryDate = passwordToken.getCreatedAt().plusDays(1);
 
     if(LocalDateTime.now().isAfter(expiryDate)) {

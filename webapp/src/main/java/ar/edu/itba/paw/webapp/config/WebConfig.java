@@ -20,6 +20,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 //import org.springframework.web.servlet.LocaleResolver;
 //import org.springframework.web.servlet.ViewResolver;
@@ -92,6 +93,13 @@ public class WebConfig {
 
     return ms;
   }
+  @Bean
+  public LocalValidatorFactoryBean getValidator() {
+    LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
+    bean.setValidationMessageSource(messageSource());
+    return bean;
+  }
+
 
   @Bean
   public DataSourceInitializer DataSourceInitializer(final DataSource ds) {

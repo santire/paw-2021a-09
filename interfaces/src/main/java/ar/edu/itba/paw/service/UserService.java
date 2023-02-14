@@ -6,6 +6,7 @@ import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.exceptions.EmailInUseException;
 import ar.edu.itba.paw.model.exceptions.TokenCreationException;
 import ar.edu.itba.paw.model.exceptions.TokenExpiredException;
+import ar.edu.itba.paw.model.exceptions.UsernameInUseException;
 
 public interface UserService {
 
@@ -16,7 +17,7 @@ public interface UserService {
                        final String lastName,
                        final String email,
                        final String phone,
-                       String baseUrl) throws EmailInUseException, TokenCreationException;
+                       String baseUrl) throws EmailInUseException, TokenCreationException, UsernameInUseException;
 
   // READ
   public Optional<User> findById(long id);
