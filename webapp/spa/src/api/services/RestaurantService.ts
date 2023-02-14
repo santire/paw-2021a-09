@@ -38,7 +38,8 @@ export async function updateRestaurant(restaurant : Restaurant, id: string) {
 export async function isRestaurantNameAvailable(name : string){
   const url = `${BASE_PATH}/` + name;
   const response = await apiClient.head<string>(url);
-  return response.data;
+  //console.log(response.status);
+  return response.status === 204;
 }
 
 export async function getRestaurantById(id: string) {
