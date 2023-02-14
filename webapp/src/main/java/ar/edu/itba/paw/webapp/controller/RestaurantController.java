@@ -190,13 +190,12 @@ public class RestaurantController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = { MediaType.APPLICATION_JSON})
     public Response addRestaurantReview(@PathParam("restaurantId") final long restaurantId, final CommentDto comment, @Context HttpServletRequest request){
-
         Optional<User> user = getLoggedUser(request);
         if(!user.isPresent()){
             LOGGER.error("anon user attempt to register a restaurant");
             return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
         }
-
+        LOGGER.info(comment.getUserComment());
         final Comment rev = commentService.addComment(user.get().getId(), restaurantId, comment.getUserComment());
 
         final URI uri = uriInfo.getBaseUriBuilder().path("/"+restaurantId+"/reviews").build();

@@ -1,9 +1,9 @@
 
 export interface Review {
     id?: string;
-    username: string;
+    username?: string;
     userComment: string;
-    date: string;
+    date?: string;
   }
   
   export interface PaginatedMenuItems {

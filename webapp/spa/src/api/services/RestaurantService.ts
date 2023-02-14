@@ -54,12 +54,6 @@ export async function getRestaurantTags() {
   return response.data;
 }
 
-// export async function getRestaurantMenu(id: string) {
-//   const url = `${BASE_PATH}/${id}/menu`;
-//   const response = await apiClient.get<MenuItem[]>(url);
-//   return response.data;
-// }
-
 export async function getRestaurantImage(id: string) {
   const url = `${BASE_PATH}/${id}/image`;
   const response = await apiClient.get<string>(url);
@@ -69,6 +63,25 @@ export async function getRestaurantImage(id: string) {
 export async function deleteRestaurantById(id: string) {
   const url = `${BASE_PATH}/${id}`;
   const response = await apiClient.delete(url);
+  return response.status;
+}
+
+export async function likeRestaurant(id: string){
+  const url = `${BASE_PATH}/${id}/like`;
+  const response = await apiClient.put(url);
+  return response.status;
+}
+
+export async function reviewRestaurant(id: string, review: Review){
+  const url = `${BASE_PATH}/${id}/reviews`;
+  console.log(review);
+  const response = await apiClient.post(url, review);
+  return response.status;
+}
+
+export async function addMenuItem(id: string, item: MenuItem){
+  const url = `${BASE_PATH}/${id}/menu`;
+  const response = await apiClient.post(url, item);
   return response.status;
 }
 

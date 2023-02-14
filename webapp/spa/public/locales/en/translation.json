@@ -91,7 +91,10 @@
       "menu.name": "Name",
       "menu.description": "Description",
       "menu.price": "Price",
-      "reviews.title": "Reviews"
+      "reviews.title": "Reviews",
+      "reviews.leaveTitle": "Leave your review",
+      "reviews.writeHere": "Write here",
+      "reviews.send": "Send"
     },
     "restaurants": {
       "title": "Browse restaurants",
