@@ -213,7 +213,8 @@
       },
       "email": {
         "label": "Email",
-        "placeholder": "you@gourmetable.com"
+        "placeholder": "you@gourmetable.com",
+        "taken": "The email is already taken"
       },
       "username": {
         "label": "Username",
@@ -286,7 +287,8 @@
       "tagsSelection": "At least 1 tag is required",
       "name": {
         "label": "Restaurant name",
-        "placeholder": "My resturant"
+        "placeholder": "My resturant",
+        "taken": "The restaurant name is already taken"
       },
       "address": {
         "label": "Address",
@@ -309,6 +311,26 @@
         "placeholder": "twitter.com/yourSite"
       },
       "submit": "Edit"
+    },
+    "profile": {
+      "profile": "Profile",
+      "username": {
+        "label": "Username",
+        "placeholder": "Your username"
+      },
+      "firstName": {
+        "label": "First name",
+        "placeholder": "Your name"
+      },
+      "lastName": {
+        "label": "Last name",
+        "placeholder": "Your last name"
+      },
+      "phoneNumber": {
+        "label": "Phone number",
+        "placeholder": "Your phone number"
+      },
+      "submit": "Submit"
     }
   }
 }

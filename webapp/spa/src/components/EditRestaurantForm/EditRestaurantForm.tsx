@@ -17,7 +17,7 @@ import {
 import { SubmitHandler, useForm } from "react-hook-form";
 import { IconUpload, IconPhoto, IconX } from '@tabler/icons';
 import { Dropzone, DropzoneProps, IMAGE_MIME_TYPE, FileWithPath } from '@mantine/dropzone';
-
+import { useMutation, useQueryClient } from "react-query";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import * as z from "zod";
@@ -83,6 +83,7 @@ type EditRestaurantForm = z.infer<typeof registerSchema>;
 export function EditRestaurantForm(props: Partial<DropzoneProps>) {
   const theme = useMantineTheme();
   const { classes } = useStyles();
+  const queryClient = useQueryClient();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { restaurantId } = useParams();
@@ -173,22 +174,23 @@ export function EditRestaurantForm(props: Partial<DropzoneProps>) {
   const processForm = async (data: EditRestaurantForm) => {
     const {...restaurant } = data;
     try {
-      const isNameAvailable = true;
       if(name !== restaurant.name){
-        const isNameAvailable = await isRestaurantNameAvailable(restaurant.name);
+        await isRestaurantNameAvailable(restaurant.name);
       }
-      if (isNameAvailable && restaurantId) {
+    } catch (e) {
+      setError("name", {
+        type: "custom",
+        message: t("pages.editRestaurant.name.taken") || ""
+      });
+      setValue("name", restaurant.name);
+      return;
+    }
+    try {
+      if (restaurantId) {
         await updateRestaurant({...restaurant}, restaurantId)
-        reset();
+        queryClient.invalidateQueries("restaurant")
         // TODO: Navigate to restaurant page
         navigate('/users/:userId/restaurants' );
-      }
-      else{
-        setError("name", {
-          type: "custom",
-          message: "The restaurant name is already taken"
-        });    
-        setValue("name", restaurant.name);
       }
     } catch (e) {
       //console.error(e);
@@ -224,7 +226,7 @@ export function EditRestaurantForm(props: Partial<DropzoneProps>) {
                 required
                 error={errors.address?.message}
                 {...register("address")}
-                value={address}
+                defaultValue={address}
               />
             </SimpleGrid>
             <SimpleGrid cols={2} mt="md" breakpoints={[{ maxWidth: "sm", cols: 1 }]}>
