@@ -135,22 +135,21 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
     console.log("process form")
     const {...restaurant } = data;
     try {
-      const isNameAvailable = await isRestaurantNameAvailable(restaurant.name);
-      if (isNameAvailable) {
-        console.log(isNameAvailable)
-        console.log({...restaurant})
-        await registerRestaurant({...restaurant})
-        reset();
-        // TODO: Navigate to restaurant page
-        navigate('/users/:userId/restaurants' );
-      }
-      else{
-        setError("name", {
-          type: "custom",
-          message: "The restaurant name is already taken"
-        });    
-        setValue("name", restaurant.name);
-      }
+      await isRestaurantNameAvailable(restaurant.name);
+    } catch (e) {
+      setError("name", {
+        type: "custom",
+        message: t("pages.editRestaurant.name.taken") || ""
+      });
+      setValue("name", restaurant.name);
+      return;
+    }
+    try {
+      console.log({...restaurant})
+      await registerRestaurant({...restaurant})
+      //reset();
+      // TODO: Navigate to restaurant page
+      navigate('/users/:userId/restaurants' );
     } catch (e) {
       //console.error(e);
     }
