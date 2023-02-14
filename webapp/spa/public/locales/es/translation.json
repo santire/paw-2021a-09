@@ -309,7 +309,7 @@
       "submit": "Editar"
     },
     "profile": {
-      "profile": "Profile",
+      "profile": "Mi información",
       "username": {
         "label": "Nombre de usuario",
         "placeholder": "Nombre de usuario"
