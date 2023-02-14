@@ -210,7 +210,8 @@
       },
       "email": {
         "label": "Email",
-        "placeholder": "you@gourmetable.com"
+        "placeholder": "you@gourmetable.com",
+        "taken": "The email is already taken"
       },
       "username": {
         "label": "Username",

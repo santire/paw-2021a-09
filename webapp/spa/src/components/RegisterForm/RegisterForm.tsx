@@ -34,16 +34,6 @@ const registerSchema = z
     password: z.string().min(8).max(100),
     confirmPassword: z.string().min(8).max(100),
   })
-  .superRefine(async ({ email }, ctx) => {
-    await new Promise((r) => setTimeout(r, 1000));
-    if (email === "santireyes98@gmail.com") {
-      ctx.addIssue({
-        path: ["email"],
-        code: "custom",
-        message: "Email already in use",
-      });
-    }
-  })
   .superRefine(({ password, confirmPassword }, ctx) => {
     if (confirmPassword !== password) {
       ctx.addIssue({
@@ -67,19 +57,25 @@ export function RegisterForm() {
     reset,
     resetField,
     formState: { errors },
+    setValue,
+    setError
   } = useForm<RegisterForm>({
     mode: "onTouched",
     resolver: zodResolver(registerSchema),
   });
 
   const processForm = async (data: RegisterForm) => {
+    const { confirmPassword, ...user } = data;
     try {
-      const { confirmPassword, ...user } = data;
       await registerUser({ ...user });
       reset();
       setSearchParams({ pendingConfirmation: "true" });
     } catch (e) {
-      console.error(e);
+      setError("email", {
+        type: "custom",
+        message: t("pages.register.email.taken") || ""
+      });
+      setValue("email", user.email);
     }
   };
 

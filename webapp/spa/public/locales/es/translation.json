@@ -206,7 +206,8 @@
       },
       "email": {
         "label": "Email",
-        "placeholder": "tu@gourmetable.com"
+        "placeholder": "tu@gourmetable.com",
+        "taken": "El correo electronico ya fue registrado"
       },
       "username": {
         "label": "Usuario",
