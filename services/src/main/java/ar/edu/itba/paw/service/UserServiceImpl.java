@@ -127,11 +127,9 @@ public class UserServiceImpl implements UserService {
     User user = passwordToken.getUser();
 
     updateUser(user.getId(),
-            user.getName(),
             encoder.encode(password),
             user.getFirstName(),
             user.getLastName(),
-            user.getEmail(),
             user.getPhone());
 
     userDao.deleteAssociatedPasswordTokens(user);
@@ -166,14 +164,12 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public void updateUser(long id, String username, String password, String firstName, String lastName, String email, String phone) {
+  public void updateUser(long id, String password, String firstName, String lastName, String phone) {
     User user = userDao.findById(id).orElseThrow(UserNotFoundException::new);
-    user.setUsername(username);
-    user.setPassword(password);
-    user.setFirstName(firstName);
-    user.setLastName(lastName);
-    user.setEmail(email);
-    user.setPhone(phone);
+    if(password != null && !password.isEmpty()) user.setPassword(password);
+    if(firstName != null && !firstName.isEmpty()) user.setFirstName(firstName);
+    if(lastName != null && !lastName.isEmpty()) user.setLastName(lastName);
+    if(phone != null && !phone.isEmpty()) user.setPhone(phone);
   }
 
 }

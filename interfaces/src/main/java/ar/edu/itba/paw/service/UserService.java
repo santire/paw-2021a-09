@@ -29,7 +29,7 @@ public interface UserService {
   // UPDATE
   public User activateUserByToken(String token) throws TokenExpiredException;
   public User updatePasswordByToken(String token, String password) throws TokenExpiredException;
-  public void updateUser(long id, String username, String password, String firstName, String lastName, String email, String phone);
+  public void updateUser(long id, String password, String firstName, String lastName, String phone);
   public void requestPasswordReset(String email, String baseUrl) throws TokenCreationException;
 
 }

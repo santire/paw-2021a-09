@@ -72,6 +72,8 @@ public class AuthComponent {
 
     public boolean isUser(Long userId) {
         User loggedUser = loggedUser();
+        LOGGER.debug("logged user: {}", loggedUser.getId());
+        LOGGER.debug("path id: {}", userId);
         return loggedUser.getId() == userId;
     }
 

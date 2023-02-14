@@ -1,12 +1,17 @@
 package ar.edu.itba.paw.webapp.auth.filters;
 
 import ar.edu.itba.paw.webapp.utils.JwtTokenUtil;
+import io.jsonwebtoken.Jwt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.stereotype.Component;
 
@@ -22,10 +27,11 @@ public class BasicAuthenticationWithJwtHeaderFilter extends BasicAuthenticationF
 
 
     @Autowired
-    public BasicAuthenticationWithJwtHeaderFilter(AuthenticationManager authenticationManager, JwtTokenUtil jwtUtility, UserDetailsService userDetailsService) {
-        super(authenticationManager);
+    public BasicAuthenticationWithJwtHeaderFilter(AuthenticationManager authenticationManager, AuthenticationEntryPoint entryPoint, JwtTokenUtil jwtUtility, UserDetailsService userDetailsService) {
+        super(authenticationManager, entryPoint);
         this.jwtUtility = jwtUtility;
         this.userDetailsService = userDetailsService;
+
     }
 
 
@@ -36,5 +42,4 @@ public class BasicAuthenticationWithJwtHeaderFilter extends BasicAuthenticationF
         String jwt = jwtUtility.generateToken(userDetailsService.loadUserByUsername(authentication.getName()));
         response.addHeader("Authorization", jwt);
     }
-
 }

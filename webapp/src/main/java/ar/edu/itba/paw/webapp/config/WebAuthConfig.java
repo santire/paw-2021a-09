@@ -8,7 +8,6 @@ import ar.edu.itba.paw.webapp.auth.filters.JwtRequestFilter;
 
 import ar.edu.itba.paw.webapp.utils.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -24,12 +23,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
-import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -67,6 +64,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
@@ -78,7 +76,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
         http.userDetailsService(userDetailsService)
                 .addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class)
                 .addFilterBefore(new JwtRequestFilter(userDetailsService, jwtTokenUtil), BasicAuthenticationFilter.class)
-                .addFilterAt(new BasicAuthenticationWithJwtHeaderFilter(authenticationManager(), jwtTokenUtil, userDetailsService), BasicAuthenticationFilter.class)
+                .addFilterAt(new BasicAuthenticationWithJwtHeaderFilter(authenticationManager(), new ApiEntryPoint(), jwtTokenUtil, userDetailsService), BasicAuthenticationFilter.class)
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
