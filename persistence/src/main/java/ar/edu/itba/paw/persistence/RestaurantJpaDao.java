@@ -11,6 +11,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,13 +42,22 @@ public class RestaurantJpaDao implements RestaurantDao {
 
     @Override
     public boolean setImageByRestaurantId(Image image, long restaurantId) {
-        final Optional<Restaurant> maybeRestaurant = findById(restaurantId);
-        if (!maybeRestaurant.isPresent()) {
-            return false;
-        }
-        Restaurant restaurant = maybeRestaurant.get();
+        final Restaurant restaurant = findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
+        if (restaurant.getProfileImage() != null) {
+            LOGGER.debug("Merging image");
+            Image img = restaurant.getProfileImage();
+            img.setData(image.getData());
+            em.merge(img);
+        } else {
+        LOGGER.debug("Creating Image of size {}", image.getData().length);
+        image.setRestaurant(restaurant);
+//        em.merge(image);
         restaurant.setProfileImage(image);
+        LOGGER.debug("Set profile image: {}", restaurant.getProfileImage() != null);
+        em.persist(image);
         em.persist(restaurant);
+        LOGGER.debug("Set profile image: {}", restaurant.getProfileImage() != null);
+        }
 
         return true;
     }
@@ -456,12 +466,12 @@ public class RestaurantJpaDao implements RestaurantDao {
     // DELETE
     @Override
     public boolean deleteRestaurantById(long id) {
-        Optional<Restaurant> maybeRestaurant = findById(id);
-        if (maybeRestaurant.isPresent()) {
-            em.remove(maybeRestaurant.get());
-            return true;
+        Restaurant restaurant = findById(id).orElseThrow(RestaurantNotFoundException::new);
+        if (restaurant.getProfileImage() != null) {
+            em.remove(restaurant.getProfileImage());
         }
-        return false;
+        em.remove(restaurant);
+        return true;
     }
 
 }

@@ -14,7 +14,7 @@ export interface Restaurant {
 
   menu?: string;
   reviews?: string;
-  image?: string;
+  image?: any;
   owner?: string;
 }
 
@@ -26,7 +26,7 @@ export interface PaginatedRestaurants {
 export const getTags = async () => {
   try {
     const data = await getRestaurantTags();
-    return data;
+    return data.map(t => t.toLowerCase());
   } catch (e) {
     //console.error(e);
     return [];

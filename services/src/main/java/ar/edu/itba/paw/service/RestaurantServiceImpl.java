@@ -26,10 +26,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Override
     @Transactional
     public boolean setImageByRestaurantId(Image image, long restaurantId) {
-        Restaurant restaurant = findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
-        restaurant.setProfileImage(image);
-        image.setRestaurant(restaurant);
-
+        restaurantDao.setImageByRestaurantId(image, restaurantId);
         return true;
     }
 

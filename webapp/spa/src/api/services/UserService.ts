@@ -1,5 +1,5 @@
 import { apiClient } from "../client";
-import { Restaurant, User } from "../../types";
+import {Restaurant, User} from "../../types";
 import { Page } from "../../types/Page";
 
 export interface FilterParams {

@@ -3,6 +3,7 @@ import { Restaurant } from "../../types";
 import { Page } from "../../types/Page";
 import { MenuItem } from "../../types/MenuItem";
 import { Review } from "../../types/Review";
+import { RegisterRestaurantForm } from "../../components/RegisterRestaurantForm/RegisterRestaurantForm";
 
 export interface FilterParams {
   page?: number;
@@ -21,21 +22,34 @@ export const NO_FILTER: FilterParams = {
   pageAmount: 10,
 };
 
-export async function registerRestaurant(restaurant : Restaurant) {
-  console.log(restaurant);
+export async function registerRestaurant(restaurant: RegisterRestaurantForm) {
   const url = `${BASE_PATH}`;
-  const response = await apiClient.post<Restaurant>(url, restaurant);
+  const { image, ...data } = restaurant;
+  console.log(restaurant);
+  const response = await apiClient.post<Restaurant>(url, data);
+  console.log(response);
+  if ("location" in response.headers) {
+    const formData = new FormData();
+    formData.append("image", image);
+    const imageUrl = response.headers["location"] + "/image";
+    console.log(image);
+    const imageResponse = await apiClient.put(imageUrl, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  }
   return response.data;
 }
 
-export async function updateRestaurant(restaurant : Restaurant, id: string) {
+export async function updateRestaurant(restaurant: Restaurant, id: string) {
   console.log(restaurant);
   const url = `${BASE_PATH}/${id}`;
   const response = await apiClient.post<Restaurant>(url, restaurant);
   return response.data;
 }
 
-export async function isRestaurantNameAvailable(name : string){
+export async function isRestaurantNameAvailable(name: string) {
   const url = `${BASE_PATH}/` + name;
   const response = await apiClient.head<string>(url);
   return response.data;
@@ -65,20 +79,20 @@ export async function deleteRestaurantById(id: string) {
   return response.status;
 }
 
-export async function likeRestaurant(id: string){
+export async function likeRestaurant(id: string) {
   const url = `${BASE_PATH}/${id}/like`;
   const response = await apiClient.put(url);
   return response.status;
 }
 
-export async function reviewRestaurant(id: string, review: Review){
+export async function reviewRestaurant(id: string, review: Review) {
   const url = `${BASE_PATH}/${id}/reviews`;
   console.log(review);
   const response = await apiClient.post(url, review);
   return response.status;
 }
 
-export async function addMenuItem(id: string, item: MenuItem){
+export async function addMenuItem(id: string, item: MenuItem) {
   const url = `${BASE_PATH}/${id}/menu`;
   const response = await apiClient.post(url, item);
   return response.status;

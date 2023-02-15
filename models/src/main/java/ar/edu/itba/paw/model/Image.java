@@ -23,7 +23,8 @@ public class Image {
     private byte[] data;
 
     @OneToOne
-    @PrimaryKeyJoinColumn(name = "restaurant_id")
+//    @PrimaryKeyJoinColumn(name = "restaurant_id")
+    @JoinColumn(name ="restaurant_id", nullable = false)
     private Restaurant restaurant;
 
 

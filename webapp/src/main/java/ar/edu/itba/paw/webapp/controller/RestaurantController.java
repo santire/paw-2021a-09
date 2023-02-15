@@ -165,6 +165,7 @@ public class RestaurantController {
         Date expireDate = CachingUtils.getExpirationDate(CachingUtils.HOUR_TO_SEC);
         final Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
         final Image image = restaurant.getProfileImage();
+        LOGGER.debug("Image: {}", image);
         final byte[] imageData = image != null ? image.getData() : Image.getPlaceholderImage();
 
         return Response.ok(imageData)
@@ -309,19 +310,21 @@ public class RestaurantController {
                              @FormDataParam("image") final byte[] bytes,
                              @Context HttpServletRequest request) throws IOException {
         // Check media type
-        // body.getMediaType()
         String contentType = body.getMediaType().toString();
         if (!(contentType.equalsIgnoreCase("image/png")
                 || contentType.equalsIgnoreCase("image/jpg")
                 || contentType.equalsIgnoreCase("image/jpeg"))) {
             // throw new InvalidMediaTypeException
         }
+        LOGGER.debug("Image type: {}", contentType);
+        LOGGER.debug("Image size: {}", bytes.length);
 
         // Check file size
 //        if(bytes.length > 200) {
 //            throw new FileTooLargeException;
 //        }
         Image image = new Image(bytes);
+        LOGGER.debug("Created image: {}", image);
         restaurantService.setImageByRestaurantId(image, restaurantId);
         final URI uri = uriInfo.getAbsolutePathBuilder().build();
         return Response.created(uri).build();
@@ -408,7 +411,6 @@ public class RestaurantController {
     @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
     public Response rateRestaurant(@PathParam("restaurantId") final Long restaurantId,
                                    @Valid @NotNull RatingForm rating, @Context HttpServletRequest request) {
-
         User user = getLoggedUser();
         ratingService.rateRestaurant(user.getId(),restaurantId,rating.getRating());
         return Response.noContent().build();
@@ -421,7 +423,6 @@ public class RestaurantController {
     public Response getRestaurantRate(@PathParam("restaurantId") final Long restaurantId,
                                       @QueryParam("userId") final Long userId,
                                       @Context HttpServletRequest request) {
-
 
         Optional<Rating> maybeRating = ratingService.getRating(userId, restaurantId);
         Double rate = maybeRating.isPresent() ? maybeRating.get().getRating() : 0;

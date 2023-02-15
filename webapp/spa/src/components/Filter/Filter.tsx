@@ -19,7 +19,7 @@ interface FilterParamsProps {
   clear: () => void;
 }
 
-const TAGS = [
+export const TAGS = [
   "arabe",
   "americano",
   "argentino",
