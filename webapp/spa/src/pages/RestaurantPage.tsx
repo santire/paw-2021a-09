@@ -37,6 +37,7 @@ import {
 import { DatePicker } from "@mantine/dates";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { CloseButton } from '@mantine/core';
 import { Rating } from "@mantine/core";
 import { useQuery, useQueryClient } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
@@ -52,7 +53,7 @@ import {
   getRestaurantReviews,
   getRestaurants,
   likeRestaurant,
-  rateRestaurant,
+  rateRestaurant, deleteMenuItem,
 } from "../api/services";
 import { useRestaurant } from "../hooks/useRestaurant";
 import { Restaurant } from "../types";
@@ -162,6 +163,15 @@ export function RestaurantPage() {
                   <td>{item.name}</td>
                   <td>{item.description}</td>
                   <td>{item.price}</td>
+                  <td>
+                    <Group position="center">
+                      <CloseButton aria-label="Close modal"
+                        onClick={() => {
+                          deleteMenuItem(restaurantId, item.id || "")
+                        }}
+                      />
+                    </Group>
+                  </td>
                 </tr>
               ))
             );
@@ -204,6 +214,7 @@ export function RestaurantPage() {
     instagram,
     tags,
   } = restaurantData;
+
 
   const SocialsButton = ({ type, url }: { type: string; url: string }) => {
     switch (type) {
@@ -257,7 +268,7 @@ export function RestaurantPage() {
 
   const handleReview = () => {
     const rev = {
-      userComment: reviewText,
+      userComment: reviewText
     };
     reviewRestaurant(restaurantId, rev);
     console.log(reviewText);

@@ -127,6 +127,12 @@ export async function addMenuItem(id: string, item: MenuItem) {
   return response.status;
 }
 
+export async function deleteMenuItem(restaurantId: string, itemId: string) {
+  const url = `${BASE_PATH}/${restaurantId}/menu/${itemId}`;
+  const response = await apiClient.delete(url);
+  return response.status;
+}
+
 export async function getRestaurants(params = NO_FILTER) {
   const url = `${BASE_PATH}/`;
   const response = await apiClient.get<Restaurant[]>(url, { params });
