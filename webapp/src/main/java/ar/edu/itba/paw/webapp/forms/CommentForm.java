@@ -1,5 +1,8 @@
 package ar.edu.itba.paw.webapp.forms;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 public class CommentForm {
@@ -7,6 +10,8 @@ public class CommentForm {
     private long id;
 
     @Size(min = 1, max = 144)
+    @NotEmpty
+    @NotNull
     private String review;
 
     public long getId() {

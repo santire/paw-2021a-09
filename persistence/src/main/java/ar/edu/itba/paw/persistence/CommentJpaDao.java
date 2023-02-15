@@ -29,7 +29,7 @@ public class CommentJpaDao implements CommentDao {
         final Comment userComment = new Comment(comment, date);
         userComment.setUser(user);
         userComment.setRestaurant(restaurant);
-        em.persist(userComment);
+        em.merge(userComment);
         return userComment;
     }
 

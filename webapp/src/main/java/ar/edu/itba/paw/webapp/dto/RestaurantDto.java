@@ -24,8 +24,8 @@ public class RestaurantDto {
     private String instagram;
     private String twitter;
     private List<String> tags;
-    private String image;
 
+    private URI image;
     private URI menu;
     private URI reviews;
     private URI owner;
@@ -46,10 +46,10 @@ public class RestaurantDto {
         dto.tags = restaurant.getTags().stream().map(tag -> tag.name()).collect(Collectors.toList());
         
         
-        dto.image = uriInfo.getBaseUriBuilder().path(PATH + restaurant.getId()+"/image").build().toString();
-        dto.menu = uriInfo.getBaseUriBuilder().path(PATH + restaurant.getId()+"/menu").build();
-        dto.reviews = uriInfo.getBaseUriBuilder().path(PATH + restaurant.getId()+"/reviews").build();
-        dto.owner = uriInfo.getBaseUriBuilder().path(PATH + "users/"+restaurant.getOwner().getId().toString()).build();
+        dto.image = uriInfo.getBaseUriBuilder().path(PATH).path(String.valueOf(restaurant.getId())).path("image").build();
+        dto.menu = uriInfo.getBaseUriBuilder().path(PATH).path(String.valueOf(restaurant.getId())).path("menu").build();
+        dto.reviews = uriInfo.getBaseUriBuilder().path(PATH).path(String.valueOf(restaurant.getId())).path("reviews").build();
+        dto.owner = uriInfo.getBaseUriBuilder().path("users").path(restaurant.getOwner().getId().toString()).build();
 
         return  dto;
     }
@@ -102,7 +102,7 @@ public class RestaurantDto {
         return reviews;
     }
 
-    public String getImage() {
+    public URI getImage() {
         return image;
     }
 
@@ -158,7 +158,7 @@ public class RestaurantDto {
         this.reviews = reviews;
     }
 
-    public void setImage(String image) {
+    public void setImage(URI image) {
         this.image = image;
     }
 

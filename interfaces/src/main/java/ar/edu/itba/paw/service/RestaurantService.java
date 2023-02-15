@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface RestaurantService {
 
     // CREATE
-    public Restaurant registerRestaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner);
+    public Restaurant registerRestaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner, String facebook, String twitter, String instagram);
     public boolean setImageByRestaurantId(Image image, long restaurantId);
 
     // READ
@@ -35,7 +35,7 @@ public interface RestaurantService {
 
 
     // UPDATE
-    public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber, List<Tags> tags);
+    public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber, List<Tags> tags, String facebook, String twitter, String instagram);
 
 
 

@@ -1,9 +1,8 @@
 package ar.edu.itba.paw.webapp.forms;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.*;
 
 public class MenuItemForm {
 
@@ -11,15 +10,18 @@ public class MenuItemForm {
 
     @Size(min = 4, max = 100)
     @Pattern(regexp = "[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ ()'´¨!.,]+")
+    @NotEmpty
     private String name;
 
     @Size(min = 0, max = 100)
     @Pattern(regexp = "[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ ()'´¨!.,]+|^$")
+    @NotEmpty
     private String description;
 
     @Min(0)
     @Max(100000)
-    private float price;
+    @NotNull
+    private Float price;
 
     public long getId() {
         return id;
@@ -45,11 +47,11 @@ public class MenuItemForm {
         this.description = description;
     }
 
-    public float getPrice() {
+    public Float getPrice() {
         return price;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(Float price) {
         this.price = price;
     }
 

@@ -9,7 +9,7 @@ public interface RestaurantDao {
 
     // CREATE
 
-    public Restaurant registerRestaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner);
+    public Restaurant registerRestaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner, String facebook, String twitter, String instagram);
     public boolean setImageByRestaurantId(Image image, long restaurantId);
 
     // READ

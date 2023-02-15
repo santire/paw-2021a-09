@@ -3,16 +3,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.MapsId;
-import javax.persistence.OneToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.xml.bind.DatatypeConverter;
 
 
@@ -32,8 +23,7 @@ public class Image {
     private byte[] data;
 
     @OneToOne
-    @MapsId
-    @JoinColumn(name = "restaurant_id")
+    @PrimaryKeyJoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
 
@@ -51,33 +41,21 @@ public class Image {
         this.data = data;
     }
 
-    // public Image(final String base64) throws UnsupportedEncodingException{
-    //     this.imageId = null;
-    //     byte[] temp = Base64.getEncoder().encode(base64.getBytes());
-    //     this.data = Base64.getDecoder().decode(new String(temp).getBytes("UTF-8"));
-    // }
-
     public Image(final String base64){
         this.data = Base64.getEncoder().encode(base64.getBytes(StandardCharsets.UTF_8));
     }
 
     public Long getImageId(){ return this.imageId; }
     public byte[] getData(){ return this.data; }
-    public byte[] getImageEncoded() throws IOException{
-        // byte[] encodeBase64 = Base64.getEncoder().encode(this.data);
-        // String base64Encoded = new String(encodeBase64, StandardCharsets.UTF_8);
-        // return base64Encoded;x
-        String decoded = new String(Base64.getDecoder().decode(this.data), StandardCharsets.UTF_8);
-        String[] splitImage = decoded.split(",");
-        return DatatypeConverter.parseBase64Binary(splitImage[1]);
-    }
 
-    public byte[] getDataFromPlaceholder() throws IOException{
+    public static byte[] getPlaceholderImage() {
         byte[] data = Base64.getEncoder().encode(placeHolder.getBytes(StandardCharsets.UTF_8));
         String decoded = new String(Base64.getDecoder().decode(data), StandardCharsets.UTF_8);
         String[] splitImage = decoded.split(",");
         return DatatypeConverter.parseBase64Binary(splitImage[1]);
     }
+
+
     public Restaurant getRestaurant() { return restaurant; }
 
     public void setImageId(Long imageId) { this.imageId = imageId; }

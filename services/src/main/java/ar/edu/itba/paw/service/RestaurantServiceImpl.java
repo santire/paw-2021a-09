@@ -19,16 +19,17 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Override
     @Transactional
-    public Restaurant registerRestaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner) {
-        return restaurantDao.registerRestaurant(name, address, phoneNumber, tags, owner);
+    public Restaurant registerRestaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner, String facebook, String twitter, String instagram) {
+        return restaurantDao.registerRestaurant(name, address, phoneNumber, tags, owner, facebook, twitter, instagram);
     }
 
     @Override
     @Transactional
     public boolean setImageByRestaurantId(Image image, long restaurantId) {
         Restaurant restaurant = findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
-        image.setRestaurant(restaurant);
         restaurant.setProfileImage(image);
+        image.setRestaurant(restaurant);
+
         return true;
     }
 
@@ -105,12 +106,15 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Override
     @Transactional
     public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber,
-            List<Tags> tags) {
+            List<Tags> tags, String facebook, String twitter, String instagram) {
         Restaurant restaurant = findById(id).orElseThrow(RestaurantNotFoundException::new);
-        restaurant.setName(name);
-        restaurant.setAddress(address);
-        restaurant.setPhoneNumber(phoneNumber);
-        restaurant.setTags(tags);
+        if (name != null) restaurant.setName(name);
+        if (address != null) restaurant.setAddress(address);
+        if (phoneNumber != null) restaurant.setPhoneNumber(phoneNumber);
+        if (tags != null) restaurant.setTags(tags);
+        if (facebook != null) restaurant.setFacebook(facebook);
+        if (twitter != null) restaurant.setTwitter(twitter);
+        if (instagram != null) restaurant.setInstagram(instagram);
 
         return Optional.of(restaurant);
     }

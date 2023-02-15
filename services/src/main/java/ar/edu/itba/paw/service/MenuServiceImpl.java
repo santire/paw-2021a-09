@@ -2,6 +2,8 @@ package ar.edu.itba.paw.service;
 
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +17,7 @@ import ar.edu.itba.paw.persistence.RestaurantDao;
 @Service
 public class MenuServiceImpl implements MenuService {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(MenuServiceImpl.class);
     @Autowired
     private MenuDao menuDao;
 
@@ -25,6 +28,7 @@ public class MenuServiceImpl implements MenuService {
 	@Transactional
 	public void addItemToRestaurant(long restaurantId, MenuItem item) {
 		Restaurant restaurant = restaurantDao.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
+		LOGGER.debug("restaurant: {}", restaurant.getName());
 		menuDao.addItemToRestaurant(restaurant, item);
 	}
 

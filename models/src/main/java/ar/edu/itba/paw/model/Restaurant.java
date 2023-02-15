@@ -102,6 +102,19 @@ public class Restaurant {
         this.rating = 0;
         this.menu = new ArrayList<>();
     }
+    public Restaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner, String facebook, String twitter, String instagram) {
+        this.name = name;
+        this.address = address;
+        this.phoneNumber = phoneNumber;
+        this.tags = tags;
+        this.owner = owner;
+        this.facebook = facebook;
+        this.twitter = twitter;
+        this.instagram = instagram;
+        // this.likes = 0;
+        this.rating = 0;
+        this.menu = new ArrayList<>();
+    }
 
     public Restaurant(Long id, String name, String address, String phoneNumber, float rating, User owner){
         this.id = id;

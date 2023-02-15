@@ -28,6 +28,9 @@ public class LikesServiceImpl implements LikesService {
     public boolean like(long userId, long restaurantId) {
         User user = userDao.findById(userId).orElseThrow(UserNotFoundException::new);
         Restaurant restaurant = restaurantDao.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
+        if (userLikesRestaurant(userId, restaurantId)) {
+            return false;
+        }
         return likesDao.like(user, restaurant);
     }
 

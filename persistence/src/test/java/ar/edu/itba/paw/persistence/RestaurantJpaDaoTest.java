@@ -61,7 +61,7 @@ public class RestaurantJpaDaoTest {
 
     @Test
     public void testRegister() {
-        Restaurant restaurant = restaurantDao.registerRestaurant(NAME, ADDRESS, PHONE_NUMBER, TAGS, OWNER);
+        Restaurant restaurant = restaurantDao.registerRestaurant(NAME, ADDRESS, PHONE_NUMBER, TAGS, OWNER, "", "", "");
         // Restaurant restaurant2 = restaurantDao.registerRestaurant(NAME, ADDRESS,
         // PHONE_NUMBER, TAGS, OWNER);
         // Restaurant restaurant3 = restaurantDao.registerRestaurant(NAME, ADDRESS,

@@ -79,7 +79,13 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .logout().disable()
                 .rememberMe().disable()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/api/restaurants", "/api/restaurants/*").permitAll()
+                .antMatchers(HttpMethod.GET,
+                        "/api/restaurants",
+                        "/api/restaurants/*",
+                        "/api/restaurants/*/image",
+                        "/api/restaurants/*/menu",
+                        "/api/restaurants/*/reviews"
+                ).permitAll()
                 .antMatchers(HttpMethod.POST, "/api/users").permitAll()
                 .antMatchers(HttpMethod.PUT, "/api/users").permitAll()
                 .antMatchers("/api/**").authenticated()

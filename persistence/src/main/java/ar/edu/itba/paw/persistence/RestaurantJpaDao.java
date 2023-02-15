@@ -33,8 +33,8 @@ public class RestaurantJpaDao implements RestaurantDao {
     // CREATE
 
     @Override
-    public Restaurant registerRestaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner) {
-        final Restaurant restaurant = new Restaurant(name, address, phoneNumber, tags, owner);
+    public Restaurant registerRestaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner, String facebook, String twitter, String instagram) {
+        final Restaurant restaurant = new Restaurant(name, address, phoneNumber, tags, owner, facebook, twitter, instagram);
         em.persist(restaurant);
         return restaurant;
     }

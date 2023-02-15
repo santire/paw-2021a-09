@@ -98,8 +98,10 @@ public class UserController {
             userService.activateUserByToken(token);
         } else if (type != null && type.equalsIgnoreCase("reset")) {
             if (passwordForm == null) throw new EmptyBodyException();
-
             userService.updatePasswordByToken(token, passwordForm.getPassword());
+        } else {
+            // TODO: Exception?
+            LOGGER.warn("Invalid type");
         }
 
         return Response.noContent().build();

@@ -18,9 +18,9 @@ public class MenuJpaDao implements MenuDao {
 
 	@Override
 	public void addItemToRestaurant(Restaurant restaurant, MenuItem item) {
-		restaurant.addMenuItem(item);
 		item.setRestaurant(restaurant);
-		em.persist(item);
+		restaurant.addMenuItem(item);
+		em.merge(item);
 	}
 
 	@Override
