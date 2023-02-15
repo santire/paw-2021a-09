@@ -8,13 +8,18 @@ import {
   Image,
   Loader,
   Button,
+  SimpleGrid,
+  Pagination,
 } from "@mantine/core";
+import qs from "qs";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
-import { Navigate, useNavigate } from "react-router-dom";
-import { getUserRestaurants } from "../api/services/UserService"
+import { Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { FilterParams, getUserRestaurants } from "../api/services/UserService";
 //import { getRestaurants } from "../api/services";
 import { UserRestaurantCard } from "../components/UserRestaurantCard/UserRestaurantCard";
+import { useAuth } from "../context/AuthContext";
 import { PaginatedRestaurants, Restaurant } from "../types";
 import { Page } from "../types/Page";
 
@@ -51,29 +56,65 @@ const useStyles = createStyles((theme) => ({
   empty: {
     align: "center",
     fontSize: 30,
-    marginTop: 100
-  }
+    marginTop: 100,
+  },
 }));
 
 export function UserRestaurantsPage() {
+  const { userId } = useParams();
+  const [params, setParams] = useState<FilterParams>({
+    page: 1,
+  });
+  const [apiParams, setApiParams] = useState(params);
+  const [searchParams, setSearchParams] = useSearchParams();
   const { status, data, error, refetch } = useQuery<Page<Restaurant>, Error>(
-    [],
-    async () => getUserRestaurants()
+    ["ownedRestaurants", { userId, params }],
+    async () =>
+      getUserRestaurants({
+        userId: userId || "",
+        params: { ...params },
+      })
   );
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
 
 
+  const parseSearchParams = () => {
+    const auxParams: FilterParams = {};
+    searchParams.forEach((value, key) => {
+      switch (key) {
+        case "page": {
+          auxParams.page = parseInt(value);
+          break;
+        }
+      }
+    });
+
+    return auxParams;
+  };
+
+
+  useEffect(() => {
+    // first time loading use paremeters in url, otherwise set on change
+    const parsedParams = parseSearchParams();
+    setParams(parsedParams);
+    setApiParams(parsedParams);
+  }, [searchParams]);
+
+
   if (status === "error") {
     return <div>{error!.message}</div>;
   }
-  
 
   const restaurants =
-  data?.data?.map((rest) => (
-    <UserRestaurantCard restaurant={rest} key={rest.name} onDelete={(id) => refetch()} />
-  )) || [];
+    data?.data?.map((rest) => (
+      <UserRestaurantCard
+        restaurant={rest}
+        key={rest.name}
+        onDelete={(id) => refetch()}
+      />
+    )) || [];
 
   return (
     <>
@@ -84,45 +125,51 @@ export function UserRestaurantsPage() {
           </Flex>
         ) : (
           <>
-            <Text className={classes.title} mb={"xl"} mt={"xl"}>{t`pages.userRestaurants.title`}</Text>
+            <Text
+              className={classes.title}
+              mb={"xl"}
+              mt={"xl"}
+            >{t`pages.userRestaurants.title`}</Text>
 
-            {
-              restaurants.length === 0 ? (
-                <Flex justify="center" align="center" h={"100%"}>
-                  <div className={classes.empty}>
-                    <Text mb={50}>
-                      {t("pages.userRestaurants.notFound")}
-                    </Text>
-                    <Button color="orange" mx={170} onClick={() => navigate("/restaurants/register")}>
-                      {t("pages.userRestaurants.createOne")}
-                    </Button>
-                  </div>
-                </Flex>
-              ) 
-              : (
-              <Carousel
-                slideSize="20%"
-                slideGap="sm"
-                breakpoints={[
-                  { maxWidth: "lg", slideSize: "33.333333333%" },
-                  { maxWidth: "md", slideSize: "50%" },
-                  { maxWidth: "sm", slideSize: "100%", slideGap: 0 },
-                ]}
-                align="start"
-                controlSize={40}
-                //loop
-              >
-                {restaurants?.map((r) => (
-                  <Carousel.Slide key={r.key}>
-                    <Center p={0} m={0}>
-                      {r}
-                    </Center>
-                  </Carousel.Slide>
-                ))}
-              </Carousel>
-              )
-            }
-            
+            {restaurants.length === 0 ? (
+              <Flex justify="center" align="center" h={"100%"}>
+                <div className={classes.empty}>
+                  <Text mb={50}>{t("pages.userRestaurants.notFound")}</Text>
+                  <Button
+                    color="orange"
+                    mx={170}
+                    onClick={() => navigate("/restaurants/register")}
+                  >
+                    {t("pages.userRestaurants.createOne")}
+                  </Button>
+                </div>
+              </Flex>
+            ) : (
+
+            <Flex direction="column" align="center">
+              <SimpleGrid cols={3} spacing="xl" mb="xl">
+                {restaurants}
+              </SimpleGrid>
+              <Pagination
+                total={data?.meta.maxPages ?? 0}
+                siblings={3}
+                initialPage={params.page ?? 1}
+                page={params.page}
+                onChange={(e) => {
+                  setParams((prev) => ({ ...prev, page: e }));
+                  setApiParams((prev) => ({ ...prev, page: e }));
+                  setSearchParams(
+                    qs.stringify(
+                      { ...params, page: e },
+                      { arrayFormat: "repeat" }
+                    )
+                  );
+                }}
+                align="center"
+                color="orange"
+              />
+            </Flex>
+            )}
           </>
         )}
       </Container>

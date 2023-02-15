@@ -48,7 +48,7 @@ export async function getRestaurantById(id: string) {
 }
 
 export async function getRestaurantTags() {
-  const url = `${BASE_PATH}/tags`;
+  const url = `/tags`;
   const response = await apiClient.get<string[]>(url);
   return response.data;
 }
