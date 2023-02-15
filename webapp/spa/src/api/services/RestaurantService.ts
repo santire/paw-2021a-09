@@ -3,6 +3,7 @@ import { Restaurant } from "../../types";
 import { Page } from "../../types/Page";
 import { MenuItem } from "../../types/MenuItem";
 import { Review } from "../../types/Review";
+import {Rate} from "../../types/Rate";
 
 export interface FilterParams {
   page?: number;
@@ -66,9 +67,33 @@ export async function deleteRestaurantById(id: string) {
 }
 
 export async function likeRestaurant(id: string){
-  const url = `${BASE_PATH}/${id}/like`;
-  const response = await apiClient.put(url);
+  const url = `${BASE_PATH}/${id}/likes`;
+  const response = await apiClient.post(url);
   return response.status;
+}
+
+export async function dislikeRestaurant(id: string){
+  const url = `${BASE_PATH}/${id}/likes`;
+  const response = await apiClient.delete(url);
+  return response.status;
+}
+
+export async function getRestaurantLike(restaurantId: string, userId: string){
+  const url = `${BASE_PATH}/${restaurantId}/likes?userId=${userId}`;
+  const response = await apiClient.get(url);
+  return response.data;
+}
+
+export async function rateRestaurant(restaurantId: string, rating: Rate){
+  const url = `${BASE_PATH}/${restaurantId}/ratings?rating=${rating}`;
+  const response = await apiClient.post<Rate>(url, rating);
+  return response.data;
+}
+
+export async function getRestaurantRating(restaurantId: string, userId: string){
+  const url = `${BASE_PATH}/${restaurantId}/ratings?userId=${userId}`;
+  const response = await apiClient.get(url);
+  return response.data;
 }
 
 export async function reviewRestaurant(id: string, review: Review){
