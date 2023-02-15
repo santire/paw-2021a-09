@@ -13,44 +13,45 @@ import {
 import { IconHeart, IconShare, IconStar } from "@tabler/icons";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
-import { deleteRestaurantById, getRestaurantImage } from "../../api/services";
+import { deleteRestaurantById } from "../../api/services";
+import { useAuth } from "../../context/AuthContext";
 import { Restaurant } from "../../types";
 import useStyles from "./UserRestaurantCard.styles";
 
 interface UserRestaurantCardProps {
   restaurant: Restaurant;
   likedByUser?: boolean;
-  onDelete?: (id?: string) => void;
 }
 
-export function UserRestaurantCard({
-  restaurant,
-  onDelete,
-}: UserRestaurantCardProps) {
+export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
   const { id, image, name, rating, likes } = restaurant;
   const { classes, theme } = useStyles();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [opened, setOpened] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string>("");
+  const { user } = useAuth();
+  const userId = user?.userId;
 
-  useEffect(() => {
-    restaurant.id
-      ? getRestaurantImage(restaurant.id).then((data) => {
-          setImageUrl(data);
-        })
-      : console.log("");
-  }, []);
+  const { mutate, isLoading } = useMutation(deleteRestaurantById, {
+    onSuccess: () => {
+      setOpened(false);
+      queryClient.invalidateQueries("ownedRestaurants");
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries("ownedRestaurants");
+    },
+  });
 
   return (
     <Card withBorder p="lg" radius="md" className={classes.card}>
       <Card.Section mb="md">
-        <Image
-          src={image?.startsWith("http") ? image : imageUrl}
-          alt={name}
-          height={180}
-        />
+        <Image src={image} alt={name} height={180} />
       </Card.Section>
 
       <Card.Section mt="xs" className={classes.section}>
@@ -129,19 +130,8 @@ export function UserRestaurantCard({
           variant="outline"
           size="md"
           fullWidth
-          onClick={() => {
-            if (restaurant.id === undefined) {
-              console.log("null restaurant id");
-            } else {
-              deleteRestaurantById(restaurant.id).then((response) => {
-                if (response === 202) {
-                  if (onDelete) {
-                    onDelete(restaurant.id);
-                  }
-                }
-              });
-            }
-          }}
+          onClick={() => mutate(id!)}
+          disabled={isLoading}
         >
           {t("UserRestaurantCard.deleteModal.confirm")}
         </Button>

@@ -8,33 +8,21 @@ import {
   Text,
   Image,
   TextInput,
-  useMantineTheme,
   Chip,
   Grid,
 } from "@mantine/core";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { IconUpload, IconPhoto, IconX } from "@tabler/icons";
-import {
-  Dropzone,
-  DropzoneProps,
-  IMAGE_MIME_TYPE,
-  FileWithPath,
-} from "@mantine/dropzone";
+import { useForm } from "react-hook-form";
+import { IconPhoto, IconX } from "@tabler/icons";
+import { Dropzone, IMAGE_MIME_TYPE, FileWithPath } from "@mantine/dropzone";
 
 import { useTranslation } from "react-i18next";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import * as z from "zod";
-import {
-  isRestaurantNameAvailable,
-  registerRestaurant,
-} from "../../api/services";
-import { register as registerUser } from "../../api/services/AuthService";
-import useStyles from "./RegisterRestaurantForm.styles";
-import { useEffect, useRef, useState } from "react";
+import { registerRestaurant, updateRestaurant } from "../../api/services";
+import useStyles from "./RestaurantForm.styles";
+import { useEffect, useState } from "react";
 import { getTags, Restaurant } from "../../types";
-import { userInfo } from "os";
 import { useMutation, useQueryClient } from "react-query";
-import { TAGS } from "../Filter/Filter";
 import { useAuth } from "../../context/AuthContext";
 
 const facebookRegex = /^(https?:\/\/)?facebook\.com\/.*$/;
@@ -44,11 +32,11 @@ const twitterRegex = /^(https?:\/\/)?twitter\.com\/.*$/;
 const registerSchema = z
   .object({
     name: z.string().min(1).max(100),
-    address: z.string().min(1).max(100),
+    address: z.string().min(6).max(100),
     phoneNumber: z
       .string()
-      .min(6)
-      .max(15)
+      .min(8)
+      .max(30)
       .regex(/[0-9]+/),
     facebook: z.string().max(100).optional(),
     instagram: z.string().max(100).optional(),
@@ -81,37 +69,85 @@ const registerSchema = z
   });
 export type RegisterRestaurantForm = z.infer<typeof registerSchema>;
 
-export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
+interface RestaurantFormProps {
+  restaurant?: Restaurant;
+  type: "create" | "update";
+}
+
+export function RestaurantForm({ restaurant, type }: RestaurantFormProps) {
   const { classes } = useStyles();
   const { t } = useTranslation();
-  const { t: en } = useTranslation();
-  const { t: es } = useTranslation("es");
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const [selectedChips, setSelectedChips] = useState<string[]>([]);
+  const [chips, setChips] = useState<string[]>([]);
   const [allTags, setAllTags] = useState<string[]>([]);
   const { user } = useAuth();
   const userId = user?.userId;
-  const { mutate, isLoading } = useMutation(registerRestaurant, {
+  const registerMutation = useMutation(registerRestaurant, {
     onSuccess: () => {
-      queryClient.invalidateQueries("ownedRestaurants");
+      queryClient.invalidateQueries(["ownedRestaurants", "restaurants"]);
       userId ? navigate(`/users/${userId}/restaurants`) : navigate("/");
     },
     onError: (error) => {
       console.log(error);
     },
     onSettled: () => {
-      queryClient.invalidateQueries("ownedRestaurants");
+      queryClient.invalidateQueries(["ownedRestaurants", "restaurants"]);
     },
   });
 
-  useEffect(() => {
-    if (allTags.length === 0) getTags().then((tags) => setAllTags(tags));
-  }, []);
+  const updateMutation = useMutation(updateRestaurant, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(["ownedRestaurants", "restaurants"]);
+      userId ? navigate(`/users/${userId}/restaurants`) : navigate("/");
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries(["ownedRestaurants", "restaurants"]);
+    },
+  });
 
   const [files, setFiles] = useState<FileWithPath[]>([]);
   const [showMessage, setShowMessage] = useState(true);
+
+  const { isLoading } = type === "update" ? updateMutation : registerMutation;
+
+  const handleMutation = (val: RegisterRestaurantForm) => {
+    if (type === "update") {
+      return updateMutation.mutate({
+        restaurant: val,
+        id: restaurant?.id ?? "",
+      });
+    } else {
+      return registerMutation.mutate(val);
+    }
+  };
+
+  useEffect(() => {
+    if (allTags.length === 0)
+      getTags().then((tags) => {
+        setAllTags(tags);
+        if (restaurant) {
+          setValue("name", restaurant.name);
+          setValue("address", restaurant.address);
+          setValue("phoneNumber", restaurant.phoneNumber);
+          setValue("facebook", restaurant.facebook);
+          setValue("twitter", restaurant.twitter);
+          setValue("instagram", restaurant.instagram);
+          setValue(
+            "tags",
+            restaurant.tags
+              .map((tag) => tag.toLowerCase())
+              .map((l) => tags.indexOf(l).toString())
+          );
+          setChips(restaurant.tags.map((tag) => tag.toLowerCase()));
+        }
+      });
+  }, []);
 
   const {
     register,
@@ -130,11 +166,10 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
     setValue("image", file);
     const imageURL = URL.createObjectURL(file);
     return (
-      <div className={classes.imageContainer}>
+      <div key={index} className={classes.imageContainer}>
         <Image
           width="200px"
           height="200px"
-          key={index}
           src={imageURL}
           imageProps={{ onLoad: () => URL.revokeObjectURL(imageURL) }}
         />
@@ -143,19 +178,18 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
   });
 
   const handleChipChange = (chipValues: string[]) => {
-    console.log(chipValues);
+    if (chipValues.length > 3) return;
+    setChips(chipValues);
     const filteredChips = chipValues.filter((chip) => chip !== "");
-    console.log(filteredChips);
     const tagIds = filteredChips.map((t) => allTags.indexOf(t).toString());
     setSelectedChips(filteredChips);
     setValue("tags", tagIds);
-    // console.log(getTagValue(filteredChips));
   };
 
   return (
     <Paper shadow="md" radius="lg">
       <div className={classes.wrapper}>
-        <form className={classes.form} onSubmit={handleSubmit((values) => mutate(values))}>
+        <form className={classes.form} onSubmit={handleSubmit(handleMutation)}>
           <Text
             className={classes.title}
             px="sm"
@@ -163,7 +197,9 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
             mb="xl"
             align="center"
           >
-            {t("pages.registerRestaurant.title")}
+            {type === "update"
+              ? t("pages.editRestaurant.title")
+              : t("pages.registerRestaurant.title")}
           </Text>
           <div className={classes.fields}>
             <Divider
@@ -261,64 +297,55 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
 
             <Grid align="center">
               <Grid.Col span={9}>
-                <Controller
-                  control={control}
-                  {...register("image")}
-                  // register adds ref which produces error so....
-                  // @ts-ignore
-                  ref={null}
-                  render={({ field: { onChange } }) => (
-                    <Dropzone
-                      mb="md"
-                      onDrop={(files) => {
-                        setFiles(files);
-                        setShowMessage(false);
-                      }}
-                      onReject={(files) => {
-                        setFiles([]);
-                        setValue("image", null);
-                        setShowMessage(true);
-                        console.log("rejected files", files);
-                      }}
-                      onChange={(e: any) => onChange(e.target.files[0])}
-                      maxSize={3 * 1024 ** 2}
-                      maxFiles={1}
-                      multiple={false}
-                      accept={IMAGE_MIME_TYPE}
-                      sx={(theme) => ({
-                        minHeight: 120,
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        border: 0,
-                        backgroundColor:
-                          theme.colorScheme === "dark"
-                            ? theme.colors.dark[6]
-                            : theme.colors.gray[0],
+                <Dropzone
+                  mb="md"
+                  onDrop={(files) => {
+                    setFiles(files);
+                    setShowMessage(false);
+                  }}
+                  onReject={(files) => {
+                    setFiles([]);
+                    setValue("image", null);
+                    setShowMessage(true);
+                    console.log("rejected files", files);
+                  }}
+                  // onChange={(e: any) => onChange(e.target.files[0])}
+                  maxSize={3 * 1024 ** 2}
+                  maxFiles={1}
+                  multiple={false}
+                  accept={IMAGE_MIME_TYPE}
+                  sx={(theme) => ({
+                    minHeight: 120,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    border: 0,
+                    backgroundColor:
+                      theme.colorScheme === "dark"
+                        ? theme.colors.dark[6]
+                        : theme.colors.gray[0],
 
-                        "&[data-accept]": {
-                          color: theme.white,
-                          backgroundColor: theme.colors.blue[6],
-                        },
+                    "&[data-accept]": {
+                      color: theme.white,
+                      backgroundColor: theme.colors.blue[6],
+                    },
 
-                        "&[data-reject]": {
-                          color: theme.white,
-                          backgroundColor: theme.colors.red[6],
-                        },
-                      })}
-                    >
-                      {showMessage && (
-                        <div className={classes.imageContainer}>
-                          <IconPhoto size={70} stroke={1.5} />
-                          <Text size="lg" inline>
-                            {t("pages.registerRestaurant.dropImage")}
-                          </Text>
-                        </div>
-                      )}
-                      {previews}
-                    </Dropzone>
+                    "&[data-reject]": {
+                      color: theme.white,
+                      backgroundColor: theme.colors.red[6],
+                    },
+                  })}
+                >
+                  {showMessage && (
+                    <div className={classes.imageContainer}>
+                      <IconPhoto size={70} stroke={1.5} />
+                      <Text size="lg" inline>
+                        {t("pages.registerRestaurant.dropImage")}
+                      </Text>
+                    </div>
                   )}
-                />
+                  {previews}
+                </Dropzone>
               </Grid.Col>
               <Grid.Col span={3}>
                 {!showMessage && (
@@ -351,6 +378,7 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
               multiple
               mt={15}
               mb="xl"
+              value={chips}
               onChange={handleChipChange}
             >
               {allTags.map((tag) => (
@@ -365,8 +393,16 @@ export function RegisterRestaurantForm(props: Partial<DropzoneProps>) {
             </Chip.Group>
           </div>
           <Group position="center" mt="md">
-            <Button type="submit" color="orange" fullWidth px="xl">
-              {t("pages.register.submit")}
+            <Button
+              type="submit"
+              color="orange"
+              fullWidth
+              px="xl"
+              disabled={isLoading}
+            >
+              {type === "update"
+                ? t("pages.editRestaurant.submit")
+                : t("pages.register.submit")}
             </Button>
           </Group>
         </form>

@@ -3,8 +3,8 @@ import { Restaurant } from "../../types";
 import { Page } from "../../types/Page";
 import { MenuItem } from "../../types/MenuItem";
 import { Review } from "../../types/Review";
-import { RegisterRestaurantForm } from "../../components/RegisterRestaurantForm/RegisterRestaurantForm";
 import { Rate } from "../../types/Rate";
+import { RegisterRestaurantForm } from "../../components/RestaurantForm/RestaurantForm";
 
 export interface FilterParams {
   page?: number;
@@ -43,10 +43,16 @@ export async function registerRestaurant(restaurant: RegisterRestaurantForm) {
   return response.data;
 }
 
-export async function updateRestaurant(restaurant: Restaurant, id: string) {
+export async function updateRestaurant({
+  restaurant,
+  id,
+}: {
+  id: string;
+  restaurant: RegisterRestaurantForm;
+}) {
   console.log(restaurant);
   const url = `${BASE_PATH}/${id}`;
-  const response = await apiClient.post<Restaurant>(url, restaurant);
+  const response = await apiClient.put<Restaurant>(url, restaurant);
   return response.data;
 }
 
@@ -68,18 +74,17 @@ export async function getRestaurantTags() {
   return response.data;
 }
 
-export async function getRestaurantImage(id: string) {
-  const url = `${BASE_PATH}/${id}/image`;
-  const response = await apiClient.get<string>(url);
-  return response.data;
-}
+// export async function getRestaurantImage(id: string) {
+//   const url = `${BASE_PATH}/${id}/image`;
+//   const response = await apiClient.get<string>(url);
+//   return response.data;
+// }
 
 export async function deleteRestaurantById(id: string) {
   const url = `${BASE_PATH}/${id}`;
   const response = await apiClient.delete(url);
   return response.status;
 }
-
 
 export async function likeRestaurant(id: string) {
   const url = `${BASE_PATH}/${id}/likes`;

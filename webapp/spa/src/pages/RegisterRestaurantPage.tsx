@@ -1,9 +1,7 @@
 import { Flex } from "@mantine/core";
 import { useEffect } from "react";
-import {
-  useNavigate,
-} from "react-router-dom";
-import { RegisterRestaurantForm } from "../components/RegisterRestaurantForm/RegisterRestaurantForm";
+import { useNavigate } from "react-router-dom";
+import { RestaurantForm } from "../components/RestaurantForm/RestaurantForm";
 import { useAuth } from "../context/AuthContext";
 
 export function RegisterRestaurantPage() {
@@ -19,7 +17,7 @@ export function RegisterRestaurantPage() {
 
   return (
     <Flex mt="xl" justify="center">
-      <RegisterRestaurantForm />
+      <RestaurantForm type="create" />
     </Flex>
   );
 }

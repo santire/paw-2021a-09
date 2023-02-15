@@ -251,7 +251,7 @@ export function RestaurantPage() {
 
   const features = tags?.map((tag, idx) => (
     <Badge color="orange" key={tag + "" + idx}>
-      {t("tags." + tag)}
+      {t("tags." + tag.toLowerCase())}
     </Badge>
   ));
 
