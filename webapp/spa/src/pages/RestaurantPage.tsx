@@ -124,6 +124,7 @@ export function RestaurantPage() {
   const [menuItemName, setMenuItemName] = useState("");
   const [menuItemDescription, setMenuItemDescription] = useState("");
   const [menuItemPrice, setMenuItemPrice] = useState("");
+
   const {
     status: likeStatus,
     data: likeData,
@@ -193,6 +194,9 @@ export function RestaurantPage() {
       </Flex>
     );
   }
+
+  const arr = restaurantData.owner?.split("/").slice(-1);
+  const isOwner = user?.userId?.toString() === arr![0];
 
   const {
     image,
@@ -472,76 +476,78 @@ export function RestaurantPage() {
                   <tbody>{rows}</tbody>
                 </Table>
 
-                <Grid mt={100}>
-                  <Grid.Col span={3}>
-                    <Input
-                      onChange={(e) => {
-                        if (e != undefined) {
-                          setMenuItemName(e.target.value);
-                        } else {
-                          setMenuItemName("");
-                        }
-                      }}
-                      placeholder="Name"
-                      styles={(theme) => ({
-                        input: {
-                          "&:focus-within": {
-                            borderColor: theme.colors.orange[7],
+                {isOwner ? (
+                  <Grid mt={100}>
+                    <Grid.Col span={3}>
+                      <Input
+                        onChange={(e) => {
+                          if (e != undefined) {
+                            setMenuItemName(e.target.value);
+                          } else {
+                            setMenuItemName("");
+                          }
+                        }}
+                        placeholder="Name"
+                        styles={(theme) => ({
+                          input: {
+                            "&:focus-within": {
+                              borderColor: theme.colors.orange[7],
+                            },
                           },
-                        },
-                      })}
-                    />
-                  </Grid.Col>
-                  <Grid.Col span={7}>
-                    <Input
-                      onChange={(e) => {
-                        if (e != undefined) {
-                          setMenuItemDescription(e.target.value);
-                        } else {
-                          setMenuItemDescription("");
-                        }
-                      }}
-                      placeholder="Description"
-                      styles={(theme) => ({
-                        input: {
-                          "&:focus-within": {
-                            borderColor: theme.colors.orange[7],
+                        })}
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={7}>
+                      <Input
+                        onChange={(e) => {
+                          if (e != undefined) {
+                            setMenuItemDescription(e.target.value);
+                          } else {
+                            setMenuItemDescription("");
+                          }
+                        }}
+                        placeholder="Description"
+                        styles={(theme) => ({
+                          input: {
+                            "&:focus-within": {
+                              borderColor: theme.colors.orange[7],
+                            },
                           },
-                        },
-                      })}
-                    />
-                  </Grid.Col>
-                  <Grid.Col span={2}>
-                    <Input
-                      placeholder="Price"
-                      onChange={(e) => {
-                        if (e != undefined) {
-                          setMenuItemPrice(e.target.value);
-                        } else {
-                          setMenuItemPrice("");
-                        }
-                      }}
-                      styles={(theme) => ({
-                        input: {
-                          "&:focus-within": {
-                            borderColor: theme.colors.orange[7],
+                        })}
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={2}>
+                      <Input
+                        placeholder="Price"
+                        onChange={(e) => {
+                          if (e != undefined) {
+                            setMenuItemPrice(e.target.value);
+                          } else {
+                            setMenuItemPrice("");
+                          }
+                        }}
+                        styles={(theme) => ({
+                          input: {
+                            "&:focus-within": {
+                              borderColor: theme.colors.orange[7],
+                            },
                           },
-                        },
-                      })}
-                    />
-                  </Grid.Col>
-                  <Grid.Col span={12}>
-                    <Flex justify={"center"}>
-                      <Button
-                        color="yellow"
-                        radius="md"
-                        onClick={handleAddMenu}
-                      >
-                        Add to menu
-                      </Button>
-                    </Flex>
-                  </Grid.Col>
-                </Grid>
+                        })}
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={12}>
+                      <Flex justify={"center"}>
+                        <Button
+                          color="yellow"
+                          radius="md"
+                          onClick={handleAddMenu}
+                        >
+                          Add to menu
+                        </Button>
+                      </Flex>
+                    </Grid.Col>
+                  </Grid>
+                ) : null}
               </Tabs.Panel>
 
               <Tabs.Panel value="Reviews" pt="xs">
@@ -578,14 +584,18 @@ export function RestaurantPage() {
                     ))}
                   </>
                 )}
-                <Textarea
-                  label={t("pages.restaurant.reviews.leaveTitle")}
-                  mb={10}
-                  onChange={(e) => setReviewText(e.target.value)}
-                />
-                <Button color="yellow" radius="md" onClick={handleReview}>
-                  {t("pages.restaurant.reviews.send")}
-                </Button>
+                {!isOwner ? (
+                  <>
+                    <Textarea
+                      label={t("pages.restaurant.reviews.leaveTitle")}
+                      mb={10}
+                      onChange={(e) => setReviewText(e.target.value)}
+                    />
+                    <Button color="yellow" radius="md" onClick={handleReview}>
+                      {t("pages.restaurant.reviews.send")}
+                    </Button>
+                  </>
+                ) : null}
               </Tabs.Panel>
             </Tabs>
           </Flex>
