@@ -1,20 +1,15 @@
 package ar.edu.itba.paw.webapp.controller;
 import ar.edu.itba.paw.model.*;
-import ar.edu.itba.paw.model.exceptions.CommentNotFoundException;
-import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
+import ar.edu.itba.paw.model.exceptions.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
-import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
 import ar.edu.itba.paw.service.*;
 import ar.edu.itba.paw.webapp.dto.*;
-import ar.edu.itba.paw.webapp.forms.CommentForm;
-import ar.edu.itba.paw.webapp.forms.MenuItemForm;
-import ar.edu.itba.paw.webapp.forms.RatingForm;
-import ar.edu.itba.paw.webapp.forms.RegisterRestaurantForm;
+import ar.edu.itba.paw.webapp.forms.*;
 import ar.edu.itba.paw.webapp.utils.CachingUtils;
 
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
@@ -27,6 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import ar.edu.itba.paw.service.UserService;
@@ -279,7 +275,10 @@ public class RestaurantController {
         User user = getLoggedUser();
         List<Tags> tagList = new ArrayList<>();
         if(restaurantForm.getTags() != null){
-            tagList = Arrays.stream(restaurantForm.getTags()).map(Tags::valueOf).collect(Collectors.toList());
+            tagList = Arrays
+                    .stream(restaurantForm.getTags())
+                    .map(Tags::valueOf)
+                    .collect(Collectors.toList());
             LOGGER.debug("tags: {}", tagList);
         }
 
@@ -428,110 +427,96 @@ public class RestaurantController {
         Double rate = maybeRating.isPresent() ? maybeRating.get().getRating() : 0;
         return Response.ok(new RatingDto(rate)).build();
     }
-//
-//    //READ RESTAURANT RESERVATIONS
-//    @GET
-//    @Path("/{restaurantId}/reservation")
-//    @Produces( value = {MediaType.APPLICATION_JSON})
-//    public Response findRestaurantReservations(@PathParam("restaurantId") final long restaurantId, @QueryParam("filterby")@DefaultValue("") String filterby, @QueryParam("page") @DefaultValue("1") Integer page, @Context HttpServletRequest request) {
-//
-//        Optional<User> user = getLoggedUser(request);
-//        if(!user.isPresent()){
-//            LOGGER.error("anon user attempt to register a restaurant");
-//            return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
-//        }
-//        if (!userService.isTheRestaurantOwner(user.get().getId(), restaurantId))
-//            return Response.status(Response.Status.FORBIDDEN.getStatusCode()).build();
-//
-//        int maxPages;
-//        List<ReservationDto> reservations;
-//
-//        if(filterby == "pending"){
-//            maxPages = reservationService.findPendingByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
-//            reservations = reservationService.findPendingByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
-//        }else if(filterby == "confirmed"){
-//            maxPages = reservationService.findConfirmedByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
-//            reservations = reservationService.findConfirmedByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
-//        }else{
-//            maxPages = reservationService.findByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
-//            reservations = reservationService.findByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
-//        }
-//        return Response.ok(new GenericEntity<List<ReservationDto>>(reservations){})
-//                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
-//                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", maxPages).build(), "last")
-//                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.max((page - 1), 1)).build(), "prev")
-//                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.min((page + 1), maxPages)).build(), "next")
-//                .build();
-//    }
-//
-//    //ADD RESERVATION
-//    @POST
-//    @Path("/{restaurantId}/reservation")
-//    @Produces(value = {MediaType.APPLICATION_JSON})
-//    @Consumes(value = { MediaType.APPLICATION_JSON})
-//    public Response addRestaurantReservation(@PathParam("restaurantId") final long restaurantId, final ReservationDto reservationDto, @Context HttpServletRequest request){
-//
-//        Optional<User> user = getLoggedUser(request);
-//        if(!user.isPresent()){
-//            LOGGER.error("anon user attempt to register a restaurant");
-//            return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
-//        }
-//        String baseUrl = request.getHeader("Origin");
-//        if (baseUrl == null) {
-//            baseUrl = uriInfo.getBaseUri().toString();
-//        }
-//        final Reservation res = reservationService.addReservation(user.get().getId(), restaurantId, reservationDto.getDate(),reservationDto.getQuantity(),baseUrl);
-//
-//        final URI uri = uriInfo.getBaseUriBuilder().path("/"+restaurantId+"/reservation").build();
-//        return Response.created(uri).build();
-//    }
-//
-//    //DELETE RESERVATION
-//    @DELETE
-//    @Path("/{restaurantId}/reservation/{reservationId}")
-//    @Produces(value = {MediaType.APPLICATION_JSON})
-//    public Response deleteRestaurantReservation(@PathParam("restaurantId") final long restaurantId, @PathParam("reservationId") final long reservationId, @QueryParam("message")@DefaultValue("") String message, @Context HttpServletRequest request){
-//
-//        Optional<User> user = getLoggedUser(request);
-//        if(!user.isPresent()){
-//            LOGGER.error("Anon user attempt to delete a restaurant");
-//            return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
-//        }
-//        Optional<Reservation> reservation = reservationService.findById(reservationId);
-//        if(!reservation.isPresent())
-//            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
-//
-//        if(reservation.get().getUser().getId().equals(user.get().getId()))
-//            reservationService.userCancelReservation(reservationId);
-//        else if(userService.isTheRestaurantOwner(user.get().getId(), reservation.get().getRestaurant().getId()))
-//            reservationService.ownerCancelReservation(reservationId, message);
-//        else
-//            return Response.status(Response.Status.FORBIDDEN.getStatusCode()).build();
-//
-//        return Response.status(Response.Status.ACCEPTED).build();
-//    }
-//
-//    //CONFIRM RESERVATION
-//    @PUT
-//    @Path("/{restaurantId}/reservation/{reservationId}")
-//    @Produces(value = {MediaType.APPLICATION_JSON})
-//    public Response confirmRestaurantReservation(@PathParam("restaurantId") final long restaurantId, @PathParam("reservationId") final long reservationId, @Context HttpServletRequest request){
-//
-//        Optional<User> user = getLoggedUser(request);
-//        if(!user.isPresent()){
-//            LOGGER.error("anon user attempt to register a restaurant");
-//            return Response.status(Response.Status.BAD_REQUEST).header("error", "error user not logged").build();
-//        }
-//        Optional<Reservation> reservation = reservationService.findById(reservationId);
-//        if(!reservation.isPresent())
-//            return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
-//
-//        if(userService.isTheRestaurantOwner(user.get().getId(), reservation.get().getRestaurant().getId()))
-//            reservationService.confirmReservation(reservationId);
-//        else
-//            return Response.status(Response.Status.FORBIDDEN.getStatusCode()).build();
-//        return Response.status(Response.Status.ACCEPTED).build();
-//    }
+
+    //READ RESTAURANT RESERVATIONS
+    @GET
+    @Path("/{restaurantId}/reservations")
+    @Produces( value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("@authComponent.isRestaurantOwner(#restaurantId)")
+    public Response findRestaurantReservations(@PathParam("restaurantId") final Long restaurantId,
+                                               @QueryParam("filterBy") @DefaultValue("") String filterBy,
+                                               @QueryParam("page") @DefaultValue("1") Integer page,
+                                               @Context HttpServletRequest request) {
+
+
+        int maxPages;
+        List<ReservationDto> reservations;
+        LOGGER.debug("Filtering reservations by: {}", filterBy);
+        if(filterBy.equalsIgnoreCase("pending")){
+            maxPages = reservationService.findPendingByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
+            reservations = reservationService.findPendingByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
+        }else if(filterBy.equalsIgnoreCase("confirmed")){
+            maxPages = reservationService.findConfirmedByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
+            reservations = reservationService.findConfirmedByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
+        }else{
+            maxPages = reservationService.findByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
+            reservations = reservationService.findByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
+        }
+        return Response.ok(new GenericEntity<List<ReservationDto>>(reservations){})
+                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
+                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", maxPages).build(), "last")
+                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.max((page - 1), 1)).build(), "prev")
+                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.min((page + 1), maxPages)).build(), "next")
+                .build();
+    }
+
+    //ADD RESERVATION
+    @POST
+    @Path("/{restaurantId}/reservations")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @Consumes(value = { MediaType.APPLICATION_JSON})
+    @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
+    public Response addRestaurantReservation(
+            @PathParam("restaurantId") final Long restaurantId,
+            @Valid @NotNull ReservationForm reservationDto, @Context HttpServletRequest request){
+        User user = getLoggedUser();
+        String baseUrl = request.getHeader("Origin");
+        if (baseUrl == null) {
+            baseUrl = uriInfo.getBaseUri().toString();
+        }
+        final Reservation res = reservationService.addReservation(
+                user.getId(),
+                restaurantId,
+                LocalDateTime.of(reservationDto.getDate(), reservationDto.getTime()),
+                reservationDto.getQuantity(),
+                baseUrl);
+
+        final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(res.getId())).build();
+        return Response.created(uri).build();
+    }
+
+    // USER CANCEL RESERVATION
+    @DELETE
+    @Path("/{restaurantId}/reservations/{reservationId}")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("@authComponent.isReservationUser(#reservationId)")
+    public Response cancelRestaurantReservation(
+            @PathParam("restaurantId") final Long restaurantId,
+            @PathParam("reservationId") final long reservationId,
+            @Context HttpServletRequest request){
+        reservationService.userCancelReservation(reservationId);
+        return Response.status(Response.Status.ACCEPTED).build();
+    }
+
+   // OWNER CONFIRM OR DENY RESERVATION
+    @PUT
+    @Path("/{restaurantId}/reservations/{reservationId}")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("@authComponent.isReservationOwner(#reservationId)")
+    public Response confirmRestaurantReservation(@PathParam("restaurantId") final Long restaurantId,
+                                                 @PathParam("reservationId") final Long reservationId,
+                                                 @QueryParam("action") final String action,
+                                                 @Valid final CancelMessageForm cancelMessageForm,
+                                                 @Context HttpServletRequest request){
+        if (action.equalsIgnoreCase("confirm")) {
+            reservationService.confirmReservation(reservationId);
+        } else if (action.equalsIgnoreCase("deny") && cancelMessageForm != null) {
+            reservationService.ownerCancelReservation(reservationId, cancelMessageForm.getMessage());
+        } else {
+            throw new EmptyBodyException();
+        }
+        return Response.noContent().build();
+    }
 
 
 

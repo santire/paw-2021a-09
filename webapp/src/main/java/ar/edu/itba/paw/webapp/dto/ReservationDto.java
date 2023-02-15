@@ -1,6 +1,11 @@
 package ar.edu.itba.paw.webapp.dto;
 
 import ar.edu.itba.paw.model.Reservation;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
@@ -8,6 +13,9 @@ import java.time.LocalDateTime;
 
 public class ReservationDto {
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+//    @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
     private LocalDateTime date;
     private long quantity;
     private boolean confirmed;
@@ -28,6 +36,7 @@ public class ReservationDto {
 
         return  dto;
     }
+
 
     public LocalDateTime getDate() {
         return date;
