@@ -37,7 +37,7 @@ import {
 import { DatePicker } from "@mantine/dates";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { CloseButton } from '@mantine/core';
+import { CloseButton } from "@mantine/core";
 import { Rating } from "@mantine/core";
 import { useQuery, useQueryClient } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
@@ -53,7 +53,8 @@ import {
   getRestaurantReviews,
   getRestaurants,
   likeRestaurant,
-  rateRestaurant, deleteMenuItem,
+  rateRestaurant,
+  deleteMenuItem,
 } from "../api/services";
 import { useRestaurant } from "../hooks/useRestaurant";
 import { Restaurant } from "../types";
@@ -63,6 +64,7 @@ import { Review } from "../types/Review";
 import { useAuth } from "../context/AuthContext";
 import { Like } from "../types/Like";
 import { Rate } from "../types/Rate";
+import { MenuItems } from "../components/MenuItems/MenuItems";
 
 const useStyles = createStyles((theme) => ({
   title: {
@@ -116,9 +118,6 @@ export function RestaurantPage() {
     data: restaurantData,
     error: restaurantError,
   } = useRestaurant(restaurantId || "");
-  const [menuStatus, setMenuStatus] = useState("idle");
-  const [menuError, setMenuError] = useState<Error>();
-  const [rows, setRows] = useState<React.ReactElement[]>([]);
   const [reviewRows, setReviewRows] = useState<Review[]>([]);
 
   const [reviewText, setReviewText] = useState("");
@@ -140,7 +139,7 @@ export function RestaurantPage() {
     data: rateData,
     error: rateError,
   } = useQuery<Rate, Error>(
-    ["rate"],
+    ["rating"],
     async () => getRestaurantRating(restaurantId || "", user?.userId || ""),
     { retry: false }
   );
@@ -150,50 +149,8 @@ export function RestaurantPage() {
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState("");
 
-  useEffect(() => {
-    if (restaurantId) {
-      setMenuStatus("loading");
-
-      getRestaurantMenu(restaurantId)
-        .then((menuItems) => {
-          setMenuStatus("success");
-          if (menuItems) {
-            setRows(
-              menuItems.data.map((item: MenuItem) => (
-                <tr key={item.name}>
-                  <td>{item.name}</td>
-                  <td>{item.description}</td>
-                  <td>{item.price}</td>
-                  <td>
-                    <Group position="center">
-                      <CloseButton aria-label="Close modal"
-                        onClick={() => {
-                          deleteMenuItem(restaurantId, item.id || "")
-                        }}
-                      />
-                    </Group>
-                  </td>
-                </tr>
-              ))
-            );
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          setMenuError(error);
-          setMenuStatus("error");
-        });
-
-      getRestaurantReviews(restaurantId).then((reviews) => {
-        if (reviews) {
-          setReviewRows(reviews.data);
-        }
-      });
-    }
-  }, [restaurantId]);
-
   if (!restaurantId) {
-    navigate("/404");
+    navigate("/");
     return <></>;
   }
 
@@ -218,7 +175,6 @@ export function RestaurantPage() {
     instagram,
     tags,
   } = restaurantData;
-
 
   const SocialsButton = ({ type, url }: { type: string; url: string }) => {
     switch (type) {
@@ -272,20 +228,9 @@ export function RestaurantPage() {
 
   const handleReview = () => {
     const rev = {
-      userComment: reviewText
+      userComment: reviewText,
     };
     reviewRestaurant(restaurantId, rev);
-    console.log(reviewText);
-  };
-
-  const handleAddMenu = () => {
-    const menuItem = {
-      name: menuItemName,
-      description: menuItemDescription,
-      price: menuItemPrice,
-    };
-    console.log(menuItem);
-    addMenuItem(restaurantId, menuItem);
     console.log(reviewText);
   };
 
@@ -476,89 +421,7 @@ export function RestaurantPage() {
               </Tabs.List>
 
               <Tabs.Panel value="Menu" pt="xs">
-                <Table>
-                  <thead>
-                    <tr>
-                      <th>{t("pages.restaurant.menu.name")}</th>
-                      <th>{t("pages.restaurant.menu.description")}</th>
-                      <th>{t("pages.restaurant.menu.price")}</th>
-                    </tr>
-                  </thead>
-                  <tbody>{rows}</tbody>
-                </Table>
-
-                {isOwner ? (
-                  <Grid mt={100}>
-                    <Grid.Col span={3}>
-                      <Input
-                        onChange={(e) => {
-                          if (e != undefined) {
-                            setMenuItemName(e.target.value);
-                          } else {
-                            setMenuItemName("");
-                          }
-                        }}
-                        placeholder="Name"
-                        styles={(theme) => ({
-                          input: {
-                            "&:focus-within": {
-                              borderColor: theme.colors.orange[7],
-                            },
-                          },
-                        })}
-                      />
-                    </Grid.Col>
-                    <Grid.Col span={7}>
-                      <Input
-                        onChange={(e) => {
-                          if (e != undefined) {
-                            setMenuItemDescription(e.target.value);
-                          } else {
-                            setMenuItemDescription("");
-                          }
-                        }}
-                        placeholder="Description"
-                        styles={(theme) => ({
-                          input: {
-                            "&:focus-within": {
-                              borderColor: theme.colors.orange[7],
-                            },
-                          },
-                        })}
-                      />
-                    </Grid.Col>
-                    <Grid.Col span={2}>
-                      <Input
-                        placeholder="Price"
-                        onChange={(e) => {
-                          if (e != undefined) {
-                            setMenuItemPrice(e.target.value);
-                          } else {
-                            setMenuItemPrice("");
-                          }
-                        }}
-                        styles={(theme) => ({
-                          input: {
-                            "&:focus-within": {
-                              borderColor: theme.colors.orange[7],
-                            },
-                          },
-                        })}
-                      />
-                    </Grid.Col>
-                    <Grid.Col span={12}>
-                      <Flex justify={"center"}>
-                        <Button
-                          color="yellow"
-                          radius="md"
-                          onClick={handleAddMenu}
-                        >
-                          Add to menu
-                        </Button>
-                      </Flex>
-                    </Grid.Col>
-                  </Grid>
-                ) : null}
+                <MenuItems restaurantId={restaurantId} isOwner={isOwner} />
               </Tabs.Panel>
 
               <Tabs.Panel value="Reviews" pt="xs">

@@ -121,14 +121,18 @@ export async function getRestaurantRating(
 
 export async function reviewRestaurant(id: string, review: Review) {
   const url = `${BASE_PATH}/${id}/reviews`;
-  console.log(review);
-  const response = await apiClient.post(url, review);
+  const response = await apiClient.post(url, {
+    review: review.userComment,
+  });
   return response.status;
 }
 
 export async function addMenuItem(id: string, item: MenuItem) {
   const url = `${BASE_PATH}/${id}/menu`;
-  const response = await apiClient.post(url, item);
+  const response = await apiClient.post(url, {
+    ...item,
+    price: ""+parseFloat(item.price),
+  });
   return response.status;
 }
 

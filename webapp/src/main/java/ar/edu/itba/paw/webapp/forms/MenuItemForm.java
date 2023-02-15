@@ -18,7 +18,7 @@ public class MenuItemForm {
     @NotEmpty
     private String description;
 
-    @Min(0)
+    @Min(1)
     @Max(100000)
     @NotNull
     private Float price;
