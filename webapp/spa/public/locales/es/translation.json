@@ -135,6 +135,17 @@
       "notFound": "Parece que no tienes ningún restaurante",
       "createOne": "Crea tu restaurante"
     },
+    "userReservations": {
+      "title": "Tus reservas",
+      "adminTitle": "Reservas a tus restaurantes",
+      "notFound": "Parece que no tienes ninguna reserva",
+      "createOne": "Haz una reserva",
+      "partySize":"Elige la cantidad de comensales",
+      "guests": "Invitados",
+      "pickDate":"Elige una fecha",
+      "confirm": "Confirmar",
+      "reservationDate": "Fecha"
+    },
     "login": {
       "alert": "Usuario o contraseña inválido",
       "confirmAlert": "Usuario verificado, por favor inicie sesión",
