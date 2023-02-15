@@ -139,6 +139,17 @@
       "notFound": "Looks like you do not own any restaurant",
       "createOne": "Create your restaurant"
     },
+    "userReservations": {
+      "title": "Your reservations",
+      "adminTitle": "Reservations made to your restaurant",
+      "notFound": "Looks like you do not have any reservations",
+      "createOne": "Make a reservation",
+      "partySize":"Choose the party size",
+      "guests": "Guests",
+      "pickDate":"Pick a Date",
+      "confirm": "Confirm",
+      "reservationDate": "Date"
+    },
     "login": {
       "alert": "Invalid username or password",
       "confirmAlert": "User verified, please log in!",
