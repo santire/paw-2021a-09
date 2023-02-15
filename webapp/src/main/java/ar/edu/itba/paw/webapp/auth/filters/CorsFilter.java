@@ -18,8 +18,8 @@ public class CorsFilter extends OncePerRequestFilter {
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         response.setHeader("Access-Control-Max-Age", "3600");
-        response.setHeader("Access-Control-Allow-Headers", "authorization, content-type, xsrf-token");
-        response.addHeader("Access-Control-Expose-Headers", "xsrf-token, Link");
+        response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+        response.addHeader("Access-Control-Expose-Headers", "Authorization, Link");
         logger.info("CORS Filter being executed!");
         if ("OPTIONS".equals(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);

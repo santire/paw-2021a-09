@@ -151,6 +151,8 @@ export function Header() {
           onClick={() => {
             logout();
             navigate("/");
+            // To reload page
+            navigate(0);
           }}
         >
           {t("header.userMenu.settings.logout")}
