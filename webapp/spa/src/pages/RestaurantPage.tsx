@@ -25,6 +25,7 @@ import {
   IconBrandFacebook,
   IconBrandInstagram,
   IconBrandTwitter,
+  IconHeart,
   IconMapPin,
   IconMenu,
   IconMessageCircle,
@@ -36,21 +37,31 @@ import {
 import { DatePicker } from "@mantine/dates";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "react-query";
+import { Rating } from "@mantine/core";
+import { useQuery, useQueryClient } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  addMenuItem,
-  getRestaurantMenu,
-  getRestaurantReviews,
   reviewRestaurant,
   makeReservation,
   ReservationForm,
+  addMenuItem,
+  dislikeRestaurant,
+  getRestaurantLike,
+  getRestaurantMenu,
+  getRestaurantRating,
+  getRestaurantReviews,
+  getRestaurants,
+  likeRestaurant,
+  rateRestaurant,
 } from "../api/services";
 import { useRestaurant } from "../hooks/useRestaurant";
 import { Restaurant } from "../types";
 import { MenuItem } from "../types/MenuItem";
 import { Page } from "../types/Page";
 import { Review } from "../types/Review";
+import { useAuth } from "../context/AuthContext";
+import { Like } from "../types/Like";
+import { Rate } from "../types/Rate";
 
 const useStyles = createStyles((theme) => ({
   title: {
@@ -94,19 +105,43 @@ const useStyles = createStyles((theme) => ({
 
 export function RestaurantPage() {
   const { classes, theme } = useStyles();
+  const queryClient = useQueryClient();
   const { restaurantId } = useParams();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { status, data, error } = useRestaurant(restaurantId || "");
-
+  const { authed, user } = useAuth();
+  const {
+    status: restaurantStatus,
+    data: restaurantData,
+    error: restaurantError,
+  } = useRestaurant(restaurantId || "");
   const [menuStatus, setMenuStatus] = useState("idle");
   const [menuError, setMenuError] = useState<Error>();
   const [rows, setRows] = useState<React.ReactElement[]>([]);
   const [reviewRows, setReviewRows] = useState<Review[]>([]);
+
   const [reviewText, setReviewText] = useState("");
   const [menuItemName, setMenuItemName] = useState("");
   const [menuItemDescription, setMenuItemDescription] = useState("");
   const [menuItemPrice, setMenuItemPrice] = useState("");
+  const {
+    status: likeStatus,
+    data: likeData,
+    error: likeError,
+  } = useQuery<Like, Error>(
+    ["like"],
+    async () => getRestaurantLike(restaurantId || "", user?.userId || ""),
+    { retry: false }
+  );
+  const {
+    status: rateStatus,
+    data: rateData,
+    error: rateError,
+  } = useQuery<Rate, Error>(
+    ["rate"],
+    async () => getRestaurantRating(restaurantId || "", user?.userId || ""),
+    { retry: false }
+  );
 
   const [quantity, setQuantity] = useState<number>(1);
   const [reservationModal, setReservationModal] = useState(false);
@@ -151,7 +186,7 @@ export function RestaurantPage() {
     return <></>;
   }
 
-  if (status === "loading" || !data) {
+  if (restaurantStatus === "loading" || !restaurantData) {
     return (
       <Flex justify="center" align="center" h={"100vh"}>
         <Loader color="orange" />
@@ -168,7 +203,7 @@ export function RestaurantPage() {
     twitter,
     instagram,
     tags,
-  } = data;
+  } = restaurantData;
 
   const SocialsButton = ({ type, url }: { type: string; url: string }) => {
     switch (type) {
@@ -179,7 +214,7 @@ export function RestaurantPage() {
               size={18}
               color={theme.colors.blue[3]}
               stroke={1.5}
-              onClick={() => navigate(url)}
+              onClick={() => window.open("http://" + url, "_blank")}
             />
           </ActionIcon>
         );
@@ -191,7 +226,7 @@ export function RestaurantPage() {
               size={18}
               color={theme.colors.pink[6]}
               stroke={1.5}
-              onClick={() => navigate(url)}
+              onClick={() => window.open("http://" + url, "_blank")}
             />
           </ActionIcon>
         );
@@ -203,7 +238,7 @@ export function RestaurantPage() {
               size={18}
               color={theme.colors.blue[6]}
               stroke={1.5}
-              onClick={() => navigate(url)}
+              onClick={() => window.open("http://" + url, "_blank")}
             />
           </ActionIcon>
         );
@@ -258,6 +293,51 @@ export function RestaurantPage() {
           console.log("Status code is OK");
         }
       });
+    }
+  };
+
+  const LikeButton = () => {
+    if (authed) {
+      return (
+        <ActionIcon>
+          <IconHeart
+            size={18}
+            color={theme.colors.red[6]}
+            stroke={1.5}
+            fill={likeData?.liked ? theme.colors.red[6] : "none"}
+            onClick={() => {
+              if (likeData?.liked === false) {
+                likeRestaurant(restaurantId || "").then(() => {
+                  queryClient.invalidateQueries("like");
+                });
+              } else if (likeData?.liked === true) {
+                dislikeRestaurant(restaurantId || "").then(() => {
+                  queryClient.invalidateQueries("like");
+                });
+              }
+            }}
+          />
+        </ActionIcon>
+      );
+    } else {
+      return <></>;
+    }
+  };
+
+  const RatingStars = () => {
+    if (authed) {
+      return (
+        <Rating
+          defaultValue={rateData?.rating}
+          onChange={(value) => {
+            rateRestaurant(restaurantId, { rating: value }).then(() => {
+              queryClient.invalidateQueries("rate");
+            });
+          }}
+        />
+      );
+    } else {
+      return <></>;
     }
   };
 
@@ -336,6 +416,10 @@ export function RestaurantPage() {
                   ) : null}
                 </Group>
               </Flex>
+              <Group spacing={20} px={3}>
+                <LikeButton />
+                <RatingStars />
+              </Group>
               <Group spacing={7} mt="xs" className={classes.tags}>
                 {features}
               </Group>
