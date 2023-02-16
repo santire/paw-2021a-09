@@ -1,8 +1,6 @@
 import {
   ActionIcon,
-  Avatar,
   Badge,
-  Box,
   Button,
   createStyles,
   Divider,
@@ -10,16 +8,11 @@ import {
   Grid,
   Group,
   Image,
-  Input,
   Loader,
   Modal,
   NumberInput,
-  Paper,
-  Table,
   Tabs,
   Text,
-  Textarea,
-  TypographyStylesProvider,
 } from "@mantine/core";
 import {
   IconBrandFacebook,
@@ -30,14 +23,10 @@ import {
   IconMenu,
   IconMessageCircle,
   IconPhone,
-  IconPhoto,
-  IconSettings,
-  IconUser,
 } from "@tabler/icons";
 import { DatePicker } from "@mantine/dates";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { CloseButton } from "@mantine/core";
 import { Rating } from "@mantine/core";
 import { useQuery, useQueryClient } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
@@ -45,26 +34,19 @@ import {
   reviewRestaurant,
   makeReservation,
   ReservationForm,
-  addMenuItem,
   dislikeRestaurant,
   getRestaurantLike,
-  getRestaurantMenu,
   getRestaurantRating,
-  getRestaurantReviews,
-  getRestaurants,
   likeRestaurant,
   rateRestaurant,
-  deleteMenuItem,
 } from "../api/services";
 import { useRestaurant } from "../hooks/useRestaurant";
-import { Restaurant } from "../types";
-import { MenuItem } from "../types/MenuItem";
-import { Page } from "../types/Page";
 import { Review } from "../types/Review";
 import { useAuth } from "../context/AuthContext";
 import { Like } from "../types/Like";
 import { Rate } from "../types/Rate";
 import { MenuItems } from "../components/MenuItems/MenuItems";
+import { Reviews } from "../components/Reviews/Reviews";
 
 const useStyles = createStyles((theme) => ({
   title: {
@@ -119,11 +101,7 @@ export function RestaurantPage() {
     error: restaurantError,
   } = useRestaurant(restaurantId || "");
   const [reviewRows, setReviewRows] = useState<Review[]>([]);
-
   const [reviewText, setReviewText] = useState("");
-  const [menuItemName, setMenuItemName] = useState("");
-  const [menuItemDescription, setMenuItemDescription] = useState("");
-  const [menuItemPrice, setMenuItemPrice] = useState("");
 
   const {
     status: likeStatus,
@@ -226,14 +204,6 @@ export function RestaurantPage() {
     </Badge>
   ));
 
-  const handleReview = () => {
-    const rev = {
-      userComment: reviewText,
-    };
-    reviewRestaurant(restaurantId, rev);
-    console.log(reviewText);
-  };
-
   const handleReservation = () => {
     if (restaurantId === undefined) {
       console.log("null restaurant id");
@@ -257,7 +227,7 @@ export function RestaurantPage() {
   };
 
   const LikeButton = () => {
-    if (authed) {
+    if (authed && !isOwner) {
       return (
         <ActionIcon>
           <IconHeart
@@ -266,6 +236,9 @@ export function RestaurantPage() {
             stroke={1.5}
             fill={likeData?.liked ? theme.colors.red[6] : "none"}
             onClick={() => {
+              if (isOwner) {
+                return;
+              }
               if (likeData?.liked === false) {
                 likeRestaurant(restaurantId || "").then(() => {
                   queryClient.invalidateQueries("like");
@@ -279,13 +252,46 @@ export function RestaurantPage() {
           />
         </ActionIcon>
       );
-    } else {
-      return <></>;
     }
+    if (isOwner) {
+      <IconHeart
+        size={18}
+        color={theme.colors.red[6]}
+        stroke={1.5}
+        fill={likeData?.liked ? theme.colors.red[6] : "none"}
+        onClick={() => {
+          if (isOwner) {
+            return;
+          }
+          if (likeData?.liked === false) {
+            likeRestaurant(restaurantId || "").then(() => {
+              queryClient.invalidateQueries("like");
+            });
+          } else if (likeData?.liked === true) {
+            dislikeRestaurant(restaurantId || "").then(() => {
+              queryClient.invalidateQueries("like");
+            });
+          }
+        }}
+      />;
+    }
+    return <></>;
   };
 
   const RatingStars = () => {
-    if (authed) {
+    if (isOwner || !authed) {
+      return (
+        <Rating
+          readOnly
+          defaultValue={rateData?.rating}
+          onChange={(value) => {
+            rateRestaurant(restaurantId, { rating: value }).then(() => {
+              queryClient.invalidateQueries("rate");
+            });
+          }}
+        />
+      );
+    } else {
       return (
         <Rating
           defaultValue={rateData?.rating}
@@ -296,8 +302,6 @@ export function RestaurantPage() {
           }}
         />
       );
-    } else {
-      return <></>;
     }
   };
 
@@ -341,9 +345,9 @@ export function RestaurantPage() {
       </Modal>
       <Grid gutter="xl" justify="flex-start" m="xl" align="stretch">
         <Grid.Col span={5}>
-          <div className={classes.img}>
-            <Image src={image} alt={name} fit="cover" />
-          </div>
+          <Group position="center">
+            <Image src={image} alt={name} fit="cover" maw={700} />
+          </Group>
         </Grid.Col>
         <Grid.Col span={7} px={"5%"}>
           <Flex direction="column" justify="space-between" h={"100%"}>
@@ -425,51 +429,7 @@ export function RestaurantPage() {
               </Tabs.Panel>
 
               <Tabs.Panel value="Reviews" pt="xs">
-                {reviewRows.length > 0 && (
-                  <>
-                    {reviewRows.map((review, index) => (
-                      <>
-                        <Paper
-                          withBorder
-                          radius="md"
-                          className={classes.comment}
-                          key={index}
-                          mb={20}
-                        >
-                          <Group>
-                            <IconUser />
-                            <div>
-                              <Text size="sm">{review.username}</Text>
-                              <Text size="xs" color="dimmed">
-                                {review.date}
-                              </Text>
-                            </div>
-                          </Group>
-                          <TypographyStylesProvider className={classes.body}>
-                            <div
-                              className={classes.content}
-                              dangerouslySetInnerHTML={{
-                                __html: review.userComment,
-                              }}
-                            />
-                          </TypographyStylesProvider>
-                        </Paper>
-                      </>
-                    ))}
-                  </>
-                )}
-                {!isOwner ? (
-                  <>
-                    <Textarea
-                      label={t("pages.restaurant.reviews.leaveTitle")}
-                      mb={10}
-                      onChange={(e) => setReviewText(e.target.value)}
-                    />
-                    <Button color="yellow" radius="md" onClick={handleReview}>
-                      {t("pages.restaurant.reviews.send")}
-                    </Button>
-                  </>
-                ) : null}
+                <Reviews restaurantId={restaurantId} isOwner={isOwner} />
               </Tabs.Panel>
             </Tabs>
           </Flex>

@@ -136,9 +136,9 @@ export function MenuItems({ restaurantId, isOwner }: MenuItemProps) {
       <Table highlightOnHover>
         <thead>
           <tr>
-            <th>{t("pages.restaurant.menu.name")}</th>
-            <th>{t("pages.restaurant.menu.description")}</th>
-            <th>{t("pages.restaurant.menu.price")}</th>
+            <th>{t("pages.restaurant.menu.name.label")}</th>
+            <th>{t("pages.restaurant.menu.description.label")}</th>
+            <th>{t("pages.restaurant.menu.price.label")}</th>
           </tr>
         </thead>
         <tbody>

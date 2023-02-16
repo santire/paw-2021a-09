@@ -88,6 +88,7 @@
     "restaurant": {
       "reservationButton": "Make a Reservation",
       "menu": {
+        "title": "Menu",
         "price": {
           "label": "Price",
           "placeholder": "$$$"
@@ -102,6 +103,10 @@
         },
         "submit": "Submit",
         "error": "Couldn't add menu item"
+      },
+      "reviews": {
+        "title": "Leave a review",
+        "submit": "Submit"
       }
     },
     "restaurants": {

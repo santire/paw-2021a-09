@@ -5,6 +5,7 @@ import { MenuItem } from "../../types/MenuItem";
 import { Review } from "../../types/Review";
 import { Rate } from "../../types/Rate";
 import { RegisterRestaurantForm } from "../../components/RestaurantForm/RestaurantForm";
+import { ReviewForm } from "../../components/Reviews/Reviews";
 
 export interface FilterParams {
   page?: number;
@@ -26,9 +27,7 @@ export const NO_FILTER: FilterParams = {
 export async function registerRestaurant(restaurant: RegisterRestaurantForm) {
   const url = `${BASE_PATH}`;
   const { image, ...data } = restaurant;
-  console.log(restaurant);
   const response = await apiClient.post<Restaurant>(url, data);
-  console.log(response);
   if ("location" in response.headers) {
     const formData = new FormData();
     formData.append("image", image);
@@ -52,7 +51,17 @@ export async function updateRestaurant({
 }) {
   console.log(restaurant);
   const url = `${BASE_PATH}/${id}`;
-  const response = await apiClient.put<Restaurant>(url, restaurant);
+  const { image, ...data } = restaurant;
+  const response = await apiClient.put<Restaurant>(url, data);
+  const imageUrl = `${BASE_PATH}/${id}/image`;
+  const formData = new FormData();
+  formData.append("image", image);
+  const imageResponse = await apiClient.put(imageUrl, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
   return response.data;
 }
 
@@ -119,11 +128,15 @@ export async function getRestaurantRating(
   return response.data;
 }
 
-export async function reviewRestaurant(id: string, review: Review) {
+export async function reviewRestaurant(id: string, review: ReviewForm) {
   const url = `${BASE_PATH}/${id}/reviews`;
-  const response = await apiClient.post(url, {
-    review: review.userComment,
-  });
+  const response = await apiClient.post(url, review);
+  return response.status;
+}
+
+export async function deleteReview(restaurantId: string, itemId: string) {
+  const url = `${BASE_PATH}/${restaurantId}/reviews/${itemId}`;
+  const response = await apiClient.delete(url);
   return response.status;
 }
 
@@ -131,7 +144,7 @@ export async function addMenuItem(id: string, item: MenuItem) {
   const url = `${BASE_PATH}/${id}/menu`;
   const response = await apiClient.post(url, {
     ...item,
-    price: ""+parseFloat(item.price),
+    price: "" + parseFloat(item.price),
   });
   return response.status;
 }
