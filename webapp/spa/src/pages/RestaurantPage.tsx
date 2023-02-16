@@ -1,8 +1,6 @@
 import {
   ActionIcon,
-  Avatar,
   Badge,
-  Box,
   Button,
   createStyles,
   Divider,
@@ -10,16 +8,11 @@ import {
   Grid,
   Group,
   Image,
-  Input,
   Loader,
   Modal,
   NumberInput,
-  Paper,
-  Table,
   Tabs,
   Text,
-  Textarea,
-  TypographyStylesProvider,
 } from "@mantine/core";
 import {
   IconBrandFacebook,
@@ -30,14 +23,10 @@ import {
   IconMenu,
   IconMessageCircle,
   IconPhone,
-  IconPhoto,
-  IconSettings,
-  IconUser,
 } from "@tabler/icons";
 import { DatePicker } from "@mantine/dates";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { CloseButton } from '@mantine/core';
 import { Rating } from "@mantine/core";
 import { useQuery, useQueryClient } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
@@ -45,24 +34,19 @@ import {
   reviewRestaurant,
   makeReservation,
   ReservationForm,
-  addMenuItem,
   dislikeRestaurant,
   getRestaurantLike,
-  getRestaurantMenu,
   getRestaurantRating,
-  getRestaurantReviews,
-  getRestaurants,
   likeRestaurant,
-  rateRestaurant, deleteMenuItem,
+  rateRestaurant,
 } from "../api/services";
 import { useRestaurant } from "../hooks/useRestaurant";
-import { Restaurant } from "../types";
-import { MenuItem } from "../types/MenuItem";
-import { Page } from "../types/Page";
 import { Review } from "../types/Review";
 import { useAuth } from "../context/AuthContext";
 import { Like } from "../types/Like";
 import { Rate } from "../types/Rate";
+import { MenuItems } from "../components/MenuItems/MenuItems";
+import { Reviews } from "../components/Reviews/Reviews";
 
 const useStyles = createStyles((theme) => ({
   title: {
@@ -116,15 +100,9 @@ export function RestaurantPage() {
     data: restaurantData,
     error: restaurantError,
   } = useRestaurant(restaurantId || "");
-  const [menuStatus, setMenuStatus] = useState("idle");
-  const [menuError, setMenuError] = useState<Error>();
-  const [rows, setRows] = useState<React.ReactElement[]>([]);
   const [reviewRows, setReviewRows] = useState<Review[]>([]);
-
   const [reviewText, setReviewText] = useState("");
-  const [menuItemName, setMenuItemName] = useState("");
-  const [menuItemDescription, setMenuItemDescription] = useState("");
-  const [menuItemPrice, setMenuItemPrice] = useState("");
+
   const {
     status: likeStatus,
     data: likeData,
@@ -139,7 +117,7 @@ export function RestaurantPage() {
     data: rateData,
     error: rateError,
   } = useQuery<Rate, Error>(
-    ["rate"],
+    ["rating"],
     async () => getRestaurantRating(restaurantId || "", user?.userId || ""),
     { retry: false }
   );
@@ -149,50 +127,8 @@ export function RestaurantPage() {
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState("");
 
-  useEffect(() => {
-    if (restaurantId) {
-      setMenuStatus("loading");
-
-      getRestaurantMenu(restaurantId)
-        .then((menuItems) => {
-          setMenuStatus("success");
-          if (menuItems) {
-            setRows(
-              menuItems.data.map((item: MenuItem) => (
-                <tr key={item.name}>
-                  <td>{item.name}</td>
-                  <td>{item.description}</td>
-                  <td>{item.price}</td>
-                  <td>
-                    <Group position="center">
-                      <CloseButton aria-label="Close modal"
-                        onClick={() => {
-                          deleteMenuItem(restaurantId, item.id || "")
-                        }}
-                      />
-                    </Group>
-                  </td>
-                </tr>
-              ))
-            );
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          setMenuError(error);
-          setMenuStatus("error");
-        });
-
-      getRestaurantReviews(restaurantId).then((reviews) => {
-        if (reviews) {
-          setReviewRows(reviews.data);
-        }
-      });
-    }
-  }, [restaurantId]);
-
   if (!restaurantId) {
-    navigate("/404");
+    navigate("/");
     return <></>;
   }
 
@@ -204,6 +140,9 @@ export function RestaurantPage() {
     );
   }
 
+  const arr = restaurantData.owner?.split("/").slice(-1);
+  const isOwner = user?.userId?.toString() === arr![0];
+
   const {
     image,
     name,
@@ -214,7 +153,6 @@ export function RestaurantPage() {
     instagram,
     tags,
   } = restaurantData;
-
 
   const SocialsButton = ({ type, url }: { type: string; url: string }) => {
     switch (type) {
@@ -262,28 +200,9 @@ export function RestaurantPage() {
 
   const features = tags?.map((tag, idx) => (
     <Badge color="orange" key={tag + "" + idx}>
-      {t("tags." + tag)}
+      {t("tags." + tag.toLowerCase())}
     </Badge>
   ));
-
-  const handleReview = () => {
-    const rev = {
-      userComment: reviewText
-    };
-    reviewRestaurant(restaurantId, rev);
-    console.log(reviewText);
-  };
-
-  const handleAddMenu = () => {
-    const menuItem = {
-      name: menuItemName,
-      description: menuItemDescription,
-      price: menuItemPrice,
-    };
-    console.log(menuItem);
-    addMenuItem(restaurantId, menuItem);
-    console.log(reviewText);
-  };
 
   const handleReservation = () => {
     if (restaurantId === undefined) {
@@ -308,7 +227,7 @@ export function RestaurantPage() {
   };
 
   const LikeButton = () => {
-    if (authed) {
+    if (authed && !isOwner) {
       return (
         <ActionIcon>
           <IconHeart
@@ -317,6 +236,9 @@ export function RestaurantPage() {
             stroke={1.5}
             fill={likeData?.liked ? theme.colors.red[6] : "none"}
             onClick={() => {
+              if (isOwner) {
+                return;
+              }
               if (likeData?.liked === false) {
                 likeRestaurant(restaurantId || "").then(() => {
                   queryClient.invalidateQueries("like");
@@ -330,13 +252,46 @@ export function RestaurantPage() {
           />
         </ActionIcon>
       );
-    } else {
-      return <></>;
     }
+    if (isOwner) {
+      <IconHeart
+        size={18}
+        color={theme.colors.red[6]}
+        stroke={1.5}
+        fill={likeData?.liked ? theme.colors.red[6] : "none"}
+        onClick={() => {
+          if (isOwner) {
+            return;
+          }
+          if (likeData?.liked === false) {
+            likeRestaurant(restaurantId || "").then(() => {
+              queryClient.invalidateQueries("like");
+            });
+          } else if (likeData?.liked === true) {
+            dislikeRestaurant(restaurantId || "").then(() => {
+              queryClient.invalidateQueries("like");
+            });
+          }
+        }}
+      />;
+    }
+    return <></>;
   };
 
   const RatingStars = () => {
-    if (authed) {
+    if (isOwner || !authed) {
+      return (
+        <Rating
+          readOnly
+          defaultValue={rateData?.rating}
+          onChange={(value) => {
+            rateRestaurant(restaurantId, { rating: value }).then(() => {
+              queryClient.invalidateQueries("rate");
+            });
+          }}
+        />
+      );
+    } else {
       return (
         <Rating
           defaultValue={rateData?.rating}
@@ -347,8 +302,6 @@ export function RestaurantPage() {
           }}
         />
       );
-    } else {
-      return <></>;
     }
   };
 
@@ -392,9 +345,9 @@ export function RestaurantPage() {
       </Modal>
       <Grid gutter="xl" justify="flex-start" m="xl" align="stretch">
         <Grid.Col span={5}>
-          <div className={classes.img}>
-            <Image src={image} alt={name} fit="cover" />
-          </div>
+          <Group position="center">
+            <Image src={image} alt={name} fit="cover" maw={700} />
+          </Group>
         </Grid.Col>
         <Grid.Col span={7} px={"5%"}>
           <Flex direction="column" justify="space-between" h={"100%"}>
@@ -472,131 +425,11 @@ export function RestaurantPage() {
               </Tabs.List>
 
               <Tabs.Panel value="Menu" pt="xs">
-                <Table>
-                  <thead>
-                    <tr>
-                      <th>{t("pages.restaurant.menu.name")}</th>
-                      <th>{t("pages.restaurant.menu.description")}</th>
-                      <th>{t("pages.restaurant.menu.price")}</th>
-                    </tr>
-                  </thead>
-                  <tbody>{rows}</tbody>
-                </Table>
-
-                <Grid mt={100}>
-                  <Grid.Col span={3}>
-                    <Input
-                      onChange={(e) => {
-                        if (e != undefined) {
-                          setMenuItemName(e.target.value);
-                        } else {
-                          setMenuItemName("");
-                        }
-                      }}
-                      placeholder="Name"
-                      styles={(theme) => ({
-                        input: {
-                          "&:focus-within": {
-                            borderColor: theme.colors.orange[7],
-                          },
-                        },
-                      })}
-                    />
-                  </Grid.Col>
-                  <Grid.Col span={7}>
-                    <Input
-                      onChange={(e) => {
-                        if (e != undefined) {
-                          setMenuItemDescription(e.target.value);
-                        } else {
-                          setMenuItemDescription("");
-                        }
-                      }}
-                      placeholder="Description"
-                      styles={(theme) => ({
-                        input: {
-                          "&:focus-within": {
-                            borderColor: theme.colors.orange[7],
-                          },
-                        },
-                      })}
-                    />
-                  </Grid.Col>
-                  <Grid.Col span={2}>
-                    <Input
-                      placeholder="Price"
-                      onChange={(e) => {
-                        if (e != undefined) {
-                          setMenuItemPrice(e.target.value);
-                        } else {
-                          setMenuItemPrice("");
-                        }
-                      }}
-                      styles={(theme) => ({
-                        input: {
-                          "&:focus-within": {
-                            borderColor: theme.colors.orange[7],
-                          },
-                        },
-                      })}
-                    />
-                  </Grid.Col>
-                  <Grid.Col span={12}>
-                    <Flex justify={"center"}>
-                      <Button
-                        color="yellow"
-                        radius="md"
-                        onClick={handleAddMenu}
-                      >
-                        Add to menu
-                      </Button>
-                    </Flex>
-                  </Grid.Col>
-                </Grid>
+                <MenuItems restaurantId={restaurantId} isOwner={isOwner} />
               </Tabs.Panel>
 
               <Tabs.Panel value="Reviews" pt="xs">
-                {reviewRows.length > 0 && (
-                  <>
-                    {reviewRows.map((review, index) => (
-                      <>
-                        <Paper
-                          withBorder
-                          radius="md"
-                          className={classes.comment}
-                          key={index}
-                          mb={20}
-                        >
-                          <Group>
-                            <IconUser />
-                            <div>
-                              <Text size="sm">{review.username}</Text>
-                              <Text size="xs" color="dimmed">
-                                {review.date}
-                              </Text>
-                            </div>
-                          </Group>
-                          <TypographyStylesProvider className={classes.body}>
-                            <div
-                              className={classes.content}
-                              dangerouslySetInnerHTML={{
-                                __html: review.userComment,
-                              }}
-                            />
-                          </TypographyStylesProvider>
-                        </Paper>
-                      </>
-                    ))}
-                  </>
-                )}
-                <Textarea
-                  label={t("pages.restaurant.reviews.leaveTitle")}
-                  mb={10}
-                  onChange={(e) => setReviewText(e.target.value)}
-                />
-                <Button color="yellow" radius="md" onClick={handleReview}>
-                  {t("pages.restaurant.reviews.send")}
-                </Button>
+                <Reviews restaurantId={restaurantId} isOwner={isOwner} />
               </Tabs.Panel>
             </Tabs>
           </Flex>

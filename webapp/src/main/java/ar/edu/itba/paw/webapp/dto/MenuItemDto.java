@@ -8,7 +8,7 @@ public class MenuItemDto {
     private  Long id;
     private String name;
     private String description;
-    private float price;
+    private Float price;
 
     public static MenuItemDto fromMenuItem(MenuItem menuItem){
         final MenuItemDto dto = new MenuItemDto();
@@ -16,7 +16,7 @@ public class MenuItemDto {
         dto.id = menuItem.getId();
         dto.name = menuItem.getName();
         dto.description = menuItem.getDescription();
-        dto.price = dto.price;
+        dto.price = menuItem.getPrice();
 
         return  dto;
     }
@@ -33,7 +33,7 @@ public class MenuItemDto {
         return description;
     }
 
-    public float getPrice() {
+    public Float getPrice() {
         return price;
     }
 
@@ -49,7 +49,7 @@ public class MenuItemDto {
         this.description = description;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(Float price) {
         this.price = price;
     }
 }

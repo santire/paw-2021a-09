@@ -51,7 +51,7 @@
     "description": "Unfortunately, this is only a 404 page. You may have mistyped the address, or the page has been moved to another URL.",
     "takeMeBack": "Take me back to the home page"
   },
-  "tags":{
+  "tags": {
     "arabe": "Arab",
     "americano": "American",
     "argentino": "Argentinian",
@@ -87,14 +87,27 @@
     },
     "restaurant": {
       "reservationButton": "Make a Reservation",
-      "menu.title": "Menu",
-      "menu.name": "Name",
-      "menu.description": "Description",
-      "menu.price": "Price",
-      "reviews.title": "Reviews",
-      "reviews.leaveTitle": "Leave your review",
-      "reviews.writeHere": "Write here",
-      "reviews.send": "Send"
+      "menu": {
+        "title": "Menu",
+        "price": {
+          "label": "Price",
+          "placeholder": "$$$"
+        },
+        "name": {
+          "label": "Name",
+          "placeholder": "Name"
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Description"
+        },
+        "submit": "Submit",
+        "error": "Couldn't add menu item"
+      },
+      "reviews": {
+        "title": "Leave a review",
+        "submit": "Submit"
+      }
     },
     "restaurants": {
       "title": "Browse restaurants",
@@ -144,9 +157,9 @@
       "adminTitle": "Reservations made to your restaurant",
       "notFound": "Looks like you do not have any reservations",
       "createOne": "Make a reservation",
-      "partySize":"Choose the party size",
+      "partySize": "Choose the party size",
       "guests": "Guests",
-      "pickDate":"Pick a Date",
+      "pickDate": "Pick a Date",
       "confirm": "Confirm",
       "reservationDate": "Date"
     },
@@ -253,7 +266,7 @@
       },
       "submit": "Register"
     },
-    "registerRestaurant" : {
+    "registerRestaurant": {
       "loginDivider": "Basic information",
       "contactDivider": "Contact Information",
       "socialMediaDivider": "Social Media",

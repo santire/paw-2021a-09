@@ -3,10 +3,9 @@ export default createStyles((theme) => {
   const BREAKPOINT = theme.fn.smallerThan("sm");
 
   return {
-
     wrapper: {
       display: "flex",
-      maxWidth: '1000px',
+      maxWidth: "1000px",
       backgroundColor:
         theme.colorScheme === "dark" ? theme.colors.dark[6] : theme.white,
       borderRadius: theme.radius.lg,
@@ -23,17 +22,16 @@ export default createStyles((theme) => {
     },
 
     imageMaxSize: {
-      width: '100px',
-      height: '100px',
+      width: "100px",
+      height: "100px",
     },
 
     imageContainer: {
       display: "flex",
       alignItems: "center",
-      maxHeight:'300px',
-      maxWidth:'1000px'
+      maxHeight: "300px",
+      maxWidth: "1000px",
     },
-    
 
     form: {
       boxSizing: "border-box",
@@ -106,19 +104,11 @@ export default createStyles((theme) => {
       },
     },
 
-    tagsText : {
+    tagsText: {
       fontSize: 14,
-      color: 'grey',
-      fontFamily: 'sans-serif',
-      marginBottom: 20
+      color: "grey",
+      fontFamily: "sans-serif",
+      marginBottom: 20,
     },
-
-    profileImageText : {
-      fontSize: 16,
-      color: 'grey',
-      fontFamily: 'sans-serif',
-      marginBottom: 20
-    }
-    
   };
 });

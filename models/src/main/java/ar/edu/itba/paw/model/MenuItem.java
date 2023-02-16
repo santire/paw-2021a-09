@@ -20,7 +20,7 @@ public class MenuItem {
     private String description;
 
     @Column
-    private float price;
+    private Float price;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.MERGE)
     @JoinColumn(name = "restaurant_id")
@@ -30,7 +30,7 @@ public class MenuItem {
         //Just for hibernate
     }
 
-    public MenuItem(Long id, String name, String description, float price, Restaurant restaurant) {
+    public MenuItem(Long id, String name, String description, Float price, Restaurant restaurant) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -38,13 +38,13 @@ public class MenuItem {
         this.restaurant = restaurant;
     }
     
-    public MenuItem(Long id, String name, String description, float price) {
+    public MenuItem(Long id, String name, String description, Float price) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
     }
-    public MenuItem(String name, String description, float price) {
+    public MenuItem(String name, String description, Float price) {
         this.id = null;
         this.name = name;
         this.description = description;
@@ -63,7 +63,7 @@ public class MenuItem {
         return description;
     }
 
-    public float getPrice() {
+    public Float getPrice() {
         return price;
     }
 
@@ -79,7 +79,7 @@ public class MenuItem {
         this.description = description;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(Float price) {
         this.price = price;
     }
 

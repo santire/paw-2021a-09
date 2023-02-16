@@ -224,6 +224,7 @@ public class RestaurantController {
     public Response addRestaurantReview(@PathParam("restaurantId") final Long restaurantId,
                                         final @Valid @NotNull CommentForm comment, @Context HttpServletRequest request){
         User user = getLoggedUser();
+        LOGGER.debug("review: {}", comment.getReview());
         final Comment rev = commentService.addComment(user.getId(), restaurantId, comment.getReview());
         final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(rev.getId())).build();
         return Response.created(uri).build();

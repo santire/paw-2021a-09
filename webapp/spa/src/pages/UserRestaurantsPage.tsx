@@ -111,8 +111,7 @@ export function UserRestaurantsPage() {
     data?.data?.map((rest) => (
       <UserRestaurantCard
         restaurant={rest}
-        key={rest.name}
-        onDelete={(id) => refetch()}
+        key={rest.id ?? rest.name}
       />
     )) || [];
 

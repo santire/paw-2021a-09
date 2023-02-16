@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
           throws UsernameInUseException, EmailInUseException, TokenCreationException {
     User user = userDao.register(username,encoder.encode(password), firstName, lastName, email, phone);
     if (user == null) return null;
-    String url = baseUrl + "/register?type=activate&token=";
+    String url = baseUrl + "/paw-2021a-09/register?type=activate&token=";
 
     String token = UUID.randomUUID().toString();
     LocalDateTime createdAt = LocalDateTime.now();
@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
   public void requestPasswordReset(String email, String baseUrl) throws TokenCreationException {
     LOGGER.debug("Requesting reset for {}", email);
     User user = userDao.findByEmail(email).orElseThrow(UserNotFoundException::new);
-    String url = baseUrl + "/reset?type=reset&token=";
+    String url = baseUrl + "/paw-2021a-09/reset?type=reset&token=";
     String token = UUID.randomUUID().toString();
     LocalDateTime createdAt = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.systemDefault());
 
