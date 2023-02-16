@@ -82,8 +82,9 @@ export function EditProfileForm(props: Partial<DropzoneProps>) {
         const {...user } = data;
         try {
             console.log({...user})
-            await updateProfile({userId: userId, email: email, ...user})
-            queryClient.invalidateQueries("user")
+            await updateProfile({userId: userId, email: email, ...user}).then(() => {
+                queryClient.invalidateQueries("user");
+            });
         } catch (e) {
             //console.error(e);
         }

@@ -22,6 +22,7 @@ export const NO_FILTER: FilterParams = {
 export async function updateProfile(user: User) {
   console.log(user);
   const url = `${BASE_PATH}/${user.userId}`;
+  user.userId = undefined;
   const response = await apiClient.put<User>(url, user);
   return response.data;
 }
