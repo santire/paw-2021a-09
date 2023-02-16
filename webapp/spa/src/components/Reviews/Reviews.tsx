@@ -26,6 +26,7 @@ import {
   getRestaurantReviews,
   reviewRestaurant,
 } from "../../api/services";
+import { useAuth } from "../../context/AuthContext";
 import { Review } from "../../types";
 import { Page } from "../../types/Page";
 
@@ -102,14 +103,6 @@ function ReviewItemComp({ item, props }: { item: Review; props: ReviewProps }) {
           ) : null}
         </Group>
         <Text className={classes.body}>{item.userComment}</Text>
-        {/* <TypographyStylesProvider className={classes.body}> */}
-        {/*   <div */}
-        {/*     className={classes.content} */}
-        {/*     dangerouslySetInnerHTML={{ */}
-        {/*       __html: item.userComment, */}
-        {/*     }} */}
-        {/*   /> */}
-        {/* </TypographyStylesProvider> */}
       </Paper>
     </>
   );
@@ -135,11 +128,12 @@ export function Reviews({ restaurantId, isOwner }: ReviewProps) {
   });
   const { t } = useTranslation();
   const [showAlert, setShowAlert] = useState(false);
+  const {authed} = useAuth();
 
   const { status, data } = useQuery<Page<Review>, Error>(
-    ["review", reviewPage],
+    ["reviews", reviewPage],
     async () => getRestaurantReviews(restaurantId, { page: reviewPage }),
-    { keepPreviousData: true }
+    // { keepPreviousData: true }
   );
 
   const { mutate, isLoading } = useMutation(
@@ -148,9 +142,11 @@ export function Reviews({ restaurantId, isOwner }: ReviewProps) {
     {
       onSuccess: () => {
         queryClient.invalidateQueries("reviews");
+        reset();
       },
       onSettled: () => {
         queryClient.invalidateQueries("reviews");
+        reset();
       },
       onError: () => {
         setShowAlert(true);
@@ -194,7 +190,7 @@ export function Reviews({ restaurantId, isOwner }: ReviewProps) {
       >
         {t("pages.restaurant.reviews.error")}
       </Alert>
-      {!isOwner ? (
+      {!isOwner && authed ? (
         <form onSubmit={handleSubmit((e) => mutate(e))}>
           <Grid >
             <Grid.Col span={7}>

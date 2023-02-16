@@ -18,7 +18,7 @@ import {
 } from "@tabler/icons";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import {
   Link,
   LinkProps,
@@ -99,6 +99,7 @@ export function Header() {
   const { t } = useTranslation();
   const [userMenuOpened, setUserMenuOpened] = useState(false);
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const userId = user?.userId || "";
   const { data, status } = useQuery<User>(["user", userId], async () =>
     getUserById(userId)
@@ -160,7 +161,8 @@ export function Header() {
             logout();
             navigate("/");
             // To reload page
-            navigate(0);
+            // navigate(0);
+            queryClient.clear();
           }}
         >
           {t("header.userMenu.settings.logout")}

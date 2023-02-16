@@ -15,7 +15,7 @@ export async function makeReservation(
   reservationDto: ReservationForm
 ) {
   const url = `restaurants/${restaurantId}/reservations`;
-  const response = await apiClient.post<any>(url, reservationDto);
+  const response = await apiClient().post<any>(url, reservationDto);
   return response.status;
 }
 
@@ -27,7 +27,7 @@ export async function getUserReservations({
   params: FilterParams;
 }) {
   const url = `users/${userId}/reservations`;
-  const response = await apiClient.get<Reservation[]>(url, { params });
+  const response = await apiClient().get<Reservation[]>(url, { params });
   const links = {
     first: 0,
     last: 0,

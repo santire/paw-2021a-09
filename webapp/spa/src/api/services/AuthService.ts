@@ -6,7 +6,7 @@ const tokenProvider = TokenProvider.getInstance();
 const PATH = "/users";
 
 export async function activateUser(token: string) {
-  const response = await apiClient.put(PATH, null, {
+  const response = await apiClient().put(PATH, null, {
     params: { type: "activation", token },
     headers: {
       "Content-Type": "application/json",
@@ -15,7 +15,7 @@ export async function activateUser(token: string) {
   return response.data;
 }
 export async function resetUser(email: string) {
-  const response = await apiClient.post(PATH, null, {
+  const response = await apiClient().post(PATH, null, {
     params: { email },
     headers: {
       "Content-Type": "application/json",
@@ -25,7 +25,7 @@ export async function resetUser(email: string) {
 }
 
 export async function resetPassword(token: string, password: string) {
-  const response = await apiClient.put(
+  const response = await apiClient().put(
     PATH,
     { password, repeatPassword: password },
     {
@@ -39,7 +39,7 @@ export async function resetPassword(token: string, password: string) {
 }
 
 export async function login(email: string, password: string) {
-  const response = await apiClient.get<User>(PATH, {
+  const response = await apiClient().get<User>(PATH, {
     auth: { username: email, password: password },
     params: { email },
   });
@@ -54,7 +54,7 @@ export async function login(email: string, password: string) {
 }
 
 export async function register(user: User) {
-  const response = await apiClient.post(PATH, {
+  const response = await apiClient().post(PATH, {
     ...user,
     repeatPassword: user.password,
   });

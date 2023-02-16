@@ -23,13 +23,13 @@ export async function updateProfile(user: User) {
   console.log(user);
   const url = `${BASE_PATH}/${user.userId}`;
   user.userId = undefined;
-  const response = await apiClient.put<User>(url, user);
+  const response = await apiClient().put<User>(url, user);
   return response.data;
 }
 
 export async function getUserById(id: string) {
   const url = `${BASE_PATH}/${id}`;
-  const response = await apiClient.get<User>(url);
+  const response = await apiClient().get<User>(url);
   return response.data;
 }
 
@@ -41,7 +41,7 @@ export async function getUserRestaurants({
   params: FilterParams;
 }) {
   const url = `${BASE_PATH}/${userId}/restaurants`;
-  const response = await apiClient.get<Restaurant[]>(url, { params });
+  const response = await apiClient().get<Restaurant[]>(url, { params });
   const links = {
     first: 0,
     last: 0,

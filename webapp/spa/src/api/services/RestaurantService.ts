@@ -27,13 +27,13 @@ export const NO_FILTER: FilterParams = {
 export async function registerRestaurant(restaurant: RegisterRestaurantForm) {
   const url = `${BASE_PATH}`;
   const { image, ...data } = restaurant;
-  const response = await apiClient.post<Restaurant>(url, data);
+  const response = await apiClient().post<Restaurant>(url, data);
   if ("location" in response.headers) {
     const formData = new FormData();
     formData.append("image", image);
     const imageUrl = response.headers["location"] + "/image";
     console.log(image);
-    const imageResponse = await apiClient.put(imageUrl, formData, {
+    const imageResponse = await apiClient().put(imageUrl, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -52,11 +52,11 @@ export async function updateRestaurant({
   console.log(restaurant);
   const url = `${BASE_PATH}/${id}`;
   const { image, ...data } = restaurant;
-  const response = await apiClient.put<Restaurant>(url, data);
+  const response = await apiClient().put<Restaurant>(url, data);
   const imageUrl = `${BASE_PATH}/${id}/image`;
   const formData = new FormData();
   formData.append("image", image);
-  const imageResponse = await apiClient.put(imageUrl, formData, {
+  const imageResponse = await apiClient().put(imageUrl, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -67,49 +67,49 @@ export async function updateRestaurant({
 
 export async function getRestaurantById(id: string) {
   const url = `${BASE_PATH}/${id}`;
-  const response = await apiClient.get<Restaurant>(url);
+  const response = await apiClient().get<Restaurant>(url);
   return response.data;
 }
 
 export async function getRestaurantTags() {
   const url = `/tags`;
-  const response = await apiClient.get<string[]>(url);
+  const response = await apiClient().get<string[]>(url);
   return response.data;
 }
 
 // export async function getRestaurantImage(id: string) {
 //   const url = `${BASE_PATH}/${id}/image`;
-//   const response = await apiClient.get<string>(url);
+//   const response = await apiClient().get<string>(url);
 //   return response.data;
 // }
 
 export async function deleteRestaurantById(id: string) {
   const url = `${BASE_PATH}/${id}`;
-  const response = await apiClient.delete(url);
+  const response = await apiClient().delete(url);
   return response.status;
 }
 
 export async function likeRestaurant(id: string) {
   const url = `${BASE_PATH}/${id}/likes`;
-  const response = await apiClient.post(url);
+  const response = await apiClient().post(url);
   return response.status;
 }
 
 export async function dislikeRestaurant(id: string) {
   const url = `${BASE_PATH}/${id}/likes`;
-  const response = await apiClient.delete(url);
+  const response = await apiClient().delete(url);
   return response.status;
 }
 
 export async function getRestaurantLike(restaurantId: string, userId: string) {
   const url = `${BASE_PATH}/${restaurantId}/likes?userId=${userId}`;
-  const response = await apiClient.get(url);
+  const response = await apiClient().get(url);
   return response.data;
 }
 
 export async function rateRestaurant(restaurantId: string, rating: Rate) {
   const url = `${BASE_PATH}/${restaurantId}/ratings`;
-  const response = await apiClient.post<Rate>(url, rating);
+  const response = await apiClient().post<Rate>(url, rating);
   return response.data;
 }
 
@@ -118,25 +118,25 @@ export async function getRestaurantRating(
   userId: string
 ) {
   const url = `${BASE_PATH}/${restaurantId}/ratings?userId=${userId}`;
-  const response = await apiClient.get(url);
+  const response = await apiClient().get(url);
   return response.data;
 }
 
 export async function reviewRestaurant(id: string, review: ReviewForm) {
   const url = `${BASE_PATH}/${id}/reviews`;
-  const response = await apiClient.post(url, review);
+  const response = await apiClient().post(url, review);
   return response.status;
 }
 
 export async function deleteReview(restaurantId: string, itemId: string) {
   const url = `${BASE_PATH}/${restaurantId}/reviews/${itemId}`;
-  const response = await apiClient.delete(url);
+  const response = await apiClient().delete(url);
   return response.status;
 }
 
 export async function addMenuItem(id: string, item: MenuItem) {
   const url = `${BASE_PATH}/${id}/menu`;
-  const response = await apiClient.post(url, {
+  const response = await apiClient().post(url, {
     ...item,
     price: "" + parseFloat(item.price),
   });
@@ -145,13 +145,13 @@ export async function addMenuItem(id: string, item: MenuItem) {
 
 export async function deleteMenuItem(restaurantId: string, itemId: string) {
   const url = `${BASE_PATH}/${restaurantId}/menu/${itemId}`;
-  const response = await apiClient.delete(url);
+  const response = await apiClient().delete(url);
   return response.status;
 }
 
 export async function getRestaurants(params = NO_FILTER) {
   const url = `${BASE_PATH}/`;
-  const response = await apiClient.get<Restaurant[]>(url, { params });
+  const response = await apiClient().get<Restaurant[]>(url, { params });
   const links = {
     first: 0,
     last: 0,
@@ -201,7 +201,7 @@ export async function getRestaurants(params = NO_FILTER) {
 
 export async function getRestaurantMenu(id: string, params = NO_FILTER) {
   const url = `${BASE_PATH}/${id}/menu`;
-  const response = await apiClient.get<MenuItem[]>(url, { params });
+  const response = await apiClient().get<MenuItem[]>(url, { params });
   const links = {
     first: 0,
     last: 0,
@@ -248,7 +248,7 @@ export async function getRestaurantMenu(id: string, params = NO_FILTER) {
 
 export async function getRestaurantReviews(id: string, params = NO_FILTER) {
   const url = `${BASE_PATH}/${id}/reviews`;
-  const response = await apiClient.get<Review[]>(url, { params });
+  const response = await apiClient().get<Review[]>(url, { params });
   const links = {
     first: 0,
     last: 0,
