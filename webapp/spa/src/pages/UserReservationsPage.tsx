@@ -129,19 +129,12 @@ export function UserReservationsPage() {
               className={classes.title}
               mb={"xl"}
               mt={"xl"}
-            >{t`pages.userRestaurants.title`}</Text>
+            >{t`pages.reservations.title`}</Text>
 
             {reservations.length === 0 ? (
               <Flex justify="center" align="center" h={"100%"}>
                 <div className={classes.empty}>
-                  <Text mb={50}>{t("pages.userRestaurants.notFound")}</Text>
-                  <Button
-                    color="orange"
-                    mx={170}
-                    onClick={() => navigate("/restaurants/register")}
-                  >
-                    {t("pages.userRestaurants.createOne")}
-                  </Button>
+                  <Text mb={50}>{t("pages.reservations.notFound")}</Text>
                 </div>
               </Flex>
             ) : (

@@ -40,6 +40,8 @@ export function ReservationCard({ reservation }: ReservationCardProps) {
   const { user } = useAuth();
   const userId = user?.userId;
 
+  const arr = restaurant.owner?.split("/").slice(-1);
+  const isOwner = user?.userId?.toString() === arr![0];
 
   const denyMutation = useMutation(
     ["denyReservation", id],
