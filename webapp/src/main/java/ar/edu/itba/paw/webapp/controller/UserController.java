@@ -12,6 +12,7 @@ import ar.edu.itba.paw.webapp.dto.RestaurantDto;
 import ar.edu.itba.paw.webapp.dto.UserDto;
 import ar.edu.itba.paw.webapp.forms.PasswordResetForm;
 import ar.edu.itba.paw.webapp.forms.RegisterUserForm;
+import ar.edu.itba.paw.webapp.forms.UpdateUserForm;
 import ar.edu.itba.paw.webapp.forms.UserForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,7 +107,7 @@ public class UserController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isUser(#userId)")
-    public Response updateUser(@PathParam("userId") final Long userId, @Valid UserForm userForm,
+    public Response updateUser(@PathParam("userId") final Long userId, @Valid UpdateUserForm userForm,
                                @Context HttpServletRequest request) {
         userService.updateUser(
                 userId,
