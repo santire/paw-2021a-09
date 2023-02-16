@@ -34,7 +34,7 @@ import {
   IconSettings,
   IconUser,
 } from "@tabler/icons";
-import { DatePicker } from "@mantine/dates";
+import { DatePicker, TimeInput } from "@mantine/dates";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Rating } from "@mantine/core";
@@ -368,6 +368,13 @@ export function RestaurantPage() {
           value={date}
           onChange={(value: Date) => setDate(new Date(value))}
         />
+
+        <TimeInput 
+          label="Pick time" 
+          format="12"
+          defaultValue={new Date()} 
+          onChange={(value: Date) => setTime(value)}
+          />
 
         <Button
           color="red"
