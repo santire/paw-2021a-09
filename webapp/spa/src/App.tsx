@@ -16,6 +16,8 @@ import { RegisterRestaurantPage } from "./pages/RegisterRestaurantPage";
 import { UserRestaurantsPage } from "./pages/UserRestaurantsPage";
 import { EditRestaurantPage } from "./pages/EditRestaurantPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import { ReservationsPage } from "./pages/ReservationPage";
+import { UserReservationsPage } from "./pages/UserReservationsPage";
 
 const queryClient = new QueryClient();
 const basename = process.env.REACT_APP_CONTEXT || "";
@@ -40,11 +42,11 @@ const router = createBrowserRouter(
         },
         {
           path: "/restaurants/register",
-          element: <RegisterRestaurantPage />
+          element: <RegisterRestaurantPage />,
         },
         {
           path: "/restaurants/:restaurantId/edit",
-          element: <EditRestaurantPage />
+          element: <EditRestaurantPage />,
         },
         {
           path: "/login",
@@ -64,15 +66,19 @@ const router = createBrowserRouter(
         },
         {
           path: "/users/:userId/restaurants",
-          element: <UserRestaurantsPage />
+          element: <UserRestaurantsPage />,
         },
         {
           path: "/users/:userId/restaurants",
-          element: <UserRestaurantsPage />
+          element: <UserRestaurantsPage />,
+        },
+        {
+          path: "/users/:userId/reservations",
+          element: <UserReservationsPage />,
         },
         {
           path: "/users/:userId",
-          element: <ProfilePage />
+          element: <ProfilePage />,
         },
         {
           path: "*",

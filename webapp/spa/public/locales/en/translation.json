@@ -85,6 +85,13 @@
       "highlights": "Highlights",
       "heading": "Discover and book the best restaurants"
     },
+    "reservations": {
+      "cancel": "Cancel reservation",
+      "accept": "Confirm reservation",
+      "deny": "Deny reservation",
+      "pending": "Pending",
+      "confirmed": "Confirmed"
+    },
     "restaurant": {
       "reservationButton": "Make a Reservation",
       "menu": {

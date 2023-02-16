@@ -135,7 +135,7 @@ public class RestaurantController {
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.min((page + 1), maxPages)).build(), "next")
                 .build();
     }
-    
+
     //READ A RESTAURANT
     @GET
     @Path("/{restaurantId}")

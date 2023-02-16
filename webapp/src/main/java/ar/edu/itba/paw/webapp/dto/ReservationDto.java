@@ -12,6 +12,15 @@ import java.net.URI;
 import java.time.LocalDateTime;
 
 public class ReservationDto {
+    public Long getReservationId() {
+        return reservationId;
+    }
+
+    public void setReservationId(Long reservationId) {
+        this.reservationId = reservationId;
+    }
+
+    private Long reservationId;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -26,6 +35,7 @@ public class ReservationDto {
     public static ReservationDto fromReservation(Reservation reservation, UriInfo uriInfo){
         final ReservationDto dto = new ReservationDto();
 
+        dto.reservationId = reservation.getId();
         dto.date = reservation.getDate();
         dto.quantity = reservation.getQuantity();
         dto.confirmed = reservation.getConfirmed();

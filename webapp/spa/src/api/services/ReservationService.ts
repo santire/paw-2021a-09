@@ -1,4 +1,4 @@
-import { Reservation } from "../../types";
+import { Reservation, Restaurant } from "../../types";
 import { Page } from "../../types/Page";
 import { apiClient } from "../client";
 import { FilterParams } from "./RestaurantService";
@@ -19,6 +19,50 @@ export async function makeReservation(
   return response.status;
 }
 
+export async function confirmReservation(
+  restaurantId: string,
+  reservationId: string
+) {
+  const url = `restaurants/${restaurantId}/reservations/${reservationId}`;
+  const response = await apiClient().put(
+    url,
+    {},
+    { params: { action: "confirm" } }
+  );
+  return response.status;
+}
+
+export async function cancelReservation(
+  restaurantId: string,
+  reservationId: string
+) {
+  const url = `restaurants/${restaurantId}/reservations/${reservationId}`;
+  const response = await apiClient().delete(url);
+  return response.status;
+}
+
+export async function denyReservation(
+  restaurantId: string,
+  reservationId: string,
+  message: string
+) {
+  const url = `restaurants/${restaurantId}/reservations/${reservationId}`;
+  const response = await apiClient().post<any>(
+    url,
+    { message: message },
+    { params: { action: "deny" } }
+  );
+  return response.status;
+}
+
+interface ReservationDto {
+  restaurant: string;
+  quantity: number;
+  reservationId: string;
+  date?: string;
+  confirmed?: boolean;
+}
+
 export async function getUserReservations({
   userId,
   params = NO_FILTER,
@@ -27,7 +71,21 @@ export async function getUserReservations({
   params: FilterParams;
 }) {
   const url = `users/${userId}/reservations`;
-  const response = await apiClient().get<Reservation[]>(url, { params });
+  const response = await apiClient().get<ReservationDto[]>(url, { params });
+  const data = [];
+  for (let reservation of response.data) {
+    const resp = await apiClient().get<Restaurant>(reservation.restaurant);
+    let reserv: Reservation = {
+      id: reservation.reservationId,
+      restaurant: resp.data,
+      quantity: reservation.quantity,
+      date: reservation.date,
+      confirmed: reservation.confirmed,
+    };
+
+    data.push(reserv);
+  }
+
   const links = {
     first: 0,
     last: 0,
@@ -66,7 +124,7 @@ export async function getUserReservations({
   });
 
   const page: Page<Reservation> = {
-    data: response.data,
+    data: data,
     meta: {
       perPage: response.data.length,
       maxPages: links?.hasOwnProperty("last") ? links.last : 0,

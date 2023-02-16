@@ -24,8 +24,8 @@ import {
   IconMessageCircle,
   IconPhone,
 } from "@tabler/icons";
-import { DatePicker } from "@mantine/dates";
-import { useState } from "react";
+import { DatePicker, TimeInput } from "@mantine/dates";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Rating } from "@mantine/core";
 import { useQuery, useQueryClient } from "react-query";
@@ -121,7 +121,7 @@ export function RestaurantPage() {
   const [quantity, setQuantity] = useState<number>(1);
   const [reservationModal, setReservationModal] = useState(false);
   const [date, setDate] = useState(new Date());
-  const [time, setTime] = useState("");
+  const [time, setTime] = useState(new Date());
 
   if (!restaurantId) {
     navigate("/");
@@ -207,16 +207,16 @@ export function RestaurantPage() {
       const day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
       const realMonth = date.getMonth() + 1;
       const month = realMonth < 10 ? `0${realMonth}` : realMonth;
-      console.log(day, month);
+      const hours = time.toLocaleTimeString("es");
 
       const form: ReservationForm = {
         date: `${day}/${month}/${date.getFullYear()}`,
-        time: "12:00",
+        time: hours.slice(0, 5),
         quantity: quantity,
       };
       makeReservation(restaurantId, form).then((status) => {
-        if (status === 201) {
-          console.log("Status code is OK");
+        if (status === 201 || status === 204) {
+          setReservationModal(false);
         }
       });
     }
@@ -329,10 +329,18 @@ export function RestaurantPage() {
           onChange={(value: Date) => setDate(new Date(value))}
         />
 
+        <TimeInput
+          label="Pick time"
+          format="12"
+          defaultValue={new Date()}
+          onChange={(value: Date) => setTime(new Date(value))}
+        />
+
         <Button
-          color="red"
+          color="orange"
           variant="outline"
           size="md"
+          mt="xl"
           fullWidth
           onClick={handleReservation}
         >
@@ -389,6 +397,7 @@ export function RestaurantPage() {
                   color="orange"
                   variant="outline"
                   size="xl"
+                  disabled={isOwner}
                   onClick={() => setReservationModal(true)}
                 >
                   {t("pages.restaurant.reservationButton")}
