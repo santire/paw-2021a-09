@@ -65,12 +65,6 @@ export async function updateRestaurant({
   return response.data;
 }
 
-export async function isRestaurantNameAvailable(name: string) {
-  const url = `${BASE_PATH}/` + name;
-  const response = await apiClient.head<string>(url);
-  return response.data;
-}
-
 export async function getRestaurantById(id: string) {
   const url = `${BASE_PATH}/${id}`;
   const response = await apiClient.get<Restaurant>(url);
@@ -114,7 +108,7 @@ export async function getRestaurantLike(restaurantId: string, userId: string) {
 }
 
 export async function rateRestaurant(restaurantId: string, rating: Rate) {
-  const url = `${BASE_PATH}/${restaurantId}/ratings?rating=${rating}`;
+  const url = `${BASE_PATH}/${restaurantId}/ratings`;
   const response = await apiClient.post<Rate>(url, rating);
   return response.data;
 }

@@ -135,19 +135,7 @@ public class RestaurantController {
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.min((page + 1), maxPages)).build(), "next")
                 .build();
     }
-
-    // FIX: This is not Restful
-    @HEAD
-    @Path("/{restaurantName}")
-    public Response checkRestaurantName(@PathParam("restaurantName") final String restaurantName){
-        final Boolean restaurantExists = restaurantService.findByName(restaurantName);
-        if(restaurantExists){
-            return Response.status(Response.Status.CONFLICT).build();
-        }
-        
-        return Response.status(Response.Status.NO_CONTENT).build();
-    }
-
+    
     //READ A RESTAURANT
     @GET
     @Path("/{restaurantId}")

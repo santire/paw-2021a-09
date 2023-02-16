@@ -18,6 +18,7 @@ import {
 } from "@tabler/icons";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "react-query";
 import {
   Link,
   LinkProps,
@@ -26,7 +27,9 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { logout } from "../../api/services/AuthService";
+import { getUserById } from "../../api/services/UserService";
 import { useAuth } from "../../context/AuthContext";
+import { User } from "../../types";
 import { GourmetableLogo } from "../GourmetableLogo/GourmetableLogo";
 import useStyles from "./Header.styles";
 
@@ -96,6 +99,11 @@ export function Header() {
   const { t } = useTranslation();
   const [userMenuOpened, setUserMenuOpened] = useState(false);
   const { user } = useAuth();
+  const userId = user?.userId || "";
+  const { data, status } = useQuery<User>(["user", userId], async () =>
+    getUserById(userId)
+  );
+
   const navigate = useNavigate();
 
   const UserMenu = (
@@ -112,7 +120,7 @@ export function Header() {
         >
           <Group spacing={7}>
             <Text weight={500} sx={{ lineHeight: 1 }} mr={3}>
-              {user?.firstName}
+              {!data ? user?.firstName : data.firstName}
             </Text>
             <IconChevronDown size={12} stroke={1.5} />
           </Group>

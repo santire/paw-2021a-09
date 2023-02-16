@@ -31,7 +31,6 @@ import { Rating } from "@mantine/core";
 import { useQuery, useQueryClient } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  reviewRestaurant,
   makeReservation,
   ReservationForm,
   dislikeRestaurant,
@@ -41,7 +40,6 @@ import {
   rateRestaurant,
 } from "../api/services";
 import { useRestaurant } from "../hooks/useRestaurant";
-import { Review } from "../types/Review";
 import { useAuth } from "../context/AuthContext";
 import { Like } from "../types/Like";
 import { Rate } from "../types/Rate";
@@ -100,8 +98,6 @@ export function RestaurantPage() {
     data: restaurantData,
     error: restaurantError,
   } = useRestaurant(restaurantId || "");
-  const [reviewRows, setReviewRows] = useState<Review[]>([]);
-  const [reviewText, setReviewText] = useState("");
 
   const {
     status: likeStatus,
