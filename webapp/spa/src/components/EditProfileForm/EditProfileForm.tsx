@@ -103,7 +103,8 @@ export function EditProfileForm(props: Partial<DropzoneProps>) {
                             <TextInput
                                 mb="md"
                                 label={t("pages.profile.username.label")}
-                                defaultValue={username}
+                                value={username}
+                                disabled={true}
                                 placeholder={t("pages.profile.username.placeholder") || ""}
                                 required
                                 error={errors.username?.message}
