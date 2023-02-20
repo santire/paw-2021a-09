@@ -26,7 +26,7 @@ export async function confirmReservation(
   const url = `restaurants/${restaurantId}/reservations/${reservationId}`;
   const response = await apiClient().put(
     url,
-    {},
+    { message: "1" },
     { params: { action: "confirm" } }
   );
   return response.status;
@@ -47,7 +47,7 @@ export async function denyReservation(
   message: string
 ) {
   const url = `restaurants/${restaurantId}/reservations/${reservationId}`;
-  const response = await apiClient().post<any>(
+  const response = await apiClient().put<any>(
     url,
     { message: message },
     { params: { action: "deny" } }

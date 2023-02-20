@@ -13,12 +13,13 @@ import {
 import { IconDeviceWatch, IconUser } from "@tabler/icons";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient, useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
 import {
   cancelReservation,
   confirmReservation,
   denyReservation,
+  getRestaurantReservations,
 } from "../../api/services";
 import { useAuth } from "../../context/AuthContext";
 import { useRestaurant } from "../../hooks/useRestaurant";
@@ -27,9 +28,11 @@ import useStyles from "./ReservationCard.styles";
 
 interface ReservationCardProps {
   reservation: Reservation;
+  hideRestaurantData?: boolean
+  closeModal?: any
 }
 
-export function ReservationCard({ reservation }: ReservationCardProps) {
+export function ReservationCard({ reservation, hideRestaurantData, closeModal }: ReservationCardProps) {
   const { id, restaurant, quantity, date, confirmed } = reservation;
   const { classes } = useStyles();
   const { t } = useTranslation();
@@ -50,6 +53,7 @@ export function ReservationCard({ reservation }: ReservationCardProps) {
     {
       onSuccess: () => {
         setOpened(false);
+        if(closeModal) closeModal()
         queryClient.invalidateQueries("reservations");
       },
       onError: (error) => {
@@ -67,6 +71,7 @@ export function ReservationCard({ reservation }: ReservationCardProps) {
     {
       onSuccess: () => {
         setOpened(false);
+        if(closeModal) closeModal()
         queryClient.invalidateQueries("reservations");
       },
       onError: (error) => {
@@ -84,6 +89,7 @@ export function ReservationCard({ reservation }: ReservationCardProps) {
     {
       onSuccess: () => {
         setOpened(false);
+        if(closeModal) closeModal()
         queryClient.invalidateQueries("reservations");
       },
       onError: (error) => {
@@ -138,16 +144,16 @@ export function ReservationCard({ reservation }: ReservationCardProps) {
 
   return (
     <Card withBorder p="lg" radius="md" className={classes.card}>
-      <Card.Section mb="md">
+      {hideRestaurantData ? null :<Card.Section mb="md" >
         <Image src={restaurant.image} alt={restaurant.name} height={180} />
-      </Card.Section>
+      </Card.Section>}
 
       <Card.Section mt="xs" className={classes.section}>
         <Grid justify="space-between">
           <Grid.Col span={8}>
-            <Text weight={700} className={classes.title} lineClamp={2}>
+          {hideRestaurantData ? null :<Text weight={700} className={classes.title} lineClamp={2}>
               {restaurant.name}
-            </Text>
+            </Text>}
             <Group>
               <IconDeviceWatch />
               <Text className={classes.tags} lineClamp={2}>

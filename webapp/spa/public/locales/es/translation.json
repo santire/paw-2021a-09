@@ -37,6 +37,7 @@
   "UserRestaurantCard": {
     "more": "Ver más",
     "edit": "Editar",
+    "viewReservations": "Ver reservas",
     "delete": "Eliminar",
     "liked": "A {{likes}} personas les gusta esto",
     "tagsTitle": "Ideal para vos, si te gusta",

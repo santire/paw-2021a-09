@@ -1,4 +1,5 @@
 import { Restaurant } from "./Restaurant";
+import { User } from "./User";
 
 export interface Reservation{
   restaurant: Restaurant;
@@ -6,4 +7,5 @@ export interface Reservation{
   id?: string;
   date?: string;
   confirmed?: boolean;
+  user?: User
 }

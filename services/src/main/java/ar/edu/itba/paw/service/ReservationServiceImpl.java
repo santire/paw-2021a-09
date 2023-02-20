@@ -1,5 +1,18 @@
 package ar.edu.itba.paw.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import ar.edu.itba.paw.model.Reservation;
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
@@ -7,22 +20,6 @@ import ar.edu.itba.paw.model.exceptions.ReservationNotFoundException;
 import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
 import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
 import ar.edu.itba.paw.persistence.ReservationDao;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.MessageSource;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import ar.edu.itba.paw.model.Email;
-import ar.edu.itba.paw.model.EmailTemplate;
-
 
  @Service
 public class ReservationServiceImpl implements ReservationService{
@@ -38,6 +35,8 @@ public class ReservationServiceImpl implements ReservationService{
     private RestaurantService restaurantService;
     @Autowired
     private MessageSource messageSource;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantServiceImpl.class);
 
     // CREATE
     @Override
@@ -156,7 +155,8 @@ public class ReservationServiceImpl implements ReservationService{
 
     @Override
     @Transactional
-    public boolean confirmReservation(long reservationId){        
+    public boolean confirmReservation(long reservationId){  
+        LOGGER.debug("inicio: confirmRerservation");
         
         Locale locale = LocaleContextHolder.getLocale();
         Reservation reservation = findById(reservationId).orElseThrow(ReservationNotFoundException::new);

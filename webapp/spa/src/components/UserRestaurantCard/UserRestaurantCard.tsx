@@ -13,12 +13,14 @@ import {
 import { IconHeart, IconShare, IconStar } from "@tabler/icons";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient, useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
-import { deleteRestaurantById } from "../../api/services";
+import { deleteRestaurantById, getRestaurantReservations, confirmReservation } from "../../api/services";
 import { useAuth } from "../../context/AuthContext";
-import { Restaurant } from "../../types";
+import { Restaurant, Reservation } from "../../types";
 import useStyles from "./UserRestaurantCard.styles";
+import ReservationCards from "./ReservationCards"
+
 
 interface UserRestaurantCardProps {
   restaurant: Restaurant;
@@ -32,6 +34,7 @@ export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [opened, setOpened] = useState(false);
+  const [openReservationModal, setOpenReservationModal] = useState(false)
   const { user } = useAuth();
   const userId = user?.userId;
 
@@ -47,6 +50,11 @@ export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
       queryClient.invalidateQueries("ownedRestaurants");
     },
   });
+
+  if (!id) {
+    navigate("/");
+    return <></>;
+  }
 
   return (
     <Card withBorder p="lg" radius="md" className={classes.card}>
@@ -91,6 +99,28 @@ export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
           {t("UserRestaurantCard.more")}
         </Button>
       </Flex>
+
+      <Flex justify="center" align="center">
+        <Button
+          color="orange"
+          variant="outline"
+          size="md"
+          fullWidth
+          onClick={() => setOpenReservationModal(true)}
+        >
+          {t("UserRestaurantCard.viewReservations")}
+        </Button>
+      </Flex>
+
+      {/** Modal de reserva */}
+      <Modal
+        centered
+        opened={openReservationModal}
+        onClose={() => setOpenReservationModal(false)}
+        title="Reservas"
+      >
+        <ReservationCards id={id} closeModal={() => setOpenReservationModal(false)} />
+      </Modal>
 
       <Flex justify="center" align="center" mt="md">
         <Button

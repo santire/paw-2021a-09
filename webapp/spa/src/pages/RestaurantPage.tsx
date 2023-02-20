@@ -30,8 +30,7 @@ import { useTranslation } from "react-i18next";
 import { Rating } from "@mantine/core";
 import { useQuery, useQueryClient } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  makeReservation,
+import {  makeReservation,
   ReservationForm,
   dislikeRestaurant,
   getRestaurantLike,

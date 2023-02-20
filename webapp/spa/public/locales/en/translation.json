@@ -36,6 +36,7 @@
   },
   "UserRestaurantCard": {
     "more": "See more",
+    "viewReservations": "View reservations",
     "edit": "Edit",
     "delete": "Delete",
     "liked": "{{likes}} people liked this",

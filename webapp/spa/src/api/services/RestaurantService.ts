@@ -1,5 +1,5 @@
 import { apiClient } from "../client";
-import { Restaurant } from "../../types";
+import { Restaurant, Reservation, User } from "../../types";
 import { Page } from "../../types/Page";
 import { MenuItem } from "../../types/MenuItem";
 import { Review } from "../../types/Review";
@@ -291,4 +291,25 @@ export async function getRestaurantReviews(id: string, params = NO_FILTER) {
     },
   };
   return page;
+}
+
+export async function getRestaurantReservations(restaurantId: string, params = NO_FILTER){
+  const url = `${BASE_PATH}/${restaurantId}/reservations`;
+  const response = await apiClient().get(url);
+
+  const data = [];
+  for (let reservation of response.data) {
+    const respRest = await apiClient().get<Restaurant>(reservation.restaurant);
+    let reserv: Reservation = {
+      id: reservation.reservationId,
+      restaurant: respRest.data,
+      quantity: reservation.quantity,
+      date: reservation.date,
+      confirmed: reservation.confirmed
+    };
+
+    data.push(reserv);
+  }
+
+  return data
 }
