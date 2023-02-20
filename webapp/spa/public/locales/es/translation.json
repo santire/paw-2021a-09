@@ -86,6 +86,14 @@
       "highlights": "Destacados",
       "heading": "Descubra y reserve los mejores restaurantes"
     },
+    "reservations": {
+      "cancel": "Cancelar",
+      "accept": "Aceptar",
+      "deny": "Rechazar",
+      "pending": "Pendiente",
+      "confirmed": "Confirmado",
+      "title": "Mis Reservaciones"
+    },
     "restaurant": {
       "reservationButton": "Hacer una reserva",
       "menu": {

@@ -91,7 +91,8 @@
       "accept": "Confirm reservation",
       "deny": "Deny reservation",
       "pending": "Pending",
-      "confirmed": "Confirmed"
+      "confirmed": "Confirmed",
+      "title": "My Reservations"
     },
     "restaurant": {
       "reservationButton": "Make a Reservation",
