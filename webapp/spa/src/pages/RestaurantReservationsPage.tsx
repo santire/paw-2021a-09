@@ -11,6 +11,8 @@ import {
   SimpleGrid,
   Pagination,
   TextInput,
+  UnstyledButton,
+  Group,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -22,7 +24,8 @@ import { FilterParams } from "../api/services/UserService";
 import { Reservation } from "../types";
 import { Page } from "../types/Page";
 import { Table } from '@mantine/core';
-import { IconSearch } from "@tabler/icons";
+import { IconSelector, IconChevronDown, IconChevronUp, IconSearch } from "@tabler/icons";
+
 
 
 const useStyles = createStyles((theme) => ({
@@ -60,7 +63,55 @@ const useStyles = createStyles((theme) => ({
     fontSize: 30,
     marginTop: 100,
   },
+  th: {
+    padding: '0 !important',
+  },
+
+  control: {
+    width: '100%',
+    padding: `${theme.spacing.xs} ${theme.spacing.md}`,
+
+    '&:hover': {
+      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+    },
+  },
+
+  icon: {
+    width: '40px',
+    height: '40px',
+    borderRadius: '40px',
+  },
 }));
+
+interface TableSortProps {
+  data: Reservation[];
+}
+
+interface ThProps {
+  children: React.ReactNode;
+  reversed: boolean;
+  sorted: boolean;
+  onSort(): void;
+}
+
+function Th({ children, reversed, sorted, onSort }: ThProps) {
+  const { classes } = useStyles();
+  const Icon = sorted ? (reversed ? IconChevronUp : IconChevronDown) : IconSelector;
+  return (
+    <th className={classes.th}>
+      <UnstyledButton onClick={onSort} className={classes.control}>
+        <Group position="apart">
+          <Text fw={500} fz="sm">
+            {children}
+          </Text>
+          <Center className={classes.icon}>
+            <Icon size="0.9rem" stroke={1.5} />
+          </Center>
+        </Group>
+      </UnstyledButton>
+    </th>
+  );
+}
 
 
 export function RestaurantReservationsPage() {
@@ -82,8 +133,59 @@ export function RestaurantReservationsPage() {
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
-  let rows: JSX.Element[] = []
 
+  const [sortedReservations, setSortedReservations] = useState<Reservation[]>([]);
+  const [sortBy, setSortBy] = useState<string | null>(null);
+  const [reverseSortDirection, setReverseSortDirection] = useState(false);
+
+
+  const rows = sortedReservations.map((reservation) => (
+      <tr key={reservation.id}>
+        <td>{reservation.quantity}</td>
+        <td>{reservation.date}</td>
+        <td>{reservation.username}</td>
+        <td>    
+          <Button color="green">
+            Confirm
+          </Button>
+        </td>
+        <td>
+          <Button color="red">
+            Deny
+          </Button>
+        </td>
+      </tr>
+  ));
+
+  const setSorting = (field: string) => {
+    const reversed = field === sortBy ? !reverseSortDirection : false;
+    setReverseSortDirection(reversed);
+    setSortBy(field as keyof Reservation);
+  };
+  
+  useEffect(() => {
+    if(reservations){
+      let sortedReservations = reservations;
+    
+      // Apply sorting
+      if (sortBy) {
+        sortedReservations.sort((a, b) => {
+          const valueA = a[sortBy as keyof Reservation];
+          const valueB = b[sortBy as keyof Reservation];
+    
+          if (valueA! < valueB!) {
+            return reverseSortDirection ? 1 : -1;
+          }
+          if (valueA! > valueB!) {
+            return reverseSortDirection ? -1 : 1;
+          }
+          return 0;
+        });
+      }
+      setSortedReservations(sortedReservations);
+    }
+  
+  }, [reservations, sortBy, reverseSortDirection]);
 
   const parseSearchParams = () => {
     const auxParams: FilterParams = {};
@@ -106,34 +208,6 @@ export function RestaurantReservationsPage() {
     setParams(parsedParams);
     setApiParams(parsedParams);
   }, [searchParams]);
-
-  if (reservations) {
-    rows = reservations.map((reservation: any) => {
-      const formattedDate = new Date(reservation.date).toLocaleString(undefined, {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-      });
-  
-      return (
-        <tr key={reservation.id}>
-          <td>{reservation.quantity}</td>
-          <td>{formattedDate}</td>
-          <td>{reservation.username}</td>
-          {/* onClick={confirmReservation(restaurantId, reservation.id)}> */}
-          <td>
-            <Button color="green">Confirm</Button>
-          </td>
-          <td>
-            <Button color="red">Deny</Button>
-          </td>
-        </tr>
-      );
-    });
-  }
 
   if (status === "error") {
     return <div>{error!.message}</div>;
@@ -166,9 +240,15 @@ export function RestaurantReservationsPage() {
               <Table>
                 <thead>
                   <tr>
-                    <th>{t("pages.restaurantReservations.table.customers")}</th>
-                    <th>{t("pages.restaurantReservations.table.date")}</th>
-                    <th>{t("pages.restaurantReservations.table.user")}</th>
+                    <Th sorted={sortBy === 'quantity'} reversed={reverseSortDirection} onSort={() => setSorting('quantity')}>
+                      {t("pages.restaurantReservations.table.customers")}
+                    </Th>
+                    <Th sorted={sortBy === 'date'} reversed={reverseSortDirection} onSort={() => setSorting('date')}>
+                      {t("pages.restaurantReservations.table.date")}
+                    </Th>
+                    <Th sorted={sortBy === 'username'} reversed={reverseSortDirection} onSort={() => setSorting('username')}>
+                      {t("pages.restaurantReservations.table.user")}
+                    </Th>
                     {/* Confirm button */}
                     <th></th>
                     {/* Deny button */}
