@@ -1,29 +1,14 @@
 import { Carousel } from "@mantine/carousel";
 import {
-  Center,
   Container,
   createStyles,
-  Flex,
   Text,
-  Image,
-  Loader,
-  Button,
-  SimpleGrid,
-  Pagination,
-  TextInput,
-  UnstyledButton,
-  Group,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "react-query";
 import { useParams, useSearchParams } from "react-router-dom";
-import { getRestaurantReservations } from "../api/services";
 import { FilterParams } from "../api/services/UserService";
-import { Reservation } from "../types";
 import { RestaurantReservationsTable } from "../components/RestaurantReservationsTable/RestaurantReservationsTable";
-
-
 
 const useStyles = createStyles((theme) => ({
   heading: {
