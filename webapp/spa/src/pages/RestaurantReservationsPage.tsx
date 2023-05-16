@@ -17,14 +17,11 @@ import {
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { getRestaurantReservations } from "../api/services";
-import { confirmReservation, denyReservation } from "../api/services";
 import { FilterParams } from "../api/services/UserService";
 import { Reservation } from "../types";
-import { Page } from "../types/Page";
-import { Table } from '@mantine/core';
-import { IconSelector, IconChevronDown, IconChevronUp, IconSearch } from "@tabler/icons";
+import { RestaurantReservationsTable } from "../components/RestaurantReservationsTable/RestaurantReservationsTable";
 
 
 
@@ -62,56 +59,8 @@ const useStyles = createStyles((theme) => ({
     align: "center",
     fontSize: 30,
     marginTop: 100,
-  },
-  th: {
-    padding: '0 !important',
-  },
-
-  control: {
-    width: '100%',
-    padding: `${theme.spacing.xs} ${theme.spacing.md}`,
-
-    '&:hover': {
-      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
-    },
-  },
-
-  icon: {
-    width: '40px',
-    height: '40px',
-    borderRadius: '40px',
-  },
+  }
 }));
-
-interface TableSortProps {
-  data: Reservation[];
-}
-
-interface ThProps {
-  children: React.ReactNode;
-  reversed: boolean;
-  sorted: boolean;
-  onSort(): void;
-}
-
-function Th({ children, reversed, sorted, onSort }: ThProps) {
-  const { classes } = useStyles();
-  const Icon = sorted ? (reversed ? IconChevronUp : IconChevronDown) : IconSelector;
-  return (
-    <th className={classes.th}>
-      <UnstyledButton onClick={onSort} className={classes.control}>
-        <Group position="apart">
-          <Text fw={500} fz="sm">
-            {children}
-          </Text>
-          <Center className={classes.icon}>
-            <Icon size="0.9rem" stroke={1.5} />
-          </Center>
-        </Group>
-      </UnstyledButton>
-    </th>
-  );
-}
 
 
 export function RestaurantReservationsPage() {
@@ -121,72 +70,10 @@ export function RestaurantReservationsPage() {
   });
   const [apiParams, setApiParams] = useState(params);
   const [searchParams, setSearchParams] = useSearchParams();
-  const {
-    status,
-    data: reservations,
-    error,
-  } = useQuery<Reservation[], Error>(
-    ["reservation"],
-    async () => getRestaurantReservations(restaurantId || ""),
-    { retry: false }
-  );
+
   const { t } = useTranslation();
   const { classes } = useStyles();
-  const navigate = useNavigate();
-
-  const [sortedReservations, setSortedReservations] = useState<Reservation[]>([]);
-  const [sortBy, setSortBy] = useState<string | null>(null);
-  const [reverseSortDirection, setReverseSortDirection] = useState(false);
-
-
-  const rows = sortedReservations.map((reservation) => (
-      <tr key={reservation.id}>
-        <td>{reservation.quantity}</td>
-        <td>{reservation.date}</td>
-        <td>{reservation.username}</td>
-        <td>    
-          <Button color="green">
-            Confirm
-          </Button>
-        </td>
-        <td>
-          <Button color="red">
-            Deny
-          </Button>
-        </td>
-      </tr>
-  ));
-
-  const setSorting = (field: string) => {
-    const reversed = field === sortBy ? !reverseSortDirection : false;
-    setReverseSortDirection(reversed);
-    setSortBy(field as keyof Reservation);
-  };
   
-  useEffect(() => {
-    if(reservations){
-      let sortedReservations = reservations;
-    
-      // Apply sorting
-      if (sortBy) {
-        sortedReservations.sort((a, b) => {
-          const valueA = a[sortBy as keyof Reservation];
-          const valueB = b[sortBy as keyof Reservation];
-    
-          if (valueA! < valueB!) {
-            return reverseSortDirection ? 1 : -1;
-          }
-          if (valueA! > valueB!) {
-            return reverseSortDirection ? -1 : 1;
-          }
-          return 0;
-        });
-      }
-      setSortedReservations(sortedReservations);
-    }
-  
-  }, [reservations, sortBy, reverseSortDirection]);
-
   const parseSearchParams = () => {
     const auxParams: FilterParams = {};
     searchParams.forEach((value, key) => {
@@ -209,58 +96,18 @@ export function RestaurantReservationsPage() {
     setApiParams(parsedParams);
   }, [searchParams]);
 
-  if (status === "error") {
-    return <div>{error!.message}</div>;
-  }
-
   return (
     <>
       <Container size="xl" my="xl">
-        {status === "loading" ? (
-          <Flex justify="center" align="center" h={"100%"}>
-            <Loader color="orange" />
-          </Flex>
-        ) : (
-          <>
-            <Text
-              className={classes.title}
-              mb={"xl"}
-              mt={"xl"}
-            >{t`pages.restaurantReservations.title`}</Text>
-
-            {rows.length === 0 ? (
-              <Flex justify="center" align="center" h={"100%"}>
-                <div className={classes.empty}>
-                  <Text mb={50}>{t("pages.restaurantReservations.notFound")}</Text>
-                </div>
-              </Flex>
-            ) : (
-
-            <Flex direction="column" align="center">
-              <Table>
-                <thead>
-                  <tr>
-                    <Th sorted={sortBy === 'quantity'} reversed={reverseSortDirection} onSort={() => setSorting('quantity')}>
-                      {t("pages.restaurantReservations.table.customers")}
-                    </Th>
-                    <Th sorted={sortBy === 'date'} reversed={reverseSortDirection} onSort={() => setSorting('date')}>
-                      {t("pages.restaurantReservations.table.date")}
-                    </Th>
-                    <Th sorted={sortBy === 'username'} reversed={reverseSortDirection} onSort={() => setSorting('username')}>
-                      {t("pages.restaurantReservations.table.user")}
-                    </Th>
-                    {/* Confirm button */}
-                    <th></th>
-                    {/* Deny button */}
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>{rows}</tbody>
-              </Table>
-            </Flex>
-            )}
-          </>
-        )}
+        <>
+          <Text
+            className={classes.title}
+            mb={"xl"}
+            mt={"xl"}>
+            {t`pages.restaurantReservations.title`}
+          </Text>
+          <RestaurantReservationsTable/>
+        </>
       </Container>
     </>
   );
