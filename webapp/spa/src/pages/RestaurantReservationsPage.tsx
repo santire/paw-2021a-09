@@ -108,24 +108,31 @@ export function RestaurantReservationsPage() {
   }, [searchParams]);
 
   if (reservations) {
-    rows = reservations.map((reservation: any) => (
-      <tr key={reservation.id}>
-        <td>{reservation.quantity}</td>
-        <td>{reservation.date}</td>
-        <td>{reservation.username}</td>
-        {/* onClick={confirmReservation(restaurantId, reservation.id)}> */}
-        <td>    
-          <Button color="green">
-            Confirm
-          </Button>
-        </td>
-        <td>
-          <Button color="red">
-            Deny
-          </Button>
-        </td>
-      </tr>
-    ));
+    rows = reservations.map((reservation: any) => {
+      const formattedDate = new Date(reservation.date).toLocaleString(undefined, {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      });
+  
+      return (
+        <tr key={reservation.id}>
+          <td>{reservation.quantity}</td>
+          <td>{formattedDate}</td>
+          <td>{reservation.username}</td>
+          {/* onClick={confirmReservation(restaurantId, reservation.id)}> */}
+          <td>
+            <Button color="green">Confirm</Button>
+          </td>
+          <td>
+            <Button color="red">Deny</Button>
+          </td>
+        </tr>
+      );
+    });
   }
 
   if (status === "error") {
