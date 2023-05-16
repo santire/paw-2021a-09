@@ -305,7 +305,8 @@ export async function getRestaurantReservations(restaurantId: string, params = N
       restaurant: respRest.data,
       quantity: reservation.quantity,
       date: reservation.date,
-      confirmed: reservation.confirmed
+      confirmed: reservation.confirmed,
+      username: reservation.username
     };
 
     data.push(reserv);

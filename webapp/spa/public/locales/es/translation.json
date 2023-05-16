@@ -94,6 +94,15 @@
       "confirmed": "Confirmado",
       "title": "Mis Reservaciones"
     },
+    "restaurantReservations": {
+      "title": "Administrar reservas",
+      "notFound": "Parece que este restaurante no tiene ninguna reserva todavia...",
+      "table": {
+        "customers": "Cantidad de comensales",
+        "date": "Fecha",
+        "user": "Cliente"
+      }
+    },
     "restaurant": {
       "reservationButton": "Hacer una reserva",
       "menu": {

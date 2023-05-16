@@ -106,7 +106,7 @@ export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
           variant="outline"
           size="md"
           fullWidth
-          onClick={() => setOpenReservationModal(true)}
+          onClick={() => navigate(`/restaurants/${id}/reservations`)}
         >
           {t("UserRestaurantCard.viewReservations")}
         </Button>

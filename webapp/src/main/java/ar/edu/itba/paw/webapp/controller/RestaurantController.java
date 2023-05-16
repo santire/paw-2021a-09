@@ -427,8 +427,6 @@ public class RestaurantController {
                                                @QueryParam("filterBy") @DefaultValue("") String filterBy,
                                                @QueryParam("page") @DefaultValue("1") Integer page,
                                                @Context HttpServletRequest request) {
-
-
         int maxPages;
         List<ReservationDto> reservations;
         LOGGER.debug("Filtering reservations by: {}", filterBy);

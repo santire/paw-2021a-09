@@ -94,6 +94,15 @@
       "confirmed": "Confirmed",
       "title": "My Reservations"
     },
+    "restaurantReservations": {
+      "title": "Manage restaurants reservations",
+      "notFound": "Looks like this restaurant does not have any reservations yet...",
+      "table": {
+        "customers": "Customers quantity",
+        "date": "Date",
+        "user": "Client"
+      }
+    },
     "restaurant": {
       "reservationButton": "Make a Reservation",
       "menu": {

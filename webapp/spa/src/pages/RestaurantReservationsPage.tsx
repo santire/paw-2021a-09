@@ -10,16 +10,20 @@ import {
   Button,
   SimpleGrid,
   Pagination,
+  TextInput,
 } from "@mantine/core";
-import qs from "qs";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { FilterParams, getUserRestaurants } from "../api/services/UserService";
-import { UserRestaurantCard } from "../components/UserRestaurantCard/UserRestaurantCard";
-import { Restaurant } from "../types";
+import { getRestaurantReservations } from "../api/services";
+import { confirmReservation, denyReservation } from "../api/services";
+import { FilterParams } from "../api/services/UserService";
+import { Reservation } from "../types";
 import { Page } from "../types/Page";
+import { Table } from '@mantine/core';
+import { IconSearch } from "@tabler/icons";
+
 
 const useStyles = createStyles((theme) => ({
   heading: {
@@ -58,24 +62,27 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export function UserRestaurantsPage() {
-  const { userId } = useParams();
+
+export function RestaurantReservationsPage() {
+  const { restaurantId } = useParams();
   const [params, setParams] = useState<FilterParams>({
     page: 1,
   });
   const [apiParams, setApiParams] = useState(params);
   const [searchParams, setSearchParams] = useSearchParams();
-  const { status, data, error, refetch } = useQuery<Page<Restaurant>, Error>(
-    ["ownedRestaurants", { userId, params }],
-    async () =>
-      getUserRestaurants({
-        userId: userId || "",
-        params: { ...params },
-      })
+  const {
+    status,
+    data: reservations,
+    error,
+  } = useQuery<Reservation[], Error>(
+    ["reservation"],
+    async () => getRestaurantReservations(restaurantId || ""),
+    { retry: false }
   );
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
+  let rows: JSX.Element[] = []
 
 
   const parseSearchParams = () => {
@@ -100,18 +107,30 @@ export function UserRestaurantsPage() {
     setApiParams(parsedParams);
   }, [searchParams]);
 
+  if (reservations) {
+    rows = reservations.map((reservation: any) => (
+      <tr key={reservation.id}>
+        <td>{reservation.quantity}</td>
+        <td>{reservation.date}</td>
+        <td>{reservation.username}</td>
+        {/* onClick={confirmReservation(restaurantId, reservation.id)}> */}
+        <td>    
+          <Button color="green">
+            Confirm
+          </Button>
+        </td>
+        <td>
+          <Button color="red">
+            Deny
+          </Button>
+        </td>
+      </tr>
+    ));
+  }
 
   if (status === "error") {
     return <div>{error!.message}</div>;
   }
-
-  const restaurants =
-    data?.data?.map((rest) => (
-      <UserRestaurantCard
-        restaurant={rest}
-        key={rest.id ?? rest.name}
-      />
-    )) || [];
 
   return (
     <>
@@ -126,45 +145,31 @@ export function UserRestaurantsPage() {
               className={classes.title}
               mb={"xl"}
               mt={"xl"}
-            >{t`pages.userRestaurants.title`}</Text>
+            >{t`pages.restaurantReservations.title`}</Text>
 
-            {restaurants.length === 0 ? (
+            {rows.length === 0 ? (
               <Flex justify="center" align="center" h={"100%"}>
                 <div className={classes.empty}>
-                  <Text mb={50}>{t("pages.userRestaurants.notFound")}</Text>
-                  <Button
-                    color="orange"
-                    mx={170}
-                    onClick={() => navigate("/restaurants/register")}
-                  >
-                    {t("pages.userRestaurants.createOne")}
-                  </Button>
+                  <Text mb={50}>{t("pages.restaurantReservations.notFound")}</Text>
                 </div>
               </Flex>
             ) : (
 
             <Flex direction="column" align="center">
-              <SimpleGrid cols={3} spacing="xl" mb="xl">
-                {restaurants}
-              </SimpleGrid>
-              <Pagination
-                total={data?.meta.maxPages ?? 0}
-                siblings={3}
-                initialPage={params.page ?? 1}
-                page={params.page}
-                onChange={(e) => {
-                  setParams((prev) => ({ ...prev, page: e }));
-                  setApiParams((prev) => ({ ...prev, page: e }));
-                  setSearchParams(
-                    qs.stringify(
-                      { ...params, page: e },
-                      { arrayFormat: "repeat" }
-                    )
-                  );
-                }}
-                align="center"
-                color="orange"
-              />
+              <Table>
+                <thead>
+                  <tr>
+                    <th>{t("pages.restaurantReservations.table.customers")}</th>
+                    <th>{t("pages.restaurantReservations.table.date")}</th>
+                    <th>{t("pages.restaurantReservations.table.user")}</th>
+                    {/* Confirm button */}
+                    <th></th>
+                    {/* Deny button */}
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>{rows}</tbody>
+              </Table>
             </Flex>
             )}
           </>
