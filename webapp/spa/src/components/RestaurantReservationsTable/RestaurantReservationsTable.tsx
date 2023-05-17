@@ -114,21 +114,29 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
           <td>{reservation.quantity}</td>
           <td>{reservation.date}</td>
           <td>{reservation.username}</td>
-          <td>    
-            <Button color="green" onClick={() => 
-                confirmReservationHandler(restaurantId!, reservation.id!)
-            }>
-              Confirm
-            </Button>
-          </td>
-          <td>
-            <Button color="red">
-              Deny
-            </Button>
-          </td>
+          {/* Conditional rendering of buttons */}
+          {params.filterBy === "pending" ? (
+            <>
+              <td>
+                <Button
+                  color="green"
+                  onClick={() => confirmReservationHandler(restaurantId!, reservation.id!)}
+                >
+                  Confirm
+                </Button>
+              </td>
+              <td>
+                <Button color="red">Deny</Button>
+              </td>
+            </>
+          ) : (
+            <td>
+              <Button color="orange">Cancel</Button>
+            </td>
+          )}
         </tr>
-    ));
-  
+      ));
+      
     const setSorting = (field: string) => {
       const reversed = field === sortBy ? !reverseSortDirection : false;
       setReverseSortDirection(reversed);
@@ -170,48 +178,53 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
         return <div>{error!.message}</div>;
       }
 
-    return (
+      return (
         <Container size="xl" my="xl">
-        {status === "loading" ? (
-          <Flex justify="center" align="center" h={"100%"}>
-            <Loader color="orange" />
-          </Flex>
-        ) : (
+          {status === "loading" ? (
+            <Flex justify="center" align="center" h={"100%"}>
+              <Loader color="orange" />
+            </Flex>
+          ) : (
             <>
-                {rows.length === 0 ? (
-                    <Flex justify="center" align="center" h={"100%"}>
-                    <div className={classes.empty}>
-                        <Text mb={50}>{t("pages.restaurantReservations.notFound")}</Text>
-                    </div>
-                    </Flex>
-                ) : (
-
+              {rows.length === 0 ? (
+                <Flex justify="center" align="center" h={"100%"}>
+                  <div className={classes.empty}>
+                    <Text mb={50}>{t("pages.restaurantReservations.notFound")}</Text>
+                  </div>
+                </Flex>
+              ) : (
                 <Flex direction="column" align="center">
-                    <Table>
+                  <Table>
                     <thead>
-                        <tr>
+                      <tr>
                         <Th sorted={sortBy === 'quantity'} reversed={reverseSortDirection} onSort={() => setSorting('quantity')}>
-                            {t("pages.restaurantReservations.table.customers")}
+                          {t("pages.restaurantReservations.table.customers")}
                         </Th>
                         <Th sorted={sortBy === 'date'} reversed={reverseSortDirection} onSort={() => setSorting('date')}>
-                            {t("pages.restaurantReservations.table.date")}
+                          {t("pages.restaurantReservations.table.date")}
                         </Th>
                         <Th sorted={sortBy === 'username'} reversed={reverseSortDirection} onSort={() => setSorting('username')}>
-                            {t("pages.restaurantReservations.table.user")}
+                          {t("pages.restaurantReservations.table.user")}
                         </Th>
-                        {/* Confirm button */}
-                        <th></th>
-                        {/* Deny button */}
-                        <th></th>
-                        </tr>
+                        {/* Conditional rendering of buttons */}
+                        {params.filterBy === "pending" && (
+                          <>
+                            <th></th> {/* Confirm button */}
+                            <th></th> {/* Deny button */}
+                          </>
+                        )}
+                        {params.filterBy !== "pending" && (
+                          <th></th>
+                        )}
+                      </tr>
                     </thead>
                     <tbody>{rows}</tbody>
-                    </Table>
+                  </Table>
                 </Flex>
-                )}
+              )}
             </>
-        )}
-      </Container>
+          )}
+        </Container>
       );
 }
 
