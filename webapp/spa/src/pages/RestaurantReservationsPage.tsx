@@ -9,6 +9,8 @@ import { useTranslation } from "react-i18next";
 import { useParams, useSearchParams } from "react-router-dom";
 import { FilterParams } from "../api/services/UserService";
 import { RestaurantReservationsTable } from "../components/RestaurantReservationsTable/RestaurantReservationsTable";
+import { IconCircleCheck, IconAlertCircle } from '@tabler/icons-react';
+import { Tabs } from '@mantine/core';
 
 const useStyles = createStyles((theme) => ({
   heading: {
@@ -44,6 +46,10 @@ const useStyles = createStyles((theme) => ({
     align: "center",
     fontSize: 30,
     marginTop: 100,
+  },
+  centerTabsList: {
+    display: "flex",
+    justifyContent: "center"
   }
 }));
 
@@ -58,6 +64,12 @@ export function RestaurantReservationsPage() {
 
   const { t } = useTranslation();
   const { classes } = useStyles();
+
+  const [activeTab, setActiveTab] = useState('pending');
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
   
   const parseSearchParams = () => {
     const auxParams: FilterParams = {};
@@ -91,7 +103,22 @@ export function RestaurantReservationsPage() {
             mt={"xl"}>
             {t`pages.restaurantReservations.title`}
           </Text>
-          <RestaurantReservationsTable/>
+          <Tabs variant="pills" value={activeTab} onTabChange={handleTabChange}>
+            <Tabs.List className={classes.centerTabsList}>
+              <Tabs.Tab value="pending" color={"yellow"} icon={<IconAlertCircle size="16px"/>}>
+                Pending reservations
+              </Tabs.Tab>
+              <Tabs.Tab value="confirmed" color={"green"} icon={<IconCircleCheck size="16px" />}>
+                Confirmed reservations
+              </Tabs.Tab>
+            </Tabs.List>
+            <Tabs.Panel value="pending">
+              <RestaurantReservationsTable filterBy="pending" />
+            </Tabs.Panel>
+            <Tabs.Panel value="confirmed">
+              <RestaurantReservationsTable filterBy="confirmed" />
+            </Tabs.Panel>
+          </Tabs>
         </>
       </Container>
     </>

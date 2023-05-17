@@ -295,6 +295,7 @@ export async function getRestaurantReviews(id: string, params = NO_FILTER) {
 }
 
 export async function getRestaurantReservations(restaurantId: string, params = NO_FILTER){
+  console.log(params)
   const url = `${BASE_PATH}/${restaurantId}/reservations`;
   const response = await apiClient().get(url, { params });
 

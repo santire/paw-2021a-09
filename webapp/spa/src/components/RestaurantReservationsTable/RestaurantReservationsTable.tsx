@@ -60,11 +60,11 @@ return (
 );
 }
 
-export function RestaurantReservationsTable() {
+export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) {
     const { restaurantId } = useParams();
     const [params, setParams] = useState<FilterParams>({
         page: 1,
-        filterBy: "pending",
+        filterBy: filterBy || "pending",
       });
     const [apiParams, setApiParams] = useState(params);
 
@@ -79,7 +79,7 @@ export function RestaurantReservationsTable() {
         data: reservations,
         error,
       } = useQuery<Reservation[], Error>(
-        ["reservation"],
+        ["reservation", params],
         async () => getRestaurantReservations(restaurantId || "", params),
         { retry: false }
       );
