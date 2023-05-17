@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Reservation } from "../../types";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
-import { FilterParams, getRestaurantReservations } from "../../api/services";
+import { confirmReservation, denyReservation, FilterParams, getRestaurantReservations } from "../../api/services";
 import { useParams, useSearchParams } from "react-router-dom";
 
 const useStyles = createStyles((theme) => ({
@@ -41,30 +41,30 @@ interface ThProps {
     onSort(): void;
   }
   
-  function Th({ children, reversed, sorted, onSort }: ThProps) {
-    const { classes } = useStyles();
-    const Icon = sorted ? (reversed ? IconChevronUp : IconChevronDown) : IconSelector;
-    return (
-      <th className={classes.th}>
-        <UnstyledButton onClick={onSort} className={classes.control}>
-          <Group position="apart">
-            <Text fw={500} fz="sm">
-              {children}
-            </Text>
-            <Center className={classes.icon}>
-              <Icon size="0.9rem" stroke={1.5} />
-            </Center>
-          </Group>
-        </UnstyledButton>
-      </th>
-    );
-  }
-  
+function Th({ children, reversed, sorted, onSort }: ThProps) {
+const { classes } = useStyles();
+const Icon = sorted ? (reversed ? IconChevronUp : IconChevronDown) : IconSelector;
+return (
+    <th className={classes.th}>
+    <UnstyledButton onClick={onSort} className={classes.control}>
+        <Group position="apart">
+        <Text fw={500} fz="sm">
+            {children}
+        </Text>
+        <Center className={classes.icon}>
+            <Icon size="0.9rem" stroke={1.5} />
+        </Center>
+        </Group>
+    </UnstyledButton>
+    </th>
+);
+}
 
 export function RestaurantReservationsTable() {
     const { restaurantId } = useParams();
     const [params, setParams] = useState<FilterParams>({
         page: 1,
+        filterBy: "pending",
       });
     const [apiParams, setApiParams] = useState(params);
 
@@ -80,23 +80,34 @@ export function RestaurantReservationsTable() {
         error,
       } = useQuery<Reservation[], Error>(
         ["reservation"],
-        async () => getRestaurantReservations(restaurantId || ""),
+        async () => getRestaurantReservations(restaurantId || "", params),
         { retry: false }
       );
 
-      const parseSearchParams = () => {
-        const auxParams: FilterParams = {};
-        searchParams.forEach((value, key) => {
-          switch (key) {
+    const parseSearchParams = () => {
+    const auxParams: FilterParams = params;
+    searchParams.forEach((value, key) => {
+        switch (key) {
             case "page": {
-              auxParams.page = parseInt(value);
-              break;
+                auxParams.page = parseInt(value);
+                break;
             }
-          }
-        });
-    
-        return auxParams;
-      };
+            case "filterBy": {
+                auxParams.filterBy = value;
+                break;
+            }
+        }
+    });
+
+    return auxParams;
+    };
+
+    async function confirmReservationHandler(restaurantId: string, reservationId: string){
+        var res = await confirmReservation(restaurantId, reservationId);
+        if(res == 204   ){
+            setSortedReservations(sortedReservations.filter((reservation) => reservation.id !== reservationId));
+        }
+    }
   
     const rows = sortedReservations.map((reservation) => (
         <tr key={reservation.id}>
@@ -104,7 +115,9 @@ export function RestaurantReservationsTable() {
           <td>{reservation.date}</td>
           <td>{reservation.username}</td>
           <td>    
-            <Button color="green">
+            <Button color="green" onClick={() => 
+                confirmReservationHandler(restaurantId!, reservation.id!)
+            }>
               Confirm
             </Button>
           </td>

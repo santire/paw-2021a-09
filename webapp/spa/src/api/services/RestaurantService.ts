@@ -16,6 +16,7 @@ export interface FilterParams {
   min?: number;
   max?: number;
   order?: string;
+  filterBy?: string;
 }
 
 const BASE_PATH = "restaurants";
@@ -295,7 +296,7 @@ export async function getRestaurantReviews(id: string, params = NO_FILTER) {
 
 export async function getRestaurantReservations(restaurantId: string, params = NO_FILTER){
   const url = `${BASE_PATH}/${restaurantId}/reservations`;
-  const response = await apiClient().get(url);
+  const response = await apiClient().get(url, { params });
 
   const data = [];
   for (let reservation of response.data) {
