@@ -19,7 +19,6 @@ import { deleteRestaurantById, getRestaurantReservations, confirmReservation } f
 import { useAuth } from "../../context/AuthContext";
 import { Restaurant, Reservation } from "../../types";
 import useStyles from "./UserRestaurantCard.styles";
-import ReservationCards from "./ReservationCards"
 
 
 interface UserRestaurantCardProps {
@@ -119,7 +118,6 @@ export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
         onClose={() => setOpenReservationModal(false)}
         title="Reservas"
       >
-        <ReservationCards id={id} closeModal={() => setOpenReservationModal(false)} />
       </Modal>
 
       <Flex justify="center" align="center" mt="md">

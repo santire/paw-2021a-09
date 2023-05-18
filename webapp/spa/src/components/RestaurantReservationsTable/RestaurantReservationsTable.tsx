@@ -1,4 +1,4 @@
-import { Button, Center, Flex, Group, Table, UnstyledButton, Text, createStyles, Container, Loader } from "@mantine/core";
+import { Button, Center, Flex, Group, Table, UnstyledButton, Text, createStyles, Container, Loader, Pagination } from "@mantine/core";
 import { IconChevronDown, IconChevronUp, IconSelector } from "@tabler/icons";
 import { useEffect, useState } from "react";
 import { Reservation } from "../../types";
@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { confirmReservation, denyReservation, FilterParams, getRestaurantReservations } from "../../api/services";
 import { useParams, useSearchParams } from "react-router-dom";
+import { Page } from "../../types/Page";
 
 const useStyles = createStyles((theme) => ({
     empty: {
@@ -62,8 +63,9 @@ return (
 
 export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) {
     const { restaurantId } = useParams();
+    const [reservationsPage, setReservationsPage] = useState(1);
     const [params, setParams] = useState<FilterParams>({
-        page: 1,
+        page: reservationsPage,
         filterBy: filterBy || "pending",
       });
     const [apiParams, setApiParams] = useState(params);
@@ -76,11 +78,11 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
     const [searchParams, setSearchParams] = useSearchParams();
     const {
         status,
-        data: reservations,
+        data,
         error,
-      } = useQuery<Reservation[], Error>(
-        ["reservation", params],
-        async () => getRestaurantReservations(restaurantId || "", params),
+      } = useQuery<Page<Reservation>, Error>(
+        ["reservation", apiParams, reservationsPage],
+        async () => getRestaurantReservations(restaurantId || "", apiParams),
         { retry: false }
       );
 
@@ -108,6 +110,12 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
             setSortedReservations(sortedReservations.filter((reservation) => reservation.id !== reservationId));
         }
     }
+
+    const handlePageChange = (page: number) => {
+        setSearchParams({ ...searchParams, page: page.toString() });
+        setReservationsPage(page)
+      };
+      
   
     const rows = sortedReservations.map((reservation) => (
         <tr key={reservation.id}>
@@ -131,7 +139,7 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
             </>
           ) : (
             <td>
-              <Button color="orange">Cancel</Button>
+              <Button color="red">Cancel</Button>
             </td>
           )}
         </tr>
@@ -144,8 +152,8 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
     };
     
     useEffect(() => {
-    if(reservations){
-        let sortedReservations = reservations;
+    if(data){
+        let sortedReservations = data.data;
     
         // Apply sorting
         if (sortBy) {
@@ -165,12 +173,12 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
         setSortedReservations(sortedReservations);
     }
     
-    }, [reservations, sortBy, reverseSortDirection]);
+    }, [data, sortBy, reverseSortDirection]);
 
     useEffect(() => {
         // first time loading use paremeters in url, otherwise set on change
         const parsedParams = parseSearchParams();
-        setParams(parsedParams);
+        setParams(apiParams);
         setApiParams(parsedParams);
       }, [searchParams]);
     
@@ -220,6 +228,14 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
                     </thead>
                     <tbody>{rows}</tbody>
                   </Table>
+                  <Pagination
+                    total={data?.meta.maxPages ?? 0}
+                    siblings={3}
+                    page={reservationsPage}
+                    onChange={handlePageChange}
+                    align="center"
+                    color="orange"
+                    />
                 </Flex>
               )}
             </>

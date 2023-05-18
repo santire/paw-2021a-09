@@ -298,8 +298,41 @@ export async function getRestaurantReservations(restaurantId: string, params = N
   console.log(params)
   const url = `${BASE_PATH}/${restaurantId}/reservations`;
   const response = await apiClient().get(url, { params });
+  const links = {
+    first: 0,
+    last: 0,
+    next: 0,
+    prev: 0,
+  };
 
-  const data = [];
+  response.headers.link?.split(",").forEach((str) => {
+    const linkInfo = /<([^>]+)>;\s+rel="([^"]+)"/gi.exec(str);
+    if (linkInfo != null) {
+      const pageInfo = /page=([^&]*)/gi.exec(linkInfo[1]);
+      if (pageInfo != null) {
+        switch (linkInfo[2]) {
+          case "first": {
+            links["first"] = parseInt(pageInfo[1]);
+            break;
+          }
+          case "last": {
+            links["last"] = parseInt(pageInfo[1]);
+            break;
+          }
+          case "next": {
+            links["next"] = parseInt(pageInfo[1]);
+            break;
+          }
+          case "prev": {
+            links["prev"] = parseInt(pageInfo[1]);
+            break;
+          }
+        }
+      }
+    }
+  });
+
+  const reservationsData = [];
   for (let reservation of response.data) {
     const respRest = await apiClient().get<Restaurant>(reservation.restaurant);
     let reserv: Reservation = {
@@ -311,8 +344,16 @@ export async function getRestaurantReservations(restaurantId: string, params = N
       username: reservation.username
     };
 
-    data.push(reserv);
+    reservationsData.push(reserv);
   }
 
-  return data
+  const page: Page<Reservation> = {
+    data: reservationsData,
+    meta: {
+      perPage: response.data.length,
+      maxPages: links?.hasOwnProperty("last") ? links.last : 0,
+    },
+  };
+
+  return page
 }
