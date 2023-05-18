@@ -1,12 +1,28 @@
-import { Button, Center, Flex, Group, Table, UnstyledButton, Text, createStyles, Container, Loader, Pagination } from "@mantine/core";
+import { Button, 
+        Center, 
+        Flex, 
+        Group, 
+        Table, 
+        UnstyledButton, 
+        Text, 
+        createStyles,
+        Container,
+        Loader,
+        Pagination,
+        Modal, 
+        TextInput
+    } from "@mantine/core";
 import { IconChevronDown, IconChevronUp, IconSelector } from "@tabler/icons";
 import { useEffect, useState } from "react";
 import { Reservation } from "../../types";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { confirmReservation, denyReservation, FilterParams, getRestaurantReservations } from "../../api/services";
-import { useParams, useSearchParams } from "react-router-dom";
+import { Form, useParams, useSearchParams } from "react-router-dom";
 import { Page } from "../../types/Page";
+import { useDisclosure } from "@mantine/hooks";
+import { DenyReservationModal } from "./DenyReservationModal/DenyReservationModal";
+
 
 const useStyles = createStyles((theme) => ({
     empty: {
@@ -86,6 +102,16 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
         { retry: false }
       );
 
+    const [denyModalVisible, setDenyModalVisible] = useState(false);
+    const [selectedReservationId, setSelectedReservationId] = useState("");
+    const [selectedRestaurantId, setSelectedRestaurantId] = useState("");
+      
+    const openDenyModal = (restaurantId: string, reservationId: string) => {
+        setSelectedRestaurantId(restaurantId);
+        setSelectedReservationId(reservationId);
+        setDenyModalVisible(true);
+    };
+      
     const parseSearchParams = () => {
     const auxParams: FilterParams = params;
     searchParams.forEach((value, key) => {
@@ -107,6 +133,13 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
     async function confirmReservationHandler(restaurantId: string, reservationId: string){
         var res = await confirmReservation(restaurantId, reservationId);
         if(res == 204   ){
+            setSortedReservations(sortedReservations.filter((reservation) => reservation.id !== reservationId));
+        }
+    }
+
+    async function denyReservationHandler(restaurantId: string, reservationId: string){
+        var res = await denyReservation(restaurantId, reservationId, 'Pinto');
+        if(res == 204){
             setSortedReservations(sortedReservations.filter((reservation) => reservation.id !== reservationId));
         }
     }
@@ -134,7 +167,9 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
                 </Button>
               </td>
               <td>
-                <Button color="red">Deny</Button>
+                <Button color="red" onClick={() => openDenyModal(restaurantId!, reservation.id!)}>
+                    Deny
+                </Button>
               </td>
             </>
           ) : (
@@ -178,9 +213,15 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
     useEffect(() => {
         // first time loading use paremeters in url, otherwise set on change
         const parsedParams = parseSearchParams();
-        setParams(apiParams);
+        // Reset to page 1 when switching to an inactive tab
+        if (parsedParams.filterBy !== filterBy) {
+            setSearchParams({ ...searchParams, page: "1" });
+            setReservationsPage(1);
+        } else {
+            setApiParams(parsedParams);
+        }
         setApiParams(parsedParams);
-      }, [searchParams]);
+      }, [searchParams, filterBy]);
     
       if (status === "error") {
         return <div>{error!.message}</div>;
@@ -240,6 +281,14 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
               )}
             </>
           )}
+            {denyModalVisible && (
+            <DenyReservationModal
+                show={denyModalVisible}
+                onClose={() => setDenyModalVisible(false)}
+                restaurantId={selectedRestaurantId}
+                reservationId={selectedReservationId}
+            />
+            )}
         </Container>
       );
 }
