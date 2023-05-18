@@ -101,6 +101,31 @@
         "customers": "Cantidad de comensales",
         "date": "Fecha",
         "user": "Cliente"
+      },
+      "tabs": {
+        "pending": {
+          "title": "Reservas pendientes"
+        },
+        "confirmed": {
+          "title": "Reservas confirmadas"
+        }
+      },
+      "confirmButton": "Confirmar",
+      "denyButton": "Rechazar",
+      "cancelButton": "Cancelar",
+      "denyModal": {
+        "denyTitle": "Rechazar reserva",
+        "cancelTitle": "Cancelar reserva",
+        "message": "Mensaje",
+        "placeholder": "Explica los motivos al usuario",
+        "denyButton": "Rechazar",
+        "goBackButton": "Volver",
+        "cancelButton": "Cancelar",
+        "form": {
+          "requiredError": "El campo mensaje es requerido",
+          "minLengthError": "El mensaje debe contener como mínimo 5 caracteres",
+          "maxLengthError": "El mensaje no puede exceder los 100 caracteres"
+        }
       }
     },
     "restaurant": {

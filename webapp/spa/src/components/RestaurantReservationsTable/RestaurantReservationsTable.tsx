@@ -9,18 +9,15 @@ import { Button,
         Container,
         Loader,
         Pagination,
-        Modal, 
-        TextInput
     } from "@mantine/core";
 import { IconChevronDown, IconChevronUp, IconSelector } from "@tabler/icons";
 import { useEffect, useState } from "react";
 import { Reservation } from "../../types";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
-import { confirmReservation, denyReservation, FilterParams, getRestaurantReservations } from "../../api/services";
-import { Form, useParams, useSearchParams } from "react-router-dom";
+import { confirmReservation, FilterParams, getRestaurantReservations } from "../../api/services";
+import { useParams, useSearchParams } from "react-router-dom";
 import { Page } from "../../types/Page";
-import { useDisclosure } from "@mantine/hooks";
 import { DenyReservationModal } from "./DenyReservationModal/DenyReservationModal";
 
 
@@ -155,18 +152,18 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
                   color="green"
                   onClick={() => confirmReservationHandler(restaurantId!, reservation.id!)}
                 >
-                  Confirm
+                  {t`pages.restaurantReservations.confirmButton`}
                 </Button>
               </td>
               <td>
                 <Button color="red" onClick={() => openDenyModal(restaurantId!, reservation.id!)}>
-                    Deny
+                {t`pages.restaurantReservations.denyButton`}
                 </Button>
               </td>
             </>
           ) : (
             <td>
-              <Button color="red" onClick={() => openDenyModal(restaurantId!, reservation.id!)}>Cancel</Button>
+              <Button color="red" onClick={() => openDenyModal(restaurantId!, reservation.id!)}>{t`pages.restaurantReservations.cancelButton`}</Button>
             </td>
           )}
         </tr>
@@ -261,6 +258,7 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
                     </thead>
                     <tbody>{rows}</tbody>
                   </Table>
+                  <div style={{ marginTop: "2rem", textAlign: "center" }}></div>
                   <Pagination
                     total={data?.meta.maxPages ?? 0}
                     siblings={3}

@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { Button, Container, Modal, TextInput } from "@mantine/core";
 import { Form } from "react-router-dom";
 import { denyReservation } from "../../../api/services";
+import { useTranslation } from "react-i18next";
 
 interface DenyReservationForm {
   message: string;
@@ -29,6 +30,7 @@ export function DenyReservationModal({
     reset,
     formState,
   } = useForm<DenyReservationForm>();
+  const { t } = useTranslation();
 
   const onSubmit = async (data: DenyReservationForm, restaurantId: string, reservationId: string) => {
     try {
@@ -42,31 +44,40 @@ export function DenyReservationModal({
   };
 
   return (
-    <Modal opened={show} onClose={onClose} title={isCancellation ? "Cancel reservation" : "Deny reservation"} centered>
+    <Modal opened={show} onClose={onClose} title={isCancellation ? t`pages.restaurantReservations.denyModal.cancelTitle` : t`pages.restaurantReservations.denyModal.denyTitle`} centered>
       <Container>
         <Form onSubmit={handleSubmit((data) => onSubmit(data, restaurantId, reservationId))}>
         <TextInput
             withAsterisk
-            label="Message"
-            placeholder="Explain the reason to your client..."
+            label={t`pages.restaurantReservations.denyModal.message`}
+            placeholder={String(t`pages.restaurantReservations.denyModal.placeholder`)}
             {...register("message", {
-              required: "Message is required",
-              minLength: {
+                required: String(t`pages.restaurantReservations.denyModal.form.requiredError`),
+                minLength: {
                 value: 5,
-                message: "Message must be at least 5 characters long",
+                message: t`pages.restaurantReservations.denyModal.form.minLengthError`,
               },
               maxLength: {
                 value: 100,
-                message: "Message cannot exceed 100 characters",
+                message: t`pages.restaurantReservations.denyModal.form.maxLengthError`,
               },
             })}
             error={errors.message?.message}
+            labelProps={{
+                style: { marginBottom: "0.5rem" },
+              }}
           />
+          <div style={{ marginTop: "2rem", textAlign: "center" }}></div>
           <Button type="submit" color="red" disabled={formState.isSubmitting}>
-            {isCancellation ? "Cancel" : "Deny"}
+            {isCancellation ? t`pages.restaurantReservations.denyModal.cancelButton` : t`pages.restaurantReservations.denyModal.denyButton`}
           </Button>
-          <Button onClick={onClose} variant="default" color="gray" disabled={formState.isSubmitting}>
-            Go back
+          <Button 
+            onClick={onClose} 
+            variant="default" 
+            color="gray" 
+            disabled={formState.isSubmitting}
+            style={{ marginLeft: "0.5rem" }}>
+                {t`pages.restaurantReservations.denyModal.goBackButton`}
           </Button>
         </Form>
       </Container>

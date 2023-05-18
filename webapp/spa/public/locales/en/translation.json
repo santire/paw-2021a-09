@@ -101,6 +101,31 @@
         "customers": "Customers quantity",
         "date": "Date",
         "user": "Client"
+      },
+      "tabs": {
+        "pending": {
+          "title": "Pending reservations"
+        },
+        "confirmed": {
+          "title": "Confirmed reservations"
+        }
+      },
+      "confirmButton": "Confirm",
+      "denyButton": "Deny",
+      "cancelButton": "Cancel",
+      "denyModal": {
+        "denyTitle": "Reject reservation",
+        "cancelTitle": "Cancel reservation",
+        "message": "Message",
+        "placeholder": "Explain the reason to your clients",
+        "denyButton": "Reject",
+        "goBackButton": "Go back",
+        "cancelButton": "Cancel",
+        "form": {
+          "requiredError": "Message is required",
+          "minLengthError": "Message must be at least 5 characters long",
+          "maxLengthError": "Message cannot exceed 100 characters"
+        }
       }
     },
     "restaurant": {

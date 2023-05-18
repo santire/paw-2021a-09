@@ -103,13 +103,14 @@ export function RestaurantReservationsPage() {
             mt={"xl"}>
             {t`pages.restaurantReservations.title`}
           </Text>
+          <div style={{ marginTop: "4rem", textAlign: "center" }}></div>
           <Tabs variant="pills" value={activeTab} onTabChange={handleTabChange}>
             <Tabs.List className={classes.centerTabsList}>
               <Tabs.Tab value="pending" color={"yellow"} icon={<IconAlertCircle size="16px"/>}>
-                Pending reservations
+                {t`pages.restaurantReservations.tabs.pending.title`}
               </Tabs.Tab>
               <Tabs.Tab value="confirmed" color={"green"} icon={<IconCircleCheck size="16px" />}>
-                Confirmed reservations
+                {t`pages.restaurantReservations.tabs.confirmed.title`}
               </Tabs.Tab>
             </Tabs.List>
             <Tabs.Panel value="pending">
