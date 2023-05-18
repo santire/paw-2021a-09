@@ -137,19 +137,11 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
         }
     }
 
-    async function denyReservationHandler(restaurantId: string, reservationId: string){
-        var res = await denyReservation(restaurantId, reservationId, 'Pinto');
-        if(res == 204){
-            setSortedReservations(sortedReservations.filter((reservation) => reservation.id !== reservationId));
-        }
-    }
-
     const handlePageChange = (page: number) => {
         setSearchParams({ ...searchParams, page: page.toString() });
         setReservationsPage(page)
       };
       
-  
     const rows = sortedReservations.map((reservation) => (
         <tr key={reservation.id}>
           <td>{reservation.quantity}</td>
@@ -174,7 +166,7 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
             </>
           ) : (
             <td>
-              <Button color="red">Cancel</Button>
+              <Button color="red" onClick={() => openDenyModal(restaurantId!, reservation.id!)}>Cancel</Button>
             </td>
           )}
         </tr>
@@ -287,6 +279,7 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
                 onClose={() => setDenyModalVisible(false)}
                 restaurantId={selectedRestaurantId}
                 reservationId={selectedReservationId}
+                isCancellation={params.filterBy !== "pending"}
             />
             )}
         </Container>

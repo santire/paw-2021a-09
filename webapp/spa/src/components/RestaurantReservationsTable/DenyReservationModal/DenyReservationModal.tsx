@@ -12,6 +12,7 @@ interface DenyReservationModalProps {
   onClose: () => void;
   restaurantId: string;
   reservationId: string;
+  isCancellation: boolean;
 }
 
 export function DenyReservationModal({
@@ -19,6 +20,7 @@ export function DenyReservationModal({
   onClose,
   restaurantId,
   reservationId,
+  isCancellation
 }: DenyReservationModalProps) {
   const {
     handleSubmit,
@@ -40,7 +42,7 @@ export function DenyReservationModal({
   };
 
   return (
-    <Modal opened={show} onClose={onClose} title="Deny Reservation" centered>
+    <Modal opened={show} onClose={onClose} title={isCancellation ? "Cancel reservation" : "Deny reservation"} centered>
       <Container>
         <Form onSubmit={handleSubmit((data) => onSubmit(data, restaurantId, reservationId))}>
         <TextInput
@@ -61,7 +63,7 @@ export function DenyReservationModal({
             error={errors.message?.message}
           />
           <Button type="submit" color="red" disabled={formState.isSubmitting}>
-            Deny
+            {isCancellation ? "Cancel" : "Deny"}
           </Button>
           <Button onClick={onClose} variant="default" color="gray" disabled={formState.isSubmitting}>
             Go back
