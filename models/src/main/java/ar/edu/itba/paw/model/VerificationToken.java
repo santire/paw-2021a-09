@@ -68,10 +68,4 @@ public class VerificationToken {
         this.setCreatedAt(timestamp);
         this.user = user;
     }
-
-    public VerificationToken(String token, Timestamp timestamp, User user) {
-        this.setToken(token);
-        this.setCreatedAt(timestamp.toLocalDateTime());
-        this.user = user;
-    }
 }

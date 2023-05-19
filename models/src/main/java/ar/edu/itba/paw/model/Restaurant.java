@@ -91,17 +91,6 @@ public class Restaurant {
     Restaurant() {
         // Just for hibernate
     }
-
-    public Restaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner) {
-        this.name = name;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.tags = tags;
-        this.owner = owner;
-        // this.likes = 0;
-        this.rating = 0;
-        this.menu = new ArrayList<>();
-    }
     public Restaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner, String facebook, String twitter, String instagram) {
         this.name = name;
         this.address = address;
@@ -111,42 +100,11 @@ public class Restaurant {
         this.facebook = facebook;
         this.twitter = twitter;
         this.instagram = instagram;
-        // this.likes = 0;
-        this.rating = 0;
+         this.likes = new ArrayList<>();
+        this.ratings = new ArrayList<>();
         this.menu = new ArrayList<>();
     }
 
-    public Restaurant(Long id, String name, String address, String phoneNumber, float rating, User owner){
-        this.id = id;
-        this.name = name;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.rating = rating;
-        this.owner = owner;
-        // this.likes = 0;
-        this.menu = new ArrayList<>();
-    }
-
-    public Restaurant(Long id, String name, String address, String phoneNumber, float rating, User owner, int likes){
-        this.id = id;
-        this.name = name;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.rating = rating;
-        this.owner = owner;
-        // this.likes = likes;
-        this.menu = new ArrayList<>();
-    }
-
-    public Restaurant(Long id, String name, String address, String phoneNumber, User owner){
-        this.id = id;
-        this.name = name;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.owner = owner;
-        // this.likes=0;
-        this.menu = new ArrayList<>();
-    }
 
     public Long getId(){ return this.id; }
     public String getName(){ return this.name; }
@@ -155,12 +113,10 @@ public class Restaurant {
     public List<Rating> getRatings(){ return this.ratings; }
     public double getRating() { 
         DecimalFormat df = new DecimalFormat("#,##");
-        double result = new Double(df.format(
-        ratings
+        return Double.parseDouble(df.format(
+        this.ratings
         .stream()
-        .mapToDouble(r -> r.getRating()).average().orElse(0)));
-        
-        return result;
+        .mapToDouble(Rating::getRating).average().orElse(0)));
     }
     public User getOwner() { return owner; }
     public int getLikes() { return likes.size(); }
@@ -184,6 +140,8 @@ public class Restaurant {
     // public void setLikes(int likes) { this.likes = likes; }
     public void setTags(List<Tags> tags) { this.tags = tags; }
     public void setMenu(List<MenuItem> menu) { this.menu = menu; }
+    public void setRatings(List<Rating> ratings) { this.ratings = ratings; }
+    public void setLikes(List<Like> likes) { this.likes = likes; }
     public void addMenuItem(MenuItem menuItem) { this.menu.add(menuItem); }
     public void setProfileImage(Image profileImage) { this.profileImage = profileImage; }
 

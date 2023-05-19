@@ -29,14 +29,6 @@ public class MenuItem {
     MenuItem() {
         //Just for hibernate
     }
-
-    public MenuItem(Long id, String name, String description, Float price, Restaurant restaurant) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.restaurant = restaurant;
-    }
     
     public MenuItem(Long id, String name, String description, Float price) {
         this.id = id;

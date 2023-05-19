@@ -30,7 +30,6 @@ public class Like {
     private Restaurant restaurant;
 
     Like() {
-
     }
 
     public Long getId() {

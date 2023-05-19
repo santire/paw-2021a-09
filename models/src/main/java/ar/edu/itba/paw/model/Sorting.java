@@ -9,7 +9,7 @@ public enum Sorting {
     LIKES("likes"),
     NAME("name");
 
-    private String sortType;
+    private final String sortType;
 
     Sorting(String sortType){
         this.sortType = sortType;

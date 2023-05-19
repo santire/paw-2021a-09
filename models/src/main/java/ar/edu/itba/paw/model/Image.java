@@ -37,16 +37,6 @@ public class Image {
         this.data = data;
     }
 
-    public Image(final long imageId, byte[] data){
-        this.imageId = imageId;
-        this.data = data;
-    }
-
-    public Image(final String base64){
-        this.data = Base64.getEncoder().encode(base64.getBytes(StandardCharsets.UTF_8));
-    }
-
-    public Long getImageId(){ return this.imageId; }
     public byte[] getData(){ return this.data; }
 
     public static byte[] getPlaceholderImage() {
@@ -56,10 +46,7 @@ public class Image {
         return DatatypeConverter.parseBase64Binary(splitImage[1]);
     }
 
-
     public Restaurant getRestaurant() { return restaurant; }
-
-    public void setImageId(Long imageId) { this.imageId = imageId; }
     public void setData(byte[] data) { this.data = data; }
     public void setRestaurant(Restaurant restaurant) { this.restaurant = restaurant; }
 
