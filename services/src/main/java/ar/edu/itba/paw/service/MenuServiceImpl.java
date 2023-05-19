@@ -26,10 +26,10 @@ public class MenuServiceImpl implements MenuService {
 
 	@Override
 	@Transactional
-	public void addItemToRestaurant(long restaurantId, MenuItem item) {
+	public MenuItem addItemToRestaurant(long restaurantId, MenuItem item) {
 		Restaurant restaurant = restaurantDao.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
 		LOGGER.debug("restaurant: {}", restaurant.getName());
-		menuDao.addItemToRestaurant(restaurant, item);
+		return menuDao.addItemToRestaurant(restaurant, item);
 	}
 
 	@Override

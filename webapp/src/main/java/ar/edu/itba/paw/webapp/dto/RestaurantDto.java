@@ -43,7 +43,7 @@ public class RestaurantDto {
         dto.instagram = restaurant.getInstagram();
         dto.twitter = restaurant.getTwitter();
         dto.likes = restaurant.getLikes();
-        dto.tags = restaurant.getTags().stream().map(tag -> tag.name()).collect(Collectors.toList());
+        dto.tags = restaurant.getTags().stream().map(Enum::name).collect(Collectors.toList());
         
         
         dto.image = uriInfo.getBaseUriBuilder().path(PATH).path(String.valueOf(restaurant.getId())).path("image").build();

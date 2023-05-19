@@ -41,8 +41,6 @@ public class UserController {
     @Autowired
     private RestaurantService restaurantService;
     @Autowired
-    private LikesService likesService;
-    @Autowired
     private ReservationService reservationService;
 
     @Context

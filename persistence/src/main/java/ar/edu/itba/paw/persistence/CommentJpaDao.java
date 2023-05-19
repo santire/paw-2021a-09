@@ -25,30 +25,30 @@ public class CommentJpaDao implements CommentDao {
     // CREATE
 
     @Override
-    public Comment addComment(User user, Restaurant restaurant, String comment, LocalDate date){
+    public Comment addComment(User user, Restaurant restaurant, String comment, LocalDate date) {
         final Comment userComment = new Comment(comment, date);
         userComment.setUser(user);
         userComment.setRestaurant(restaurant);
-        em.merge(userComment);
+        em.persist(userComment);
         return userComment;
     }
 
     // READ
 
     @Override
-    public Optional<Comment> findById(long id){
+    public Optional<Comment> findById(long id) {
         return Optional.ofNullable(em.find(Comment.class, id));
     }
 
     @Override
-    public Optional<Comment> findByUserAndRestaurantId(long userId, long restaurantId){
+    public Optional<Comment> findByUserAndRestaurantId(long userId, long restaurantId) {
         Query nativeQuery = em.createNativeQuery(
                 "SELECT comment_id FROM comments WHERE user_id = :userId and restaurant_id = :restaurantId ORDER BY date ASC");
         nativeQuery.setParameter("userId", userId);
         nativeQuery.setParameter("restaurantId", restaurantId);
 
         @SuppressWarnings("unchecked")
-        Long filteredId = (Long)nativeQuery.getResultList().stream().map(e -> Long.valueOf(e.toString())).findFirst().orElse(null);
+        Long filteredId = (Long) nativeQuery.getResultList().stream().map(e -> Long.valueOf(e.toString())).findFirst().orElse(null);
         if (filteredId == null) {
             return Optional.empty();
         }
@@ -59,7 +59,7 @@ public class CommentJpaDao implements CommentDao {
 
 
     @Override
-    public List<Comment> findByRestaurant(int page, int amountOnPage, long restaurantId){
+    public List<Comment> findByRestaurant(int page, int amountOnPage, long restaurantId) {
         Query nativeQuery = em.createNativeQuery(
                 "SELECT comment_id FROM comments"
                         +
@@ -81,10 +81,10 @@ public class CommentJpaDao implements CommentDao {
                 Comment.class);
         query.setParameter("filteredIds", filteredIds);
 
-        return query.getResultList().stream().sorted(Comparator.comparing(v->filteredIds.indexOf(v.getId()))).collect(Collectors.toList());
+        return query.getResultList().stream().sorted(Comparator.comparing(v -> filteredIds.indexOf(v.getId()))).collect(Collectors.toList());
     }
 
-    public int findByRestaurantPageCount(int amountOnPage, long restaurantId){
+    public int findByRestaurantPageCount(int amountOnPage, long restaurantId) {
         Query nativeQuery = em.createNativeQuery(
                 "SELECT comment_id FROM comments"
                         +
@@ -102,7 +102,7 @@ public class CommentJpaDao implements CommentDao {
     // DESTROY
 
     @Override
-    public boolean deleteComment(long commentId){
+    public boolean deleteComment(long commentId) {
         Optional<Comment> maybeComment = findById(commentId);
         if (maybeComment.isPresent()) {
             em.remove(maybeComment.get());

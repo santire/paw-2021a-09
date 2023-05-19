@@ -120,7 +120,7 @@ public class Restaurant {
     }
     public User getOwner() { return owner; }
     public int getLikes() { return likes.size(); }
-    // public int getLikes() { return likes; }
+
     public List<MenuItem> getMenu() { return this.menuPage; }
     public List<Tags> getTags() {return this.tags;}
     public Image getProfileImage() { return this.profileImage; }

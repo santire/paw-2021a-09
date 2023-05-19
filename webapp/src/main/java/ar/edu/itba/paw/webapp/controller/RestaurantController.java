@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.webapp.controller;
 import ar.edu.itba.paw.model.*;
+import ar.edu.itba.paw.model.Image;
+import ar.edu.itba.paw.model.MenuItem;
 import ar.edu.itba.paw.model.exceptions.*;
 
 import javax.validation.Valid;
@@ -21,9 +23,12 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
+import java.awt.*;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 import ar.edu.itba.paw.service.UserService;
 
@@ -215,7 +220,7 @@ public class RestaurantController {
         LOGGER.debug("review: {}", comment.getReview());
         final Comment rev = commentService.addComment(user.getId(), restaurantId, comment.getReview());
         final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(rev.getId())).build();
-        return Response.created(uri).build();
+        return Response.created(uri).entity(CommentDto.fromComment(rev, uriInfo)).build();
     }
 
     //DELETE REVIEW
@@ -239,9 +244,9 @@ public class RestaurantController {
     public Response addRestaurantMenuItem(@PathParam("restaurantId") final Long restaurantId,
                                           final @Valid @NotNull MenuItemForm menuItem, @Context HttpServletRequest request){
         final MenuItem item = new MenuItem(menuItem.getId(), menuItem.getName(), menuItem.getDescription(), menuItem.getPrice());
-        menuService.addItemToRestaurant(restaurantId, item);
-        final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(item.getId())).build();
-        return Response.created(uri).build();
+        final MenuItem createdItem = menuService.addItemToRestaurant(restaurantId, item);
+        final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(createdItem.getId())).build();
+        return Response.created(uri).entity(MenuItemDto.fromMenuItem(createdItem)).build();
     }
 
     //DELETE MENU ITEM
@@ -286,7 +291,7 @@ public class RestaurantController {
         final URI uri = uriInfo.getAbsolutePathBuilder()
                 .path(String.valueOf(restaurant.getId())).build();
         LOGGER.info("Restaurant created in : " + uri);
-        return Response.created(uri).build();
+        return Response.created(uri).entity(RestaurantDto.fromRestaurant(restaurant, uriInfo)).build();
     }
 
     @PUT
@@ -316,7 +321,7 @@ public class RestaurantController {
         LOGGER.debug("Created image: {}", image);
         restaurantService.setImageByRestaurantId(image, restaurantId);
         final URI uri = uriInfo.getAbsolutePathBuilder().build();
-        return Response.created(uri).build();
+        return Response.created(uri).entity(bytes).build();
     }
         @PUT
         @Path("/{restaurantId}")
@@ -472,7 +477,7 @@ public class RestaurantController {
                 baseUrl);
 
         final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(res.getId())).build();
-        return Response.created(uri).build();
+        return Response.created(uri).entity(ReservationDto.fromReservation(res, uriInfo)).build();
     }
 
     // USER CANCEL RESERVATION
