@@ -29,6 +29,8 @@ public interface ReservationDao {
     public List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId, LocalDateTime currentTime);
     public int findPendingByRestaurantPageCount(int amountOnPage, long restaurantId, LocalDateTime currentTime);
 
+    public List<Reservation> findHistoryByRestaurant(int page, int amountOnPage, long restaurantId, LocalDateTime currentTime);
+    public int findHistoryByRestaurantPageCount(int amountOnPage, long restaurantId, LocalDateTime currentTime);
 
     public Optional<Reservation> findById(long id);
 

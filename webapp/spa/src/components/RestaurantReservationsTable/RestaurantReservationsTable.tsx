@@ -161,9 +161,15 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
                 </Button>
               </td>
             </>
-          ) : (
+          ) : params.filterBy === "confirmed" ? (
             <td>
               <Button color="red" onClick={() => openDenyModal(restaurantId!, reservation.id!)}>{t`pages.restaurantReservations.cancelButton`}</Button>
+            </td>
+          ) : (
+            <td>
+                <Text style={{ color: reservation.confirmed ? 'darkgreen' : 'darkred' }}>
+                    {reservation.confirmed ? 'Confirmed' : 'Not confirmed'}
+                </Text>
             </td>
           )}
         </tr>

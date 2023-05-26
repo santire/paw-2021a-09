@@ -97,6 +97,7 @@
     "restaurantReservations": {
       "title": "Manage restaurants reservations",
       "notFound": "Looks like this restaurant does not have any reservations yet...",
+      "history":  "Go to reservation history",
       "table": {
         "customers": "Customers quantity",
         "date": "Date",
@@ -127,6 +128,10 @@
           "maxLengthError": "Message cannot exceed 100 characters"
         }
       }
+    },
+    "restaurantHistoryReservations": {
+      "title": "Reservations history",
+      "current": "Go back to current reservations"
     },
     "restaurant": {
       "reservationButton": "Make a Reservation",

@@ -1,6 +1,6 @@
 import { Carousel } from "@mantine/carousel";
 import {
-  Button,
+    Button,
   Container,
   createStyles,
   Text,
@@ -59,7 +59,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 
-export function RestaurantReservationsPage() {
+export function RestaurantHistoryReservationsPage() {
   const { restaurantId } = useParams();
   const [params, setParams] = useState<FilterParams>({
     page: 1,
@@ -107,7 +107,7 @@ export function RestaurantReservationsPage() {
             className={classes.title}
             mb={"xl"}
             mt={"xl"}>
-            {t`pages.restaurantReservations.title`}
+            {t`pages.restaurantHistoryReservations.title`}
           </Text>
           <Button
               style={{
@@ -115,27 +115,12 @@ export function RestaurantReservationsPage() {
                 textDecoration: 'underline',
                 cursor: 'pointer',
               }}
-              onClick={() => navigate(`/restaurants/${restaurantId}/reservations/history`)}
+              onClick={() => navigate(`/restaurants/${restaurantId}/reservations`)}
             >
-            {t`pages.restaurantReservations.history`}
-            </Button>
+            {t`pages.restaurantHistoryReservations.current`}
+          </Button>
           <div style={{ marginTop: "4rem", textAlign: "center" }}></div>
-          <Tabs variant="pills" value={activeTab} onTabChange={handleTabChange}>
-            <Tabs.List className={classes.centerTabsList}>
-              <Tabs.Tab value="pending" color={"yellow"} icon={<IconAlertCircle size="16px"/>}>
-                {t`pages.restaurantReservations.tabs.pending.title`}
-              </Tabs.Tab>
-              <Tabs.Tab value="confirmed" color={"green"} icon={<IconCircleCheck size="16px" />}>
-                {t`pages.restaurantReservations.tabs.confirmed.title`}
-              </Tabs.Tab>
-            </Tabs.List>
-            <Tabs.Panel value="pending">
-              <RestaurantReservationsTable filterBy="pending" />
-            </Tabs.Panel>
-            <Tabs.Panel value="confirmed">
-              <RestaurantReservationsTable filterBy="confirmed" />
-            </Tabs.Panel>
-          </Tabs>
+          <RestaurantReservationsTable filterBy="history" />
         </>
       </Container>
     </>

@@ -436,7 +436,11 @@ public class RestaurantController {
         }else if(filterBy.equalsIgnoreCase("confirmed")){
             maxPages = reservationService.findConfirmedByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
             reservations = reservationService.findConfirmedByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
-        }else{
+        }else if(filterBy.equalsIgnoreCase("history")){
+            maxPages = reservationService.findHistoryByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
+            reservations = reservationService.findHistoryByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
+        }
+        else{
             maxPages = reservationService.findByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
             reservations = reservationService.findByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
         }

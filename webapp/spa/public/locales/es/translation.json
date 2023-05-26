@@ -97,6 +97,7 @@
     "restaurantReservations": {
       "title": "Administrar reservas",
       "notFound": "Parece que este restaurante no tiene ninguna reserva todavia...",
+      "history":  "Ver historial de reservas",
       "table": {
         "customers": "Cantidad de comensales",
         "date": "Fecha",
@@ -127,6 +128,10 @@
           "maxLengthError": "El mensaje no puede exceder los 100 caracteres"
         }
       }
+    },
+    "restaurantHistoryReservations": {
+      "title": "Historial de reservas",
+      "current": "Volver a las reservas actuales"
     },
     "restaurant": {
       "reservationButton": "Hacer una reserva",
