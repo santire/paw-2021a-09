@@ -193,7 +193,8 @@
         },
         "submit": "Apply",
         "clear": "Clear filters"
-      }
+      },
+      "notFound": "No results found for your search."
     },
     "userRestaurants": {
       "title": "Your restaurants",

@@ -14,6 +14,8 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Restaurant } from "../../types";
 import useStyles from "./RestaurantCard.styles";
+import {useState} from "react";
+import {TAGS} from "../Filter/Filter";
 
 interface RestaurantCardProps {
   restaurant: Restaurant;
@@ -28,12 +30,35 @@ export function RestaurantCard({
   const { classes, theme } = useStyles();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { t: en } = useTranslation();
+  const { t: es } = useTranslation("es");
+  const getOptionsArr = (keyword: string) => {
+    return [en(keyword), es(keyword)];
+  };
+
+  const getTagValue = (values: string[]) => {
+    const tagOptions: { [key: string]: string[] } = {};
+    for (let tag of TAGS) {
+      console.log("ag: " + es(`tags.${tag}`));
+      tagOptions[tag] = getOptionsArr(`tags.${tag}`);
+    }
+    const toReturn: string[] = [];
+    Object.entries(tagOptions).forEach(([_, val], index) => {
+      for (let tagVal of values) {
+        if (val.map((t) => t.toLowerCase()).includes(tagVal.toLowerCase())) {
+          toReturn.push("" + index);
+        }
+      }
+    });
+
+    return toReturn;
+  };
 
   const features = tags?.map((tag, idx) => (
-    <Badge color="orange" key={tag + "" + idx}>
-      {t("tags." + tag.toLowerCase())}
-    </Badge>
-  ));
+        <Badge component="a" onClick={() => navigate(`/restaurants?tags=${getTagValue([t("tags." + tag.toLowerCase()).toLowerCase()])}`)} color="orange" key={tag + "" + idx} style={{ cursor: 'pointer' }}>
+        {t("tags." + tag.toLowerCase())}
+        </Badge>
+));
 
   return (
     <Card withBorder p="lg" radius="md" className={classes.card}>
@@ -105,6 +130,7 @@ export function RestaurantCard({
             </ActionIcon>
             <ActionIcon>
               <IconShare size={18} color={theme.colors.blue[6]} stroke={1.5} />
+              $={likedByUser?"true":"false"}
             </ActionIcon>
           </Group>
         </Group>

@@ -189,7 +189,8 @@
         },
         "submit": "Aplicar",
         "clear": "Limpiar filtros"
-      }
+      },
+      "notFound": "No encontramos restaurantes para tu búsqueda."
     },
     "userRestaurants": {
       "title": "Tus restaurantes",

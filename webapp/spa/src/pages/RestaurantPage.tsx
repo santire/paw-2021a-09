@@ -44,6 +44,7 @@ import { Like } from "../types/Like";
 import { Rate } from "../types/Rate";
 import { MenuItems } from "../components/MenuItems/MenuItems";
 import { Reviews } from "../components/Reviews/Reviews";
+import {TAGS} from "../components/Filter/Filter";
 
 const useStyles = createStyles((theme) => ({
   title: {
@@ -92,6 +93,29 @@ export function RestaurantPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { authed, user } = useAuth();
+  const { t: en } = useTranslation();
+  const { t: es } = useTranslation("es");
+  const getOptionsArr = (keyword: string) => {
+    return [en(keyword), es(keyword)];
+  };
+
+  const getTagValue = (values: string[]) => {
+    const tagOptions: { [key: string]: string[] } = {};
+    for (let tag of TAGS) {
+      console.log("ag: " + es(`tags.${tag}`));
+      tagOptions[tag] = getOptionsArr(`tags.${tag}`);
+    }
+    const toReturn: string[] = [];
+    Object.entries(tagOptions).forEach(([_, val], index) => {
+      for (let tagVal of values) {
+        if (val.map((t) => t.toLowerCase()).includes(tagVal.toLowerCase())) {
+          toReturn.push("" + index);
+        }
+      }
+    });
+
+    return toReturn;
+  };
   const {
     status: restaurantStatus,
     data: restaurantData,
@@ -194,7 +218,7 @@ export function RestaurantPage() {
   };
 
   const features = tags?.map((tag, idx) => (
-    <Badge color="orange" key={tag + "" + idx}>
+    <Badge component="a" onClick={() => navigate(`/restaurants?tags=${getTagValue([t("tags." + tag.toLowerCase()).toLowerCase()])}`)} color="orange" key={tag + "" + idx} style={{ cursor: 'pointer' }}>
       {t("tags." + tag.toLowerCase())}
     </Badge>
   ));
@@ -278,10 +302,10 @@ export function RestaurantPage() {
       return (
         <Rating
           readOnly
-          defaultValue={rateData?.rating}
+          defaultValue={restaurantData.rating}
           onChange={(value) => {
             rateRestaurant(restaurantId, { rating: value }).then(() => {
-              queryClient.invalidateQueries("rate");
+              queryClient.invalidateQueries("rating");
             });
           }}
         />
@@ -292,7 +316,7 @@ export function RestaurantPage() {
           defaultValue={rateData?.rating}
           onChange={(value) => {
             rateRestaurant(restaurantId, { rating: value }).then(() => {
-              queryClient.invalidateQueries("rate");
+              queryClient.invalidateQueries("rating");
             });
           }}
         />
