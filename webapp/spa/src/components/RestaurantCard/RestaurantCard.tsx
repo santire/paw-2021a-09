@@ -130,7 +130,6 @@ export function RestaurantCard({
             </ActionIcon>
             <ActionIcon>
               <IconShare size={18} color={theme.colors.blue[6]} stroke={1.5} />
-              $={likedByUser?"true":"false"}
             </ActionIcon>
           </Group>
         </Group>
