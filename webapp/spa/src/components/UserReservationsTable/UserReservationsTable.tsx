@@ -19,6 +19,7 @@ import { confirmReservation, FilterParams, getRestaurantReservations, getUserRes
 import { useParams, useSearchParams } from "react-router-dom";
 import { Page } from "../../types/Page";
 import { UserDenyReservationModal } from "./UserDenyReservationModal/UserDenyReservationModal";
+import { ParseStatus } from "zod";
 
 const useStyles = createStyles((theme) => ({
 empty: {
@@ -132,18 +133,20 @@ const handlePageChange = (page: number) => {
   
 const rows = sortedReservations.map((reservation) => (
     <tr key={reservation.id}>
-      <td>{reservation.quantity}</td>
-      <td>{reservation.date}</td>
-      <td>{reservation.restaurant.name}</td>
-      <td>
+        <td>{reservation.quantity}</td>
+        <td>{reservation.date}</td>
+        <td>{reservation.restaurant.name}</td>
+        <td>
             <Text style={{ color: reservation.confirmed ? 'darkgreen' : 'darkred' }}>
                 {reservation.confirmed ? 'Confirmed' : 'Not confirmed'}
             </Text>
-    </td>
-    <td>
-          <Button color="red" onClick={() => openDenyModal(userId!, reservation.id!)}>{t`pages.restaurantReservations.cancelButton`}</Button>
         </td>
-      {/* Conditional rendering of buttons */}
+        {/* Conditional rendering of buttons */}
+        {params.filterBy !== "history" && (
+            <td>
+                <Button color="red" onClick={() => openDenyModal(userId!, reservation.id!)}>{t`pages.restaurantReservations.cancelButton`}</Button>
+            </td>
+        )}
     </tr>
   ));
   
@@ -205,7 +208,7 @@ useEffect(() => {
           {rows.length === 0 ? (
             <Flex justify="center" align="center" h={"100%"}>
               <div className={classes.empty}>
-                <Text mb={50}>{t("pages.restaurantReservations.notFound")}</Text>
+                <Text mb={50}>{t("pages.userReservations.notFound")}</Text>
               </div>
             </Flex>
           ) : (
@@ -225,7 +228,10 @@ useEffect(() => {
                     <Th sorted={sortBy === 'state'} reversed={reverseSortDirection} onSort={() => setSorting('username')}>
                       {t("pages.userReservations.table.state")}
                     </Th>
-                    <th></th>
+                    {params.filterBy !== "history" && (
+                        <th></th>
+                    )
+                }
                   </tr>
                 </thead>
                 <tbody>{rows}</tbody>

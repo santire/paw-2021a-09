@@ -142,7 +142,8 @@ public class UserController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isUser(#userId)")
     public Response getUserRestaurants(
-            @PathParam("userId") final Long userId, @QueryParam("page") @DefaultValue("1") Integer page,
+            @PathParam("userId") final Long userId, 
+            @QueryParam("page") @DefaultValue("1") Integer page,
             @Context HttpServletRequest request) {
         int maxPages = restaurantService.getRestaurantsFromOwnerPagesCount(AMOUNT_OF_RESTAURANTS, userId);
         List<RestaurantDto> restaurants = restaurantService.getRestaurantsFromOwner(page, AMOUNT_OF_RESTAURANTS, userId)
@@ -163,14 +164,26 @@ public class UserController {
     @Path("/{userId}/reservations")
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isUser(#userId)")
-    public Response getLikedRestaurants(
+    public Response getUserReservations(
             @PathParam("userId") final Long userId,
+            @QueryParam("filterBy") @DefaultValue("") String filterBy,
             @QueryParam("page") @DefaultValue("1") Integer page, @Context HttpServletRequest request) {
-        int maxPages = reservationService.findByUserPageCount(AMOUNT_OF_RESERVATIONS, userId);
-        List<ReservationDto> reservation = reservationService.findByUser(page, AMOUNT_OF_RESERVATIONS, userId)
-                .stream()
-                .map(u -> ReservationDto.fromReservation(u, uriInfo))
-                .collect(Collectors.toList());
+        List<ReservationDto> reservation;    
+        int maxPages;    
+        if(filterBy.equalsIgnoreCase("history")){
+            maxPages = reservationService.findByUserHistoryPageCount(AMOUNT_OF_RESERVATIONS, userId);
+            reservation = reservationService.findByUserHistory(page, AMOUNT_OF_RESERVATIONS, userId)
+            .stream()
+            .map(u -> ReservationDto.fromReservation(u, uriInfo))
+            .collect(Collectors.toList());
+        }
+        else {
+            maxPages = reservationService.findByUserPageCount(AMOUNT_OF_RESERVATIONS, userId);
+            reservation = reservationService.findByUser(page, AMOUNT_OF_RESERVATIONS, userId)
+                    .stream()
+                    .map(u -> ReservationDto.fromReservation(u, uriInfo))
+                    .collect(Collectors.toList());
+        }
         return Response.ok(new GenericEntity<List<ReservationDto>>(reservation) {
                 })
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")

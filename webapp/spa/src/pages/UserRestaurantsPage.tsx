@@ -131,7 +131,7 @@ export function UserRestaurantsPage() {
             {restaurants.length === 0 ? (
               <Flex justify="center" align="center" h={"100%"}>
                 <div className={classes.empty}>
-                  <Text mb={200}>{t("pages.userRestaurants.notFound")}</Text>
+                  <Text mb={50}>{t("pages.userRestaurants.notFound")}</Text>
                   <Button
                     color="orange"
                     mx={170}

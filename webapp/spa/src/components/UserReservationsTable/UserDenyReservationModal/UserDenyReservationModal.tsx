@@ -35,7 +35,7 @@ export function UserDenyReservationModal({
         {t`pages.userReservations.denyModal.text`}
       </Text>
       <Container>
-          <Button type="submit" color="red" onSubmit={() => onSubmit(restaurantId, reservationId)}>
+          <Button type="submit" color="red" onClick={() => onSubmit(restaurantId, reservationId)}>
             {t`pages.userReservations.denyModal.cancelButton`}
           </Button>
           <Button 
