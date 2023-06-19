@@ -26,13 +26,12 @@ interface UserRestaurantCardProps {
 }
 
 export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
-  const { id, image, name, rating, likes } = restaurant;
+  const { id, image, name, rating, likes, reservationsCount } = restaurant;
   const { classes, theme } = useStyles();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [opened, setOpened] = useState(false);
-  const [openReservationModal, setOpenReservationModal] = useState(false)
   const { user } = useAuth();
   const userId = user?.userId;
 
@@ -88,7 +87,7 @@ export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
 
       <Flex justify="center" align="center">
         <Button
-          color="orange"
+          color="cyan"
           variant="outline"
           size="sm"
           fullWidth
@@ -100,7 +99,7 @@ export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
 
       <Flex justify="center" align="center" mt="md">
         <Button
-          color="cyan"
+          color="orange"
           variant="outline"
           size="sm"
           fullWidth
@@ -159,6 +158,9 @@ export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
         <Group position="apart">
           <Text size="xs" color="dimmed">
             {t("restaurantCard.liked", { likes: likes })}
+          </Text>
+          <Text size="xs" color="yellow">
+            {t("restaurantCard.pending", { reservationsCount: reservationsCount })}
           </Text>
         </Group>
       </Card.Section>

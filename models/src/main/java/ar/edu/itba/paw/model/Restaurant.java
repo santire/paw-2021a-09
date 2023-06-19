@@ -21,6 +21,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -81,6 +82,8 @@ public class Restaurant {
     @Column(length = 100)
     private String twitter;
 
+    @Formula("(SELECT COUNT(*) FROM reservations r WHERE r.restaurant_id = restaurant_id AND r.confirmed=false)")
+    private int reservationsCount;
 
     // private List<Reservation> reservations; ?
 
@@ -164,6 +167,7 @@ public class Restaurant {
     }
     public User getOwner() { return owner; }
     public int getLikes() { return likes.size(); }
+    public int getReservationsCount() { return reservationsCount; }
     // public int getLikes() { return likes; }
     public List<MenuItem> getMenu() { return this.menuPage; }
     public List<Tags> getTags() {return this.tags;}
@@ -174,7 +178,6 @@ public class Restaurant {
     public String getTwitter() { return twitter; }
 
 
-
     public void setId(Long id) { this.id = id; }
     public void setName(String name) { this.name = name; }
     public void setAddress(String address) { this.address = address; }
@@ -183,6 +186,7 @@ public class Restaurant {
     public void setOwner(User owner) { this.owner = owner; }
     // public void setLikes(int likes) { this.likes = likes; }
     public void setTags(List<Tags> tags) { this.tags = tags; }
+    public void setReservationCount(int reservationsCount) { this.reservationsCount = reservationsCount; }
     public void setMenu(List<MenuItem> menu) { this.menu = menu; }
     public void addMenuItem(MenuItem menuItem) { this.menu.add(menuItem); }
     public void setProfileImage(Image profileImage) { this.profileImage = profileImage; }

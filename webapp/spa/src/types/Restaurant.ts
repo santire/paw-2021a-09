@@ -11,6 +11,7 @@ export interface Restaurant {
   instagram?: string;
   twitter?: string;
   tags: string[];
+  reservationsCount?: number;
 
   menu?: string;
   reviews?: string;

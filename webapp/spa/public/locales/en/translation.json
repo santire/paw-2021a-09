@@ -32,6 +32,7 @@
   "restaurantCard": {
     "more": "See more",
     "liked": "{{likes}} people liked this",
+    "pending": "You have {{reservationsCount}} pending reservations",
     "tagsTitle": "Perfect for you, if you enjoy"
   },
   "UserRestaurantCard": {

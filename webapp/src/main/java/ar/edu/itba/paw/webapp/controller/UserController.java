@@ -150,7 +150,6 @@ public class UserController {
                 .stream()
                 .map(u -> RestaurantDto.fromRestaurant(u, uriInfo))
                 .collect(Collectors.toList());
-
         return Response.ok(new GenericEntity<List<RestaurantDto>>(restaurants) {
                 })
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
