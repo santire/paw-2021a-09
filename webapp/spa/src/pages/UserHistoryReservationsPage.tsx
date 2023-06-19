@@ -1,35 +1,14 @@
-import { Carousel } from "@mantine/carousel";
 import {
-  Center,
+    Button,
   Container,
   createStyles,
-  Flex,
   Text,
-  Image,
-  Loader,
-  Button,
-  SimpleGrid,
-  Pagination,
-  Tabs,
 } from "@mantine/core";
-import { IconAlertCircle, IconCircleCheck } from "@tabler/icons";
-import qs from "qs";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "react-query";
-import {
-  Navigate,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
-import { getUserReservations } from "../api/services";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { FilterParams } from "../api/services/UserService";
-import { ReservationCard } from "../components/ReservationCard/ReservationCard";
 import { UserReservationsTable } from "../components/UserReservationsTable/UserReservationsTable";
-//import { getRestaurants } from "../api/services";
-import { Reservation } from "../types";
-import { Page } from "../types/Page";
 
 const useStyles = createStyles((theme) => ({
   heading: {
@@ -61,6 +40,10 @@ const useStyles = createStyles((theme) => ({
     fontSize: theme.fontSizes.xl * 1.8,
     paddingLeft: theme.spacing.sm,
   },
+  subtitle: {
+    fontSize: theme.fontSizes.md,
+    paddingLeft: theme.spacing.sm,
+  },
   empty: {
     align: "center",
     fontSize: 30,
@@ -72,24 +55,18 @@ const useStyles = createStyles((theme) => ({
   }
 }));
 
-export function UserReservationsPage() {
-  const { userId } = useParams();
-  const [params, setParams] = useState<FilterParams>({
+
+export function UserHistoryReservationsPage() {
+    const { userId } = useParams();
+    const [params, setParams] = useState<FilterParams>({
     page: 1,
   });
   const [apiParams, setApiParams] = useState(params);
   const [searchParams, setSearchParams] = useSearchParams();
-  const { status, data, error, refetch } = useQuery<Page<Reservation>, Error>(
-    ["reservations", { userId, params }],
-    async () =>
-      getUserReservations({
-        userId: userId || "",
-        params: { ...params },
-      })
-  );
+  const navigate = useNavigate();
+
   const { t } = useTranslation();
   const { classes } = useStyles();
-  const navigate = useNavigate();
   
   const parseSearchParams = () => {
     const auxParams: FilterParams = {};
@@ -105,21 +82,13 @@ export function UserReservationsPage() {
     return auxParams;
   };
 
+
   useEffect(() => {
     // first time loading use paremeters in url, otherwise set on change
     const parsedParams = parseSearchParams();
     setParams(parsedParams);
     setApiParams(parsedParams);
   }, [searchParams]);
-
-  if (status === "error") {
-    return <div>{error!.message}</div>;
-  }
-
-  const reservations =
-    data?.data?.map((rest) => (
-      <ReservationCard reservation={rest} key={rest.id} />
-    )) || [];
 
   return (
     <>
@@ -129,7 +98,7 @@ export function UserReservationsPage() {
             className={classes.title}
             mb={"xl"}
             mt={"xl"}>
-            {t`pages.restaurantReservations.title`}
+            {t`pages.restaurantHistoryReservations.title`}
           </Text>
           <Button
               style={{
@@ -137,12 +106,12 @@ export function UserReservationsPage() {
                 textDecoration: 'underline',
                 cursor: 'pointer',
               }}
-              onClick={() => navigate(`/users/${userId}/reservations/history`)}
+              onClick={() => navigate(`/users/${userId}/reservations`)}
             >
-            {t`pages.restaurantReservations.history`}
-            </Button>
+            {t`pages.restaurantHistoryReservations.current`}
+          </Button>
           <div style={{ marginTop: "4rem", textAlign: "center" }}></div>
-          <UserReservationsTable filterBy="pending" />
+          <UserReservationsTable filterBy="history" />
         </>
       </Container>
     </>

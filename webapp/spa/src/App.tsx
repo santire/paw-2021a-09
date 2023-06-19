@@ -20,6 +20,7 @@ import { ReservationsPage } from "./pages/ReservationPage";
 import { UserReservationsPage } from "./pages/UserReservationsPage";
 import { RestaurantReservationsPage } from "./pages/RestaurantReservationsPage";
 import { RestaurantHistoryReservationsPage } from "./pages/RestaurantHistoryReservationsPage";
+import { UserHistoryReservationsPage } from "./pages/UserHistoryReservationsPage";
 
 const queryClient = new QueryClient();
 const basename = process.env.REACT_APP_CONTEXT || "";
@@ -81,6 +82,10 @@ const router = createBrowserRouter(
         {
           path: "/users/:userId/reservations",
           element: <UserReservationsPage />,
+        },
+        {
+          path: "/users/:userId/reservations/history",
+          element: <UserHistoryReservationsPage />,
         },
         {
           path: "/users/:userId",

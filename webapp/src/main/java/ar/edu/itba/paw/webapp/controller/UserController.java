@@ -13,7 +13,6 @@ import ar.edu.itba.paw.webapp.dto.UserDto;
 import ar.edu.itba.paw.webapp.forms.PasswordResetForm;
 import ar.edu.itba.paw.webapp.forms.RegisterUserForm;
 import ar.edu.itba.paw.webapp.forms.UpdateUserForm;
-import ar.edu.itba.paw.webapp.forms.UserForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

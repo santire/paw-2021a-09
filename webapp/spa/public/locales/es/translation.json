@@ -208,7 +208,19 @@
       "guests": "Invitados",
       "pickDate":"Elige una fecha",
       "confirm": "Confirmar",
-      "reservationDate": "Fecha"
+      "reservationDate": "Fecha",
+      "table": {
+        "customers": "Cantidad de comensales",
+        "date": "Fecha",
+        "restaurant": "Restaurante",
+        "state": "Estado"
+      },
+      "denyModal": {
+        "cancelTitle": "Cancelar reserva",
+        "goBackButton": "Volver",
+        "cancelButton": "Cancelar",
+        "text": "¿Seguro quiere cancelar su reserva?"
+      }
     },
     "login": {
       "alert": "Usuario o contraseña inválido",

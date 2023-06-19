@@ -211,7 +211,19 @@
       "guests": "Guests",
       "pickDate": "Pick a Date",
       "confirm": "Confirm",
-      "reservationDate": "Date"
+      "reservationDate": "Date",
+      "table": {
+        "customers": "Customers quantity",
+        "date": "Date",
+        "restaurant": "Restaurant",
+        "state": "State"
+      },
+      "denyModal": {
+        "cancelTitle": "Cancel reservation",
+        "goBackButton": "Go back",
+        "cancelButton": "Cancel",
+        "text": "Are you sure you want to cancel your reservation?"
+      }
     },
     "login": {
       "alert": "Invalid username or password",
