@@ -1,5 +1,4 @@
 import {
-  ActionIcon,
   Badge,
   Button,
   Card,
@@ -58,7 +57,7 @@ export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
   return (
     <Card withBorder p="lg" radius="md" className={classes.card}>
       <Card.Section mb="md">
-        <Image src={image} alt={name} height={180} />
+        <Image src={image} alt={name} height={120} />
       </Card.Section>
 
       <Card.Section mt="xs" className={classes.section}>
@@ -91,7 +90,7 @@ export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
         <Button
           color="orange"
           variant="outline"
-          size="md"
+          size="sm"
           fullWidth
           onClick={() => navigate(`/restaurants/${id}`)}
         >
@@ -99,11 +98,11 @@ export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
         </Button>
       </Flex>
 
-      <Flex justify="center" align="center">
+      <Flex justify="center" align="center" mt="md">
         <Button
-          color="orange"
+          color="cyan"
           variant="outline"
-          size="md"
+          size="sm"
           fullWidth
           onClick={() => navigate(`/restaurants/${id}/reservations`)}
         >
@@ -111,20 +110,11 @@ export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
         </Button>
       </Flex>
 
-      {/** Modal de reserva */}
-      <Modal
-        centered
-        opened={openReservationModal}
-        onClose={() => setOpenReservationModal(false)}
-        title="Reservas"
-      >
-      </Modal>
-
       <Flex justify="center" align="center" mt="md">
         <Button
           color="gray"
           variant="outline"
-          size="md"
+          size="sm"
           fullWidth
           onClick={() => navigate(`/restaurants/${id}/edit`)}
         >
@@ -136,7 +126,7 @@ export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
         <Button
           color="red"
           variant="outline"
-          size="md"
+          size="sm"
           fullWidth
           onClick={() => setOpened(true)}
         >
@@ -156,7 +146,7 @@ export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
         <Button
           color="red"
           variant="outline"
-          size="md"
+          size="sm"
           fullWidth
           onClick={() => mutate(id!)}
           disabled={isLoading}

@@ -115,7 +115,7 @@ export function UserRestaurantsPage() {
 
   return (
     <>
-      <Container size="xl" my="xl">
+      <Container size="xl" my="sm">
         {status === "loading" ? (
           <Flex justify="center" align="center" h={"100%"}>
             <Loader color="orange" />
@@ -131,7 +131,7 @@ export function UserRestaurantsPage() {
             {restaurants.length === 0 ? (
               <Flex justify="center" align="center" h={"100%"}>
                 <div className={classes.empty}>
-                  <Text mb={50}>{t("pages.userRestaurants.notFound")}</Text>
+                  <Text mb={200}>{t("pages.userRestaurants.notFound")}</Text>
                   <Button
                     color="orange"
                     mx={170}
@@ -143,8 +143,8 @@ export function UserRestaurantsPage() {
               </Flex>
             ) : (
 
-            <Flex direction="column" align="center">
-              <SimpleGrid cols={3} spacing="xl" mb="xl">
+            <Flex direction="column" align="center" mt="xl">
+              <SimpleGrid cols={5} spacing="xl" mb="xl" mt={50}>
                 {restaurants}
               </SimpleGrid>
               <Pagination
