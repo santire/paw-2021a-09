@@ -93,7 +93,8 @@
       "deny": "Rechazar",
       "pending": "Pendiente",
       "confirmed": "Confirmado",
-      "title": "Mis Reservaciones"
+      "title": "Mis Reservaciones",
+      "notFound": "Parece que no tiene ninguna reserva"
     },
     "restaurantReservations": {
       "title": "Administrar reservas",
