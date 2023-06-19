@@ -79,14 +79,6 @@ export function UserReservationsPage() {
   });
   const [apiParams, setApiParams] = useState(params);
   const [searchParams, setSearchParams] = useSearchParams();
-  const { status, data, error, refetch } = useQuery<Page<Reservation>, Error>(
-    ["reservations", { userId, params }],
-    async () =>
-      getUserReservations({
-        userId: userId || "",
-        params: { ...params },
-      })
-  );
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
@@ -112,15 +104,6 @@ export function UserReservationsPage() {
     setApiParams(parsedParams);
   }, [searchParams]);
 
-  if (status === "error") {
-    return <div>{error!.message}</div>;
-  }
-
-  const reservations =
-    data?.data?.map((rest) => (
-      <ReservationCard reservation={rest} key={rest.id} />
-    )) || [];
-
   return (
     <>
       <Container size="xl" my="xl">
@@ -142,7 +125,7 @@ export function UserReservationsPage() {
             {t`pages.restaurantReservations.history`}
             </Button>
           <div style={{ marginTop: "4rem", textAlign: "center" }}></div>
-          <UserReservationsTable filterBy="pending" />
+          <UserReservationsTable filterBy="" />
         </>
       </Container>
     </>
