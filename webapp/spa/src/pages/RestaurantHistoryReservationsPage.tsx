@@ -1,6 +1,5 @@
-import { Carousel } from "@mantine/carousel";
 import {
-    Button,
+  Button,
   Container,
   createStyles,
   Text,
@@ -10,8 +9,6 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { FilterParams } from "../api/services/UserService";
 import { RestaurantReservationsTable } from "../components/RestaurantReservationsTable/RestaurantReservationsTable";
-import { IconCircleCheck, IconAlertCircle } from '@tabler/icons-react';
-import { Tabs } from '@mantine/core';
 
 const useStyles = createStyles((theme) => ({
   heading: {

@@ -82,7 +82,7 @@ public class Restaurant {
     @Column(length = 100)
     private String twitter;
 
-    @Formula("(SELECT COUNT(*) FROM reservations r WHERE r.restaurant_id = restaurant_id AND r.confirmed=false)")
+    @Formula("(SELECT COUNT(*) FROM reservations r WHERE r.restaurant_id = restaurant_id AND r.confirmed=false AND r.date > CURRENT_DATE)")
     private int reservationsCount;
 
     // private List<Reservation> reservations; ?

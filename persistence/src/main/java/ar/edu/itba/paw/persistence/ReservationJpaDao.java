@@ -297,7 +297,7 @@ public class ReservationJpaDao implements ReservationDao {
         Query nativeQuery = em.createNativeQuery(
                 "SELECT reservation_id FROM reservations"
                 +
-                " WHERE restaurant_id = :restaurantId AND confirmed = false AND date < :currTime"
+                " WHERE restaurant_id = :restaurantId AND date < :currTime"
                 +
                 " ORDER BY date ASC"
                 );

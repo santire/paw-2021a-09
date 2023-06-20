@@ -15,11 +15,10 @@ import { useEffect, useState } from "react";
 import { Reservation } from "../../types";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
-import { confirmReservation, FilterParams, getRestaurantReservations, getUserReservations } from "../../api/services";
+import { FilterParams, getUserReservations } from "../../api/services";
 import { useParams, useSearchParams } from "react-router-dom";
 import { Page } from "../../types/Page";
 import { UserDenyReservationModal } from "./UserDenyReservationModal/UserDenyReservationModal";
-import { ParseStatus } from "zod";
 
 const useStyles = createStyles((theme) => ({
 empty: {
