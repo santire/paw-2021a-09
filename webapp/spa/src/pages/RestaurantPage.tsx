@@ -11,6 +11,7 @@ import {
   Loader,
   Modal,
   NumberInput,
+  Select,
   Tabs,
   Text,
 } from "@mantine/core";
@@ -46,6 +47,7 @@ import { Rate } from "../types/Rate";
 import { MenuItems } from "../components/MenuItems/MenuItems";
 import { Reviews } from "../components/Reviews/Reviews";
 import {TAGS} from "../components/Filter/Filter";
+import { DateUtils } from "../utils/DateUtils";
 
 const useStyles = createStyles((theme) => ({
   title: {
@@ -326,6 +328,24 @@ export function RestaurantPage() {
     }
   };
 
+  const getTimeOptions = () => {
+    if (!date) return [];
+    return DateUtils.getTimeOptions(date);
+  };
+
+  const handleTimeChange = (value: string) => {
+    const [hours, minutes] = value.split(':');
+    const selectedTime = new Date();
+    selectedTime.setHours(Number(hours));
+    selectedTime.setMinutes(Number(minutes));
+    setTime(selectedTime);
+  };
+
+  const handleDateChange = (value: Date) => {
+    setDate(new Date(value));
+    const timeOptions = DateUtils.getTimeOptions(date);
+    setTime(DateUtils.addTimeToDate(date, timeOptions[0])); // Set the first option as the default time
+  };
 
   return (
     <>
@@ -352,30 +372,16 @@ export function RestaurantPage() {
           label={t("pages.userReservations.reservationDate")}
           withAsterisk
           value={date}
-          onChange={(value: Date) => setDate(new Date(value))}
+          onChange={handleDateChange}
         />
 
-        <TimeInput
+        <Select
           label="Pick time"
-          format="24"
-          defaultValue={new Date()}
-          onChange={(value: Date) => setTime(new Date(value))}
-        />
-        <TimeInput
-          label="Click icon to show browser picker"
-          ref={ref}
-          rightSection={
-            <ActionIcon onClick={() => {
-              ref.current?.showPicker()
-              console.log("TIME PICKER! " + ref.current ? ref.current?.showPicker() : "null pa");
-            }
-            }>
-              <IconClock size="1rem" stroke={1.5} />
-            </ActionIcon>
-          }
-          maw={400}
-          mx="auto"
-        />
+          value={time ? `${time.getHours()}:${time.getMinutes().toString().padStart(2, '0')}` : ''}
+          onChange={handleTimeChange}
+          data = {getTimeOptions()}
+          >
+        </Select>
 
         <Button
           color="orange"
