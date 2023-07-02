@@ -19,6 +19,7 @@ import { confirmReservation, FilterParams, getRestaurantReservations } from "../
 import { useParams, useSearchParams } from "react-router-dom";
 import { Page } from "../../types/Page";
 import { DenyReservationModal } from "./DenyReservationModal/DenyReservationModal";
+import { DateUtils } from "../../utils/DateUtils";
 
 
 const useStyles = createStyles((theme) => ({
@@ -139,10 +140,13 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
         setReservationsPage(page)
       };
       
-    const rows = sortedReservations.map((reservation) => (
-        <tr key={reservation.id}>
+    const rows = sortedReservations.map((reservation) => {
+        const date = new Date(reservation.date!);
+        const formattedDate = DateUtils.formatDate(date);
+
+        return <tr key={reservation.id}>
           <td>{reservation.quantity}</td>
-          <td>{reservation.date}</td>
+          <td>{formattedDate}</td>
           <td>{reservation.username}</td>
           {/* Conditional rendering of buttons */}
           {params.filterBy === "pending" ? (
@@ -173,7 +177,7 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
             </td>
           )}
         </tr>
-      ));
+  });
       
     const setSorting = (field: string) => {
       const reversed = field === sortBy ? !reverseSortDirection : false;

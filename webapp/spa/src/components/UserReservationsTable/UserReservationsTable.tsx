@@ -19,6 +19,7 @@ import { FilterParams, getUserReservations } from "../../api/services";
 import { useParams, useSearchParams } from "react-router-dom";
 import { Page } from "../../types/Page";
 import { UserDenyReservationModal } from "./UserDenyReservationModal/UserDenyReservationModal";
+import { DateUtils } from "../../utils/DateUtils";
 
 const useStyles = createStyles((theme) => ({
 empty: {
@@ -130,10 +131,13 @@ const handlePageChange = (page: number) => {
     setReservationsPage(page)
   };
   
-const rows = sortedReservations.map((reservation) => (
-    <tr key={reservation.id}>
+const rows = sortedReservations.map((reservation) => {
+    const date = new Date(reservation.date!);
+    const formattedDate = DateUtils.formatDate(date);
+
+    return <tr key={reservation.id}>
         <td>{reservation.quantity}</td>
-        <td>{reservation.date}</td>
+        <td>{formattedDate}</td>
         <td>{reservation.restaurant.name}</td>
         <td>
             <Text style={{ color: reservation.confirmed ? 'darkgreen' : 'darkred' }}>
@@ -147,7 +151,7 @@ const rows = sortedReservations.map((reservation) => (
             </td>
         )}
     </tr>
-  ));
+  });
   
 const setSorting = (field: string) => {
   const reversed = field === sortBy ? !reverseSortDirection : false;

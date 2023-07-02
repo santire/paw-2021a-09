@@ -2,15 +2,20 @@ package ar.edu.itba.paw.webapp.controller;
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.exceptions.*;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
+import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
 import ar.edu.itba.paw.service.*;
+import ar.edu.itba.paw.webapp.controller.mappers.AccessDeniedExceptionMapper;
+import ar.edu.itba.paw.webapp.controller.mappers.RestaurantNotFoundExceptionMapper;
 import ar.edu.itba.paw.webapp.dto.*;
 import ar.edu.itba.paw.webapp.forms.*;
 import ar.edu.itba.paw.webapp.utils.CachingUtils;
+import ar.edu.itba.paw.webapp.validators.*;
 
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -58,6 +63,8 @@ public class RestaurantController {
     private LikesService likesService;
     @Autowired
     private ReservationService reservationService;
+    @Context
+    private Validator validator;
 
     @Context
     private UriInfo uriInfo;
@@ -298,20 +305,12 @@ public class RestaurantController {
                              @FormDataParam("image") final FormDataBodyPart body,
                              @FormDataParam("image") final byte[] bytes,
                              @Context HttpServletRequest request) throws IOException {
-        // Check media type
+        ImageFileValidator imageFileValidator = new ImageFileValidator();
+        // Throws InvalidImageException if not valid
+        imageFileValidator.isValid(body, null); 
         String contentType = body.getMediaType().toString();
-        if (!(contentType.equalsIgnoreCase("image/png")
-                || contentType.equalsIgnoreCase("image/jpg")
-                || contentType.equalsIgnoreCase("image/jpeg"))) {
-            // throw new InvalidMediaTypeException
-        }
         LOGGER.debug("Image type: {}", contentType);
-        LOGGER.debug("Image size: {}", bytes.length);
-
-        // Check file size
-//        if(bytes.length > 200) {
-//            throw new FileTooLargeException;
-//        }
+        LOGGER.debug("Image size: {}", bytes.length / 1024);
         Image image = new Image(bytes);
         LOGGER.debug("Created image: {}", image);
         restaurantService.setImageByRestaurantId(image, restaurantId);

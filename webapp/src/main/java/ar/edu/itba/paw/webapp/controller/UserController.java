@@ -192,4 +192,18 @@ public class UserController {
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.min((page + 1), maxPages)).build(), "next")
                 .build();
     }
+
+        //READ USER LIKES
+        @GET
+        @Path("/{userId}/likes")
+        @Produces(value = {MediaType.APPLICATION_JSON})
+        @PreAuthorize("@authComponent.isUser(#userId)")
+        public Response getUserLikes(
+                @PathParam("userId") final Long userId, 
+                @Context HttpServletRequest request) {
+                    List<Long> likedRestaurants = likesService.getLikesByUserId(userId);
+            return Response.ok(new GenericEntity<List<Long>>(likedRestaurants) {
+                    })
+                    .build();
+        }
 }

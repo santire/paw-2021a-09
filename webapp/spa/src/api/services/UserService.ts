@@ -33,6 +33,12 @@ export async function getUserById(id: string) {
   return response.data;
 }
 
+export async function getUserLikes(id: string) {
+  const url = `${BASE_PATH}/${id}/likes`;
+  const response = await apiClient().get<string[]>(url);
+  return response.data;
+}
+
 export async function getUserRestaurants({
   userId,
   params = NO_FILTER,

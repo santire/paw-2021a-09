@@ -1,5 +1,9 @@
 package ar.edu.itba.paw.persistence;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -39,6 +43,22 @@ public class LikeJpaDao implements LikesDao {
 		query.setParameter(2, restaurantId);
 
 		return query.getResultList().stream().findFirst().isPresent();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Long> getLikesByUserId(long userId){
+		Query query = em.createNativeQuery("SELECT restaurant_id FROM likes WHERE user_id = ?1");
+		query.setParameter(1, userId);
+
+		List<BigInteger> resultList = query.getResultList();
+		List<Long> likes = new ArrayList<>();
+
+		for (BigInteger result : resultList) {
+			likes.add(result.longValue());
+		}
+
+		return likes;
 	}
 
 }

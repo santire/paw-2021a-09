@@ -18,6 +18,7 @@ import {
   IconBrandFacebook,
   IconBrandInstagram,
   IconBrandTwitter,
+  IconClock,
   IconHeart,
   IconMapPin,
   IconMenu,
@@ -25,7 +26,7 @@ import {
   IconPhone,
 } from "@tabler/icons";
 import { DatePicker, TimeInput } from "@mantine/dates";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Rating } from "@mantine/core";
 import { useQuery, useQueryClient } from "react-query";
@@ -91,6 +92,7 @@ export function RestaurantPage() {
   const queryClient = useQueryClient();
   const { restaurantId } = useParams();
   const { t } = useTranslation();
+  const ref = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { authed, user } = useAuth();
   const { t: en } = useTranslation();
@@ -324,6 +326,7 @@ export function RestaurantPage() {
     }
   };
 
+
   return (
     <>
       <Modal
@@ -354,9 +357,24 @@ export function RestaurantPage() {
 
         <TimeInput
           label="Pick time"
-          format="12"
+          format="24"
           defaultValue={new Date()}
           onChange={(value: Date) => setTime(new Date(value))}
+        />
+        <TimeInput
+          label="Click icon to show browser picker"
+          ref={ref}
+          rightSection={
+            <ActionIcon onClick={() => {
+              ref.current?.showPicker()
+              console.log("TIME PICKER! " + ref.current ? ref.current?.showPicker() : "null pa");
+            }
+            }>
+              <IconClock size="1rem" stroke={1.5} />
+            </ActionIcon>
+          }
+          maw={400}
+          mx="auto"
         />
 
         <Button
