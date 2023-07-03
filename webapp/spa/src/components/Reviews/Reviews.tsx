@@ -5,6 +5,7 @@ import {
   CloseButton,
   Container,
   createStyles,
+  Divider,
   Flex,
   Grid,
   Group,
@@ -164,6 +165,9 @@ export function Reviews({ restaurantId, isOwner }: ReviewProps) {
   }
 
   const Reviews = () => {
+    if (!data || data.data.length === 0) {
+      return <Text align="center" mt={30}>{t("pages.restaurant.reviews.noReviews")}</Text>;
+    }
     return (
       <Container mt="xl" w={"100%"}>
         {data?.data.map((i, index) => (
@@ -192,12 +196,12 @@ export function Reviews({ restaurantId, isOwner }: ReviewProps) {
       </Alert>
       {!isOwner && authed ? (
         <form onSubmit={handleSubmit((e) => mutate(e))}>
-          <Grid >
-            <Grid.Col span={7}>
+          <Grid justify={"center"}>
+            <Grid.Col span={12}>
               <Reviews />
             </Grid.Col>
-            <Grid.Col span={5}>
-              <Group position="center" my="md" pt={8}>
+            <Grid.Col span={8}>
+              <Group position="center" pt={40}>
                 <Textarea
                   label={t("pages.restaurant.reviews.title")}
                   mb={10}
@@ -221,14 +225,18 @@ export function Reviews({ restaurantId, isOwner }: ReviewProps) {
       ) : (
         <Reviews />
       )}
-      <Pagination
-        total={data?.meta.maxPages ?? 0}
-        siblings={3}
-        page={reviewPage}
-        onChange={setReviewPage}
-        align="center"
-        color="orange"
-      />
+      {
+        data && data.data.length > 0 ?
+          <Pagination
+            total={data?.meta.maxPages ?? 0}
+            mt={20}
+            siblings={3}
+            page={reviewPage}
+            onChange={setReviewPage}
+            align="center"
+            color="orange"
+          /> : null
+      }
     </Flex>
   );
 }

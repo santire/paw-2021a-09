@@ -155,7 +155,8 @@
       },
       "reviews": {
         "title": "Leave a review",
-        "submit": "Submit"
+        "submit": "Submit",
+        "noReviews": "This restaurant has no reviews yet..."
       }
     },
     "restaurants": {
