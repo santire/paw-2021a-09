@@ -16,7 +16,7 @@ export async function makeReservation(
 ) {
   const url = `restaurants/${restaurantId}/reservations`;
   const response = await apiClient().post<any>(url, reservationDto);
-  return response.status;
+  return response;
 }
 
 export async function confirmReservation(

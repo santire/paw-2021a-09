@@ -1,5 +1,6 @@
 import {
   ActionIcon,
+  Alert,
   Badge,
   Button,
   createStyles,
@@ -102,6 +103,19 @@ export function RestaurantPage() {
   const getOptionsArr = (keyword: string) => {
     return [en(keyword), es(keyword)];
   };
+  const [reservationError, setReservationError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (reservationError) {
+      timer = setTimeout(() => {
+        setReservationError(null);
+      }, 5000);
+    }
+
+    return () => clearTimeout(timer);
+  }, [reservationError]);
 
   const getTagValue = (values: string[]) => {
     const tagOptions: { [key: string]: string[] } = {};
@@ -241,13 +255,22 @@ export function RestaurantPage() {
         time: hours.slice(0, 5),
         quantity: quantity,
       };
-      makeReservation(restaurantId, form).then((status) => {
-        if (status === 201 || status === 204) {
+      makeReservation(restaurantId, form).then((response) => {
+        if (response.status === 201 || response.status === 204) {
           setReservationModal(false);
+        }
+      }).catch((error) => {
+        if (error.response && error.response.data && error.response.data.message) {
+          // Extract the error message from the response
+          setReservationError(error.response.data.errors[1]);
+        } else {
+          // Fallback to displaying the default error message
+          setReservationError("Error making reservation. Please try again.");
         }
       });
     }
   };
+  
 
   const LikeButton = () => {
     if (authed && !isOwner) {
@@ -346,6 +369,7 @@ export function RestaurantPage() {
     const timeOptions = DateUtils.getTimeOptions(date);
     setTime(DateUtils.addTimeToDate(date, timeOptions[0])); // Set the first option as the default time
   };
+  
 
   return (
     <>
@@ -380,8 +404,21 @@ export function RestaurantPage() {
           value={time ? `${time.getHours()}:${time.getMinutes().toString().padStart(2, '0')}` : ''}
           onChange={handleTimeChange}
           data = {getTimeOptions()}
+          mb={5}
           >
         </Select>
+
+        {reservationError && (
+          <Alert
+              color="red"
+              title="Error"
+              mt={5}
+              mb={3}
+              onClose={() => setReservationError(null)}
+            >
+              {reservationError}
+          </Alert>
+        )}
 
         <Button
           color="orange"
