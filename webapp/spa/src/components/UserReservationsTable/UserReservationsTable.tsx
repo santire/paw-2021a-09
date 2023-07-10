@@ -258,6 +258,7 @@ useEffect(() => {
             onClose={() => setDenyModalVisible(false)}
             restaurantId={selectedRestaurantId}
             reservationId={selectedReservationId}
+            refetch={refetch}
         />
         )}
     </Container>

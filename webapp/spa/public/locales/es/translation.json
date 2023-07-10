@@ -137,6 +137,8 @@
     },
     "restaurant": {
       "reservationButton": "Hacer una reserva",
+      "notifTitle": "Reserva pendiente",
+      "pendingReservation": "Su reserva fue enviada correctamente y espera confirmación del restaurante.",
       "menu": {
         "title": "Menu",
         "price": {

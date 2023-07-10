@@ -8,6 +8,7 @@ interface UserDenyReservationModalProps {
   onClose: () => void;
   restaurantId: string;
   reservationId: string;
+  refetch: () => void; // Add the refetch prop
 }
 
 export function UserDenyReservationModal({
@@ -15,12 +16,15 @@ export function UserDenyReservationModal({
   onClose,
   restaurantId,
   reservationId,
+  refetch
 }: UserDenyReservationModalProps) {
   const { t } = useTranslation();
 
   const onSubmit = async (restaurantId: string, reservationId: string) => {
     try {
-      await cancelReservation(restaurantId, reservationId);
+      await cancelReservation(restaurantId, reservationId).then(() => {
+        refetch();
+      });
       onClose();
     } catch (error) {
       // Handle error

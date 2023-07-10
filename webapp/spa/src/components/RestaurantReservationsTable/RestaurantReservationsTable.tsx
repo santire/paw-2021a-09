@@ -94,6 +94,7 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
         status,
         data,
         error,
+        refetch
       } = useQuery<Page<Reservation>, Error>(
         ["reservation", apiParams, reservationsPage],
         async () => getRestaurantReservations(restaurantId || "", apiParams),
@@ -130,8 +131,8 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
 
     async function confirmReservationHandler(restaurantId: string, reservationId: string){
         var res = await confirmReservation(restaurantId, reservationId);
-        if(res == 204   ){
-            setSortedReservations(sortedReservations.filter((reservation) => reservation.id !== reservationId));
+        if(res === 204){
+          refetch();  
         }
     }
 
@@ -288,6 +289,7 @@ export function RestaurantReservationsTable({ filterBy }: { filterBy: string }) 
                 restaurantId={selectedRestaurantId}
                 reservationId={selectedReservationId}
                 isCancellation={params.filterBy !== "pending"}
+                refetch={refetch}
             />
             )}
         </Container>

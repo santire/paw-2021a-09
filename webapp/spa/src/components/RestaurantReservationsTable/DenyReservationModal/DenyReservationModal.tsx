@@ -14,6 +14,7 @@ interface DenyReservationModalProps {
   restaurantId: string;
   reservationId: string;
   isCancellation: boolean;
+  refetch: () => void;
 }
 
 export function DenyReservationModal({
@@ -21,7 +22,8 @@ export function DenyReservationModal({
   onClose,
   restaurantId,
   reservationId,
-  isCancellation
+  isCancellation,
+  refetch
 }: DenyReservationModalProps) {
   const {
     handleSubmit,
@@ -35,7 +37,7 @@ export function DenyReservationModal({
   const onSubmit = async (data: DenyReservationForm, restaurantId: string, reservationId: string) => {
     try {
       await denyReservation(restaurantId, reservationId, data.message);
-      console.log("I have been called!");
+      refetch();
       onClose();
     } catch (error) {
       // Handle error

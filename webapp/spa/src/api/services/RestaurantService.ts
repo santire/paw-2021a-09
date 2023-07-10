@@ -29,7 +29,7 @@ export async function registerRestaurant(restaurant: RegisterRestaurantForm) {
   const url = `${BASE_PATH}`;
   const { image, ...data } = restaurant;
   const response = await apiClient().post<Restaurant>(url, data);
-  if ("location" in response.headers) {
+  if ("location" in response.headers && image) {
     const formData = new FormData();
     formData.append("image", image);
     const imageUrl = response.headers["location"] + "/image";

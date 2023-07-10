@@ -327,7 +327,6 @@ export function RestaurantForm({ restaurant, type }: RestaurantFormProps) {
                     setShowMessage(true);
                     console.log("rejected files", files);
                   }}
-                  // onChange={(e: any) => onChange(e.target.files[0])}
                   maxSize={3 * 1024 ** 2}
                   maxFiles={1}
                   multiple={false}
@@ -397,6 +396,11 @@ export function RestaurantForm({ restaurant, type }: RestaurantFormProps) {
             <Text size="xl" inline className={classes.tagsText}>
               {t("pages.registerRestaurant.tagsSelection")}
             </Text>
+            {errors.tags && (
+              <Text color="red" mt={5}>
+                {errors.tags.message}
+              </Text>
+            )}
             <Chip.Group
               position="center"
               multiple
@@ -409,7 +413,6 @@ export function RestaurantForm({ restaurant, type }: RestaurantFormProps) {
                 <Chip
                   key={tag}
                   value={tag}
-                  //onClick={() => handleChipClick(tag)}
                 >
                   {t("tags." + tag.toLowerCase())}
                 </Chip>

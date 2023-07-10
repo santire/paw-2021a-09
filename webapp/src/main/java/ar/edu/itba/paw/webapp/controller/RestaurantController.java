@@ -22,6 +22,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.StreamingHttpOutputMessage.Body;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -305,8 +306,8 @@ public class RestaurantController {
                              @FormDataParam("image") final FormDataBodyPart body,
                              @FormDataParam("image") final byte[] bytes,
                              @Context HttpServletRequest request) throws IOException {
-        ImageFileValidator imageFileValidator = new ImageFileValidator();
         // Throws InvalidImageException if not valid
+        ImageFileValidator imageFileValidator = new ImageFileValidator();
         imageFileValidator.isValid(body, null); 
         String contentType = body.getMediaType().toString();
         LOGGER.debug("Image type: {}", contentType);

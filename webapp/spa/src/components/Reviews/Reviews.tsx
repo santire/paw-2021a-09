@@ -16,7 +16,7 @@ import {
   Text,
   Textarea,
 } from "@mantine/core";
-import { IconAlertCircle, IconUser } from "@tabler/icons";
+import { IconAlertCircle, IconTrash, IconUser } from "@tabler/icons";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -51,10 +51,12 @@ const useStyles = createStyles((theme) => ({
 interface ReviewProps {
   restaurantId: string;
   isOwner?: boolean;
+  username?: string;
 }
 
 function ReviewItemComp({ item, props }: { item: Review; props: ReviewProps }) {
-  const { isOwner, restaurantId } = props;
+  const { isOwner, restaurantId, username } = props;
+  console.log("USERNAME BEGGINS =>" + username)
   const queryClient = useQueryClient();
   const { classes } = useStyles();
 
@@ -71,6 +73,7 @@ function ReviewItemComp({ item, props }: { item: Review; props: ReviewProps }) {
     }
   );
 
+  const isCurrentUserReview = item.username === username;
   return (
     <>
       <Paper
@@ -91,15 +94,17 @@ function ReviewItemComp({ item, props }: { item: Review; props: ReviewProps }) {
             </Text>
           </div>
 
-          {isOwner ? (
+          {isOwner || isCurrentUserReview ? (
             <Group position="center">
-              <CloseButton
-                aria-label="Close modal"
-                onClick={() => {
-                  mutate();
-                }}
-                disabled={isLoading}
-              />
+              {isCurrentUserReview && (
+                <CloseButton
+                  aria-label="Close modal"
+                  onClick={() => {
+                    mutate();
+                  }}
+                  disabled={isLoading}
+                />
+              )}
             </Group>
           ) : null}
         </Group>
@@ -115,7 +120,7 @@ const reviewSchema = z.object({
 
 export type ReviewForm = z.infer<typeof reviewSchema>;
 
-export function Reviews({ restaurantId, isOwner }: ReviewProps) {
+export function Reviews({ restaurantId, isOwner, username }: ReviewProps) {
   const [reviewPage, setReviewPage] = useState(1);
   const queryClient = useQueryClient();
 
@@ -174,7 +179,7 @@ export function Reviews({ restaurantId, isOwner }: ReviewProps) {
           <ReviewItemComp
             key={index}
             item={i}
-            props={{ restaurantId, isOwner }}
+            props={{ restaurantId, isOwner, username }}
           />
         ))}
       </Container>

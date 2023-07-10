@@ -15,19 +15,20 @@ import {
   Select,
   Tabs,
   Text,
+  Notification
 } from "@mantine/core";
 import {
   IconBrandFacebook,
   IconBrandInstagram,
   IconBrandTwitter,
-  IconClock,
+  IconCheck,
   IconHeart,
   IconMapPin,
   IconMenu,
   IconMessageCircle,
   IconPhone,
 } from "@tabler/icons";
-import { DatePicker, TimeInput } from "@mantine/dates";
+import { DatePicker } from "@mantine/dates";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Rating } from "@mantine/core";
@@ -104,6 +105,7 @@ export function RestaurantPage() {
     return [en(keyword), es(keyword)];
   };
   const [reservationError, setReservationError] = useState<string | null>(null);
+  const [showNotification, setShowNotification] = useState(false);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -179,6 +181,7 @@ export function RestaurantPage() {
 
   const arr = restaurantData.owner?.split("/").slice(-1);
   const isOwner = user?.userId?.toString() === arr![0];
+  console.log("USERNAME ===>  " + user?.username)
 
   const {
     image,
@@ -258,6 +261,10 @@ export function RestaurantPage() {
       makeReservation(restaurantId, form).then((response) => {
         if (response.status === 201 || response.status === 204) {
           setReservationModal(false);
+          setShowNotification(true); // Show the notification
+          setTimeout(() => {
+            setShowNotification(false); // Hide the notification after 3 seconds
+          }, 3000);
         }
       }).catch((error) => {
         if (error.response && error.response.data && error.response.data.message) {
@@ -491,6 +498,19 @@ export function RestaurantPage() {
           </Flex>
         </Grid.Col>
 
+        <Grid.Col span={4} offset={4}>
+          {showNotification && (
+            <Notification
+              icon={<IconCheck size="1.1rem" />}
+              color="teal"
+              title={t("pages.restaurant.notifTitle")}
+            >
+              {t("pages.restaurant.pendingReservation")}
+            </Notification>
+          )}
+        </Grid.Col>
+
+
         <Grid.Col span={12}>
           <Divider m="xl" orientation="horizontal" />
         </Grid.Col>
@@ -518,7 +538,7 @@ export function RestaurantPage() {
               </Tabs.Panel>
 
               <Tabs.Panel value="Reviews" pt="xs">
-                <Reviews restaurantId={restaurantId} isOwner={isOwner} />
+                <Reviews restaurantId={restaurantId} isOwner={isOwner} username={user?.username}/>
               </Tabs.Panel>
             </Tabs>
           </Flex>
