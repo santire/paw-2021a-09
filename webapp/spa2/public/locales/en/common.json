@@ -1,0 +1,372 @@
+{
+  "theme": {
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "header": {
+    "browse": "Browse",
+    "reservations": "My Reservations",
+    "restaurants": "My Restaurants",
+    "search": "Search",
+    "login": "Log In",
+    "register": "Register",
+    "userMenu": {
+      "restaurants": {
+        "title": "Restaurants",
+        "register": "Register your restaurant",
+        "restaurants": "Manage your restaurants",
+        "reservations": "Administer reservations"
+      },
+      "settings": {
+        "title": "Settings",
+        "account": "Profile",
+        "logout": "Logout"
+      }
+    }
+  },
+  "footer": {
+    "copyright": "All rights reserved",
+    "weAre": "We are",
+    "contactUs": "Contact us"
+  },
+  "restaurantCard": {
+    "more": "See more",
+    "liked": "{{likes}} people liked this",
+    "tagsTitle": "Perfect for you, if you enjoy"
+  },
+  "UserRestaurantCard": {
+    "more": "See more",
+    "viewReservations": "View reservations",
+    "edit": "Edit",
+    "delete": "Delete",
+    "liked": "{{likes}} people liked this",
+    "tagsTitle": "Perfect for you, if you enjoy",
+    "deleteModal": {
+      "title": "Are you sure you want to delete?",
+      "text": "This action cannot be undone and all your restaurant information will be lost.",
+      "confirm": "Confirm"
+    }
+  },
+  "error": {
+    "title": "You have found a secret place.",
+    "description": "Unfortunately, this is only a 404 page. You may have mistyped the address, or the page has been moved to another URL.",
+    "takeMeBack": "Take me back to the home page"
+  },
+  "errors": {
+    "invalidCredentials": "Email or password is incorrect"
+  },
+  "tags": {
+    "arabe": "Arab",
+    "americano": "American",
+    "argentino": "Argentinian",
+    "armenio": "Armenian",
+    "asiatico": "Asian",
+    "autoctono": "Local",
+    "bodegon": "Bodegon",
+    "chino": "Chinese",
+    "cocinacasera": "Homemade",
+    "contemporanea": "Contemporary",
+    "deautor": "Signature",
+    "defusion": "Fusion",
+    "español": "Spanish",
+    "frances": "French",
+    "indio": "Indian",
+    "internacional": "International",
+    "italiano": "Italian",
+    "japones": "Japanese",
+    "latino": "Latino",
+    "mediterraneo": "Mediterranean",
+    "mexicano": "Mexican",
+    "parrilla": "Grill",
+    "peruano": "Peruvian",
+    "pescadosymariscos": "Seafood",
+    "picadas": "Picadas",
+    "pizzeria": "Pizza",
+    "vegetariano": "Vegetarian"
+  },
+  "pages": {
+    "home": {
+      "highlights": "Highlights",
+      "heading": "Discover and book the best restaurants"
+    },
+    "reservations": {
+      "cancel": "Cancel reservation",
+      "accept": "Confirm reservation",
+      "deny": "Deny reservation",
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "title": "My Reservations"
+    },
+    "restaurant": {
+      "reservationButton": "Make a Reservation",
+      "menu": {
+        "title": "Menu",
+        "price": {
+          "label": "Price",
+          "placeholder": "$$$"
+        },
+        "name": {
+          "label": "Name",
+          "placeholder": "Name"
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Description"
+        },
+        "submit": "Submit",
+        "error": "Couldn't add menu item"
+      },
+      "reviews": {
+        "title": "Leave a review",
+        "submit": "Submit"
+      }
+    },
+    "restaurants": {
+      "title": "Browse restaurants",
+      "filter": {
+        "title": "Filters",
+        "min": {
+          "label": "Min average price",
+          "placeholder": "1"
+        },
+        "max": {
+          "label": "Max average price",
+          "placeholder": "10000"
+        },
+        "max": {
+          "label": "Max average price",
+          "placeholder": "10000"
+        },
+        "sort": {
+          "label": "Sort",
+          "placeholder": "Select sorting",
+          "name": "Name",
+          "hot": "Hot",
+          "price": "Price",
+          "likes": "Likes"
+        },
+        "order": {
+          "label": "Order",
+          "placeholder": "Select ordering",
+          "asc": "ascending",
+          "desc": "descending"
+        },
+        "tags": {
+          "label": "Categories",
+          "placeholder": "Select categories"
+        },
+        "submit": "Apply",
+        "clear": "Clear filters"
+      }
+    },
+    "userRestaurants": {
+      "title": "Your restaurants",
+      "notFound": "Looks like you do not own any restaurant",
+      "createOne": "Create your restaurant"
+    },
+    "userReservations": {
+      "title": "Your reservations",
+      "adminTitle": "Reservations made to your restaurant",
+      "notFound": "Looks like you do not have any reservations",
+      "createOne": "Make a reservation",
+      "partySize": "Choose the party size",
+      "guests": "Guests",
+      "pickDate": "Pick a Date",
+      "confirm": "Confirm",
+      "reservationDate": "Date"
+    },
+    "login": {
+      "alert": "Invalid username or password",
+      "confirmAlert": "User verified, please log in!",
+      "updatedAlert": "Password updated, please log in!",
+      "welcomeBack": "Welcome back!",
+      "createAccount": {
+        "title": "Do not have an account yet?",
+        "prompt": "Create account"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "you@gourmetable.com"
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "Your password",
+        "forgot": "Forgot password?"
+      },
+      "rememberMe": {
+        "label": "Remember me"
+      },
+      "signIn": "Sign In"
+    },
+    "forgot": {
+      "title": "Reset password",
+      "confirmation": {
+        "title": "Password reset requested",
+        "subtitle": "Follow the instructions sent to your email to update your password"
+      },
+      "account": {
+        "title": "Already have an account?",
+        "prompt": "Login here"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "you@gourmetable.com"
+      },
+      "submit": "Send email"
+    },
+    "reset": {
+      "title": "Set a new password",
+      "confirmation": {
+        "title": "Password reset requested",
+        "subtitle": "Follow the instructions sent to your email to update your password"
+      },
+      "account": {
+        "title": "Already have an account?",
+        "prompt": "Login here"
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "Your password"
+      },
+      "confirmPassword": {
+        "label": "Confirm password",
+        "placeholder": "Confirm Password"
+      },
+      "error": {
+        "title": "Oops!",
+        "subtitle": "Something went wrong, make sure you have the right link"
+      },
+      "submit": "Update password"
+    },
+    "register": {
+      "loginDivider": "Login Information",
+      "contactDivider": "Contact Information",
+      "title": "Welcome to Gourmetable!",
+      "subtitle": "Please register",
+      "confirmation": {
+        "title": "You're almost done!",
+        "subtitle": "Follow the instructions sent to your email to activate your account"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "you@gourmetable.com",
+        "taken": "The email is already taken"
+      },
+      "username": {
+        "label": "Username",
+        "placeholder": "johndoe123"
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "Your password"
+      },
+      "confirmPassword": {
+        "label": "Confirm password",
+        "placeholder": "Confirm Password"
+      },
+      "firstName": {
+        "label": "First name",
+        "placeholder": "John"
+      },
+      "lastName": {
+        "label": "Last name",
+        "placeholder": "Doe"
+      },
+      "phone": {
+        "label": "Phone number",
+        "placeholder": "1123456789"
+      },
+      "submit": "Register"
+    },
+    "registerRestaurant": {
+      "loginDivider": "Basic information",
+      "contactDivider": "Contact Information",
+      "socialMediaDivider": "Social Media",
+      "title": "Register a restaurant",
+      "tagsDivider": "Tags",
+      "profileImage": "Profile Image",
+      "dropImage": "Drop images here ir click to select files",
+      "tagsSelection": "At least 1 tag1 is required",
+      "name": {
+        "label": "Restaurant name",
+        "placeholder": "Your restaurant name"
+      },
+      "address": {
+        "label": "Address",
+        "placeholder": "Av. Siempreviva 123"
+      },
+      "phone": {
+        "label": "Phone number",
+        "placeholder": "1123456789"
+      },
+      "facebook": {
+        "label": "Facebook",
+        "placeholder": "facebook.com/yourSite"
+      },
+      "instagram": {
+        "label": "Instagram",
+        "placeholder": "instagram.com/yourSite"
+      },
+      "twitter": {
+        "label": "Twitter",
+        "placeholder": "twitter.com/yourSite"
+      }
+    },
+    "editRestaurant": {
+      "loginDivider": "General",
+      "contactDivider": "Contact Information",
+      "socialMediaDivider": "Social Media",
+      "title": "Edit restaurant",
+      "tagsDivider": "Categories",
+      "profileImage": "Profile Image",
+      "dropImage": "Change profile image",
+      "tagsSelection": "At least 1 tag is required",
+      "name": {
+        "label": "Restaurant name",
+        "placeholder": "My resturant",
+        "taken": "The restaurant name is already taken"
+      },
+      "address": {
+        "label": "Address",
+        "placeholder": "Av. Siempreviva 123"
+      },
+      "phone": {
+        "label": "Phone number",
+        "placeholder": "1123456789"
+      },
+      "facebook": {
+        "label": "Facebook",
+        "placeholder": "facebook.com/yourSite"
+      },
+      "instagram": {
+        "label": "Instagram",
+        "placeholder": "instagram.com/yourSite"
+      },
+      "twitter": {
+        "label": "Twitter",
+        "placeholder": "twitter.com/yourSite"
+      },
+      "submit": "Edit"
+    },
+    "profile": {
+      "profile": "Profile",
+      "username": {
+        "label": "Username",
+        "placeholder": "Your username"
+      },
+      "firstName": {
+        "label": "First name",
+        "placeholder": "Your name"
+      },
+      "lastName": {
+        "label": "Last name",
+        "placeholder": "Your last name"
+      },
+      "phoneNumber": {
+        "label": "Phone number",
+        "placeholder": "Your phone number"
+      },
+      "submit": "Submit"
+    }
+  }
+}
