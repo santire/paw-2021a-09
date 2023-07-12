@@ -83,6 +83,9 @@ export function RestaurantForm({ restaurant, type }: RestaurantFormProps) {
   const [selectedChips, setSelectedChips] = useState<string[]>([]);
   const [chips, setChips] = useState<string[]>([]);
   const [allTags, setAllTags] = useState<string[]>([]);
+  const [imageErrorMessage, setImageErrorMessage] = useState("");
+  const [showImageError, setShowImageError] = useState(true);
+
   const { user } = useAuth();
   const userId = user?.userId;
   const registerMutation = useMutation(registerRestaurant, {
@@ -116,14 +119,28 @@ export function RestaurantForm({ restaurant, type }: RestaurantFormProps) {
 
   const { isLoading } = type === "update" ? updateMutation : registerMutation;
 
-  const handleMutation = (val: RegisterRestaurantForm) => {
-    if (type === "update") {
-      return updateMutation.mutate({
-        restaurant: val,
-        id: restaurant?.id ?? "",
-      });
-    } else {
-      return registerMutation.mutate(val);
+  const handleMutation = async (val: RegisterRestaurantForm) => {
+    try {
+      if (type === "update") {
+        await updateMutation.mutateAsync({
+          restaurant: val,
+          id: restaurant?.id ?? "",
+        });
+      } else {
+        await registerMutation.mutateAsync(val);
+      }
+    } catch (error: any) {
+      if (error.response && error.response.status === 400) {
+        const { type, message, errors } = error.response.data;
+        if (type === "InvalidImageException") {
+          setImageErrorMessage(errors);
+          setShowImageError(true); // Show the error message
+        } else {
+          console.log(error);
+        }
+      } else {
+        console.log(error);
+      }
     }
   };
 
@@ -302,6 +319,7 @@ export function RestaurantForm({ restaurant, type }: RestaurantFormProps) {
                   onDrop={(files) => {
                     setFiles(files);
                     setShowMessage(false);
+                    setShowImageError(false);
                   }}
                   onReject={(files) => {
                     setFiles([]);
@@ -309,7 +327,6 @@ export function RestaurantForm({ restaurant, type }: RestaurantFormProps) {
                     setShowMessage(true);
                     console.log("rejected files", files);
                   }}
-                  // onChange={(e: any) => onChange(e.target.files[0])}
                   maxSize={3 * 1024 ** 2}
                   maxFiles={1}
                   multiple={false}
@@ -346,6 +363,11 @@ export function RestaurantForm({ restaurant, type }: RestaurantFormProps) {
                   )}
                   {previews}
                 </Dropzone>
+                {showImageError && imageErrorMessage && (
+                    <Text color="red" mt={5}>
+                      {imageErrorMessage}
+                    </Text>
+                  )}
               </Grid.Col>
               <Grid.Col span={3}>
                 {!showMessage && (
@@ -357,6 +379,7 @@ export function RestaurantForm({ restaurant, type }: RestaurantFormProps) {
                         setFiles([]);
                         setValue("image", null);
                         setShowMessage(true);
+                        setShowImageError(false); // Hide the error message
                       }}
                     >
                       <IconX size={20} stroke={2} />
@@ -373,6 +396,11 @@ export function RestaurantForm({ restaurant, type }: RestaurantFormProps) {
             <Text size="xl" inline className={classes.tagsText}>
               {t("pages.registerRestaurant.tagsSelection")}
             </Text>
+            {errors.tags && (
+              <Text color="red" mt={5}>
+                {errors.tags.message}
+              </Text>
+            )}
             <Chip.Group
               position="center"
               multiple
@@ -385,7 +413,6 @@ export function RestaurantForm({ restaurant, type }: RestaurantFormProps) {
                 <Chip
                   key={tag}
                   value={tag}
-                  //onClick={() => handleChipClick(tag)}
                 >
                   {t("tags." + tag.toLowerCase())}
                 </Chip>

@@ -15,12 +15,10 @@ import qs from "qs";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
-import { Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { FilterParams, getUserRestaurants } from "../api/services/UserService";
-//import { getRestaurants } from "../api/services";
 import { UserRestaurantCard } from "../components/UserRestaurantCard/UserRestaurantCard";
-import { useAuth } from "../context/AuthContext";
-import { PaginatedRestaurants, Restaurant } from "../types";
+import { Restaurant } from "../types";
 import { Page } from "../types/Page";
 
 const useStyles = createStyles((theme) => ({
@@ -117,7 +115,7 @@ export function UserRestaurantsPage() {
 
   return (
     <>
-      <Container size="xl" my="xl">
+      <Container size="xl" my="sm">
         {status === "loading" ? (
           <Flex justify="center" align="center" h={"100%"}>
             <Loader color="orange" />
@@ -145,8 +143,8 @@ export function UserRestaurantsPage() {
               </Flex>
             ) : (
 
-            <Flex direction="column" align="center">
-              <SimpleGrid cols={3} spacing="xl" mb="xl">
+            <Flex direction="column" align="center" mt="xl">
+              <SimpleGrid cols={5} spacing="xl" mb="xl" mt={50}>
                 {restaurants}
               </SimpleGrid>
               <Pagination

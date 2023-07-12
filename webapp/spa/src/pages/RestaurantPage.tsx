@@ -1,5 +1,6 @@
 import {
   ActionIcon,
+  Alert,
   Badge,
   Button,
   createStyles,
@@ -11,21 +12,24 @@ import {
   Loader,
   Modal,
   NumberInput,
+  Select,
   Tabs,
   Text,
+  Notification
 } from "@mantine/core";
 import {
   IconBrandFacebook,
   IconBrandInstagram,
   IconBrandTwitter,
+  IconCheck,
   IconHeart,
   IconMapPin,
   IconMenu,
   IconMessageCircle,
   IconPhone,
 } from "@tabler/icons";
-import { DatePicker, TimeInput } from "@mantine/dates";
-import { useEffect, useState } from "react";
+import { DatePicker } from "@mantine/dates";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Rating } from "@mantine/core";
 import { useQuery, useQueryClient } from "react-query";
@@ -44,6 +48,8 @@ import { Like } from "../types/Like";
 import { Rate } from "../types/Rate";
 import { MenuItems } from "../components/MenuItems/MenuItems";
 import { Reviews } from "../components/Reviews/Reviews";
+import {TAGS} from "../components/Filter/Filter";
+import { DateUtils } from "../utils/DateUtils";
 
 const useStyles = createStyles((theme) => ({
   title: {
@@ -90,8 +96,46 @@ export function RestaurantPage() {
   const queryClient = useQueryClient();
   const { restaurantId } = useParams();
   const { t } = useTranslation();
+  const ref = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { authed, user } = useAuth();
+  const { t: en } = useTranslation();
+  const { t: es } = useTranslation("es");
+  const getOptionsArr = (keyword: string) => {
+    return [en(keyword), es(keyword)];
+  };
+  const [reservationError, setReservationError] = useState<string | null>(null);
+  const [showNotification, setShowNotification] = useState(false);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (reservationError) {
+      timer = setTimeout(() => {
+        setReservationError(null);
+      }, 5000);
+    }
+
+    return () => clearTimeout(timer);
+  }, [reservationError]);
+
+  const getTagValue = (values: string[]) => {
+    const tagOptions: { [key: string]: string[] } = {};
+    for (let tag of TAGS) {
+      console.log("ag: " + es(`tags.${tag}`));
+      tagOptions[tag] = getOptionsArr(`tags.${tag}`);
+    }
+    const toReturn: string[] = [];
+    Object.entries(tagOptions).forEach(([_, val], index) => {
+      for (let tagVal of values) {
+        if (val.map((t) => t.toLowerCase()).includes(tagVal.toLowerCase())) {
+          toReturn.push("" + index);
+        }
+      }
+    });
+
+    return toReturn;
+  };
   const {
     status: restaurantStatus,
     data: restaurantData,
@@ -137,6 +181,7 @@ export function RestaurantPage() {
 
   const arr = restaurantData.owner?.split("/").slice(-1);
   const isOwner = user?.userId?.toString() === arr![0];
+  console.log("USERNAME ===>  " + user?.username)
 
   const {
     image,
@@ -194,7 +239,7 @@ export function RestaurantPage() {
   };
 
   const features = tags?.map((tag, idx) => (
-    <Badge color="orange" key={tag + "" + idx}>
+    <Badge component="a" onClick={() => navigate(`/restaurants?tags=${getTagValue([t("tags." + tag.toLowerCase()).toLowerCase()])}`)} color="orange" key={tag + "" + idx} style={{ cursor: 'pointer' }}>
       {t("tags." + tag.toLowerCase())}
     </Badge>
   ));
@@ -213,13 +258,26 @@ export function RestaurantPage() {
         time: hours.slice(0, 5),
         quantity: quantity,
       };
-      makeReservation(restaurantId, form).then((status) => {
-        if (status === 201 || status === 204) {
+      makeReservation(restaurantId, form).then((response) => {
+        if (response.status === 201 || response.status === 204) {
           setReservationModal(false);
+          setShowNotification(true); // Show the notification
+          setTimeout(() => {
+            setShowNotification(false); // Hide the notification after 3 seconds
+          }, 3000);
+        }
+      }).catch((error) => {
+        if (error.response && error.response.data && error.response.data.message) {
+          // Extract the error message from the response
+          setReservationError(error.response.data.errors[1]);
+        } else {
+          // Fallback to displaying the default error message
+          setReservationError("Error making reservation. Please try again.");
         }
       });
     }
   };
+  
 
   const LikeButton = () => {
     if (authed && !isOwner) {
@@ -278,10 +336,10 @@ export function RestaurantPage() {
       return (
         <Rating
           readOnly
-          defaultValue={rateData?.rating}
+          defaultValue={restaurantData.rating}
           onChange={(value) => {
             rateRestaurant(restaurantId, { rating: value }).then(() => {
-              queryClient.invalidateQueries("rate");
+              queryClient.invalidateQueries("rating");
             });
           }}
         />
@@ -292,13 +350,33 @@ export function RestaurantPage() {
           defaultValue={rateData?.rating}
           onChange={(value) => {
             rateRestaurant(restaurantId, { rating: value }).then(() => {
-              queryClient.invalidateQueries("rate");
+              queryClient.invalidateQueries("rating");
             });
           }}
         />
       );
     }
   };
+
+  const getTimeOptions = () => {
+    if (!date) return [];
+    return DateUtils.getTimeOptions(date);
+  };
+
+  const handleTimeChange = (value: string) => {
+    const [hours, minutes] = value.split(':');
+    const selectedTime = new Date();
+    selectedTime.setHours(Number(hours));
+    selectedTime.setMinutes(Number(minutes));
+    setTime(selectedTime);
+  };
+
+  const handleDateChange = (value: Date) => {
+    setDate(new Date(value));
+    const timeOptions = DateUtils.getTimeOptions(date);
+    setTime(DateUtils.addTimeToDate(date, timeOptions[0])); // Set the first option as the default time
+  };
+  
 
   return (
     <>
@@ -325,15 +403,29 @@ export function RestaurantPage() {
           label={t("pages.userReservations.reservationDate")}
           withAsterisk
           value={date}
-          onChange={(value: Date) => setDate(new Date(value))}
+          onChange={handleDateChange}
         />
 
-        <TimeInput
+        <Select
           label="Pick time"
-          format="12"
-          defaultValue={new Date()}
-          onChange={(value: Date) => setTime(new Date(value))}
-        />
+          value={time ? `${time.getHours()}:${time.getMinutes().toString().padStart(2, '0')}` : ''}
+          onChange={handleTimeChange}
+          data = {getTimeOptions()}
+          mb={5}
+          >
+        </Select>
+
+        {reservationError && (
+          <Alert
+              color="red"
+              title="Error"
+              mt={5}
+              mb={3}
+              onClose={() => setReservationError(null)}
+            >
+              {reservationError}
+          </Alert>
+        )}
 
         <Button
           color="orange"
@@ -406,6 +498,19 @@ export function RestaurantPage() {
           </Flex>
         </Grid.Col>
 
+        <Grid.Col span={4} offset={4}>
+          {showNotification && (
+            <Notification
+              icon={<IconCheck size="1.1rem" />}
+              color="teal"
+              title={t("pages.restaurant.notifTitle")}
+            >
+              {t("pages.restaurant.pendingReservation")}
+            </Notification>
+          )}
+        </Grid.Col>
+
+
         <Grid.Col span={12}>
           <Divider m="xl" orientation="horizontal" />
         </Grid.Col>
@@ -433,7 +538,7 @@ export function RestaurantPage() {
               </Tabs.Panel>
 
               <Tabs.Panel value="Reviews" pt="xs">
-                <Reviews restaurantId={restaurantId} isOwner={isOwner} />
+                <Reviews restaurantId={restaurantId} isOwner={isOwner} username={user?.username}/>
               </Tabs.Panel>
             </Tabs>
           </Flex>

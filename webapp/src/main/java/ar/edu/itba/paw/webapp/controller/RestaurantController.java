@@ -4,21 +4,27 @@ import ar.edu.itba.paw.model.Image;
 import ar.edu.itba.paw.model.MenuItem;
 import ar.edu.itba.paw.model.exceptions.*;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
+import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
 import ar.edu.itba.paw.service.*;
+import ar.edu.itba.paw.webapp.controller.mappers.AccessDeniedExceptionMapper;
+import ar.edu.itba.paw.webapp.controller.mappers.RestaurantNotFoundExceptionMapper;
 import ar.edu.itba.paw.webapp.dto.*;
 import ar.edu.itba.paw.webapp.forms.*;
 import ar.edu.itba.paw.webapp.utils.CachingUtils;
+import ar.edu.itba.paw.webapp.validators.*;
 
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.StreamingHttpOutputMessage.Body;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -63,6 +69,8 @@ public class RestaurantController {
     private LikesService likesService;
     @Autowired
     private ReservationService reservationService;
+    @Context
+    private Validator validator;
 
     @Context
     private UriInfo uriInfo;
@@ -303,20 +311,12 @@ public class RestaurantController {
                              @FormDataParam("image") final FormDataBodyPart body,
                              @FormDataParam("image") final byte[] bytes,
                              @Context HttpServletRequest request) throws IOException {
-        // Check media type
+        // Throws InvalidImageException if not valid
+        ImageFileValidator imageFileValidator = new ImageFileValidator();
+        imageFileValidator.isValid(body, null); 
         String contentType = body.getMediaType().toString();
-        if (!(contentType.equalsIgnoreCase("image/png")
-                || contentType.equalsIgnoreCase("image/jpg")
-                || contentType.equalsIgnoreCase("image/jpeg"))) {
-            // throw new InvalidMediaTypeException
-        }
         LOGGER.debug("Image type: {}", contentType);
-        LOGGER.debug("Image size: {}", bytes.length);
-
-        // Check file size
-//        if(bytes.length > 200) {
-//            throw new FileTooLargeException;
-//        }
+        LOGGER.debug("Image size: {}", bytes.length / 1024);
         Image image = new Image(bytes);
         LOGGER.debug("Created image: {}", image);
         restaurantService.setImageByRestaurantId(image, restaurantId);
@@ -432,8 +432,6 @@ public class RestaurantController {
                                                @QueryParam("filterBy") @DefaultValue("") String filterBy,
                                                @QueryParam("page") @DefaultValue("1") Integer page,
                                                @Context HttpServletRequest request) {
-
-
         int maxPages;
         List<ReservationDto> reservations;
         LOGGER.debug("Filtering reservations by: {}", filterBy);
@@ -443,7 +441,11 @@ public class RestaurantController {
         }else if(filterBy.equalsIgnoreCase("confirmed")){
             maxPages = reservationService.findConfirmedByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
             reservations = reservationService.findConfirmedByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
-        }else{
+        }else if(filterBy.equalsIgnoreCase("history")){
+            maxPages = reservationService.findHistoryByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
+            reservations = reservationService.findHistoryByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
+        }
+        else{
             maxPages = reservationService.findByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
             reservations = reservationService.findByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
         }

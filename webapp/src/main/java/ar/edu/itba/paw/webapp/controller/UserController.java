@@ -13,7 +13,6 @@ import ar.edu.itba.paw.webapp.dto.UserDto;
 import ar.edu.itba.paw.webapp.forms.PasswordResetForm;
 import ar.edu.itba.paw.webapp.forms.RegisterUserForm;
 import ar.edu.itba.paw.webapp.forms.UpdateUserForm;
-import ar.edu.itba.paw.webapp.forms.UserForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +41,8 @@ public class UserController {
     private RestaurantService restaurantService;
     @Autowired
     private ReservationService reservationService;
+    @Autowired
+    private LikesService likesService;
 
     @Context
     private UriInfo uriInfo;
@@ -141,14 +142,14 @@ public class UserController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isUser(#userId)")
     public Response getUserRestaurants(
-            @PathParam("userId") final Long userId, @QueryParam("page") @DefaultValue("1") Integer page,
+            @PathParam("userId") final Long userId, 
+            @QueryParam("page") @DefaultValue("1") Integer page,
             @Context HttpServletRequest request) {
         int maxPages = restaurantService.getRestaurantsFromOwnerPagesCount(AMOUNT_OF_RESTAURANTS, userId);
         List<RestaurantDto> restaurants = restaurantService.getRestaurantsFromOwner(page, AMOUNT_OF_RESTAURANTS, userId)
                 .stream()
                 .map(u -> RestaurantDto.fromRestaurant(u, uriInfo))
                 .collect(Collectors.toList());
-
         return Response.ok(new GenericEntity<List<RestaurantDto>>(restaurants) {
                 })
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
@@ -163,14 +164,26 @@ public class UserController {
     @Path("/{userId}/reservations")
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isUser(#userId)")
-    public Response getLikedRestaurants(
+    public Response getUserReservations(
             @PathParam("userId") final Long userId,
+            @QueryParam("filterBy") @DefaultValue("") String filterBy,
             @QueryParam("page") @DefaultValue("1") Integer page, @Context HttpServletRequest request) {
-        int maxPages = reservationService.findByUserPageCount(AMOUNT_OF_RESERVATIONS, userId);
-        List<ReservationDto> reservation = reservationService.findByUser(page, AMOUNT_OF_RESERVATIONS, userId)
-                .stream()
-                .map(u -> ReservationDto.fromReservation(u, uriInfo))
-                .collect(Collectors.toList());
+        List<ReservationDto> reservation;    
+        int maxPages;    
+        if(filterBy.equalsIgnoreCase("history")){
+            maxPages = reservationService.findByUserHistoryPageCount(AMOUNT_OF_RESERVATIONS, userId);
+            reservation = reservationService.findByUserHistory(page, AMOUNT_OF_RESERVATIONS, userId)
+            .stream()
+            .map(u -> ReservationDto.fromReservation(u, uriInfo))
+            .collect(Collectors.toList());
+        }
+        else {
+            maxPages = reservationService.findByUserPageCount(AMOUNT_OF_RESERVATIONS, userId);
+            reservation = reservationService.findByUser(page, AMOUNT_OF_RESERVATIONS, userId)
+                    .stream()
+                    .map(u -> ReservationDto.fromReservation(u, uriInfo))
+                    .collect(Collectors.toList());
+        }
         return Response.ok(new GenericEntity<List<ReservationDto>>(reservation) {
                 })
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
@@ -179,4 +192,18 @@ public class UserController {
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.min((page + 1), maxPages)).build(), "next")
                 .build();
     }
+
+        //READ USER LIKES
+        @GET
+        @Path("/{userId}/likes")
+        @Produces(value = {MediaType.APPLICATION_JSON})
+        @PreAuthorize("@authComponent.isUser(#userId)")
+        public Response getUserLikes(
+                @PathParam("userId") final Long userId, 
+                @Context HttpServletRequest request) {
+                    List<Long> likedRestaurants = likesService.getLikesByUserId(userId);
+            return Response.ok(new GenericEntity<List<Long>>(likedRestaurants) {
+                    })
+                    .build();
+        }
 }

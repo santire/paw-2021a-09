@@ -32,6 +32,7 @@
   "restaurantCard": {
     "more": "Ver más",
     "liked": "A {{likes}} personas les gusta esto",
+    "pending": "Tienes {{reservationsCount}} reservas pendientes",
     "tagsTitle": "Ideal para vos, si te gusta"
   },
   "UserRestaurantCard": {
@@ -92,10 +93,52 @@
       "deny": "Rechazar",
       "pending": "Pendiente",
       "confirmed": "Confirmado",
-      "title": "Mis Reservaciones"
+      "title": "Mis Reservaciones",
+      "notFound": "Parece que no tiene ninguna reserva"
+    },
+    "restaurantReservations": {
+      "title": "Administrar reservas",
+      "notFound": "Parece que este restaurante no tiene ninguna reserva todavia...",
+      "history":  "Ver historial de reservas",
+      "table": {
+        "customers": "Cantidad de comensales",
+        "date": "Fecha",
+        "user": "Cliente"
+      },
+      "tabs": {
+        "pending": {
+          "title": "Reservas pendientes"
+        },
+        "confirmed": {
+          "title": "Reservas confirmadas"
+        }
+      },
+      "confirmButton": "Confirmar",
+      "denyButton": "Rechazar",
+      "cancelButton": "Cancelar",
+      "denyModal": {
+        "denyTitle": "Rechazar reserva",
+        "cancelTitle": "Cancelar reserva",
+        "message": "Mensaje",
+        "placeholder": "Explica los motivos al usuario",
+        "denyButton": "Rechazar",
+        "goBackButton": "Volver",
+        "cancelButton": "Cancelar",
+        "form": {
+          "requiredError": "El campo mensaje es requerido",
+          "minLengthError": "El mensaje debe contener como mínimo 5 caracteres",
+          "maxLengthError": "El mensaje no puede exceder los 100 caracteres"
+        }
+      }
+    },
+    "restaurantHistoryReservations": {
+      "title": "Historial de reservas",
+      "current": "Volver a las reservas actuales"
     },
     "restaurant": {
       "reservationButton": "Hacer una reserva",
+      "notifTitle": "Reserva pendiente",
+      "pendingReservation": "Su reserva fue enviada correctamente y espera confirmación del restaurante.",
       "menu": {
         "title": "Menu",
         "price": {
@@ -115,7 +158,8 @@
       },
       "reviews": {
         "title": "Dejar una reseña",
-        "submit": "Agregar"
+        "submit": "Agregar",
+        "noReviews": "Este restaurante no tiene ninguna reseña..."
       }
     },
     "restaurants": {
@@ -150,7 +194,8 @@
         },
         "submit": "Aplicar",
         "clear": "Limpiar filtros"
-      }
+      },
+      "notFound": "No encontramos restaurantes para tu búsqueda."
     },
     "userRestaurants": {
       "title": "Tus restaurantes",
@@ -166,7 +211,19 @@
       "guests": "Invitados",
       "pickDate":"Elige una fecha",
       "confirm": "Confirmar",
-      "reservationDate": "Fecha"
+      "reservationDate": "Fecha",
+      "table": {
+        "customers": "Cantidad de comensales",
+        "date": "Fecha",
+        "restaurant": "Restaurante",
+        "state": "Estado"
+      },
+      "denyModal": {
+        "cancelTitle": "Cancelar reserva",
+        "goBackButton": "Volver",
+        "cancelButton": "Cancelar",
+        "text": "¿Seguro quiere cancelar su reserva?"
+      }
     },
     "login": {
       "alert": "Usuario o contraseña inválido",

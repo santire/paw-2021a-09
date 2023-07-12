@@ -149,6 +149,23 @@ public class ReservationServiceImpl implements ReservationService{
         return reservationDao.findPendingByRestaurantPageCount(amountOnPage, restaurantId, currentTime);
      }
 
+     @Override
+     @Transactional
+     public List<Reservation> findHistoryByRestaurant(int page, int amountOnPage, long restaurantId) {
+         LocalDateTime currentTime = LocalDateTime.now();
+         List<Reservation> reservations =  reservationDao.findHistoryByRestaurant(page, amountOnPage, restaurantId, currentTime);
+          return reservations;
+      }
+ 
+     @Override
+     @Transactional
+      public int findHistoryByRestaurantPageCount(int amountOnPage, long restaurantId) {
+         LocalDateTime currentTime = LocalDateTime.now();
+         return reservationDao.findHistoryByRestaurantPageCount(amountOnPage, restaurantId, currentTime);
+      }
+
+
+
 
 
     // UPDATE

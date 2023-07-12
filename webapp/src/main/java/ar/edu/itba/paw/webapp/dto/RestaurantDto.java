@@ -24,6 +24,7 @@ public class RestaurantDto {
     private String instagram;
     private String twitter;
     private List<String> tags;
+    private int reservationsCount;
 
     private URI image;
     private URI menu;
@@ -44,8 +45,7 @@ public class RestaurantDto {
         dto.twitter = restaurant.getTwitter();
         dto.likes = restaurant.getLikes();
         dto.tags = restaurant.getTags().stream().map(Enum::name).collect(Collectors.toList());
-        
-        
+        dto.reservationsCount = restaurant.getReservationsCount();
         dto.image = uriInfo.getBaseUriBuilder().path(PATH).path(String.valueOf(restaurant.getId())).path("image").build();
         dto.menu = uriInfo.getBaseUriBuilder().path(PATH).path(String.valueOf(restaurant.getId())).path("menu").build();
         dto.reviews = uriInfo.getBaseUriBuilder().path(PATH).path(String.valueOf(restaurant.getId())).path("reviews").build();
@@ -92,6 +92,10 @@ public class RestaurantDto {
 
     public List<String> getTags() {
         return tags;
+    }
+
+    public int getReservationsCount() {
+        return reservationsCount;
     }
 
     public URI getMenu() {
@@ -164,6 +168,10 @@ public class RestaurantDto {
 
     public void setOwner(URI owner) {
         this.owner = owner;
+    }
+
+    public void setReservationCount(int reservationsCount) {
+        this.reservationsCount = reservationsCount;
     }
 
 }

@@ -1,18 +1,14 @@
 import {
+  Button,
   Container,
   createStyles,
   Text,
-  Button,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { FilterParams } from "../api/services/UserService";
-import { UserReservationsTable } from "../components/UserReservationsTable/UserReservationsTable";
+import { RestaurantReservationsTable } from "../components/RestaurantReservationsTable/RestaurantReservationsTable";
 
 const useStyles = createStyles((theme) => ({
   heading: {
@@ -44,6 +40,10 @@ const useStyles = createStyles((theme) => ({
     fontSize: theme.fontSizes.xl * 1.8,
     paddingLeft: theme.spacing.sm,
   },
+  subtitle: {
+    fontSize: theme.fontSizes.md,
+    paddingLeft: theme.spacing.sm,
+  },
   empty: {
     align: "center",
     fontSize: 30,
@@ -55,16 +55,24 @@ const useStyles = createStyles((theme) => ({
   }
 }));
 
-export function UserReservationsPage() {
-  const { userId } = useParams();
+
+export function RestaurantHistoryReservationsPage() {
+  const { restaurantId } = useParams();
   const [params, setParams] = useState<FilterParams>({
     page: 1,
   });
   const [apiParams, setApiParams] = useState(params);
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+
   const { t } = useTranslation();
   const { classes } = useStyles();
-  const navigate = useNavigate();
+
+  const [activeTab, setActiveTab] = useState('pending');
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
   
   const parseSearchParams = () => {
     const auxParams: FilterParams = {};
@@ -79,6 +87,7 @@ export function UserReservationsPage() {
 
     return auxParams;
   };
+
 
   useEffect(() => {
     // first time loading use paremeters in url, otherwise set on change
@@ -95,7 +104,7 @@ export function UserReservationsPage() {
             className={classes.title}
             mb={"xl"}
             mt={"xl"}>
-            {t`pages.restaurantReservations.title`}
+            {t`pages.restaurantHistoryReservations.title`}
           </Text>
           <Button
               style={{
@@ -103,12 +112,12 @@ export function UserReservationsPage() {
                 textDecoration: 'underline',
                 cursor: 'pointer',
               }}
-              onClick={() => navigate(`/users/${userId}/reservations/history`)}
+              onClick={() => navigate(`/restaurants/${restaurantId}/reservations`)}
             >
-            {t`pages.restaurantReservations.history`}
-            </Button>
+            {t`pages.restaurantHistoryReservations.current`}
+          </Button>
           <div style={{ marginTop: "4rem", textAlign: "center" }}></div>
-          <UserReservationsTable filterBy="" />
+          <RestaurantReservationsTable filterBy="history" />
         </>
       </Container>
     </>

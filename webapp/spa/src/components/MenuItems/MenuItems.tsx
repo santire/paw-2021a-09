@@ -133,7 +133,7 @@ export function MenuItems({ restaurantId, isOwner }: MenuItemProps) {
 
   const Menu = () => {
     return (
-      <Table highlightOnHover>
+      <Table highlightOnHover mb={80}>
         <thead>
           <tr>
             <th>{t("pages.restaurant.menu.name.label")}</th>
@@ -212,6 +212,7 @@ export function MenuItems({ restaurantId, isOwner }: MenuItemProps) {
         ) : null}
         <Pagination
           total={data?.meta.maxPages ?? 0}
+          mt={40}
           siblings={3}
           page={menuPage}
           onChange={setMenuPage}

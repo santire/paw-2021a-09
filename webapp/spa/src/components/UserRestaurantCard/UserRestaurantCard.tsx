@@ -1,5 +1,4 @@
 import {
-  ActionIcon,
   Badge,
   Button,
   Card,
@@ -19,7 +18,6 @@ import { deleteRestaurantById, getRestaurantReservations, confirmReservation } f
 import { useAuth } from "../../context/AuthContext";
 import { Restaurant, Reservation } from "../../types";
 import useStyles from "./UserRestaurantCard.styles";
-import ReservationCards from "./ReservationCards"
 
 
 interface UserRestaurantCardProps {
@@ -28,13 +26,12 @@ interface UserRestaurantCardProps {
 }
 
 export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
-  const { id, image, name, rating, likes } = restaurant;
+  const { id, image, name, rating, likes, reservationsCount } = restaurant;
   const { classes, theme } = useStyles();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [opened, setOpened] = useState(false);
-  const [openReservationModal, setOpenReservationModal] = useState(false)
   const { user } = useAuth();
   const userId = user?.userId;
 
@@ -59,7 +56,7 @@ export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
   return (
     <Card withBorder p="lg" radius="md" className={classes.card}>
       <Card.Section mb="md">
-        <Image src={image} alt={name} height={180} />
+        <Image src={image} alt={name} height={120} />
       </Card.Section>
 
       <Card.Section mt="xs" className={classes.section}>
@@ -90,9 +87,9 @@ export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
 
       <Flex justify="center" align="center">
         <Button
-          color="orange"
+          color="cyan"
           variant="outline"
-          size="md"
+          size="sm"
           fullWidth
           onClick={() => navigate(`/restaurants/${id}`)}
         >
@@ -100,33 +97,23 @@ export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
         </Button>
       </Flex>
 
-      <Flex justify="center" align="center">
+      <Flex justify="center" align="center" mt="md">
         <Button
           color="orange"
           variant="outline"
-          size="md"
+          size="sm"
           fullWidth
-          onClick={() => setOpenReservationModal(true)}
+          onClick={() => navigate(`/restaurants/${id}/reservations`)}
         >
           {t("UserRestaurantCard.viewReservations")}
         </Button>
       </Flex>
 
-      {/** Modal de reserva */}
-      <Modal
-        centered
-        opened={openReservationModal}
-        onClose={() => setOpenReservationModal(false)}
-        title="Reservas"
-      >
-        <ReservationCards id={id} closeModal={() => setOpenReservationModal(false)} />
-      </Modal>
-
       <Flex justify="center" align="center" mt="md">
         <Button
           color="gray"
           variant="outline"
-          size="md"
+          size="sm"
           fullWidth
           onClick={() => navigate(`/restaurants/${id}/edit`)}
         >
@@ -138,7 +125,7 @@ export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
         <Button
           color="red"
           variant="outline"
-          size="md"
+          size="sm"
           fullWidth
           onClick={() => setOpened(true)}
         >
@@ -158,7 +145,7 @@ export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
         <Button
           color="red"
           variant="outline"
-          size="md"
+          size="sm"
           fullWidth
           onClick={() => mutate(id!)}
           disabled={isLoading}
@@ -171,6 +158,9 @@ export function UserRestaurantCard({ restaurant }: UserRestaurantCardProps) {
         <Group position="apart">
           <Text size="xs" color="dimmed">
             {t("restaurantCard.liked", { likes: likes })}
+          </Text>
+          <Text size="xs" color="yellow">
+            {t("restaurantCard.pending", { reservationsCount: reservationsCount })}
           </Text>
         </Group>
       </Card.Section>

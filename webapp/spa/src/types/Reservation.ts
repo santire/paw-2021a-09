@@ -7,5 +7,5 @@ export interface Reservation{
   id?: string;
   date?: string;
   confirmed?: boolean;
-  user?: User
+  username?: string
 }

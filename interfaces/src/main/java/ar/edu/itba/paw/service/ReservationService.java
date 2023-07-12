@@ -29,6 +29,9 @@ public interface ReservationService {
     public List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId);
     public int findPendingByRestaurantPageCount(int amountOnPage, long restaurantId);
 
+    public List<Reservation> findHistoryByRestaurant(int page, int amountOnPage, long restaurantId);
+    public int findHistoryByRestaurantPageCount(int amountOnPage, long restaurantId);
+
     // UPDATE
     public boolean confirmReservation(long reservationId);
 

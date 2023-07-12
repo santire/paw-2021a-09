@@ -38,6 +38,7 @@ public class User {
   @OneToMany(orphanRemoval = true, mappedBy = "owner", fetch = FetchType.LAZY)
   private List<Restaurant> ownedRestaurants;
 
+
   User() {
     // Just for hibernate
   }

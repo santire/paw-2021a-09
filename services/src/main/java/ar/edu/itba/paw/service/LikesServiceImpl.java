@@ -8,6 +8,8 @@ import ar.edu.itba.paw.persistence.LikesDao;
 import ar.edu.itba.paw.persistence.RestaurantDao;
 import ar.edu.itba.paw.persistence.UserDao;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,5 +46,11 @@ public class LikesServiceImpl implements LikesService {
     @Transactional
     public boolean userLikesRestaurant(long userId, long restaurantId){
     return likesDao.userLikesRestaurant(userId, restaurantId);
+    }
+
+    @Override
+    @Transactional
+    public List<Long> getLikesByUserId(long userId){
+        return likesDao.getLikesByUserId(userId);
     }
 }

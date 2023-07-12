@@ -141,12 +141,12 @@ export function Header() {
         >
           {t("header.userMenu.restaurants.restaurants")}
         </Menu.Item>
-        <Menu.Item
+        {/* <Menu.Item
           icon={<IconMessagePlus size={14} stroke={1.5} />}
           onClick={() => navigate(`/users/${user?.userId}/reservations`)}
         >
           {t("header.userMenu.restaurants.reservations")}
-        </Menu.Item>
+        </Menu.Item> */}
         <Menu.Divider />
         <Menu.Label>{t("header.userMenu.settings.title")}</Menu.Label>
         <Menu.Item

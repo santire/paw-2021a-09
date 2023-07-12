@@ -9,31 +9,70 @@ import {
   Image,
   Text,
 } from "@mantine/core";
-import { IconHeart, IconShare, IconStar } from "@tabler/icons";
+import { IconShare, IconStar } from "@tabler/icons";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Restaurant } from "../../types";
 import useStyles from "./RestaurantCard.styles";
+import {TAGS} from "../Filter/Filter";
+import LikeButton from "../Likes/LikeButton";
+import { useState } from "react";
 
 interface RestaurantCardProps {
   restaurant: Restaurant;
   likedByUser?: boolean;
+  authed?: boolean;
+  isOwner?: boolean;
 }
 
 export function RestaurantCard({
   restaurant,
   likedByUser,
+  authed,
+  isOwner,
 }: RestaurantCardProps) {
-  const { id, image, tags, name, rating, likes } = restaurant;
+  const { id, image, tags, name, rating } = restaurant;
   const { classes, theme } = useStyles();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { t: en } = useTranslation();
+  const { t: es } = useTranslation("es");
+  const getOptionsArr = (keyword: string) => {
+    return [en(keyword), es(keyword)];
+  };
+
+  const getTagValue = (values: string[]) => {
+    const tagOptions: { [key: string]: string[] } = {};
+    for (let tag of TAGS) {
+      console.log("ag: " + es(`tags.${tag}`));
+      tagOptions[tag] = getOptionsArr(`tags.${tag}`);
+    }
+    const toReturn: string[] = [];
+    Object.entries(tagOptions).forEach(([_, val], index) => {
+      for (let tagVal of values) {
+        if (val.map((t) => t.toLowerCase()).includes(tagVal.toLowerCase())) {
+          toReturn.push("" + index);
+        }
+      }
+    });
+
+    return toReturn;
+  };
 
   const features = tags?.map((tag, idx) => (
-    <Badge color="orange" key={tag + "" + idx}>
-      {t("tags." + tag.toLowerCase())}
-    </Badge>
-  ));
+        <Badge component="a" onClick={() => navigate(`/restaurants?tags=${getTagValue([t("tags." + tag.toLowerCase()).toLowerCase()])}`)} color="orange" key={tag + "" + idx} style={{ cursor: 'pointer' }}>
+        {t("tags." + tag.toLowerCase())}
+        </Badge>
+));
+
+const [likes, setLikes] = useState<number>(restaurant.likes ?? 0);
+const updateLikes = (liked: boolean) => {
+  if (liked) {
+    setLikes((prevLikes) => prevLikes + 1); // Increment likes by 1 if liked is true
+  } else {
+    setLikes((prevLikes) => prevLikes - 1); // Decrement likes by 1 if liked is false
+  }
+};
 
   return (
     <Card withBorder p="lg" radius="md" className={classes.card}>
@@ -100,15 +139,18 @@ export function RestaurantCard({
             {t("restaurantCard.liked", { likes: likes })}
           </Text>
           <Group spacing={0}>
-            <ActionIcon>
-              <IconHeart size={18} color={theme.colors.red[6]} stroke={1.5} />
-            </ActionIcon>
-            <ActionIcon>
-              <IconShare size={18} color={theme.colors.blue[6]} stroke={1.5} />
-            </ActionIcon>
+            <LikeButton 
+              restaurantId={restaurant.id!} 
+              authed={authed} 
+              isOwner={isOwner} 
+              userLikesRestaurant={likedByUser!}
+              updateLikes={updateLikes} // Pass the updateLikes function as a prop
+              likes={likes} // Pass the likes state as a prop
+              />
           </Group>
         </Group>
       </Card.Section>
     </Card>
   );
 }
+

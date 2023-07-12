@@ -32,6 +32,7 @@
   "restaurantCard": {
     "more": "See more",
     "liked": "{{likes}} people liked this",
+    "pending": "You have {{reservationsCount}} pending reservations",
     "tagsTitle": "Perfect for you, if you enjoy"
   },
   "UserRestaurantCard": {
@@ -94,8 +95,49 @@
       "confirmed": "Confirmed",
       "title": "My Reservations"
     },
+    "restaurantReservations": {
+      "title": "Manage restaurants reservations",
+      "notFound": "Looks like this restaurant does not have any reservations yet...",
+      "history":  "Go to reservation history",
+      "table": {
+        "customers": "Customers quantity",
+        "date": "Date",
+        "user": "Client"
+      },
+      "tabs": {
+        "pending": {
+          "title": "Pending reservations"
+        },
+        "confirmed": {
+          "title": "Confirmed reservations"
+        }
+      },
+      "confirmButton": "Confirm",
+      "denyButton": "Deny",
+      "cancelButton": "Cancel",
+      "denyModal": {
+        "denyTitle": "Reject reservation",
+        "cancelTitle": "Cancel reservation",
+        "message": "Message",
+        "placeholder": "Explain the reason to your clients",
+        "denyButton": "Reject",
+        "goBackButton": "Go back",
+        "cancelButton": "Cancel",
+        "form": {
+          "requiredError": "Message is required",
+          "minLengthError": "Message must be at least 5 characters long",
+          "maxLengthError": "Message cannot exceed 100 characters"
+        }
+      }
+    },
+    "restaurantHistoryReservations": {
+      "title": "Reservations history",
+      "current": "Go back to current reservations"
+    },
     "restaurant": {
       "reservationButton": "Make a Reservation",
+      "notifTitle": "Pending reservation",
+      "pendingReservation": "Your reservation has been sent successfully and is waiting until restaurant's confirmation",
       "menu": {
         "title": "Menu",
         "price": {
@@ -115,7 +157,8 @@
       },
       "reviews": {
         "title": "Leave a review",
-        "submit": "Submit"
+        "submit": "Submit",
+        "noReviews": "This restaurant has no reviews yet..."
       }
     },
     "restaurants": {
@@ -154,7 +197,8 @@
         },
         "submit": "Apply",
         "clear": "Clear filters"
-      }
+      },
+      "notFound": "No results found for your search."
     },
     "userRestaurants": {
       "title": "Your restaurants",
@@ -170,7 +214,19 @@
       "guests": "Guests",
       "pickDate": "Pick a Date",
       "confirm": "Confirm",
-      "reservationDate": "Date"
+      "reservationDate": "Date",
+      "table": {
+        "customers": "Customers quantity",
+        "date": "Date",
+        "restaurant": "Restaurant",
+        "state": "State"
+      },
+      "denyModal": {
+        "cancelTitle": "Cancel reservation",
+        "goBackButton": "Go back",
+        "cancelButton": "Cancel",
+        "text": "Are you sure you want to cancel your reservation?"
+      }
     },
     "login": {
       "alert": "Invalid username or password",

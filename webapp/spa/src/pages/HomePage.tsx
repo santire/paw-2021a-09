@@ -11,9 +11,12 @@ import {
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { getRestaurants } from "../api/services";
+import { getUserLikes } from "../api/services/UserService";
 import { RestaurantCard } from "../components/RestaurantCard/RestaurantCard";
+import { useAuth } from "../context/AuthContext";
 import { PaginatedRestaurants, Restaurant } from "../types";
 import { Page } from "../types/Page";
+import { RestaurantUtils } from "../utils/RestaurantUtils";
 
 const useStyles = createStyles((theme) => ({
   heading: {
@@ -53,16 +56,41 @@ export function HomePage() {
     async () => getRestaurants()
   );
   const { t } = useTranslation();
+  const { authed, user } = useAuth();
   const { classes } = useStyles();
+  const { status: likedStatus, data: likedData } = useQuery<string[], Error>(
+    "likedRestaurants",
+    async () => {
+      const response = await getUserLikes(user?.userId!)
+      return response;
+    },
+    { enabled: authed && user?.userId != null }
+  );
+  const likedRestaurants = likedData || [];
+
 
   if (status === "error") {
     return <div>{error!.message}</div>;
   }
 
-  const restaurants =
-    data?.data?.map((rest) => (
-      <RestaurantCard restaurant={rest} key={rest.name} />
-    )) || [];
+  if (likedStatus === "loading") {
+    return <div>Loading liked restaurants...</div>;
+  }
+
+  const restaurants = data?.data?.map((rest) => (
+    <RestaurantCard
+      restaurant={rest}
+      isOwner={
+        rest.owner && user?.userId
+          ? RestaurantUtils.userIsOwner(rest.owner, user.userId)
+          : false
+      }
+      likedByUser={likedRestaurants.includes(rest.id!)}
+      authed={authed}
+      key={rest.name}
+    />
+  )) || [];
+  
 
   if (data?.data?.length && data?.data?.length > 0 && data?.data?.length < 5) {
     // duplicate data to fix carousel

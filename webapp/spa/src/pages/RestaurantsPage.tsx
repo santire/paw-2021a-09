@@ -6,7 +6,7 @@ import {
   Loader,
   Pagination,
   SimpleGrid,
-  Text,
+  Text, Title,
 } from "@mantine/core";
 import qs from "qs";
 import { useEffect, useState } from "react";
@@ -35,6 +35,43 @@ export function RestaurantsPage() {
 
   const { classes } = useStyles();
   const { t } = useTranslation();
+
+  const RestaurantsList = () => {
+    if(restaurantCards.length >0)
+      return(
+          <Flex direction="column" align="center">
+            <SimpleGrid cols={3} spacing="xl" mb="xl">
+              {restaurantCards}
+            </SimpleGrid>
+            <Pagination
+                total={data?.meta.maxPages ?? 0}
+                siblings={3}
+                initialPage={params.page ?? 1}
+                page={params.page}
+                onChange={(e) => {
+                  setParams((prev) => ({ ...prev, page: e }));
+                  setApiParams((prev) => ({ ...prev, page: e }));
+                  setSearchParams(
+                      qs.stringify(
+                          { ...params, page: e },
+                          { arrayFormat: "repeat" }
+                      )
+                  );
+                }}
+                align="center"
+                color="orange"
+            />
+          </Flex>
+      );
+    else
+      return(
+          <Flex direction="column" align="center">
+            <Title className={classes.title}>{t("pages.restaurants.notFound")}</Title>
+          </Flex>
+      );
+  };
+
+
 
   const parseSearchParams = () => {
     const auxParams: FilterParams = {};
@@ -110,6 +147,7 @@ export function RestaurantsPage() {
       <RestaurantCard restaurant={rest} key={rest.name} />
     )) || [];
 
+
   return (
     <Container my="xl" size={1920}>
       <Text
@@ -131,29 +169,7 @@ export function RestaurantsPage() {
               <Loader color="orange" />
             </Flex>
           ) : (
-            <Flex direction="column" align="center">
-              <SimpleGrid cols={3} spacing="xl" mb="xl">
-                {restaurantCards}
-              </SimpleGrid>
-              <Pagination
-                total={data?.meta.maxPages ?? 0}
-                siblings={3}
-                initialPage={params.page ?? 1}
-                page={params.page}
-                onChange={(e) => {
-                  setParams((prev) => ({ ...prev, page: e }));
-                  setApiParams((prev) => ({ ...prev, page: e }));
-                  setSearchParams(
-                    qs.stringify(
-                      { ...params, page: e },
-                      { arrayFormat: "repeat" }
-                    )
-                  );
-                }}
-                align="center"
-                color="orange"
-              />
-            </Flex>
+              <RestaurantsList />
           )}
         </Grid.Col>
       </Grid>
