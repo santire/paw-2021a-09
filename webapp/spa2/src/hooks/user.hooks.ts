@@ -45,3 +45,76 @@ export function useLoginUser(options?: QueryOptions) {
     },
   });
 }
+
+export function useActivateUser(options?: QueryOptions) {
+  return useMutation({
+    mutationFn: AuthService.activate,
+    onSuccess: () => {
+      if (options?.onSuccess) {
+        options.onSuccess();
+      }
+    },
+    onError: ({ cause }) => {
+      if (isServerError(cause) && options?.onError) {
+        options.onError(cause);
+      } else {
+        console.log("An error here shouldn't be happening");
+      }
+    },
+  });
+}
+
+export function useRequestPasswordReset(options?: QueryOptions) {
+  return useMutation({
+    mutationFn: AuthService.requestPasswordReset,
+    onSuccess: () => {
+      if (options?.onSuccess) {
+        options.onSuccess();
+      }
+    },
+    onError: ({ cause }) => {
+      if (isServerError(cause) && options?.onError) {
+        options.onError(cause);
+      } else {
+        console.log("An error here shouldn't be happening");
+      }
+    },
+  });
+}
+
+
+export function usePasswordReset(options?: QueryOptions) {
+  return useMutation({
+    mutationFn: AuthService.resetPassword,
+    onSuccess: () => {
+      if (options?.onSuccess) {
+        options.onSuccess();
+      }
+    },
+    onError: ({ cause }) => {
+      if (isServerError(cause) && options?.onError) {
+        options.onError(cause);
+      } else {
+        console.log("An error here shouldn't be happening");
+      }
+    },
+  });
+}
+
+export function useCreateUser(options?: QueryOptions) {
+  return useMutation({
+    mutationFn: UserService.create,
+    onSuccess: () => {
+      if (options?.onSuccess) {
+        options.onSuccess();
+      }
+    },
+    onError: ({ cause }) => {
+      if (isServerError(cause) && options?.onError) {
+        options.onError(cause);
+      } else {
+        console.log("An error here shouldn't be happening");
+      }
+    },
+  });
+}

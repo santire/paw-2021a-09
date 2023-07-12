@@ -50,10 +50,15 @@
   "error": {
     "title": "You have found a secret place.",
     "description": "Unfortunately, this is only a 404 page. You may have mistyped the address, or the page has been moved to another URL.",
-    "takeMeBack": "Take me back to the home page"
+    "takeMeBack": "Take me back to the home page",
+    "takeMeBackForgot": "Take me back to the forgot page"
   },
   "errors": {
-    "invalidCredentials": "Email or password is incorrect"
+    "invalidCredentials": "Email or password is incorrect",
+    "repeatPassword": "The passwords do not match",
+    "tokenExpired": "The token has expired, please register again.",
+    "tokenDoesNotExist": "Something's wrong with the link, please try again.",
+    "userNotFound": "This email is not associated to a valid user"
   },
   "tags": {
     "arabe": "Arab",
@@ -254,7 +259,8 @@
       },
       "username": {
         "label": "Username",
-        "placeholder": "johndoe123"
+        "placeholder": "johndoe123",
+        "taken": "The username is already taken"
       },
       "password": {
         "label": "Password",

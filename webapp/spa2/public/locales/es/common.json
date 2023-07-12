@@ -50,10 +50,15 @@
   "error": {
     "title": "Encontraste un lugar secreto",
     "description": "Lamentablemente esto es solo una página de 404. Es posible que hayas escrito mal la dirección o que la página se haya movido",
-    "takeMeBack": "Volver al inicio"
+    "takeMeBack": "Volver al inicio",
+    "takeMeBackForgot": "Volver a reiniciar contraseña"
   },
   "errors": {
-    "invalidCredentials": "Email o contraseña inválido"
+    "invalidCredentials": "Email o contraseña inválido",
+    "repeatPassword": "Las contraseñas deben ser iguales",
+    "tokenExpired": "El token ha expirado, por favor regístrese devuelta.",
+    "tokenDoesNotExist": "Hubo un problema con el link, por favor intente nuevamente.",
+    "userNotFound": "Este email no está asociado a un usuario válido"
   },
   "tags": {
     "arabe": "Árabe",
@@ -250,7 +255,8 @@
       },
       "username": {
         "label": "Usuario",
-        "placeholder": "johndoe123"
+        "placeholder": "johndoe123",
+        "taken": "El usuario ya fue registrado"
       },
       "password": {
         "label": "Contraseña",

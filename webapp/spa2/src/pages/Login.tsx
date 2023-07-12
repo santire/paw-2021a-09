@@ -11,7 +11,7 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
-import { IconAlertCircle, IconCheck } from "@tabler/icons-react";
+import { IconCheck } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -28,7 +28,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const [showAlert, setShowAlert] = useState("");
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const {
     register,
     handleSubmit,
@@ -90,7 +90,10 @@ export function LoginPage() {
         color="green"
         withCloseButton
         hidden={showAlert !== "confirmed" && showAlert !== "updated"}
-        onClose={() => setShowAlert("")}
+        onClose={() => {
+          setShowAlert("");
+          setSearchParams("");
+        }}
       >
         {showAlert === "confirmed"
           ? t("pages.login.confirmAlert")

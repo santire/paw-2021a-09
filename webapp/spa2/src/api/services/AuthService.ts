@@ -6,7 +6,11 @@ interface IAuthService {
   login(data: IUserLogin): Promise<{ token: string; userId: number }>;
   activate(token: string): Promise<void>;
   requestPasswordReset(email: string): Promise<void>;
-  resetPassword(token: string, password: string): Promise<void>;
+  resetPassword(params: {
+    token: string;
+    password: string;
+    repeatPassword: string;
+  }): Promise<void>;
 }
 
 module AuthServiceImp {
@@ -14,6 +18,9 @@ module AuthServiceImp {
     try {
       const response = await apiClient.put(PATH, null, {
         params: { type: "activation", token },
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
       if (response.status == 204) {
@@ -28,7 +35,16 @@ module AuthServiceImp {
         });
       }
     } catch (error) {
-      throw new Error("Unexpected error", { cause: apiErrorHandler(error) });
+      throw new Error("Unexpected error", {
+        cause: apiErrorHandler(error, {
+          TokenExpiredException: {
+            code: "token_expired",
+          },
+          TokenDoesNotExistException: {
+            code: "token_does_not_exist",
+          },
+        }),
+      });
     }
   }
 
@@ -36,9 +52,12 @@ module AuthServiceImp {
     try {
       const response = await apiClient.post(PATH, null, {
         params: { email },
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
-      if (response.status == 204) {
+      if (response.status == 202) {
         return response.data;
       } else {
         // Only successful case should be 204, there shouldn't be any other 2XX
@@ -50,18 +69,29 @@ module AuthServiceImp {
         });
       }
     } catch (error) {
-      throw new Error("Unexpected error", { cause: apiErrorHandler(error) });
+      throw new Error("Unexpected error", {
+        cause: apiErrorHandler(error, {
+          UserNotFoundException: {
+            code: "not_found",
+          },
+        }),
+      });
     }
   }
 
-  export async function resetPassword(
-    token: string,
-    password: string
-  ): Promise<void> {
+  export async function resetPassword({
+    token,
+    password,
+    repeatPassword,
+  }: {
+    token: string;
+    password: string;
+    repeatPassword: string;
+  }): Promise<void> {
     try {
       const response = await apiClient.put(
         PATH,
-        { password, repeatPassword: password },
+        { password, repeatPassword },
         {
           params: {
             type: "reset",
@@ -81,7 +111,16 @@ module AuthServiceImp {
         });
       }
     } catch (error) {
-      throw new Error("Unexpected error", { cause: apiErrorHandler(error) });
+      throw new Error("Unexpected error", {
+        cause: apiErrorHandler(error, {
+          TokenExpiredException: {
+            code: "token_expired",
+          },
+          TokenDoesNotExistException: {
+            code: "token_does_not_exist",
+          },
+        }),
+      });
     }
   }
 

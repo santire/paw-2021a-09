@@ -49,7 +49,11 @@ export function isServerError(object: any): object is ServerError {
 export function apiErrorHandler(
   error: any,
   mappers?: {
-    [key: string]: { code?: string; status?: string; errors?: string[] };
+    [key: string]: {
+      code?: string;
+      status?: string;
+      errors?: ValidationError[];
+    };
   }
 ): ServerError {
   if (
@@ -59,10 +63,21 @@ export function apiErrorHandler(
   ) {
     const data = error.response?.data as ServerErrorResponse;
     const mapperOut = mappers && mappers[data.type];
+    let errors: ValidationError[] = [];
+
+    if (data.type === "ConstraintViolationException" && data.errors) {
+      errors = data.errors.map((e) => {
+        const [subject, message] = e.split(":");
+        return {
+          subject,
+          message,
+        };
+      });
+    }
     return {
       code: mapperOut?.code || error.response.statusText || "500",
       status: mapperOut?.status || "" + error.response.status,
-      ...(mapperOut?.errors || {}),
+      errors: mapperOut?.errors || errors,
     };
   }
   console.log("API HANDLER ERROR: ", error);
@@ -70,6 +85,11 @@ export function apiErrorHandler(
     code: "unknown_error",
     status: "500",
   };
+}
+
+interface ValidationError {
+  subject: string;
+  message: string;
 }
 
 export interface ServerErrorResponse {
@@ -82,7 +102,7 @@ export interface ServerErrorResponse {
 export interface ServerError {
   status: string;
   code: string;
-  errors?: string[];
+  errors?: ValidationError[];
 }
 
 export { apiClient };

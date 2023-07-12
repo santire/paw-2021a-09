@@ -34,7 +34,7 @@ const HasPasswords = z.object({
 export const UserRegisterSchema = UserSchemaBase.merge(HasPasswords).refine(
   (data) => data.password === data.repeatPassword,
   {
-    message: "replace.with.strings.key",
+    message: "errors.repeatPassword",
     path: ["repeatPassword"],
   }
 );
@@ -42,7 +42,7 @@ export const UserRegisterSchema = UserSchemaBase.merge(HasPasswords).refine(
 export const UserUpdateSchema = UserSchemaBase.merge(HasPasswords)
   .partial()
   .refine((data) => data.password === data.repeatPassword, {
-    message: "replace.with.strings.key",
+    message: "errors.repeatPassword",
     path: ["repeatPassword"],
   });
 
@@ -51,3 +51,15 @@ export const UserSchema = UserSchemaBase.merge(HasID).merge(HasURLs);
 export const UserLoginSchema = UserSchemaBase.pick({
   email: true,
 }).extend({ password: z.string().min(8).max(100) });
+
+export const UserForgotSchema = UserSchemaBase.pick({
+  email: true,
+});
+
+export const UserResetPasswordSchema = HasPasswords.refine(
+  (data) => data.password === data.repeatPassword,
+  {
+    message: "errors.repeatPassword",
+    path: ["repeatPassword"],
+  }
+);
