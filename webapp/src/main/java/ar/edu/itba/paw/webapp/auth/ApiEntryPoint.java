@@ -25,7 +25,7 @@ public class ApiEntryPoint implements AuthenticationEntryPoint {
         LOGGER.error("Unauthorized error: {}", authException.getMessage());
         httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
         httpServletResponse.setContentType("application/json");
-        httpServletResponse.getWriter().write("{\"message\": \"Unauthorized\",\"status\": \"401\"}");
+        httpServletResponse.getWriter().write("{\"type\": \"Unauthorized\",\"message\": \"Unauthorized\",\"status\": \"401\"}");
     }
 
 }

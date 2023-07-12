@@ -38,19 +38,6 @@ public class UserDto {
         return dto;
     }
 
-    public static UserDto fromUser(User user){
-        final UserDto dto = new UserDto();
-        dto.userId = user.getId();
-        dto.username = user.getUsername();
-        dto.firstName = user.getFirstName();
-        dto.lastName = user.getLastName();
-        dto.email= user.getEmail();
-        dto.phone =user.getPhone();
-
-        // Warning! Never return Password to user!
-        return dto;
-    }
-
     public Long getUserId() {
         return userId;
     }

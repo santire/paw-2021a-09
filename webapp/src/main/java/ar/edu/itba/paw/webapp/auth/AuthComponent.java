@@ -74,7 +74,7 @@ public class AuthComponent {
         User loggedUser = loggedUser();
         LOGGER.debug("logged user: {}", loggedUser.getId());
         LOGGER.debug("path id: {}", userId);
-        return loggedUser.getId() == userId;
+        return loggedUser.getId().equals(userId);
     }
     public boolean isUserByEmail(String email) {
         User loggedUser = loggedUser();
