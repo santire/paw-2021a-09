@@ -69,26 +69,6 @@ public class RestaurantJpaDao implements RestaurantDao {
         return Optional.ofNullable(em.find(Restaurant.class, id));
     }
 
-    @Override
-    public Boolean findByName(String name) {
-        Query nativeQuery = em.createNativeQuery(
-            "SELECT *"
-            +
-            " FROM restaurants"
-            +
-            " WHERE name = :restaurantName"
-            );
-        nativeQuery.setParameter("restaurantName", name);
-
-        @SuppressWarnings("unchecked")
-        List<Restaurant> result = nativeQuery.getResultList();
-        if(result.isEmpty()) {
-            return false;
-        }
-        else {
-            return true;
-        }
-    }
 
     @Override
     public Optional<Restaurant> findByIdWithMenu(int page, int amountOnPage, long id){
@@ -133,7 +113,7 @@ public class RestaurantJpaDao implements RestaurantDao {
     }
 
     @Override
-    public int findByIdWithMenuPageCount(int amountOnPage, long id){
+    public int findByIdWithMenuCount(int amountOnPage, long id){
         Query nativeQuery = em.createNativeQuery(
                 "SELECT menu_item_id"
                 +
@@ -147,43 +127,8 @@ public class RestaurantJpaDao implements RestaurantDao {
                 );
 
         nativeQuery.setParameter("rid", id);
-        int amountOfRestaurants = nativeQuery.getResultList().size();
-        int pageAmount = (int) Math.ceil((double) amountOfRestaurants / amountOnPage);
-
-        return pageAmount <= 0 ? 1 : pageAmount;
+        return nativeQuery.getResultList().size();
     }
-
-    @Override
-    public List<Restaurant> getAllRestaurants(int page, int amountOnPage, String searchTerm) {
-        Query nativeQuery = em.createNativeQuery("SELECT restaurant_id FROM restaurants WHERE lower(name) LIKE ?1");
-        nativeQuery.setParameter(1, "%" + searchTerm.trim().toLowerCase() + "%");
-        nativeQuery.setFirstResult((page - 1) * amountOnPage);
-        nativeQuery.setMaxResults(amountOnPage);
-        @SuppressWarnings("unchecked")
-        List<Long> filteredIds = (List<Long>) nativeQuery.getResultList().stream().map(e -> Long.valueOf(e.toString()))
-                .collect(Collectors.toList());
-
-        if (filteredIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        final TypedQuery<Restaurant> query = em.createQuery("from Restaurant where id IN :filteredIds",
-                Restaurant.class);
-        query.setParameter("filteredIds", filteredIds);
-        return query.getResultList();
-    }
-
-    @Override
-    public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm) {
-        Query nativeQuery = em.createNativeQuery("SELECT restaurant_id FROM restaurants WHERE lower(name) LIKE ?1");
-        nativeQuery.setParameter(1, "%" + searchTerm.trim().toLowerCase() + "%");
-
-        int amountOfRestaurants = nativeQuery.getResultList().size();
-        int pageAmount = (int) Math.ceil((double) amountOfRestaurants / amountOnPage);
-
-        return pageAmount <= 0 ? 1 : pageAmount;
-    }
-
     @Override
     public List<Restaurant> getHotRestaurants(int limit, int lastDays) {
         Query nativeQuery = em.createNativeQuery(
@@ -266,7 +211,7 @@ public class RestaurantJpaDao implements RestaurantDao {
         return query.getResultList();
     }
 
-    public int getRestaurantsFromOwnerPagesCount(int amountOnPage, long userId) {
+    public int getRestaurantsFromOwnerCount(int amountOnPage, long userId) {
         Query nativeQuery = em.createNativeQuery("SELECT restaurant_id FROM restaurants WHERE user_id = :userId");
         nativeQuery.setParameter("userId", userId);
 
@@ -294,6 +239,8 @@ public class RestaurantJpaDao implements RestaurantDao {
 
         if(!desc)
             order="ASC";
+        if(page <= 0)
+            page = 1;
 
         Query nativeQuery = em.createNativeQuery(
                 "SELECT restaurant_id FROM ("
@@ -373,7 +320,7 @@ public class RestaurantJpaDao implements RestaurantDao {
     }
 
     @Override
-    public int getRestaurantsFilteredByPageCount(int amountOnPage, String name, List<Tags> tags, double minAvgPrice,
+    public int getRestaurantsFilteredByCount(int amountOnPage, String name, List<Tags> tags, double minAvgPrice,
             double maxAvgPrice) {
         String TAG_CHECK_QUERY = " ";
         if(!tags.isEmpty()){
@@ -413,47 +360,11 @@ public class RestaurantJpaDao implements RestaurantDao {
         nativeQuery.setParameter("searchTerm", "%" + name.trim().toLowerCase() + "%");
         nativeQuery.setParameter("low", minAvgPrice);
         nativeQuery.setParameter("high", maxAvgPrice);
-        int amountOfRestaurants = nativeQuery.getResultList().size();
-        int pageAmount = (int) Math.ceil((double) amountOfRestaurants / amountOnPage);
-
-        return pageAmount <= 0 ? 1 : pageAmount;
+        return nativeQuery.getResultList().size();
     }
 
-
-
-    @Override
-    public List<Restaurant> getLikedRestaurantsPreview(int limit, long userId) {
-        Query nativeQuery = em.createNativeQuery(
-                " SELECT r.restaurant_id FROM restaurants r"
-                +
-                " RIGHT JOIN likes l ON r.restaurant_id = l.restaurant_id"
-                +
-                " WHERE l.user_id = ?1"
-                +
-                " ORDER BY l.like_id DESC"
-                );
-        nativeQuery.setParameter(1, userId);
-        nativeQuery.setMaxResults(limit);
-
-        @SuppressWarnings("unchecked")
-        List<Long> filteredIds = (List<Long>) nativeQuery.getResultList().stream().map(e -> Long.valueOf(e.toString()))
-                .collect(Collectors.toList());
-
-        if (filteredIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-        LOGGER.debug("list: {}", filteredIds.toString());
-
-        final TypedQuery<Restaurant> query = em.createQuery("from Restaurant where id IN :filteredIds",
-                Restaurant.class);
-        query.setParameter("filteredIds", filteredIds);
-
-        return query.getResultList().stream().sorted(Comparator.comparing(v->filteredIds.indexOf(v.getId()))).collect(Collectors.toList());
-    }
 
     // UPDATE
-
-
     @Override
     public boolean menuBelongsToRestaurant(long restaurantId, long menuId) {
         Query nativeQuery = em.createNativeQuery("SELECT menu_item_id FROM restaurants r LEFT JOIN menu_items m ON r.restaurant_id = m.restaurant_id WHERE r.restaurant_id = :rid AND m.menu_item_id = :mid");

@@ -9,16 +9,27 @@ import { LoginPage } from "./pages/Login";
 import { RegisterPage } from "./pages/Register";
 import { ForgotPage } from "./pages/Forgot";
 import { ResetPage } from "./pages/Reset";
+import { HomePage } from "./pages/Home";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // refetchOnWindowFocus: false, // default: true
+      // staleTime: Infinity,
+    },
+  },
+});
 
 const basename = import.meta.env.VITE_CONTEXT || "";
 const router = createBrowserRouter(
   [
     {
-      path: "/",
       element: <Layout />,
       children: [
+        {
+          path: "/",
+          element: <HomePage />,
+        },
         {
           path: "/login",
           element: <LoginPage />,

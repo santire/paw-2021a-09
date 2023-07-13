@@ -21,6 +21,7 @@ export function useGetUser() {
   return useQuery({
     queryKey: userKeys.details(),
     queryFn: () => UserService.getById(userId),
+    staleTime: Infinity,
     enabled: isAuthenticated,
   });
 }

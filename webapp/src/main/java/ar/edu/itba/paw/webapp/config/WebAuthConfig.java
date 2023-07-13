@@ -84,7 +84,8 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                         "/api/restaurants/*",
                         "/api/restaurants/*/image",
                         "/api/restaurants/*/menu",
-                        "/api/restaurants/*/reviews"
+                        "/api/restaurants/*/reviews",
+                        "/api/tags"
                 ).permitAll()
                 .antMatchers(HttpMethod.POST, "/api/users").permitAll()
                 .antMatchers(HttpMethod.PUT, "/api/users").permitAll()

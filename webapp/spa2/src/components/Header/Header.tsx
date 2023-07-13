@@ -30,6 +30,7 @@ import useStyles from "./Header.styles";
 import { useAuth } from "../../hooks/useAuth";
 import { useGetUser } from "../../hooks/user.hooks";
 import { IUser } from "../../types/user/user.models";
+import { useQueryClient } from "react-query";
 
 interface NavItemProps extends LinkProps {
   label: string;
@@ -98,6 +99,7 @@ function UserMenu(user: IUser) {
   const [userMenuOpened, setUserMenuOpened] = useState(false);
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const queryClient = useQueryClient();
   return (
     <Menu
       width={260}
@@ -150,6 +152,7 @@ function UserMenu(user: IUser) {
           icon={<IconLogout size={14} stroke={1.5} />}
           onClick={() => {
             logout();
+            queryClient.clear();
             navigate("/");
           }}
         >

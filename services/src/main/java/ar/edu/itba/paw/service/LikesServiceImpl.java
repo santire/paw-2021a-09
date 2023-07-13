@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.service;
 
+import ar.edu.itba.paw.model.Like;
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
@@ -46,6 +47,11 @@ public class LikesServiceImpl implements LikesService {
     @Transactional
     public boolean userLikesRestaurant(long userId, long restaurantId){
     return likesDao.userLikesRestaurant(userId, restaurantId);
+    }
+    @Override
+    @Transactional
+    public List<Like> userLikesRestaurants(long userId, List<Long> restaurantIds){
+        return likesDao.userLikesRestaurants(userId, restaurantIds);
     }
 
     @Override

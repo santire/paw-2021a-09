@@ -1,45 +1,36 @@
 package ar.edu.itba.paw.webapp.controller;
+
 import ar.edu.itba.paw.model.*;
-import ar.edu.itba.paw.model.Image;
-import ar.edu.itba.paw.model.MenuItem;
-import ar.edu.itba.paw.model.exceptions.*;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.Valid;
-import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
-
+import ar.edu.itba.paw.model.exceptions.CommentNotFoundException;
+import ar.edu.itba.paw.model.exceptions.EmptyBodyException;
+import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
 import ar.edu.itba.paw.service.*;
-import ar.edu.itba.paw.webapp.controller.mappers.AccessDeniedExceptionMapper;
-import ar.edu.itba.paw.webapp.controller.mappers.RestaurantNotFoundExceptionMapper;
 import ar.edu.itba.paw.webapp.dto.*;
 import ar.edu.itba.paw.webapp.forms.*;
 import ar.edu.itba.paw.webapp.utils.CachingUtils;
-import ar.edu.itba.paw.webapp.validators.*;
-
+import ar.edu.itba.paw.webapp.utils.PageUtils;
+import ar.edu.itba.paw.webapp.validators.ImageFileValidator;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.StreamingHttpOutputMessage.Body;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.awt.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
-import ar.edu.itba.paw.service.UserService;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 
 
 @Component
@@ -77,43 +68,45 @@ public class RestaurantController {
 
     //READ RESTAURANTS
     @GET
-    @Produces( value = {MediaType.APPLICATION_JSON})
+    @Produces(value = {MediaType.APPLICATION_JSON})
     public Response getRestaurants(@QueryParam("page") @DefaultValue("1") Integer page,
                                    @QueryParam("pageAmount") @DefaultValue("10") Integer pageAmount,
-                                   @QueryParam("search")@DefaultValue("") String search,
+                                   @QueryParam("search") @DefaultValue("") String search,
                                    @QueryParam("tags") List<Integer> tags,
                                    @QueryParam("min") @DefaultValue("1") Integer min,
                                    @QueryParam("max") @DefaultValue("10000") Integer max,
-                                   @QueryParam("sort")@DefaultValue("name") String sortBy,
-                                   @QueryParam("order")@DefaultValue("asc") String order,
-                                   @QueryParam("filterBy")@DefaultValue("") String filterBy) {
+                                   @QueryParam("sort") @DefaultValue("name") String sortBy,
+                                   @QueryParam("order") @DefaultValue("asc") String order,
+                                   @QueryParam("filterBy") @DefaultValue("") String filterBy) {
 
-        if(filterBy.equalsIgnoreCase("hot")){
+        if (filterBy.equalsIgnoreCase("hot")) {
             List<RestaurantDto> restaurants = restaurantService.getHotRestaurants(pageAmount, 7)
                     .stream()
                     .map(u -> RestaurantDto.fromRestaurant(u, uriInfo))
                     .collect(Collectors.toList());
-            return Response.ok(new GenericEntity<List<RestaurantDto>>(restaurants){}).build();
+            return Response.ok(new GenericEntity<List<RestaurantDto>>(restaurants) {
+            }).build();
         }
-        if(filterBy.equalsIgnoreCase("popular")){
+        if (filterBy.equalsIgnoreCase("popular")) {
             List<RestaurantDto> restaurants = restaurantService.getPopularRestaurants(pageAmount, 2)
                     .stream()
                     .map(u -> RestaurantDto.fromRestaurant(u, uriInfo))
                     .collect(Collectors.toList());
-            return Response.ok(new GenericEntity<List<RestaurantDto>>(restaurants){}).build();
+            return Response.ok(new GenericEntity<List<RestaurantDto>>(restaurants) {
+            }).build();
         }
 
-        if (search != "")
+        if (!Objects.equals(search, "")) {
             search = search.trim().replaceAll("[^a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]+", "");
+        }
 
         List<Tags> tagsSelected = new ArrayList<>();
 //        List<Integer> tagsChecked = new ArrayList<>();
-        if(tags!=null){
-            for( int i : tags){
-                if(Tags.valueOf(i) == null) {
+        if (tags != null) {
+            for (int i : tags) {
+                if (Tags.valueOf(i) == null) {
                     LOGGER.warn("Tag {} does not exist. Ignoring...", i);
-                }
-                else {
+                } else {
                     tagsSelected.add(Tags.valueOf(i));
 //                    tagsChecked.add(i);
                 }
@@ -127,37 +120,34 @@ public class RestaurantController {
             LOGGER.warn("Invalid sorting option {}, defaulting to NAME", sortBy);
         }
 
-        boolean desc = false;
-        if(order != null && order.equalsIgnoreCase("DESC"))
-            desc = true;
-        if(pageAmount > MAX_AMOUNT_PER_PAGE) {
+        boolean desc = order != null && order.equalsIgnoreCase("DESC");
+        if (pageAmount > MAX_AMOUNT_PER_PAGE) {
             pageAmount = MAX_AMOUNT_PER_PAGE;
         }
 
-        int maxPages = restaurantService.getRestaurantsFilteredByPageCount(pageAmount, search, tagsSelected, min, max);
+        int totalRestaurants = restaurantService.getRestaurantsFilteredByCount(pageAmount, search, tagsSelected, min, max);
         List<RestaurantDto> restaurants = restaurantService.getRestaurantsFilteredBy(
-                page, pageAmount, search, tagsSelected,min,max, sort, desc, 7)
+                        page, pageAmount, search, tagsSelected, min, max, sort, desc, 7)
                 .stream()
                 .map(u -> RestaurantDto.fromRestaurant(u, uriInfo))
                 .collect(Collectors.toList());
         LOGGER.info(String.valueOf(restaurants.size()));
-        return Response.ok(new GenericEntity<List<RestaurantDto>>(restaurants){})
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", maxPages).build(), "last")
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.max((page - 1), 1)).build(), "prev")
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.min((page + 1), maxPages)).build(), "next")
-                .build();
+
+        return PageUtils.paginatedResponse(new GenericEntity<List<RestaurantDto>>(restaurants) {
+        }, uriInfo, page, pageAmount, totalRestaurants);
     }
 
     //READ A RESTAURANT
     @GET
     @Path("/{restaurantId}")
-    @Produces( value = {MediaType.APPLICATION_JSON})
+    @Produces(value = {MediaType.APPLICATION_JSON})
     public Response findRestaurantByID(@PathParam("restaurantId") final long restaurantId) {
         final Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
         final RestaurantDto restaurantDto = RestaurantDto.fromRestaurant(restaurant, uriInfo);
-        return Response.ok(new GenericEntity<RestaurantDto>(restaurantDto){}).build();
+        return Response.ok(new GenericEntity<RestaurantDto>(restaurantDto) {
+        }).build();
     }
+
     @GET
     @Path("/{restaurantId}/image")
     @Produces("image/jpg")
@@ -176,11 +166,11 @@ public class RestaurantController {
     //READ RESTAURANT MENU
     @GET
     @Path("/{restaurantId}/menu")
-    @Produces( value = {MediaType.APPLICATION_JSON})
+    @Produces(value = {MediaType.APPLICATION_JSON})
     public Response findRestaurantMenu(@PathParam("restaurantId") final long restaurantId, @QueryParam("page") @DefaultValue("1") Integer page) {
 
-        int maxPages = restaurantService.findByIdWithMenuPagesCount(AMOUNT_OF_MENU_ITEMS, restaurantId);
-        final Restaurant restaurant = restaurantService.findByIdWithMenu(restaurantId,page,AMOUNT_OF_MENU_ITEMS)
+        int amountOfMenuItems = restaurantService.findByIdWithMenuCount(AMOUNT_OF_MENU_ITEMS, restaurantId);
+        final Restaurant restaurant = restaurantService.findByIdWithMenu(restaurantId, page, AMOUNT_OF_MENU_ITEMS)
                 .orElseThrow(RestaurantNotFoundException::new);
 
         List<MenuItemDto> menu = restaurant.getMenu()
@@ -188,18 +178,14 @@ public class RestaurantController {
                 .map(MenuItemDto::fromMenuItem)
                 .collect(Collectors.toList());
 
-        return Response.ok(new GenericEntity<List<MenuItemDto>>(menu){})
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", maxPages).build(), "last")
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.max((page - 1), 1)).build(), "prev")
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.min((page + 1), maxPages)).build(), "next")
-                .build();
+        return PageUtils.paginatedResponse(new GenericEntity<List<MenuItemDto>>(menu) {
+        }, uriInfo, page, AMOUNT_OF_MENU_ITEMS, amountOfMenuItems);
     }
 
     //READ RESTAURANT REVIEWS
     @GET
     @Path("/{restaurantId}/reviews")
-    @Produces( value = {MediaType.APPLICATION_JSON})
+    @Produces(value = {MediaType.APPLICATION_JSON})
     public Response findRestaurantReviews(@PathParam("restaurantId") final long restaurantId, @QueryParam("page") @DefaultValue("1") Integer page) {
         int maxPages = commentService.findByRestaurantPageCount(AMOUNT_OF_REVIEWS, restaurantId);
 
@@ -208,7 +194,8 @@ public class RestaurantController {
                 .map(u -> CommentDto.fromComment(u, uriInfo))
                 .collect(Collectors.toList());
 
-        return Response.ok(new GenericEntity<List<CommentDto>>(reviews){})
+        return Response.ok(new GenericEntity<List<CommentDto>>(reviews) {
+                })
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", maxPages).build(), "last")
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.max((page - 1), 1)).build(), "prev")
@@ -220,10 +207,10 @@ public class RestaurantController {
     @POST
     @Path("/{restaurantId}/reviews")
     @Produces(value = {MediaType.APPLICATION_JSON})
-    @Consumes(value = { MediaType.APPLICATION_JSON})
+    @Consumes(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
     public Response addRestaurantReview(@PathParam("restaurantId") final Long restaurantId,
-                                        final @Valid @NotNull CommentForm comment, @Context HttpServletRequest request){
+                                        final @Valid @NotNull CommentForm comment, @Context HttpServletRequest request) {
         User user = getLoggedUser();
         LOGGER.debug("review: {}", comment.getReview());
         final Comment rev = commentService.addComment(user.getId(), restaurantId, comment.getReview());
@@ -237,7 +224,7 @@ public class RestaurantController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isReviewOwner(#reviewId) OR hasRole('ROLE_ADMIN')")
     public Response deleteRestaurantReview(@PathParam("restaurantId") final Long restaurantId,
-                                           @PathParam("reviewId") final Long reviewId, @Context HttpServletRequest request){
+                                           @PathParam("reviewId") final Long reviewId, @Context HttpServletRequest request) {
         Comment review = commentService.findById(reviewId).orElseThrow(CommentNotFoundException::new);
         commentService.deleteComment(reviewId);
         return Response.noContent().build();
@@ -247,10 +234,10 @@ public class RestaurantController {
     @POST
     @Path("/{restaurantId}/menu")
     @Produces(value = {MediaType.APPLICATION_JSON})
-    @Consumes(value = { MediaType.APPLICATION_JSON})
+    @Consumes(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isRestaurantOwner(#restaurantId)")
     public Response addRestaurantMenuItem(@PathParam("restaurantId") final Long restaurantId,
-                                          final @Valid @NotNull MenuItemForm menuItem, @Context HttpServletRequest request){
+                                          final @Valid @NotNull MenuItemForm menuItem, @Context HttpServletRequest request) {
         final MenuItem item = new MenuItem(menuItem.getId(), menuItem.getName(), menuItem.getDescription(), menuItem.getPrice());
         final MenuItem createdItem = menuService.addItemToRestaurant(restaurantId, item);
         final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(createdItem.getId())).build();
@@ -264,7 +251,7 @@ public class RestaurantController {
     // Restaurant owner and menu item belongs to said restaurant
     @PreAuthorize("@authComponent.isRestaurantAndMenuOwner(#restaurantId, #menuId) or hasRole('ROLE_ADMIN')")
     public Response deleteRestaurantMenuItem(@PathParam("restaurantId") final Long restaurantId,
-                                             @PathParam("menuId") final Long menuId, @Context HttpServletRequest request){
+                                             @PathParam("menuId") final Long menuId, @Context HttpServletRequest request) {
         menuService.deleteItemById(menuId);
         return Response.noContent().build();
     }
@@ -272,12 +259,12 @@ public class RestaurantController {
     //REGISTER RESTAURANT
     @POST
     @Produces(value = {MediaType.APPLICATION_JSON})
-    @Consumes(value = { MediaType.APPLICATION_JSON})
+    @Consumes(value = {MediaType.APPLICATION_JSON})
     public Response registerRestaurant(final @Valid @NotNull RegisterRestaurantForm restaurantForm,
                                        @Context HttpServletRequest request) {
         User user = getLoggedUser();
         List<Tags> tagList = new ArrayList<>();
-        if(restaurantForm.getTags() != null){
+        if (restaurantForm.getTags() != null) {
             tagList = Arrays
                     .stream(restaurantForm.getTags())
                     .map(Tags::valueOf)
@@ -294,7 +281,7 @@ public class RestaurantController {
                 restaurantForm.getFacebook(),
                 restaurantForm.getTwitter(),
                 restaurantForm.getInstagram()
-                );
+        );
 
         final URI uri = uriInfo.getAbsolutePathBuilder()
                 .path(String.valueOf(restaurant.getId())).build();
@@ -305,7 +292,7 @@ public class RestaurantController {
     @PUT
     @Path("/{restaurantId}/image")
     @Produces(value = {MediaType.APPLICATION_JSON})
-    @Consumes(value = { MediaType.MULTIPART_FORM_DATA})
+    @Consumes(value = {MediaType.MULTIPART_FORM_DATA})
     @PreAuthorize("@authComponent.isRestaurantOwner(#restaurantId)")
     public Response setImage(@PathParam("restaurantId") final Long restaurantId,
                              @FormDataParam("image") final FormDataBodyPart body,
@@ -313,7 +300,7 @@ public class RestaurantController {
                              @Context HttpServletRequest request) throws IOException {
         // Throws InvalidImageException if not valid
         ImageFileValidator imageFileValidator = new ImageFileValidator();
-        imageFileValidator.isValid(body, null); 
+        imageFileValidator.isValid(body, null);
         String contentType = body.getMediaType().toString();
         LOGGER.debug("Image type: {}", contentType);
         LOGGER.debug("Image size: {}", bytes.length / 1024);
@@ -323,32 +310,33 @@ public class RestaurantController {
         final URI uri = uriInfo.getAbsolutePathBuilder().build();
         return Response.created(uri).entity(bytes).build();
     }
-        @PUT
-        @Path("/{restaurantId}")
-        @Produces(value = {MediaType.APPLICATION_JSON})
-        @Consumes(value = { MediaType.APPLICATION_JSON})
-        @PreAuthorize("@authComponent.isRestaurantOwner(#restaurantId)")
-        public Response updateRestaurant(
-                @PathParam("restaurantId") final Long restaurantId,
-                final @Valid @NotNull RegisterRestaurantForm restaurantForm,
-                                           @Context HttpServletRequest request) {
-            List<Tags> tagList = new ArrayList<>();
-            if(restaurantForm.getTags() != null){
-                tagList = Arrays.stream(restaurantForm.getTags()).map(Tags::valueOf).collect(Collectors.toList());
-                LOGGER.debug("tags: {}", tagList);
-            }
-            restaurantService.updateRestaurant(
-                    restaurantId,
-                    restaurantForm.getName(),
-                    restaurantForm.getAddress(),
-                    restaurantForm.getPhoneNumber(),
-                    tagList,
-                    restaurantForm.getFacebook(),
-                    restaurantForm.getTwitter(),
-                    restaurantForm.getInstagram()
-                    );
-            return Response.noContent().build();
+
+    @PUT
+    @Path("/{restaurantId}")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @Consumes(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("@authComponent.isRestaurantOwner(#restaurantId)")
+    public Response updateRestaurant(
+            @PathParam("restaurantId") final Long restaurantId,
+            final @Valid @NotNull RegisterRestaurantForm restaurantForm,
+            @Context HttpServletRequest request) {
+        List<Tags> tagList = new ArrayList<>();
+        if (restaurantForm.getTags() != null) {
+            tagList = Arrays.stream(restaurantForm.getTags()).map(Tags::valueOf).collect(Collectors.toList());
+            LOGGER.debug("tags: {}", tagList);
         }
+        restaurantService.updateRestaurant(
+                restaurantId,
+                restaurantForm.getName(),
+                restaurantForm.getAddress(),
+                restaurantForm.getPhoneNumber(),
+                tagList,
+                restaurantForm.getFacebook(),
+                restaurantForm.getTwitter(),
+                restaurantForm.getInstagram()
+        );
+        return Response.noContent().build();
+    }
 
     //DELETE RESTAURANT
     @DELETE
@@ -356,7 +344,7 @@ public class RestaurantController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isRestaurantOwner(#restaurantId)")
     public Response deleteRestaurant(@PathParam("restaurantId") final Long restaurantId,
-                                     @Context HttpServletRequest request){
+                                     @Context HttpServletRequest request) {
         restaurantService.deleteRestaurantById(restaurantId);
         return Response.noContent().build();
     }
@@ -365,7 +353,7 @@ public class RestaurantController {
     //LIKE RESTAURANT
     @POST
     @Path("/{restaurantId}/likes")
-    @Produces( value = {MediaType.APPLICATION_JSON})
+    @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
     public Response likeRestaurant(@PathParam("restaurantId") final Long restaurantId,
                                    @Context HttpServletRequest request) {
@@ -376,44 +364,44 @@ public class RestaurantController {
 
     @DELETE
     @Path("/{restaurantId}/likes")
-    @Produces( value = {MediaType.APPLICATION_JSON})
+    @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
     public Response dislikeRestaurant(@PathParam("restaurantId") final Long restaurantId,
-                                   @Context HttpServletRequest request) {
+                                      @Context HttpServletRequest request) {
         User user = getLoggedUser();
         likesService.dislike(user.getId(), restaurantId);
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
-   //GET USER LIKE
+    //GET USER LIKE
     @GET
     @Path("/{restaurantId}/likes")
-    @Produces( value = {MediaType.APPLICATION_JSON})
+    @Produces(value = {MediaType.APPLICATION_JSON})
     public Response getRestaurantlikes(
             @PathParam("restaurantId") final Long restaurantId,
             @QueryParam("userId") final Long userId,
             @Context HttpServletRequest request) {
 
-        Boolean like = likesService.userLikesRestaurant(userId,restaurantId);
+        Boolean like = likesService.userLikesRestaurant(userId, restaurantId);
         return Response.ok(new LikeDto(like)).build();
     }
 
     //RATE RESTAURANT
     @POST
     @Path("/{restaurantId}/ratings")
-    @Produces( value = {MediaType.APPLICATION_JSON})
+    @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
     public Response rateRestaurant(@PathParam("restaurantId") final Long restaurantId,
                                    @Valid @NotNull RatingForm rating, @Context HttpServletRequest request) {
         User user = getLoggedUser();
-        ratingService.rateRestaurant(user.getId(),restaurantId,rating.getRating());
+        ratingService.rateRestaurant(user.getId(), restaurantId, rating.getRating());
         return Response.noContent().build();
     }
 
     //READ USER RATING
     @GET
     @Path("/{restaurantId}/ratings")
-    @Produces( value = {MediaType.APPLICATION_JSON})
+    @Produces(value = {MediaType.APPLICATION_JSON})
     public Response getRestaurantRate(@PathParam("restaurantId") final Long restaurantId,
                                       @QueryParam("userId") final Long userId,
                                       @Context HttpServletRequest request) {
@@ -426,7 +414,7 @@ public class RestaurantController {
     //READ RESTAURANT RESERVATIONS
     @GET
     @Path("/{restaurantId}/reservations")
-    @Produces( value = {MediaType.APPLICATION_JSON})
+    @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isRestaurantOwner(#restaurantId)")
     public Response findRestaurantReservations(@PathParam("restaurantId") final Long restaurantId,
                                                @QueryParam("filterBy") @DefaultValue("") String filterBy,
@@ -435,21 +423,21 @@ public class RestaurantController {
         int maxPages;
         List<ReservationDto> reservations;
         LOGGER.debug("Filtering reservations by: {}", filterBy);
-        if(filterBy.equalsIgnoreCase("pending")){
+        if (filterBy.equalsIgnoreCase("pending")) {
             maxPages = reservationService.findPendingByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
             reservations = reservationService.findPendingByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
-        }else if(filterBy.equalsIgnoreCase("confirmed")){
+        } else if (filterBy.equalsIgnoreCase("confirmed")) {
             maxPages = reservationService.findConfirmedByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
             reservations = reservationService.findConfirmedByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
-        }else if(filterBy.equalsIgnoreCase("history")){
+        } else if (filterBy.equalsIgnoreCase("history")) {
             maxPages = reservationService.findHistoryByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
             reservations = reservationService.findHistoryByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
-        }
-        else{
+        } else {
             maxPages = reservationService.findByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
             reservations = reservationService.findByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
         }
-        return Response.ok(new GenericEntity<List<ReservationDto>>(reservations){})
+        return Response.ok(new GenericEntity<List<ReservationDto>>(reservations) {
+                })
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", maxPages).build(), "last")
                 .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.max((page - 1), 1)).build(), "prev")
@@ -461,11 +449,11 @@ public class RestaurantController {
     @POST
     @Path("/{restaurantId}/reservations")
     @Produces(value = {MediaType.APPLICATION_JSON})
-    @Consumes(value = { MediaType.APPLICATION_JSON})
+    @Consumes(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
     public Response addRestaurantReservation(
             @PathParam("restaurantId") final Long restaurantId,
-            @Valid @NotNull ReservationForm reservationDto, @Context HttpServletRequest request){
+            @Valid @NotNull ReservationForm reservationDto, @Context HttpServletRequest request) {
         User user = getLoggedUser();
         String baseUrl = request.getHeader("Origin");
         if (baseUrl == null) {
@@ -490,12 +478,12 @@ public class RestaurantController {
     public Response cancelRestaurantReservation(
             @PathParam("restaurantId") final Long restaurantId,
             @PathParam("reservationId") final long reservationId,
-            @Context HttpServletRequest request){
+            @Context HttpServletRequest request) {
         reservationService.userCancelReservation(reservationId);
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
-   // OWNER CONFIRM OR DENY RESERVATION
+    // OWNER CONFIRM OR DENY RESERVATION
     @PUT
     @Path("/{restaurantId}/reservations/{reservationId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
@@ -504,7 +492,7 @@ public class RestaurantController {
                                                  @PathParam("reservationId") final Long reservationId,
                                                  @QueryParam("action") final String action,
                                                  @Valid final CancelMessageForm cancelMessageForm,
-                                                 @Context HttpServletRequest request){
+                                                 @Context HttpServletRequest request) {
         if (action.equalsIgnoreCase("confirm")) {
             reservationService.confirmReservation(reservationId);
         } else if (action.equalsIgnoreCase("deny") && cancelMessageForm != null) {
@@ -516,12 +504,10 @@ public class RestaurantController {
     }
 
 
-
-
-    private User getLoggedUser(){
+    private User getLoggedUser() {
         return userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName())
                 // This shouldn't happen as authority is handled before
-                .orElseThrow(()-> new AccessDeniedException("Unauthorized"));
+                .orElseThrow(() -> new AccessDeniedException("Unauthorized"));
     }
 
 

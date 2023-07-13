@@ -2,17 +2,22 @@ package ar.edu.itba.paw.webapp.controller;
 
 
 import ar.edu.itba.paw.model.User;
-import ar.edu.itba.paw.model.exceptions.*;
+import ar.edu.itba.paw.model.exceptions.EmailInUseException;
+import ar.edu.itba.paw.model.exceptions.EmptyBodyException;
+import ar.edu.itba.paw.model.exceptions.TokenCreationException;
+import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
 import ar.edu.itba.paw.service.LikesService;
 import ar.edu.itba.paw.service.ReservationService;
 import ar.edu.itba.paw.service.RestaurantService;
 import ar.edu.itba.paw.service.UserService;
+import ar.edu.itba.paw.webapp.dto.LikeDto;
 import ar.edu.itba.paw.webapp.dto.ReservationDto;
 import ar.edu.itba.paw.webapp.dto.RestaurantDto;
 import ar.edu.itba.paw.webapp.dto.UserDto;
 import ar.edu.itba.paw.webapp.forms.PasswordResetForm;
 import ar.edu.itba.paw.webapp.forms.RegisterUserForm;
 import ar.edu.itba.paw.webapp.forms.UpdateUserForm;
+import ar.edu.itba.paw.webapp.utils.PageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +29,7 @@ import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,9 +57,7 @@ public class UserController {
     @POST
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = {MediaType.APPLICATION_JSON})
-    public Response registerUser(@QueryParam("email") final String forgotEmail, @Valid final RegisterUserForm userForm,
-                                 @Context HttpServletRequest request)
-            throws EmailInUseException, TokenCreationException {
+    public Response registerUser(@QueryParam("email") final String forgotEmail, @Valid final RegisterUserForm userForm, @Context HttpServletRequest request) throws EmailInUseException, TokenCreationException {
         String baseUrl = request.getHeader("Origin");
         if (baseUrl == null) {
             baseUrl = uriInfo.getBaseUri().toString();
@@ -68,14 +72,7 @@ public class UserController {
             throw new EmptyBodyException();
         }
 
-        final User user = userService.register(
-                userForm.getUsername(),
-                userForm.getPassword(),
-                userForm.getFirstName(),
-                userForm.getLastName(),
-                userForm.getEmail(),
-                userForm.getPhone(),
-                baseUrl);
+        final User user = userService.register(userForm.getUsername(), userForm.getPassword(), userForm.getFirstName(), userForm.getLastName(), userForm.getEmail(), userForm.getPhone(), baseUrl);
 
         final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(user.getId())).build();
         LOGGER.info("user created: {}", uri);
@@ -85,8 +82,7 @@ public class UserController {
     @PUT
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = {MediaType.APPLICATION_JSON})
-    public Response activateOrReset(@QueryParam("token") final String token, @QueryParam("type") final String type,
-                                    @Valid PasswordResetForm passwordForm, @Context HttpServletRequest request) {
+    public Response activateOrReset(@QueryParam("token") final String token, @QueryParam("type") final String type, @Valid PasswordResetForm passwordForm, @Context HttpServletRequest request) {
         if (type != null && type.equalsIgnoreCase("activation")) {
             userService.activateUserByToken(token);
         } else if (type != null && type.equalsIgnoreCase("reset")) {
@@ -106,14 +102,8 @@ public class UserController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isUser(#userId)")
-    public Response updateUser(@PathParam("userId") final Long userId, @Valid UpdateUserForm userForm,
-                               @Context HttpServletRequest request) {
-        userService.updateUser(
-                userId,
-                userForm.getPassword(),
-                userForm.getFirstName(),
-                userForm.getLastName(),
-                userForm.getPhone());
+    public Response updateUser(@PathParam("userId") final Long userId, @Valid UpdateUserForm userForm, @Context HttpServletRequest request) {
+        userService.updateUser(userId, userForm.getPassword(), userForm.getFirstName(), userForm.getLastName(), userForm.getPhone());
         return Response.noContent().build();
     }
 
@@ -128,6 +118,7 @@ public class UserController {
         return Response.ok(UserDto.fromUser(user, request.getRequestURL().toString(), uriInfo)).build();
 
     }
+
     @GET
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isUserByEmail(#email)")
@@ -141,22 +132,11 @@ public class UserController {
     @Path("/{userId}/restaurants")
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isUser(#userId)")
-    public Response getUserRestaurants(
-            @PathParam("userId") final Long userId, 
-            @QueryParam("page") @DefaultValue("1") Integer page,
-            @Context HttpServletRequest request) {
-        int maxPages = restaurantService.getRestaurantsFromOwnerPagesCount(AMOUNT_OF_RESTAURANTS, userId);
-        List<RestaurantDto> restaurants = restaurantService.getRestaurantsFromOwner(page, AMOUNT_OF_RESTAURANTS, userId)
-                .stream()
-                .map(u -> RestaurantDto.fromRestaurant(u, uriInfo))
-                .collect(Collectors.toList());
-        return Response.ok(new GenericEntity<List<RestaurantDto>>(restaurants) {
-                })
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", maxPages).build(), "last")
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.max((page - 1), 1)).build(), "prev")
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.min((page + 1), maxPages)).build(), "next")
-                .build();
+    public Response getUserRestaurants(@PathParam("userId") final Long userId, @QueryParam("page") @DefaultValue("1") Integer page, @Context HttpServletRequest request) {
+        int totalRestaurants = restaurantService.getRestaurantsFromOwnerCount(AMOUNT_OF_RESTAURANTS, userId);
+        List<RestaurantDto> restaurants = restaurantService.getRestaurantsFromOwner(page, AMOUNT_OF_RESTAURANTS, userId).stream().map(u -> RestaurantDto.fromRestaurant(u, uriInfo)).collect(Collectors.toList());
+        return PageUtils.paginatedResponse(new GenericEntity<List<RestaurantDto>>(restaurants) {
+        }, uriInfo, page, AMOUNT_OF_RESTAURANTS, totalRestaurants);
     }
 
     //READ USER RESERVATIONS
@@ -164,46 +144,39 @@ public class UserController {
     @Path("/{userId}/reservations")
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isUser(#userId)")
-    public Response getUserReservations(
-            @PathParam("userId") final Long userId,
-            @QueryParam("filterBy") @DefaultValue("") String filterBy,
-            @QueryParam("page") @DefaultValue("1") Integer page, @Context HttpServletRequest request) {
-        List<ReservationDto> reservation;    
-        int maxPages;    
-        if(filterBy.equalsIgnoreCase("history")){
+    public Response getUserReservations(@PathParam("userId") final Long userId, @QueryParam("filterBy") @DefaultValue("") String filterBy, @QueryParam("page") @DefaultValue("1") Integer page, @Context HttpServletRequest request) {
+        List<ReservationDto> reservation;
+        int maxPages;
+        if (filterBy.equalsIgnoreCase("history")) {
             maxPages = reservationService.findByUserHistoryPageCount(AMOUNT_OF_RESERVATIONS, userId);
-            reservation = reservationService.findByUserHistory(page, AMOUNT_OF_RESERVATIONS, userId)
-            .stream()
-            .map(u -> ReservationDto.fromReservation(u, uriInfo))
-            .collect(Collectors.toList());
-        }
-        else {
+            reservation = reservationService.findByUserHistory(page, AMOUNT_OF_RESERVATIONS, userId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
+        } else {
             maxPages = reservationService.findByUserPageCount(AMOUNT_OF_RESERVATIONS, userId);
-            reservation = reservationService.findByUser(page, AMOUNT_OF_RESERVATIONS, userId)
-                    .stream()
-                    .map(u -> ReservationDto.fromReservation(u, uriInfo))
-                    .collect(Collectors.toList());
+            reservation = reservationService.findByUser(page, AMOUNT_OF_RESERVATIONS, userId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
         }
         return Response.ok(new GenericEntity<List<ReservationDto>>(reservation) {
-                })
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", maxPages).build(), "last")
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.max((page - 1), 1)).build(), "prev")
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.min((page + 1), maxPages)).build(), "next")
-                .build();
+        }).link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first").link(uriInfo.getAbsolutePathBuilder().queryParam("page", maxPages).build(), "last").link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.max((page - 1), 1)).build(), "prev").link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.min((page + 1), maxPages)).build(), "next").build();
     }
 
-        //READ USER LIKES
-        @GET
-        @Path("/{userId}/likes")
-        @Produces(value = {MediaType.APPLICATION_JSON})
-        @PreAuthorize("@authComponent.isUser(#userId)")
-        public Response getUserLikes(
-                @PathParam("userId") final Long userId, 
-                @Context HttpServletRequest request) {
-                    List<Long> likedRestaurants = likesService.getLikesByUserId(userId);
-            return Response.ok(new GenericEntity<List<Long>>(likedRestaurants) {
-                    })
-                    .build();
+    //READ USER LIKES
+    @GET
+    @Path("/{userId}/likes")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("@authComponent.isUser(#userId)")
+    public Response userLikesRestaurants(@PathParam("userId") final Long userId, @QueryParam("restaurantId") List<Long> restaurantIds, @Context HttpServletRequest request) {
+        if (restaurantIds == null) {
+            restaurantIds = new ArrayList<>();
         }
+        List<Long> likedIds = likesService.userLikesRestaurants(userId, restaurantIds).stream().map(l -> l.getRestaurant().getId()).collect(Collectors.toList());
+        List<LikeDto> likes = new ArrayList<>();
+        for (Long id : restaurantIds) {
+            LikeDto like = new LikeDto(false, id, userId);
+            if (likedIds.contains(id)) {
+                like.setLiked(true);
+            }
+            likes.add(like);
+        }
+        return Response.ok(new GenericEntity<List<LikeDto>>(likes) {
+        }).build();
+    }
 }
