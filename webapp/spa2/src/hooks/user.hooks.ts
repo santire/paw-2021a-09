@@ -3,6 +3,7 @@ import { AuthService } from "../api/services/AuthService";
 import { useAuth } from "./useAuth";
 import { ServerError, isServerError } from "../api/client";
 import { UserService } from "../api/services/UserService";
+import { IRestaurant } from "../types/restaurant/restaurant.models";
 
 const userKeys = {
   all: ["users"] as const,
@@ -83,7 +84,6 @@ export function useRequestPasswordReset(options?: QueryOptions) {
   });
 }
 
-
 export function usePasswordReset(options?: QueryOptions) {
   return useMutation({
     mutationFn: AuthService.resetPassword,
@@ -118,4 +118,18 @@ export function useCreateUser(options?: QueryOptions) {
       }
     },
   });
+}
+
+type isOwnerProps = {
+  restaurant?: IRestaurant;
+  restaurantId?: number;
+};
+export function useIsOwner({ restaurant, restaurantId }: isOwnerProps) {
+  const { userId } = useAuth();
+  if (restaurant) {
+    const { owner } = restaurant;
+    const rid = parseInt(owner.substring(owner.lastIndexOf("/") + 1));
+    return userId === rid;
+  }
+  return userId === restaurantId;
 }

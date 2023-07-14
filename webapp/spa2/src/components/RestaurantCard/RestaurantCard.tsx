@@ -1,5 +1,4 @@
 import {
-  ActionIcon,
   Badge,
   Button,
   Card,
@@ -14,33 +13,20 @@ import { IRestaurant } from "../../types/restaurant/restaurant.models";
 import useStyles from "./RestaurantCard.styles";
 import { useNavigate } from "react-router-dom";
 import { IconStar } from "@tabler/icons-react";
-import { useGetTags } from "../../hooks/tags.hooks";
+import { LikeButton } from "../LikeButton/LikeButton";
+import { useIsOwner } from "../../hooks/user.hooks";
+import { ManageButton } from "../ManageButton/ManageButton";
+import { TagButton } from "../TagButton/TagButton";
 
 interface RestaurantCardProps {
   restaurant: IRestaurant;
 }
 export function RestaurantCard({ restaurant }: RestaurantCardProps) {
-  const { id, image, tags, name, rating, likes, likedByUser } = restaurant;
+  const { id, image, tags, name, rating, likes } = restaurant;
   const { classes, theme } = useStyles();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const tagList = useGetTags();
-
-  const features = tags?.map((tag, idx) => (
-    <Badge
-      component="a"
-      onClick={() =>
-        tagList.isSuccess
-          ? navigate(`/restaurants?tags=${tagList.data.indexOf(tag)}`)
-          : null
-      }
-      color="orange"
-      key={tag + "" + idx}
-      style={{ cursor: "pointer" }}
-    >
-      {t("tags." + tag.toLowerCase())}
-    </Badge>
-  ));
+  const isOwner = useIsOwner({ restaurant });
 
   return (
     <Card withBorder p="lg" radius="md" className={classes.card}>
@@ -81,7 +67,9 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
           {t("restaurantCard.tagsTitle")}
         </Text>
         <Group spacing={7} mt="xs" className={classes.tags}>
-          {features}
+          {tags.map((t) => (
+            <TagButton key={t} tag={t} />
+          ))}
         </Group>
       </Card.Section>
 
@@ -103,15 +91,11 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
             {t("restaurantCard.liked", { likes: likes })}
           </Text>
           <Group spacing={0}>
-            {likedByUser ? <em>si</em> : <em>no</em>}
-            {/* <LikeButton */}
-            {/*   restaurantId={restaurant.id!} */}
-            {/*   authed={authed} */}
-            {/*   isOwner={isOwner} */}
-            {/*   userLikesRestaurant={likedByUser!} */}
-            {/*   updateLikes={updateLikes} // Pass the updateLikes function as a prop */}
-            {/*   likes={likes} // Pass the likes state as a prop */}
-            {/* /> */}
+            {isOwner ? (
+              <ManageButton restaurant={restaurant} />
+            ) : (
+              <LikeButton restaurant={restaurant} />
+            )}
           </Group>
         </Group>
       </Card.Section>

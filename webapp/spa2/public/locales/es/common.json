@@ -32,7 +32,8 @@
   "restaurantCard": {
     "more": "Ver más",
     "liked": "A {{likes}} personas les gusta esto",
-    "tagsTitle": "Ideal para vos, si te gusta"
+    "tagsTitle": "Ideal para vos, si te gusta",
+    "likeTooltip": "Debe estar logueado para dar me gusta"
   },
   "UserRestaurantCard": {
     "more": "Ver más",
@@ -91,7 +92,10 @@
   },
   "pages": {
     "home": {
-      "highlights": "Destacados",
+      "hot": "Restaurantes destacados",
+      "hotTooltip": "Restaurantes con muchas reservas",
+      "popular": "Restaurantes populares",
+      "popularTooltip": "Restaurantes más gustados",
       "heading": "Descubra y reserve los mejores restaurantes"
     },
     "reservations": {

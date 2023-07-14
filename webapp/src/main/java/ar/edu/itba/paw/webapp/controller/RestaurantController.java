@@ -80,7 +80,7 @@ public class RestaurantController {
                                    @QueryParam("filterBy") @DefaultValue("") String filterBy) {
 
         if (filterBy.equalsIgnoreCase("hot")) {
-            List<RestaurantDto> restaurants = restaurantService.getHotRestaurants(pageAmount, 7)
+            List<RestaurantDto> restaurants = restaurantService.getHotRestaurants(pageAmount, 365)
                     .stream()
                     .map(u -> RestaurantDto.fromRestaurant(u, uriInfo))
                     .collect(Collectors.toList());
@@ -359,7 +359,7 @@ public class RestaurantController {
                                    @Context HttpServletRequest request) {
         User user = getLoggedUser();
         likesService.like(user.getId(), restaurantId);
-        return Response.status(Response.Status.ACCEPTED).build();
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 
     @DELETE
@@ -370,7 +370,7 @@ public class RestaurantController {
                                       @Context HttpServletRequest request) {
         User user = getLoggedUser();
         likesService.dislike(user.getId(), restaurantId);
-        return Response.status(Response.Status.ACCEPTED).build();
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 
     //GET USER LIKE

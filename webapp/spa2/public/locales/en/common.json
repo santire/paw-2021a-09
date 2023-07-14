@@ -32,7 +32,11 @@
   "restaurantCard": {
     "more": "See more",
     "liked": "{{likes}} people liked this",
-    "tagsTitle": "Perfect for you, if you enjoy"
+    "tagsTitle": "Perfect for you, if you enjoy",
+    "likeTooltip": "Must be logged in to like"
+  },
+  "restaurantCarousel": {
+    "noRestaurants": "No restaurants available"
   },
   "UserRestaurantCard": {
     "more": "See more",
@@ -91,7 +95,10 @@
   },
   "pages": {
     "home": {
-      "highlights": "Highlights",
+      "hot": "Hot Restaurants",
+      "hotTooltip": "Restaurants with lots of reservations",
+      "popular": "Popular Restaurants",
+      "popularTooltip": "Most liked restaurants",
       "heading": "Discover and book the best restaurants"
     },
     "reservations": {

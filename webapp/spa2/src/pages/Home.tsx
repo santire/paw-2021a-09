@@ -1,6 +1,4 @@
-import { Carousel } from "@mantine/carousel";
 import {
-  Center,
   Container,
   createStyles,
   Flex,
@@ -9,9 +7,11 @@ import {
 } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import homeImageSrc from "../assets/images/home_image.png";
-import { useGetRestaurants } from "../hooks/restaurant.hooks";
-import { useQueryClient } from "react-query";
-import { RestaurantCard } from "../components/RestaurantCard/RestaurantCard";
+import {
+  useGetHotRestaurants,
+  useGetPopularRestaurants,
+} from "../hooks/restaurant.hooks";
+import { RestaurantCarousel } from "../components/RestaurantCarousel/RestaurantCarousel";
 
 const useStyles = createStyles((theme) => ({
   heading: {
@@ -39,43 +39,16 @@ const useStyles = createStyles((theme) => ({
         ? theme.colors.dark[0]
         : theme.colors.gray[9],
   },
-  title: {
-    fontSize: theme.fontSizes.xl * 1.8,
-    paddingLeft: theme.spacing.sm,
-  },
 }));
 
 export function HomePage() {
   const { classes } = useStyles();
   const { t } = useTranslation();
-  const restaurants = [<div>rest</div>, <div>rest</div>];
-  const r = useGetRestaurants({ page: 0, pageAmount: 10 });
-  const queryClient = useQueryClient();
-
-  // if (data?.data?.length && data?.data?.length > 0 && data?.data?.length < 5) {
-  //   // duplicate data to fix carousel
-  //   for (let i = 0; i < data.data?.length; i++) {
-  //     const restaurant = data.data[i];
-  //     const rest = (
-  //       <RestaurantCard restaurant={restaurant} key={restaurant.name + i} />
-  //     );
-  //     restaurants.push(rest);
-  //   }
-  // }
+  const popularRestaurants = useGetPopularRestaurants();
+  const hotRestaurants = useGetHotRestaurants();
 
   return (
     <>
-      <button onClick={() => queryClient.invalidateQueries("restaurants")}>
-        invalidate
-      </button>
-      {r.data?.data.map((d) => (
-        <div key={d.id}>
-          <RestaurantCard restaurant={d} />
-          <br />
-          <br />
-        </div>
-      ))}
-      {r.data ? <div></div> : null}
       <div className={classes.heading}>
         <Flex
           justify="space-between"
@@ -87,29 +60,20 @@ export function HomePage() {
         </Flex>
       </div>
       <Container size="xl" my="xl">
-        <>
-          <Text className={classes.title}>{t`pages.home.highlights`}</Text>
-          <Carousel
-            slideSize="20%"
-            slideGap="sm"
-            breakpoints={[
-              { maxWidth: "lg", slideSize: "33.333333333%" },
-              { maxWidth: "md", slideSize: "50%" },
-              { maxWidth: "sm", slideSize: "100%", slideGap: 0 },
-            ]}
-            align="start"
-            controlSize={40}
-            //loop
-          >
-            {restaurants?.map((r, i) => (
-              <Carousel.Slide key={i}>
-                <Center p={0} m={0}>
-                  {r}
-                </Center>
-              </Carousel.Slide>
-            ))}
-          </Carousel>
-        </>
+        <RestaurantCarousel
+          restaurants={popularRestaurants.data?.data}
+          title={t("pages.home.popular")}
+          tooltip={t("pages.home.popularTooltip")}
+          loading={popularRestaurants.isLoading}
+        />
+      </Container>
+      <Container size="xl" my="xl">
+        <RestaurantCarousel
+          restaurants={hotRestaurants.data?.data}
+          title={t("pages.home.hot")}
+          tooltip={t("pages.home.hotTooltip")}
+          loading={hotRestaurants.isLoading}
+        />
       </Container>
     </>
   );

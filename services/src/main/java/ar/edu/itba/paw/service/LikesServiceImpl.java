@@ -3,6 +3,8 @@ package ar.edu.itba.paw.service;
 import ar.edu.itba.paw.model.Like;
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.exceptions.AlreadyLikedException;
+import ar.edu.itba.paw.model.exceptions.NotLikedException;
 import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
 import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
 import ar.edu.itba.paw.persistence.LikesDao;
@@ -32,7 +34,7 @@ public class LikesServiceImpl implements LikesService {
         User user = userDao.findById(userId).orElseThrow(UserNotFoundException::new);
         Restaurant restaurant = restaurantDao.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
         if (userLikesRestaurant(userId, restaurantId)) {
-            return false;
+            throw new AlreadyLikedException();
         }
         return likesDao.like(user, restaurant);
     }
@@ -40,6 +42,11 @@ public class LikesServiceImpl implements LikesService {
     @Override
     @Transactional
     public boolean dislike(long userId, long restaurantId) {
+        User user = userDao.findById(userId).orElseThrow(UserNotFoundException::new);
+        Restaurant restaurant = restaurantDao.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
+        if (!userLikesRestaurant(userId, restaurantId)) {
+            throw new NotLikedException();
+        }
         return likesDao.dislike(userId, restaurantId);
     }
 
