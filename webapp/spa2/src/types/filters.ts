@@ -5,5 +5,4 @@ export interface RestaurantFilterParams {
   min?: number;
   max?: number;
   order?: string;
-  filterBy?: string;
 }

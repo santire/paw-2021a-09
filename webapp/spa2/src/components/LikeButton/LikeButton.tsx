@@ -60,15 +60,18 @@ export function LikeButton({ restaurant }: LikeButtonProps) {
         </Button>
       </Modal>
       <Box>
-        <ActionIcon loading={mutation.isLoading} variant="transparent">
+        <ActionIcon
+          loading={mutation.isLoading}
+          variant="transparent"
+          onClick={() =>
+            isAuthenticated ? mutation.mutate(id) : setOpened(true)
+          }
+        >
           <IconHeart
             size={18}
             color={theme.colors.red[6]}
             fill={likedByUser ? "red" : "none"}
             stroke={1.5}
-            onClick={() =>
-              isAuthenticated ? mutation.mutate(id) : setOpened(true)
-            }
           />
         </ActionIcon>
       </Box>

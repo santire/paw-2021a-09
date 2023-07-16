@@ -1,4 +1,4 @@
-import { Group, Loader, Text, Title, Tooltip } from "@mantine/core";
+import { Group, Loader, Text, Tooltip } from "@mantine/core";
 import { Carousel } from "@mantine/carousel";
 import { IRestaurant } from "../../types/restaurant/restaurant.models";
 import { Center, createStyles } from "@mantine/core";
@@ -44,7 +44,7 @@ const useStyles = createStyles((theme, _params, getRef) => ({
         "&[data-active]": {
           opacity: 1,
         },
-        opacity: 1,
+        opacity: 0.3,
       },
     },
   },

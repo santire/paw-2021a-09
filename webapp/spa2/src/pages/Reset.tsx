@@ -33,7 +33,6 @@ export function ResetPage() {
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm<IUserResetPassword>({
     mode: "onTouched",

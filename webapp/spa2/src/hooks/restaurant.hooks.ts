@@ -9,39 +9,49 @@ import {
 import { UserService } from "../api/services/UserService";
 import { LikeService } from "../api/services/LikeService";
 import { RestaurantFilterParams } from "../types/filters";
+import { useSearchParams } from "react-router-dom";
 
-const NO_FILTER = {};
 const restaurantKeys = {
   all: ["restaurants"] as const,
-  lists: () => [...restaurantKeys.all, "list"] as const,
-  list: (filters: RestaurantFilterParams) =>
-    [...restaurantKeys.lists(), { ...filters }] as const,
-  popular: () => [...restaurantKeys.lists(), "popular"] as const,
-  hot: () => [...restaurantKeys.lists(), "hot"] as const,
+  lists: (userId: number) => [...restaurantKeys.all, "list", userId] as const,
+  list: (userId: number, filters?: PageParams & RestaurantFilterParams) =>
+    [...restaurantKeys.lists(userId), { ...filters }] as const,
+  popular: (userId: number) =>
+    [...restaurantKeys.lists(userId), "popular"] as const,
+  hot: (userId: number) => [...restaurantKeys.lists(userId), "hot"] as const,
   details: () => [...restaurantKeys.all, "detail"] as const,
   detail: (id: number) => [...restaurantKeys.details(), id] as const,
 };
 
 export function useGetRestaurants(
-  pageParams: PageParams,
-  filters?: RestaurantFilterParams
+  params?: PageParams & RestaurantFilterParams
 ) {
   const { isAuthenticated, userId } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   return useQuery<Page<IRestaurant[]>>({
-    queryKey: restaurantKeys.list(filters ?? NO_FILTER),
+    queryKey: restaurantKeys.list(userId, params),
+    enabled: !!params,
     queryFn: async () =>
       withLikes(
-        () => RestaurantService.getAll(pageParams, filters),
+        () => RestaurantService.getAll({ ...params!, pageAmount: 6 }),
         isAuthenticated,
         userId
       ),
+    onSuccess: (data) => {
+      const page = parseInt(searchParams.get("page") || "NaN");
+      // If page is invalid resets back to first
+      if (page > data.meta.maxPages) {
+        searchParams.delete("page");
+        setSearchParams(searchParams);
+      }
+    },
   });
 }
 
 export function useGetPopularRestaurants() {
   const { isAuthenticated, userId } = useAuth();
   return useQuery<Page<IRestaurant[]>>({
-    queryKey: restaurantKeys.popular(),
+    queryKey: restaurantKeys.popular(userId),
     queryFn: async () =>
       withLikes(() => RestaurantService.getPopular(), isAuthenticated, userId),
   });
@@ -50,7 +60,7 @@ export function useGetPopularRestaurants() {
 export function useGetHotRestaurants() {
   const { isAuthenticated, userId } = useAuth();
   return useQuery<Page<IRestaurant[]>>({
-    queryKey: restaurantKeys.hot(),
+    queryKey: restaurantKeys.hot(userId),
     queryFn: async () =>
       withLikes(() => RestaurantService.getHot(), isAuthenticated, userId),
   });

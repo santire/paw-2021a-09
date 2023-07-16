@@ -127,7 +127,7 @@ public class UserServiceImpl implements UserService {
     User user = passwordToken.getUser();
 
     updateUser(user.getId(),
-            encoder.encode(password),
+            password,
             user.getFirstName(),
             user.getLastName(),
             user.getPhone());
@@ -167,7 +167,7 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public void updateUser(long id, String password, String firstName, String lastName, String phone) {
     User user = userDao.findById(id).orElseThrow(UserNotFoundException::new);
-    if(password != null && !password.isEmpty()) user.setPassword(password);
+    if(password != null && !password.isEmpty()) user.setPassword(encoder.encode(password));
     if(firstName != null && !firstName.isEmpty()) user.setFirstName(firstName);
     if(lastName != null && !lastName.isEmpty()) user.setLastName(lastName);
     if(phone != null && !phone.isEmpty()) user.setPhone(phone);

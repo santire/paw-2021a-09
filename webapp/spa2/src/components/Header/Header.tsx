@@ -22,8 +22,8 @@ import {
   Link,
   LinkProps,
   RelativeRoutingType,
+  createSearchParams,
   useNavigate,
-  useSearchParams,
 } from "react-router-dom";
 import { GourmetableLogo } from "../GourmetableLogo/GourmetableLogo";
 import useStyles from "./Header.styles";
@@ -56,7 +56,7 @@ function SearchBar() {
   const { classes } = useStyles();
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
-  const [searchParams, setSearchParams] = useSearchParams();
+  // const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   return (
     <Autocomplete
@@ -68,12 +68,12 @@ function SearchBar() {
       data={[]}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
-          searchParams.set("search", search);
-          setSearchParams(searchParams);
+          // searchParams.set("search", search);
+          // setSearchParams({ search: search });
           setSearch("");
           navigate({
             pathname: "restaurants",
-            search: searchParams.toString(),
+            search: `${createSearchParams({ search: search })}`,
           });
         }
       }}
@@ -144,7 +144,7 @@ function UserMenu(user: IUser) {
         <Menu.Label>{t("header.userMenu.settings.title")}</Menu.Label>
         <Menu.Item
           icon={<IconSettings size={14} stroke={1.5} />}
-          onClick={() => navigate(`/users/${user?.userId}`)}
+          onClick={() => navigate("/users/edit")}
         >
           {t("header.userMenu.settings.account")}
         </Menu.Item>

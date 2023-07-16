@@ -1,11 +1,16 @@
 import { ILike } from "../../types/like";
-import { IUser, IUserRegister } from "../../types/user/user.models";
+import {
+  IUser,
+  IUserRegister,
+  IUserUpdate,
+} from "../../types/user/user.models";
 import { apiClient, apiErrorHandler } from "../client";
 
 const PATH = "/users";
 interface IUserService {
   getById(userId: number): Promise<IUser>;
   create(user: IUserRegister): Promise<IUser>;
+  update(userId: number, user: IUserUpdate): Promise<IUser>;
   getLikesByRestaurants(
     userId: number,
     restaurantIds: number[]
@@ -29,6 +34,27 @@ module UserServiceImpl {
   export async function create(user: IUserRegister) {
     try {
       const response = await apiClient.post<IUser>(PATH, {
+        ...user,
+      });
+
+      return response.data;
+    } catch (error) {
+      throw new Error("Response Error", {
+        cause: apiErrorHandler(error, {
+          Unauthorized: { code: "invalid_credentials" },
+          ConstraintViolationException: { code: "validation_error" },
+          UsernameInUseException: {
+            code: "validation_error",
+            errors: [{ subject: "username", message: "username in use" }],
+          },
+        }),
+      });
+    }
+  }
+
+  export async function update(userId: number, user: IUserUpdate) {
+    try {
+      const response = await apiClient.put(`${PATH}/${userId}`, {
         ...user,
       });
 

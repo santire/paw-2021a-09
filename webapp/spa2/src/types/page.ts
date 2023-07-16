@@ -9,7 +9,7 @@ export interface Page<T> {
 
 export interface PageParams {
   page: number;
-  pageAmount: number;
+  pageAmount?: number;
 }
 
 export const MAX_PAGE_AMOUNT = 10;

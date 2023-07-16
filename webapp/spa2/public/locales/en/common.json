@@ -62,7 +62,8 @@
     "repeatPassword": "The passwords do not match",
     "tokenExpired": "The token has expired, please register again.",
     "tokenDoesNotExist": "Something's wrong with the link, please try again.",
-    "userNotFound": "This email is not associated to a valid user"
+    "userNotFound": "This email is not associated to a valid user",
+    "invalidPhone": "Invalid phone number"
   },
   "tags": {
     "arabe": "Arab",
@@ -92,6 +93,12 @@
     "picadas": "Picadas",
     "pizzeria": "Pizza",
     "vegetariano": "Vegetarian"
+  },
+  "filter": {
+    "priceInput": {
+      "minLargerThanMax": "El precio mínimo tiene que ser menor al máximo",
+      "maxSmallerThanMin": "El precio máximo tiene que ser mayor al mínimo"
+    }
   },
   "pages": {
     "home": {
@@ -135,6 +142,7 @@
     },
     "restaurants": {
       "title": "Browse restaurants",
+      "notFound": "There are no restaurants matching that filter criteria",
       "filter": {
         "title": "Filters",
         "min": {
@@ -363,6 +371,11 @@
     },
     "profile": {
       "profile": "Profile",
+      "notFound": "Couldn't load user information",
+      "successAlert": "Profile information updated successfully",
+      "email": {
+        "label": "Email"
+      },
       "username": {
         "label": "Username",
         "placeholder": "Your username"

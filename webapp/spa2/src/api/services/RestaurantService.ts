@@ -15,8 +15,7 @@ import { pagedResponse } from "../utils";
 const PATH = "/restaurants";
 interface IRestaurantService {
   getAll(
-    pageParams: PageParams,
-    filterParams?: RestaurantFilterParams
+    params: PageParams & RestaurantFilterParams
   ): Promise<Page<IRestaurantResponse[]>>;
 
   getPopular(): Promise<Page<IRestaurantResponse[]>>;
@@ -25,20 +24,20 @@ interface IRestaurantService {
 }
 
 async function _getAll(
-  pageParams: PageParams,
-  filterParams?: RestaurantFilterParams,
+  params: PageParams & RestaurantFilterParams,
   filterBy?: string
 ) {
-  if (pageParams.pageAmount > MAX_PAGE_AMOUNT) {
-    pageParams.pageAmount = MAX_PAGE_AMOUNT;
+  if ((params?.pageAmount ?? 0) > MAX_PAGE_AMOUNT) {
+    params.pageAmount = MAX_PAGE_AMOUNT;
   }
   try {
-    const params = {
-      ...pageParams,
-      ...filterParams,
+    const apiParams = {
+      ...params,
       filterBy,
     };
-    const response = await apiClient.get<IRestaurant[]>(PATH, { params });
+    const response = await apiClient.get<IRestaurant[]>(PATH, {
+      params: apiParams,
+    });
     return pagedResponse(response);
   } catch (error) {
     throw new Error("General Error", {
@@ -48,19 +47,16 @@ async function _getAll(
 }
 
 module RestaurantServiceImpl {
-  export async function getAll(
-    pageParams: PageParams,
-    filterParams?: RestaurantFilterParams
-  ) {
-    return _getAll(pageParams, filterParams);
+  export async function getAll(params: PageParams & RestaurantFilterParams) {
+    return _getAll(params);
   }
 
   export async function getPopular() {
-    return _getAll(DEFAULT_PAGE, undefined, "popular");
+    return _getAll(DEFAULT_PAGE, "popular");
   }
 
   export async function getHot() {
-    return _getAll(DEFAULT_PAGE, undefined, "hot");
+    return _getAll(DEFAULT_PAGE, "hot");
   }
 }
 

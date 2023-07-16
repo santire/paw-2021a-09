@@ -9,7 +9,7 @@ interface AuthContextType {
 }
 
 const initialAuthContext: AuthContextType = {
-  isAuthenticated: false,
+  isAuthenticated: !!localStorage.getItem("token"),
   setCredentials: () => {},
   logout: () => {},
   userId: NaN,

@@ -150,7 +150,7 @@ public class RestaurantController {
 
     @GET
     @Path("/{restaurantId}/image")
-    @Produces("image/jpg")
+    @Produces(value = {MediaType.APPLICATION_JSON, "image/jpg"})
     public Response getRestaurantImage(@PathParam("restaurantId") final long restaurantId) throws IOException {
         CacheControl cache = CachingUtils.getCaching(CachingUtils.HOUR_TO_SEC);
         Date expireDate = CachingUtils.getExpirationDate(CachingUtils.HOUR_TO_SEC);
@@ -160,6 +160,7 @@ public class RestaurantController {
         final byte[] imageData = image != null ? image.getData() : Image.getPlaceholderImage();
 
         return Response.ok(imageData)
+                .header("Content-Type", "image/jpg")
                 .cacheControl(cache).expires(expireDate).build();
     }
 

@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useEffect, useState } from "react";
-import { useActivateUser, useLoginUser } from "../hooks/user.hooks";
+import { useActivateUser } from "../hooks/user.hooks";
 import { IconAlertCircle } from "@tabler/icons-react";
 import { RegisterForm } from "../components/RegisterForm/RegisterForm";
 
