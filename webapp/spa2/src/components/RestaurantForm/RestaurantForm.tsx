@@ -43,7 +43,6 @@ export function RestaurantForm() {
     formState: { errors },
     setError,
     clearErrors,
-    getValues,
     setValue,
   } = useForm<IRestaurantRegister>({
     mode: "onTouched",

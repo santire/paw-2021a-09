@@ -21,11 +21,11 @@
     "@mantine/notifications": "^5.9.0",
     "@tabler/icons-react": "^2.24.0",
     "axios": "^1.4.0",
+    "dayjs": "^1.11.6",
+    "embla-carousel-react": "^7.0.5",
     "i18next": "^22.5.0",
     "i18next-browser-languagedetector": "^7.0.1",
     "i18next-http-backend": "^2.2.1",
-    "dayjs": "^1.11.6",
-    "embla-carousel-react": "^7.0.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.44.1",
@@ -39,6 +39,7 @@
     "zod-i18n-map": "^2.13.0"
   },
   "devDependencies": {
+    "@types/qs": "^6.9.7",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
