@@ -132,11 +132,20 @@ public class UserController {
     @Path("/{userId}/restaurants")
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isUser(#userId)")
-    public Response getUserRestaurants(@PathParam("userId") final Long userId, @QueryParam("page") @DefaultValue("1") Integer page, @Context HttpServletRequest request) {
-        int totalRestaurants = restaurantService.getRestaurantsFromOwnerCount(AMOUNT_OF_RESTAURANTS, userId);
-        List<RestaurantDto> restaurants = restaurantService.getRestaurantsFromOwner(page, AMOUNT_OF_RESTAURANTS, userId).stream().map(u -> RestaurantDto.fromRestaurant(u, uriInfo)).collect(Collectors.toList());
+    public Response getUserRestaurants(@PathParam("userId") final Long userId,
+                                       @QueryParam("page") @DefaultValue("1") Integer page,
+                                       @QueryParam("pageAmount") @DefaultValue("10") Integer pageAmount,
+                                       @Context HttpServletRequest request) {
+        if(pageAmount > AMOUNT_OF_RESTAURANTS) {
+            pageAmount = AMOUNT_OF_RESTAURANTS;
+        }
+        if(pageAmount <= 0) {
+            pageAmount = 1;
+        }
+        int totalRestaurants = restaurantService.getRestaurantsFromOwnerCount(userId);
+        List<RestaurantDto> restaurants = restaurantService.getRestaurantsFromOwner(page, pageAmount, userId).stream().map(u -> RestaurantDto.fromRestaurant(u, uriInfo)).collect(Collectors.toList());
         return PageUtils.paginatedResponse(new GenericEntity<List<RestaurantDto>>(restaurants) {
-        }, uriInfo, page, AMOUNT_OF_RESTAURANTS, totalRestaurants);
+        }, uriInfo, page, pageAmount, totalRestaurants);
     }
 
     //READ USER RESERVATIONS

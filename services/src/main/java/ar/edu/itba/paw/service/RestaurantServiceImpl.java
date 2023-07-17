@@ -3,12 +3,10 @@ package ar.edu.itba.paw.service;
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
 import ar.edu.itba.paw.persistence.RestaurantDao;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +20,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     public Restaurant registerRestaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner, String facebook, String twitter, String instagram) {
         return restaurantDao.registerRestaurant(name, address, phoneNumber, tags, owner, facebook, twitter, instagram);
     }
+
     @Override
     @Transactional
     public boolean setImageByRestaurantId(Image image, long restaurantId) {
@@ -35,16 +34,19 @@ public class RestaurantServiceImpl implements RestaurantService {
     public Optional<Restaurant> findById(long id) {
         return restaurantDao.findById(id);
     }
+
     @Override
     @Transactional
     public List<Restaurant> getPopularRestaurants(int limit, int minValue) {
         return restaurantDao.getPopularRestaurants(limit, minValue);
     }
+
     @Override
     @Transactional
     public Optional<Restaurant> findByIdWithMenu(long id, int menuPage, int amountOnMenuPage) {
         return restaurantDao.findByIdWithMenu(menuPage, amountOnMenuPage, id);
     }
+
     @Override
     @Transactional
     public int findByIdWithMenuCount(int amountOnMenuPage, long id) {
@@ -59,34 +61,32 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Override
     @Transactional
-    public int getRestaurantsFromOwnerCount(int amountOnPage, long userId) {
-        return restaurantDao.getRestaurantsFromOwnerCount(amountOnPage, userId);
+    public int getRestaurantsFromOwnerCount(long userId) {
+        return restaurantDao.getRestaurantsFromOwnerCount(userId);
     }
+
     @Override
     @Transactional
     public List<Restaurant> getHotRestaurants(int limit, int lastDays) {
         return restaurantDao.getHotRestaurants(limit, lastDays);
     }
+
     @Override
     @Transactional
-    public List<Restaurant> getRestaurantsFilteredBy(int page, int amountOnPage, String name, List<Tags> tags,
-                                                     double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays) {
-        return restaurantDao.getRestaurantsFilteredBy(page, amountOnPage,
-                name,tags,minAvgPrice,maxAvgPrice,sort,desc,lastDays);
+    public List<Restaurant> getRestaurantsFilteredBy(int page, int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays) {
+        return restaurantDao.getRestaurantsFilteredBy(page, amountOnPage, name, tags, minAvgPrice, maxAvgPrice, sort, desc, lastDays);
     }
+
     @Override
     @Transactional
-    public int getRestaurantsFilteredByCount(int amountOnPage, String name, List<Tags> tags, double minAvgPrice,
-                                                 double maxAvgPrice) {
-        return restaurantDao.getRestaurantsFilteredByCount(amountOnPage, name,
-                tags, minAvgPrice, maxAvgPrice);
+    public int getRestaurantsFilteredByCount(String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice) {
+        return restaurantDao.getRestaurantsFilteredByCount(name, tags, minAvgPrice, maxAvgPrice);
     }
 
     // UPDATE
     @Override
     @Transactional
-    public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber,
-            List<Tags> tags, String facebook, String twitter, String instagram) {
+    public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber, List<Tags> tags, String facebook, String twitter, String instagram) {
         Restaurant restaurant = findById(id).orElseThrow(RestaurantNotFoundException::new);
         if (name != null) restaurant.setName(name);
         if (address != null) restaurant.setAddress(address);

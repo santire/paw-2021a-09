@@ -12,7 +12,7 @@ const userKeys = {
   detail: (id: number) => [...userKeys.details(), id] as const,
 };
 
-export interface QueryOptions {
+interface QueryOptions {
   onSuccess?: () => void;
   onError?: (error: ServerError) => void;
 }

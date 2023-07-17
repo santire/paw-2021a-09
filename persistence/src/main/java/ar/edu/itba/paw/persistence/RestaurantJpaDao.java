@@ -211,14 +211,11 @@ public class RestaurantJpaDao implements RestaurantDao {
         return query.getResultList();
     }
 
-    public int getRestaurantsFromOwnerCount(int amountOnPage, long userId) {
+    public int getRestaurantsFromOwnerCount(long userId) {
         Query nativeQuery = em.createNativeQuery("SELECT restaurant_id FROM restaurants WHERE user_id = :userId");
         nativeQuery.setParameter("userId", userId);
 
-        int amountOfRestaurants = nativeQuery.getResultList().size();
-        int pageAmount = (int) Math.ceil((double) amountOfRestaurants / amountOnPage);
-
-        return pageAmount <= 0 ? 1 : pageAmount;
+        return nativeQuery.getResultList().size();
     }
 
     @Override
@@ -320,7 +317,7 @@ public class RestaurantJpaDao implements RestaurantDao {
     }
 
     @Override
-    public int getRestaurantsFilteredByCount(int amountOnPage, String name, List<Tags> tags, double minAvgPrice,
+    public int getRestaurantsFilteredByCount(String name, List<Tags> tags, double minAvgPrice,
             double maxAvgPrice) {
         String TAG_CHECK_QUERY = " ";
         if(!tags.isEmpty()){

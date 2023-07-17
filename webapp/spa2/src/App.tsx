@@ -12,6 +12,8 @@ import { ResetPage } from "./pages/Reset";
 import { HomePage } from "./pages/Home";
 import { RestaurantsPage } from "./pages/Restaurants";
 import { ProfilePage } from "./pages/Profile";
+import { RegisterRestaurantPage } from "./pages/RegisterRestaurant";
+import { UserRestaurantsPage } from "./pages/UserRestaurants";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,6 +39,10 @@ const router = createBrowserRouter(
           element: <RestaurantsPage />,
         },
         {
+          path: "/restaurants/register",
+          element: <RegisterRestaurantPage />,
+        },
+        {
           path: "/login",
           element: <LoginPage />,
         },
@@ -53,8 +59,12 @@ const router = createBrowserRouter(
           element: <ResetPage />,
         },
         {
-          path: "/users/edit",
+          path: "/user/edit",
           element: <ProfilePage />,
+        },
+        {
+          path: "/user/restaurants",
+          element: <UserRestaurantsPage />,
         },
         {
           path: "*",

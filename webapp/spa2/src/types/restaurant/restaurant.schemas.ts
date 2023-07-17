@@ -35,6 +35,7 @@ const HasURLs = z.object({
 });
 
 const HasComputedProps = z.object({
+  reservationsCount: z.number().gte(0),
   likes: z.number().gte(0),
   rating: z.number().gte(0).lte(5),
 });

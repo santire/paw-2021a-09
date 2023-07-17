@@ -10,12 +10,23 @@ import { UserService } from "../api/services/UserService";
 import { LikeService } from "../api/services/LikeService";
 import { RestaurantFilterParams } from "../types/filters";
 import { useSearchParams } from "react-router-dom";
+import { ServerError, isServerError } from "../api/client";
+
+interface QueryOptions {
+  onSuccess?: () => void;
+  onError?: (error: ServerError) => void;
+}
 
 const restaurantKeys = {
   all: ["restaurants"] as const,
   lists: (userId: number) => [...restaurantKeys.all, "list", userId] as const,
   list: (userId: number, filters?: PageParams & RestaurantFilterParams) =>
-    [...restaurantKeys.lists(userId), { ...filters }] as const,
+    [...restaurantKeys.lists(userId), { filters }] as const,
+  owned: (userId: number, pageParams?: PageParams) => [
+    ...restaurantKeys.list(userId),
+    "owned",
+    { pageParams },
+  ],
   popular: (userId: number) =>
     [...restaurantKeys.lists(userId), "popular"] as const,
   hot: (userId: number) => [...restaurantKeys.lists(userId), "hot"] as const,
@@ -33,7 +44,33 @@ export function useGetRestaurants(
     enabled: !!params,
     queryFn: async () =>
       withLikes(
-        () => RestaurantService.getAll({ ...params!, pageAmount: 6 }),
+        () => RestaurantService.getAll({ ...params! }),
+        isAuthenticated,
+        userId
+      ),
+    onSuccess: (data) => {
+      const page = parseInt(searchParams.get("page") || "NaN");
+      // If page is invalid resets back to first
+      if (page > data.meta.maxPages) {
+        searchParams.delete("page");
+        setSearchParams(searchParams);
+      }
+    },
+  });
+}
+
+export function useGetOwnedRestaurants(params?: PageParams) {
+  const { isAuthenticated, userId } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  return useQuery<Page<IRestaurant[]>>({
+    queryKey: restaurantKeys.owned(userId, params),
+    enabled: !!params && !!userId,
+    queryFn: async () =>
+      withLikes(
+        () =>
+          RestaurantService.getOwnedRestaurants(userId, {
+            ...params!,
+          }),
         isAuthenticated,
         userId
       ),
@@ -63,6 +100,62 @@ export function useGetHotRestaurants() {
     queryKey: restaurantKeys.hot(userId),
     queryFn: async () =>
       withLikes(() => RestaurantService.getHot(), isAuthenticated, userId),
+  });
+}
+
+export function useCreateRestaurant(options?: QueryOptions) {
+  const queryClient = useQueryClient();
+  const { userId } = useAuth();
+
+  return useMutation({
+    mutationFn: RestaurantService.create,
+    onSuccess: () => {
+      // Invalidate because might change page order
+      queryClient.invalidateQueries(restaurantKeys.lists(userId));
+      // queryClient.setQueriesData<Page<IRestaurant[]>>(
+      //   restaurantKeys.all,
+      //   (prev) => ({
+      //     meta: prev!.meta,
+      //     data: [...prev!.data, { ...data, likedByUser: false }],
+      //   })
+      // );
+
+      if (options?.onSuccess) {
+        options.onSuccess();
+      }
+    },
+
+    onError: ({ cause }) => {
+      if (isServerError(cause) && options?.onError) {
+        options.onError(cause);
+      } else {
+        console.log("An error here shouldn't be happening");
+      }
+    },
+  });
+}
+
+export function useDeleteRestaurant(options?: QueryOptions) {
+  const queryClient = useQueryClient();
+  const { userId } = useAuth();
+
+  return useMutation({
+    mutationFn: RestaurantService.deleteRestaurant,
+    onSuccess: () => {
+      // Invalidate because might change page order
+      queryClient.invalidateQueries(restaurantKeys.lists(userId));
+      if (options?.onSuccess) {
+        options.onSuccess();
+      }
+    },
+
+    onError: ({ cause }) => {
+      if (isServerError(cause) && options?.onError) {
+        options.onError(cause);
+      } else {
+        console.log("An error here shouldn't be happening");
+      }
+    },
   });
 }
 

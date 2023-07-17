@@ -1,4 +1,5 @@
 import {
+  Button,
   Container,
   createStyles,
   Flex,
@@ -8,31 +9,43 @@ import {
   Text,
 } from "@mantine/core";
 import { useTranslation } from "react-i18next";
-import { RestaurantCard } from "../components/RestaurantCard/RestaurantCard";
-import { useGetRestaurants } from "../hooks/restaurant.hooks";
-import {
-  useFilterSearchParams,
-  usePageSearchParams,
-} from "../hooks/searchParams.hooks";
-import { Filter } from "../components/Filter/Filter";
+import { useGetOwnedRestaurants } from "../hooks/restaurant.hooks";
+import { usePageSearchParams } from "../hooks/searchParams.hooks";
 import { RestaurantCardSkeleton } from "../components/RestaurantCard/RestaurantCardSkeleton";
+import { UserRestaurantCard } from "../components/UserRestaurantCard/UserRestaurantCard";
+import { useAuth } from "../hooks/useAuth";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = createStyles((theme) => ({
   title: {
     fontSize: theme.fontSizes.xl * 1.8,
     paddingLeft: theme.spacing.sm,
   },
+  empty: {
+    align: "center",
+    fontSize: 30,
+    marginTop: 100,
+  },
 }));
 
-export function RestaurantsPage() {
-  const [pageParams, setPageParams] = usePageSearchParams();
-  const [filterParams] = useFilterSearchParams();
+export function UserRestaurantsPage() {
+  const [pageParams, setPageParams] = usePageSearchParams({
+    page: 1,
+    pageAmount: 6,
+  });
   // Ugly hack, but otherwise would do two queries when loading from url with filter params
-  const { data, error } = useGetRestaurants(
-    pageParams && filterParams ? { ...pageParams, ...filterParams } : undefined
-  );
+  const { data, error } = useGetOwnedRestaurants(pageParams);
 
+  const { classes } = useStyles();
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/");
+    }
+  }, []);
 
   if (error) {
     return (
@@ -52,7 +65,7 @@ export function RestaurantsPage() {
           <Flex direction="column" align="center">
             <SimpleGrid cols={3} spacing="xl" mb="xl">
               {restaurants.data.map((rest) => (
-                <RestaurantCard restaurant={rest} key={rest.name} />
+                <UserRestaurantCard restaurant={rest} key={rest.id} />
               ))}
             </SimpleGrid>
             <Pagination
@@ -70,22 +83,17 @@ export function RestaurantsPage() {
     } else {
       return (
         <Wrapper>
-          <Flex
-            direction="column"
-            align="center"
-            justify="space-between"
-            h={"100%"}
-          >
-            <Flex align={"center"} justify="center" h="100%">
-              <Text size="xl">{t("pages.restaurants.notFound")}</Text>
-            </Flex>
-            <Pagination
-              total={1}
-              initialPage={1}
-              align="center"
-              color="orange"
-              disabled={true}
-            />
+          <Flex justify="center" align="center" h={"100%"}>
+            <div className={classes.empty}>
+              <Text mb={50}>{t("pages.userRestaurants.notFound")}</Text>
+              <Button
+                color="orange"
+                mx={170}
+                onClick={() => navigate("/restaurants/register")}
+              >
+                {t("pages.userRestaurants.createOne")}
+              </Button>
+            </div>
           </Flex>
         </Wrapper>
       );
@@ -122,12 +130,9 @@ function Wrapper({ children }: { children: React.ReactNode }) {
       <Text
         my="xl"
         className={classes.title}
-      >{t`pages.restaurants.title`}</Text>
+      >{t`pages.userRestaurants.title`}</Text>
       <Grid gutter="md" justify="center">
-        <Grid.Col span={3}>
-          <Filter />
-        </Grid.Col>
-        <Grid.Col span={9}>{children}</Grid.Col>
+        <Grid.Col span={12}>{children}</Grid.Col>
       </Grid>
     </Container>
   );

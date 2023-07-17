@@ -130,21 +130,15 @@ function UserMenu(user: IUser) {
         </Menu.Item>
         <Menu.Item
           icon={<IconToolsKitchen2 size={14} stroke={1.5} />}
-          onClick={() => navigate(`/users/${user?.userId}/restaurants`)}
+          onClick={() => navigate(`/user/restaurants`)}
         >
           {t("header.userMenu.restaurants.restaurants")}
-        </Menu.Item>
-        <Menu.Item
-          icon={<IconMessagePlus size={14} stroke={1.5} />}
-          onClick={() => navigate(`/users/${user?.userId}/reservations`)}
-        >
-          {t("header.userMenu.restaurants.reservations")}
         </Menu.Item>
         <Menu.Divider />
         <Menu.Label>{t("header.userMenu.settings.title")}</Menu.Label>
         <Menu.Item
           icon={<IconSettings size={14} stroke={1.5} />}
-          onClick={() => navigate("/users/edit")}
+          onClick={() => navigate("/user/edit")}
         >
           {t("header.userMenu.settings.account")}
         </Menu.Item>
@@ -180,7 +174,7 @@ export function Header() {
               {isAuthenticated && user.isSuccess ? (
                 <NavItem
                   label={t("header.reservations")}
-                  to={`users/${user.data.userId}/reservations`}
+                  to={`user/reservations`}
                   hidden={!user}
                 />
               ) : null}

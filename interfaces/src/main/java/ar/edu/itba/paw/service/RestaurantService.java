@@ -16,10 +16,10 @@ public interface RestaurantService {
     Optional<Restaurant> findByIdWithMenu(long id, int menuPage, int amountOnMenuPage);
     int findByIdWithMenuCount(int amountOnMenuPage, long id);
     List<Restaurant> getRestaurantsFromOwner(int page, int amountOnPage, long userId);
-    int getRestaurantsFromOwnerCount(int amountOnPage, long userId);
+    int getRestaurantsFromOwnerCount(long userId);
     List<Restaurant> getPopularRestaurants(int limit, int minValue);
     List<Restaurant> getRestaurantsFilteredBy(int page, int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays);
-    int getRestaurantsFilteredByCount(int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice);
+    int getRestaurantsFilteredByCount(String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice);
     List<Restaurant> getHotRestaurants(int limit, int lastDays);
 
     // UPDATE

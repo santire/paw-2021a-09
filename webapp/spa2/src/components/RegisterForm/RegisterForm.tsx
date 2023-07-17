@@ -141,7 +141,11 @@ export function RegisterForm({ setPending }: RegisterFormProps) {
                 placeholder={t("pages.register.phone.placeholder") || ""}
                 type="number"
                 required
-                error={errors.phone?.message}
+                error={
+                  errors.phone?.message === "errors.invalidPhone"
+                    ? t(errors.phone?.message)
+                    : errors.phone?.message
+                }
                 {...register("phone")}
               />
             </SimpleGrid>

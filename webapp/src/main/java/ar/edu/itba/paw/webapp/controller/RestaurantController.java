@@ -125,7 +125,7 @@ public class RestaurantController {
             pageAmount = MAX_AMOUNT_PER_PAGE;
         }
 
-        int totalRestaurants = restaurantService.getRestaurantsFilteredByCount(pageAmount, search, tagsSelected, min, max);
+        int totalRestaurants = restaurantService.getRestaurantsFilteredByCount(search, tagsSelected, min, max);
         List<RestaurantDto> restaurants = restaurantService.getRestaurantsFilteredBy(
                         page, pageAmount, search, tagsSelected, min, max, sort, desc, 7)
                 .stream()
@@ -309,7 +309,7 @@ public class RestaurantController {
         LOGGER.debug("Created image: {}", image);
         restaurantService.setImageByRestaurantId(image, restaurantId);
         final URI uri = uriInfo.getAbsolutePathBuilder().build();
-        return Response.created(uri).entity(bytes).build();
+        return Response.ok(uri).entity(bytes).build();
     }
 
     @PUT

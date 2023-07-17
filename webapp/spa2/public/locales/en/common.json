@@ -35,6 +35,20 @@
     "tagsTitle": "Perfect for you, if you enjoy",
     "likeTooltip": "Must be logged in to like"
   },
+  "userRestaurantCard": {
+    "more": "See more",
+    "viewReservations": "View reservations",
+    "pending": "You have {{reservationsCount}} pending reservations",
+    "edit": "Edit",
+    "delete": "Delete",
+    "liked": "{{likes}} people liked this",
+    "tagsTitle": "Perfect for you, if you enjoy",
+    "deleteModal": {
+      "title": "Are you sure you want to delete?",
+      "text": "This action cannot be undone and all your restaurant information will be lost.",
+      "confirm": "Confirm"
+    }
+  },
   "restaurantCarousel": {
     "noRestaurants": "No restaurants available"
   },
@@ -306,8 +320,14 @@
       "title": "Register a restaurant",
       "tagsDivider": "Tags",
       "profileImage": "Profile Image",
-      "dropImage": "Drop images here ir click to select files",
-      "tagsSelection": "At least 1 tag1 is required",
+      "dropImage": "Drop image here or click to select file",
+      "dropImageSize": "The image file shouldn't exceed 400kb",
+      "tagsSelection": "At least 1 tag is required",
+      "errors": {
+        "imageTooLarge": "The image is too large",
+        "imageMissing": "An image is required",
+        "imageInvalidType": "Not a valid image type"
+      },
       "name": {
         "label": "Restaurant name",
         "placeholder": "Your restaurant name"
