@@ -144,15 +144,11 @@ export function useCreateUser(options?: QueryOptions) {
 }
 
 type isOwnerProps = {
-  restaurant?: IRestaurant;
-  restaurantId?: number;
+  restaurant: IRestaurant;
 };
-export function useIsOwner({ restaurant, restaurantId }: isOwnerProps) {
+export function useIsOwner({ restaurant }: isOwnerProps) {
   const { userId } = useAuth();
-  if (restaurant) {
-    const { owner } = restaurant;
-    const rid = parseInt(owner.substring(owner.lastIndexOf("/") + 1));
-    return userId === rid;
-  }
-  return userId === restaurantId;
+  const { owner } = restaurant;
+  const rid = parseInt(owner.substring(owner.lastIndexOf("/") + 1));
+  return userId === rid;
 }

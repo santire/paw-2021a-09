@@ -135,6 +135,8 @@
       "reservationButton": "Make a Reservation",
       "menu": {
         "title": "Menu",
+        "notFound": "This restaurant doesn't have menu items yet",
+        "ownerHint": "Add one to make it visible to the public!",
         "price": {
           "label": "Price",
           "placeholder": "$$$"

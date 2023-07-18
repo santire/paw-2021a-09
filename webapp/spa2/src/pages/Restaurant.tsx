@@ -14,7 +14,6 @@ import {
   Badge,
 } from "@mantine/core";
 import {
-  IconCheck,
   IconMapPin,
   IconMenu,
   IconMessageCircle,
@@ -30,8 +29,9 @@ import { IRestaurant } from "../types/restaurant/restaurant.models";
 import { SocialsButton } from "../components/SocialsButton/SocialsButton";
 import { TagButton } from "../components/TagButton/TagButton";
 import { useIsOwner } from "../hooks/user.hooks";
-import { ManageButton } from "../components/ManageButton/ManageButton";
 import { RatingStars } from "../components/RatingStars/RatingStars";
+import { MenuItems } from "../components/MenuItems/MenuItems";
+import { useTabSearchParam } from "../hooks/searchParams.hooks";
 
 const useStyles = createStyles((theme) => ({
   title: {
@@ -74,8 +74,9 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export function RestaurantPage({ restaurantId }: { restaurantId: number }) {
-  const { data, isLoading, isError } = useGetRestaurant(restaurantId);
   const { t } = useTranslation();
+  const [tabParam, setTabParam] = useTabSearchParam("menu");
+  const { data, isLoading, isError } = useGetRestaurant(restaurantId);
 
   if (isLoading) {
     return (
@@ -119,25 +120,26 @@ export function RestaurantPage({ restaurantId }: { restaurantId: number }) {
         <Divider m="xl" orientation="horizontal" />
         <Flex justify={"center"}>
           <Tabs
-            defaultValue="Menu"
+            value={tabParam ?? "menu"}
+            onTabChange={setTabParam}
             style={{ width: "80%", justifyContent: "center" }}
           >
             <Tabs.List>
-              <Tabs.Tab value="Menu" icon={<IconMenu size={14} />}>
+              <Tabs.Tab value="menu" icon={<IconMenu size={14} />}>
                 {t("pages.restaurant.menu.title")}
               </Tabs.Tab>
-              <Tabs.Tab value="Reviews" icon={<IconMessageCircle size={14} />}>
+              <Tabs.Tab value="reviews" icon={<IconMessageCircle size={14} />}>
                 {t("pages.restaurant.reviews.title")}
               </Tabs.Tab>
             </Tabs.List>
 
-            <Tabs.Panel value="Menu" pt="xs">
+            <Tabs.Panel value="menu" pt="xs">
               <Center mt={50}>
-                <Loader color="gray" variant="dots" size="xl" />
+                <MenuItems restaurant={data} />
               </Center>
             </Tabs.Panel>
 
-            <Tabs.Panel value="Reviews" pt="xs">
+            <Tabs.Panel value="reviews" pt="xs">
               <Center mt={50}>
                 <Loader color="gray" variant="dots" size="xl" />
               </Center>
@@ -190,7 +192,7 @@ function RestaurantHeader({ restaurant }: { restaurant: IRestaurant }) {
             <Grid justify="space-between">
               <Grid.Col span={8}>
                 <Group spacing="xs" mb="xs">
-                  <IconMapPin size={18} color="gray" stroke={1.5} />
+                  <IconMapPin size={18} color="orange" stroke={1.5} />
                   <Text align="left" className={classes.address}>
                     {address}
                   </Text>
@@ -216,7 +218,7 @@ function RestaurantHeader({ restaurant }: { restaurant: IRestaurant }) {
               </Grid.Col>
             </Grid>
             <Group spacing="xs" mb="xs">
-              <IconPhone size={18} color="gray" stroke={1.5} />
+              <IconPhone size={18} color="orange" stroke={1.5} />
               <Text align="left" className={classes.address}>
                 {phoneNumber}
               </Text>
@@ -236,11 +238,7 @@ function RestaurantHeader({ restaurant }: { restaurant: IRestaurant }) {
             </Flex>
 
             <Group spacing={20} px={3}>
-              {isOwner ? (
-                <ManageButton restaurant={restaurant} />
-              ) : (
-                <LikeButton restaurant={restaurant} />
-              )}
+              {isOwner ? null : <LikeButton restaurant={restaurant} />}
               <RatingStars restaurant={restaurant} />
             </Group>
 
@@ -255,15 +253,32 @@ function RestaurantHeader({ restaurant }: { restaurant: IRestaurant }) {
 
             <Flex direction="column" justify="space-between" h={"100%"}>
               {isOwner ? (
-                <Button
-                  mt="xl"
-                  color="orange"
-                  variant="outline"
-                  size="xl"
-                  onClick={() => navigate(`/restaurants/${restaurant.id}/edit`)}
-                >
-                  {t("userRestaurantCard.edit")}
-                </Button>
+                <Flex direction="column" align="center" justify="space-between">
+                  <Button
+                    mt="xl"
+                    color="gray"
+                    variant="outline"
+                    size="lg"
+                    w="100%"
+                    onClick={() =>
+                      navigate(`/restaurants/${restaurant.id}/edit`)
+                    }
+                  >
+                    {t("userRestaurantCard.edit")}
+                  </Button>
+                  <Button
+                    mt="sm"
+                    color="orange"
+                    variant="outline"
+                    size="lg"
+                    w="100%"
+                    onClick={() =>
+                      navigate(`/restaurants/${restaurant.id}/reservations`)
+                    }
+                  >
+                    {t("userRestaurantCard.viewReservations")}
+                  </Button>
+                </Flex>
               ) : (
                 <Button
                   mt="xl"

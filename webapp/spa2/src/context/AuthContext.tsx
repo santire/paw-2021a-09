@@ -25,6 +25,7 @@ export function AuthContextProvider({ children }: Props) {
   );
   const [userId, setUserId] = useState(initialAuthContext.userId);
   const queryClient = useQueryClient();
+
   const setCredentials = (token: string, userId: number) => {
     // Set the token and userId in localStorage
     localStorage.setItem("token", token);
@@ -48,6 +49,7 @@ export function AuthContextProvider({ children }: Props) {
   useEffect(() => {
     // Check authentication status on component mount
     const checkAuthStatus = () => {
+      // console.log("Checking auth status");
       try {
         const token = localStorage.getItem("token");
         const userId = parseInt(localStorage.getItem("userId") || "");
@@ -68,6 +70,11 @@ export function AuthContextProvider({ children }: Props) {
     };
 
     checkAuthStatus();
+    // Check auth every 10 minutes
+    const interval = setInterval(() => checkAuthStatus(), 0.2 * 60 * 1000);
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -86,13 +93,17 @@ function isTokenValid(jwtToken: string): boolean {
     if (!jwt) {
       return false;
     }
-    const expirationDate = new Date(jwt && jwt.exp && jwt.exp * 1000);
     // multiply by 1000 to convert seconds into milliseconds
-    return new Date() < expirationDate;
-    // DEBUG: force token validity to x mins
+    const expirationDate = new Date(jwt && jwt.exp && jwt.exp * 1000);
+
     // let x = 0.15;
-    // return (jwt && jwt.exp && jwt.exp * 1000) - (60 - x) * 60 * 1000 || null;
+    // const expirationDate = new Date(
+    //   (jwt && jwt.exp && jwt.exp * 1000) - (60 - x) * 5 * 60 * 1000
+    // );
+    // console.log("expiration date: ", expirationDate);
+    return new Date() < expirationDate;
   } catch (e) {
+    // DEBUG: force token validity to x mins
     console.log("Invalid token");
     return false;
   }

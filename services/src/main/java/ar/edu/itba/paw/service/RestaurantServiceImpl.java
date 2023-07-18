@@ -49,8 +49,8 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Override
     @Transactional
-    public int findByIdWithMenuCount(int amountOnMenuPage, long id) {
-        return restaurantDao.findByIdWithMenuCount(amountOnMenuPage, id);
+    public int findByIdWithMenuCount(long id) {
+        return restaurantDao.findByIdWithMenuCount( id);
     }
 
     @Override

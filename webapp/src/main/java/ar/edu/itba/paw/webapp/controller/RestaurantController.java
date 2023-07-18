@@ -168,7 +168,8 @@ public class RestaurantController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     public Response findRestaurantMenu(@PathParam("restaurantId") final long restaurantId, @QueryParam("page") @DefaultValue("1") Integer page) {
 
-        int amountOfMenuItems = restaurantService.findByIdWithMenuCount(AMOUNT_OF_MENU_ITEMS, restaurantId);
+        int amountOfMenuItems = restaurantService.findByIdWithMenuCount(restaurantId);
+        LOGGER.debug("Amount of menu items: {}", amountOfMenuItems);
         final Restaurant restaurant = restaurantService.findByIdWithMenu(restaurantId, page, AMOUNT_OF_MENU_ITEMS)
                 .orElseThrow(RestaurantNotFoundException::new);
 

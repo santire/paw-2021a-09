@@ -45,7 +45,7 @@ export function UserRestaurantsPage() {
     if (!isAuthenticated) {
       navigate("/");
     }
-  }, []);
+  }, [isAuthenticated]);
 
   if (error) {
     return (

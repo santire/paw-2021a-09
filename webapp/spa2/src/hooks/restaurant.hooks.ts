@@ -65,7 +65,6 @@ export function useGetRestaurants(
 
 export function useGetRestaurant(restaurantId: number) {
   const { isAuthenticated, userId } = useAuth();
-  console.log({ isAuthenticated, userId });
   return useQuery<IRestaurant>({
     queryKey: restaurantKeys.detail(userId, restaurantId),
     queryFn: async () =>
