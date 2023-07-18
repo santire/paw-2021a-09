@@ -208,7 +208,7 @@ async function withLikes(
 ) {
   const { data, meta } = await getter();
   // If user is authenticated, stiches likedBy status
-  if (isAuthenticated) {
+  if (isAuthenticated && !!userId) {
     const ids = data.map((r) => r.id);
     const likes = await UserService.getLikesByRestaurants(userId, ids);
     const newData = data.map((r) => ({
