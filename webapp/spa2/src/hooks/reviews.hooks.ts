@@ -2,28 +2,28 @@ import { useSearchParams } from "react-router-dom";
 import { ServerError, isServerError } from "../api/client";
 import { Page, PageParams } from "../types/page";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { IMenuItem } from "../types/menuItem/menuItem.models";
-import { MenuItemService } from "../api/services/MenuItemService";
+import { ReviewService } from "../api/services/ReviewService";
+import { IReview } from "../types/review/review.models";
 
 interface QueryOptions {
   onSuccess?: () => void;
   onError?: (error: ServerError) => void;
 }
 
-const menuKeys = {
-  all: ["menuItems"] as const,
+const reviewKeys = {
+  all: ["reviews"] as const,
   lists: (restaurantId: number) =>
-    [...menuKeys.all, "list", restaurantId] as const,
+    [...reviewKeys.all, "list", restaurantId] as const,
   list: (restaurantId: number, filters?: PageParams) =>
-    [...menuKeys.lists(restaurantId), { filters }] as const,
+    [...reviewKeys.lists(restaurantId), { filters }] as const,
 };
 
-export function useGetMenuItems(restaurantId: number, params?: PageParams) {
+export function useGetReviews(restaurantId: number, params?: PageParams) {
   const [searchParams, setSearchParams] = useSearchParams();
-  return useQuery<Page<IMenuItem[]>>({
-    queryKey: menuKeys.list(restaurantId, params),
+  return useQuery<Page<IReview[]>>({
+    queryKey: reviewKeys.list(restaurantId, params),
     enabled: !!params,
-    queryFn: () => MenuItemService.getAll(restaurantId, params!),
+    queryFn: () => ReviewService.getAll(restaurantId, params!),
     onSuccess: (data) => {
       const page = parseInt(searchParams.get("page") || "NaN");
       // If page is invalid resets back to first
@@ -35,14 +35,14 @@ export function useGetMenuItems(restaurantId: number, params?: PageParams) {
   });
 }
 
-export function useCreateMenuItem(options?: QueryOptions) {
+export function useCreateReview(options?: QueryOptions) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: MenuItemService.create,
+    mutationFn: ReviewService.create,
     onSuccess: (_, { restaurantId }) => {
       // Invalidate because might change page order
-      queryClient.invalidateQueries(menuKeys.lists(restaurantId));
+      queryClient.invalidateQueries(reviewKeys.lists(restaurantId));
       if (options?.onSuccess) {
         options.onSuccess();
       }
@@ -57,14 +57,14 @@ export function useCreateMenuItem(options?: QueryOptions) {
   });
 }
 
-export function useDeleteMenuItem(options?: QueryOptions) {
+export function useDeleteReview(options?: QueryOptions) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: MenuItemService.deleteMenuItem,
+    mutationFn: ReviewService.deleteReview,
     onSuccess: (_, { restaurantId }) => {
       // Invalidate because might change page order
-      queryClient.invalidateQueries(menuKeys.lists(restaurantId));
+      queryClient.invalidateQueries(reviewKeys.lists(restaurantId));
       if (options?.onSuccess) {
         options.onSuccess();
       }

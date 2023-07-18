@@ -154,7 +154,9 @@
       },
       "reviews": {
         "title": "Leave a review",
-        "submit": "Submit"
+        "submit": "Submit",
+        "notFound": "This restaurant doesn't have any reviews yet",
+        "hint": "Be the first to make a review!"
       }
     },
     "restaurants": {

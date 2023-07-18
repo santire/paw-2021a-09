@@ -32,6 +32,7 @@ import { useIsOwner } from "../hooks/user.hooks";
 import { RatingStars } from "../components/RatingStars/RatingStars";
 import { MenuItems } from "../components/MenuItems/MenuItems";
 import { useTabSearchParam } from "../hooks/searchParams.hooks";
+import { Reviews } from "../components/Reviews/Reviews";
 
 const useStyles = createStyles((theme) => ({
   title: {
@@ -141,7 +142,7 @@ export function RestaurantPage({ restaurantId }: { restaurantId: number }) {
 
             <Tabs.Panel value="reviews" pt="xs">
               <Center mt={50}>
-                <Loader color="gray" variant="dots" size="xl" />
+                <Reviews restaurant={data} />
               </Center>
             </Tabs.Panel>
           </Tabs>

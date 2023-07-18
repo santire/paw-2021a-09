@@ -5,6 +5,7 @@ import { ServerError, isServerError } from "../api/client";
 import { UserService } from "../api/services/UserService";
 import { IRestaurant } from "../types/restaurant/restaurant.models";
 import { IUserUpdate } from "../types/user/user.models";
+import { IReview } from "../types/review/review.models";
 
 const userKeys = {
   all: ["users"] as const,
@@ -144,11 +145,19 @@ export function useCreateUser(options?: QueryOptions) {
 }
 
 type isOwnerProps = {
-  restaurant: IRestaurant;
+  restaurant?: IRestaurant;
+  review?: IReview;
 };
-export function useIsOwner({ restaurant }: isOwnerProps) {
+export function useIsOwner({ restaurant, review }: isOwnerProps) {
   const { userId } = useAuth();
-  const { owner } = restaurant;
-  const rid = parseInt(owner.substring(owner.lastIndexOf("/") + 1));
-  return userId === rid;
+  if (restaurant) {
+    const { owner } = restaurant;
+    const rid = parseInt(owner.substring(owner.lastIndexOf("/") + 1));
+    return userId === rid;
+  }
+  if (review) {
+    const { user } = review;
+    const uid = parseInt(user.substring(user.lastIndexOf("/") + 1));
+    return userId === uid;
+  }
 }
