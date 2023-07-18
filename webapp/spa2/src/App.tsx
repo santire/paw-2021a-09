@@ -14,12 +14,14 @@ import { RestaurantsPage } from "./pages/Restaurants";
 import { ProfilePage } from "./pages/Profile";
 import { RegisterRestaurantPage } from "./pages/RegisterRestaurant";
 import { UserRestaurantsPage } from "./pages/UserRestaurants";
+import { RestaurantPage, ValidateRestaurant } from "./pages/Restaurant";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
+      retry: false,
       // refetchOnWindowFocus: false, // default: true
-      // staleTime: Infinity,
+      staleTime: Infinity,
     },
   },
 });
@@ -37,6 +39,10 @@ const router = createBrowserRouter(
         {
           path: "/restaurants",
           element: <RestaurantsPage />,
+        },
+        {
+          path: "/restaurants/:restaurantId",
+          element: <ValidateRestaurant />,
         },
         {
           path: "/restaurants/register",

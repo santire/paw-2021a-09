@@ -5,24 +5,17 @@ import {
   Flex,
   Grid,
   Group,
-  Image,
   Skeleton,
   Text,
 } from "@mantine/core";
 import { useTranslation } from "react-i18next";
-import { IRestaurant } from "../../types/restaurant/restaurant.models";
 import useStyles from "./RestaurantCard.styles";
 import { useNavigate } from "react-router-dom";
 import { IconStar } from "@tabler/icons-react";
-import { LikeButton } from "../LikeButton/LikeButton";
-import { useIsOwner } from "../../hooks/user.hooks";
-import { ManageButton } from "../ManageButton/ManageButton";
-import { TagButton } from "../TagButton/TagButton";
 
 export function RestaurantCardSkeleton() {
-  const { classes, theme } = useStyles();
+  const { classes } = useStyles();
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   return (
     <Card withBorder p="lg" radius="md" className={classes.card}>
@@ -45,11 +38,7 @@ export function RestaurantCardSkeleton() {
                     <Skeleton height={8} width={18} />
                   </Text>
                   <Flex align="center" p={0} m={0}>
-                    <IconStar
-                      size={16}
-                      color={"gray"}
-                      fill={"gray"}
-                    />
+                    <IconStar size={16} color={"gray"} fill={"gray"} />
                   </Flex>
                 </Group>
               </Badge>
@@ -66,8 +55,13 @@ export function RestaurantCardSkeleton() {
       </Card.Section>
 
       <Flex justify="center" align="center" mt="md">
-        <Button color="orange" variant="outline" size="md" fullWidth disabled>
-        </Button>
+        <Button
+          color="orange"
+          variant="outline"
+          size="md"
+          fullWidth
+          disabled
+        ></Button>
       </Flex>
 
       <Card.Section className={classes.footer}>

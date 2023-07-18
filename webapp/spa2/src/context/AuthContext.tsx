@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import { apiClient } from "../api/client";
+import { useQueryClient } from "react-query";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -9,7 +10,7 @@ interface AuthContextType {
 }
 
 const initialAuthContext: AuthContextType = {
-  isAuthenticated: !!localStorage.getItem("token"),
+  isAuthenticated: false,
   setCredentials: () => {},
   logout: () => {},
   userId: NaN,
@@ -23,6 +24,7 @@ export function AuthContextProvider({ children }: Props) {
     initialAuthContext.isAuthenticated
   );
   const [userId, setUserId] = useState(initialAuthContext.userId);
+  const queryClient = useQueryClient();
   const setCredentials = (token: string, userId: number) => {
     // Set the token and userId in localStorage
     localStorage.setItem("token", token);
@@ -40,11 +42,12 @@ export function AuthContextProvider({ children }: Props) {
     localStorage.removeItem("userId");
     setIsAuthenticated(false);
     setUserId(NaN);
+    queryClient.clear();
   };
 
   useEffect(() => {
     // Check authentication status on component mount
-    const checkAuthStatus = async () => {
+    const checkAuthStatus = () => {
       try {
         const token = localStorage.getItem("token");
         const userId = parseInt(localStorage.getItem("userId") || "");

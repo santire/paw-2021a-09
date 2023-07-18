@@ -18,13 +18,13 @@ interface QueryOptions {
 }
 
 export function useGetUser() {
-  const { userId } = useAuth();
+  const { isAuthenticated, userId } = useAuth();
 
   return useQuery({
     queryKey: userKeys.details(),
     queryFn: () => UserService.getById(userId),
     staleTime: Infinity,
-    enabled: !!userId,
+    enabled: isAuthenticated,
   });
 }
 

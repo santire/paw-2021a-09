@@ -33,7 +33,8 @@
     "more": "Ver más",
     "liked": "A {{likes}} personas les gusta esto",
     "tagsTitle": "Ideal para vos, si te gusta",
-    "likeTooltip": "Debe estar logueado para dar me gusta"
+    "likeTooltip": "Debe estar logueado para dar me gusta",
+    "rateTooltip": "Debe estar logueado para puntuar"
   },
   "UserRestaurantCard": {
     "more": "Ver más",

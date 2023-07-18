@@ -16,7 +16,6 @@ import useStyles from "./UserRestaurantCard.styles";
 import { useNavigate } from "react-router-dom";
 import { IconStar } from "@tabler/icons-react";
 import { ManageButton } from "../ManageButton/ManageButton";
-import { TagButton } from "../TagButton/TagButton";
 import { useState } from "react";
 import { useDeleteRestaurant } from "../../hooks/restaurant.hooks";
 
@@ -24,7 +23,7 @@ interface RestaurantCardProps {
   restaurant: IRestaurant;
 }
 export function UserRestaurantCard({ restaurant }: RestaurantCardProps) {
-  const { id, image, tags, name, rating, reservationsCount } = restaurant;
+  const { id, image, name, rating, reservationsCount } = restaurant;
   const { classes, theme } = useStyles();
   const [opened, setOpened] = useState(false);
   const { t } = useTranslation();

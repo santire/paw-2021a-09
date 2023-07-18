@@ -53,8 +53,6 @@ public class RestaurantController {
     @Autowired
     private MenuService menuService;
     @Autowired
-    private SocialMediaService socialMediaService;
-    @Autowired
     private RatingService ratingService;
     @Autowired
     private LikesService likesService;
@@ -399,18 +397,7 @@ public class RestaurantController {
         return Response.noContent().build();
     }
 
-    //READ USER RATING
-    @GET
-    @Path("/{restaurantId}/ratings")
-    @Produces(value = {MediaType.APPLICATION_JSON})
-    public Response getRestaurantRate(@PathParam("restaurantId") final Long restaurantId,
-                                      @QueryParam("userId") final Long userId,
-                                      @Context HttpServletRequest request) {
 
-        Optional<Rating> maybeRating = ratingService.getRating(userId, restaurantId);
-        Double rate = maybeRating.isPresent() ? maybeRating.get().getRating() : 0;
-        return Response.ok(new RatingDto(rate)).build();
-    }
 
     //READ RESTAURANT RESERVATIONS
     @GET
