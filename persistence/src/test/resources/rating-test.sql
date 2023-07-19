@@ -10,14 +10,14 @@ VALUES (2, 'another', '12345678', 'axl', 'rose', 'axlrose@itba.edu.ar', '1135633
 
 /*Insert Restaurants Values*/
 INSERT INTO restaurants(restaurant_id, name, address, phone_number, rating, user_id)
- VALUES(1, 'BurgerKing', 'Mendoza 2929', '1123346545', 0, 1);
+VALUES(1, 'BurgerKing', 'Mendoza 2929', '1123346545', 0, 1);
 INSERT INTO restaurants(restaurant_id, name, address, phone_number, rating, user_id)
 VALUES(2, 'BurgerQueen', 'Salta 129', '1223346545', 0, 1);
 
 /*Insert Rating Values*/
 INSERT INTO ratings(rating_id, user_id, restaurant_id, rating)
- VALUES(1, 1, 1, 5);
+VALUES(1, 1, 1, 5);
 INSERT INTO ratings(rating_id, user_id, restaurant_id, rating)
- VALUES(2, 1, 2, 3);
+VALUES(2, 1, 2, 3);
 INSERT INTO ratings(rating_id, user_id, restaurant_id, rating)
 VALUES(3, 2, 1, 3);
