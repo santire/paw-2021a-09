@@ -102,6 +102,7 @@ export function LoginPage() {
       <Paper withBorder shadow="md" p={30} mt={showAlert ? 10 : 30} radius="md">
         <form onSubmit={handleSubmit((data) => mutate(data))}>
           <TextInput
+            aria-label="email-input"
             label={t("pages.login.email.label")}
             placeholder={t("pages.login.email.placeholder") || ""}
             required
@@ -109,6 +110,7 @@ export function LoginPage() {
             {...register("email")}
           />
           <PasswordInput
+            aria-label="pass-input"
             label={t("pages.login.password.label")}
             placeholder={t("pages.login.password.placeholder") || ""}
             error={errors.password?.message}
@@ -130,6 +132,7 @@ export function LoginPage() {
             mt="xl"
             color="orange"
             type="submit"
+            aria-label="login-button"
             disabled={isLoading}
           >
             {isLoading ? (

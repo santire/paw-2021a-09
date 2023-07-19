@@ -60,7 +60,7 @@ export function LikeButton({ restaurant }: LikeButtonProps) {
         </Button>
       </Modal>
       <Box>
-        <ActionIcon
+        <ActionIcon aria-label="like-button"
           loading={mutation.isLoading}
           variant="transparent"
           onClick={() =>
