@@ -31,6 +31,14 @@ public class PresentTimeValidator implements ConstraintValidator<PresentTime, Ob
     public boolean isValid(Object value, ConstraintValidatorContext context) {
         final LocalTime time = (LocalTime) new BeanWrapperImpl(value).getPropertyValue(timeFieldName);
         final LocalDate date = (LocalDate) new BeanWrapperImpl(value).getPropertyValue(dateFieldName);
+        if(time == null) {
+            buildViolation(context, "Missing time", timeFieldName);
+            return false;
+        }
+        if(date == null) {
+            buildViolation(context, "Missing date", dateFieldName);
+            return false;
+        }
 
         final LocalTime currentTime = LocalTime.now();
         final LocalDate currentDate = LocalDate.now();

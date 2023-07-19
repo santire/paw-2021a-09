@@ -1,151 +1,203 @@
 package ar.edu.itba.paw.webapp.controller;
 
 
+import ar.edu.itba.paw.model.Rating;
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.exceptions.EmailInUseException;
+import ar.edu.itba.paw.model.exceptions.EmptyBodyException;
 import ar.edu.itba.paw.model.exceptions.TokenCreationException;
-import ar.edu.itba.paw.model.exceptions.TokenDoesNotExistException;
-import ar.edu.itba.paw.model.exceptions.TokenExpiredException;
-import ar.edu.itba.paw.webapp.auth.PawUserDetailsService;
-import ar.edu.itba.paw.webapp.forms.EmailForm;
-import ar.edu.itba.paw.webapp.forms.PasswordForm;
-import ar.edu.itba.paw.webapp.forms.UserForm;
+import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
+import ar.edu.itba.paw.service.*;
+import ar.edu.itba.paw.webapp.dto.*;
+import ar.edu.itba.paw.webapp.forms.PasswordResetForm;
+import ar.edu.itba.paw.webapp.forms.RegisterUserForm;
+import ar.edu.itba.paw.webapp.forms.UpdateUserForm;
+import ar.edu.itba.paw.webapp.utils.PageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Component;
 
-
-import ar.edu.itba.paw.service.UserService;
-
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-@Controller
+
+@Path("users")
+@Component
 public class UserController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
-
+    private static final int AMOUNT_OF_RESTAURANTS = 10;
+    private static final int AMOUNT_OF_RESERVATIONS = 10;
     @Autowired
     private UserService userService;
-
     @Autowired
-    private PawUserDetailsService pawUserDetailsService;
-
+    private RestaurantService restaurantService;
     @Autowired
-    private CommonAttributes ca;
+    private ReservationService reservationService;
+    @Autowired
+    private LikesService likesService;
+    @Autowired
+    private RatingService ratingService;
+
+    @Context
+    private UriInfo uriInfo;
+
+    // CREATE USER
+    @POST
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @Consumes(value = {MediaType.APPLICATION_JSON})
+    public Response registerUser(@QueryParam("email") final String forgotEmail, @Valid final RegisterUserForm userForm, @Context HttpServletRequest request) throws EmailInUseException, TokenCreationException {
+        String baseUrl = request.getHeader("Origin");
+        if (baseUrl == null) {
+            baseUrl = uriInfo.getBaseUri().toString();
+        }
+
+        if (forgotEmail != null && !forgotEmail.isEmpty()) {
+            userService.requestPasswordReset(forgotEmail, baseUrl);
+            return Response.status(Response.Status.ACCEPTED).build();
+        }
+
+        if (userForm == null) {
+            throw new EmptyBodyException();
+        }
+
+        final User user = userService.register(userForm.getUsername(), userForm.getPassword(), userForm.getFirstName(), userForm.getLastName(), userForm.getEmail(), userForm.getPhone(), baseUrl);
+
+        final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(user.getId())).build();
+        LOGGER.info("user created: {}", uri);
+        return Response.created(uri).build();
+    }
+
+    @PUT
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @Consumes(value = {MediaType.APPLICATION_JSON})
+    public Response activateOrReset(@QueryParam("token") final String token, @QueryParam("type") final String type, @Valid PasswordResetForm passwordForm, @Context HttpServletRequest request) {
+        if (type != null && type.equalsIgnoreCase("activation")) {
+            userService.activateUserByToken(token);
+        } else if (type != null && type.equalsIgnoreCase("reset")) {
+            if (passwordForm == null) throw new EmptyBodyException();
+            userService.updatePasswordByToken(token, passwordForm.getPassword());
+        } else {
+            // TODO: Exception?
+            LOGGER.warn("Invalid type");
+        }
+
+        return Response.noContent().build();
+    }
 
     // UPDATE USER
-
-    @RequestMapping(path = { "/user/edit" }, method = RequestMethod.GET)
-    public ModelAndView editUser(
-            @ModelAttribute("updateUserForm") final UserForm form) {
-
-        final ModelAndView mav = new ModelAndView("editUser");
-        return mav;
+    @PUT
+    @Path("/{userId}")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @Consumes(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("@authComponent.isUser(#userId)")
+    public Response updateUser(@PathParam("userId") final Long userId, @Valid UpdateUserForm userForm, @Context HttpServletRequest request) {
+        userService.updateUser(userId, userForm.getPassword(), userForm.getFirstName(), userForm.getLastName(), userForm.getPhone());
+        return Response.noContent().build();
     }
 
-    @RequestMapping(path = { "/user/edit" }, method = RequestMethod.POST)
-    public ModelAndView editUser(
-            @Valid @ModelAttribute("updateUserForm") final UserForm form,
-            final BindingResult errors,
-            RedirectAttributes redirectAttributes) {
 
-        User loggedUser = ca.loggedUser();
+    // READ USER
+    @GET
+    @Path("/{userId}")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+//    @PreAuthorize("@authComponent.isUser(#userId)")
+    public Response getUser(@PathParam("userId") final Long userId, @Context HttpServletRequest request) {
+        final User user = userService.findById(userId).orElseThrow(UserNotFoundException::new);
+        return Response.ok(UserDto.fromUser(user, request.getRequestURL().toString(), uriInfo)).build();
 
-        if (errors.hasErrors()) {
-            LOGGER.debug("Form has errors at /user/edit for user {}", loggedUser.getId());
-            return editUser(form);
-        }
-        try {
-            userService.updateUser(
-                    loggedUser.getId(),
-                    form.getUsername(),
-                    loggedUser.getPassword(),
-                    form.getFirstName(),
-                    form.getLastName(),
-                    loggedUser.getEmail(),
-                    form.getPhone());
-
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("somethingWrong", true);
-            return new ModelAndView("redirect:/user/edit");
-        }
-
-        redirectAttributes.addFlashAttribute("editedUser", true);
-        return new ModelAndView("redirect:/");
     }
 
-    @RequestMapping(path = { "/forgot-password" }, method = RequestMethod.GET)
-    public ModelAndView forgotPasswordForm(
-            @ModelAttribute("emailForm") final EmailForm form,
-            final BindingResult errors) {
-        return new ModelAndView("resetPassword");
+    @GET
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("@authComponent.isUserByEmail(#email)")
+    public Response getUserByEmail(@QueryParam("email") final String email, @Context HttpServletRequest request) {
+        final User user = userService.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        return Response.ok(UserDto.fromUser(user, request.getRequestURL().toString(), uriInfo)).build();
     }
 
-    @RequestMapping(path = { "/forgot-password" }, method = RequestMethod.POST)
-    public ModelAndView forgotPassword(
-            @Valid @ModelAttribute("emailForm") final EmailForm form,
-            final BindingResult errors) {
-
-        if (errors != null && errors.hasErrors()) {
-            return forgotPasswordForm(form, errors);
+    //READ USER RESTAURANTS
+    @GET
+    @Path("/{userId}/restaurants")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("@authComponent.isUser(#userId)")
+    public Response getUserRestaurants(@PathParam("userId") final Long userId,
+                                       @QueryParam("page") @DefaultValue("1") Integer page,
+                                       @QueryParam("pageAmount") @DefaultValue("10") Integer pageAmount,
+                                       @Context HttpServletRequest request) {
+        if(pageAmount > AMOUNT_OF_RESTAURANTS) {
+            pageAmount = AMOUNT_OF_RESTAURANTS;
         }
-
-        try {
-            userService.requestPasswordReset(form.getEmail(), ca.getUri());
-            return new ModelAndView("requestedResetPassword");
-        } catch (TokenCreationException e) {
-            LOGGER.error("Could not generate token");
-            return forgotPasswordForm(form, errors).addObject("tokenError", true);
+        if(pageAmount <= 0) {
+            pageAmount = 1;
         }
+        int totalRestaurants = restaurantService.getRestaurantsFromOwnerCount(userId);
+        List<RestaurantDto> restaurants = restaurantService.getRestaurantsFromOwner(page, pageAmount, userId).stream().map(u -> RestaurantDto.fromRestaurant(u, uriInfo)).collect(Collectors.toList());
+        return PageUtils.paginatedResponse(new GenericEntity<List<RestaurantDto>>(restaurants) {
+        }, uriInfo, page, pageAmount, totalRestaurants);
     }
 
-    @RequestMapping(path = { "/reset-password" }, method = RequestMethod.GET)
-    public ModelAndView updatePasswordForm(
-            @RequestParam(name="token", required=true) final String token,
-            @ModelAttribute("passwordForm") final PasswordForm form,
-            final BindingResult errors) {
+    //READ USER RESERVATIONS
+    @GET
+    @Path("/{userId}/reservations")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("@authComponent.isUser(#userId)")
+    public Response getUserReservations(@PathParam("userId") final Long userId, @QueryParam("filterBy") @DefaultValue("") String filterBy, @QueryParam("page") @DefaultValue("1") Integer page, @Context HttpServletRequest request) {
+        List<ReservationDto> reservations;
+        int totalReservations;
+        if (filterBy.equalsIgnoreCase("history")) {
+            totalReservations = reservationService.findByUserHistoryCount(userId);
+            reservations = reservationService.findByUserHistory(page, AMOUNT_OF_RESERVATIONS, userId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
+        } else {
+            totalReservations = reservationService.findByUserCount(userId);
+            reservations = reservationService.findByUser(page, AMOUNT_OF_RESERVATIONS, userId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
+        }
 
-        return new ModelAndView("updatePassword");
+        return PageUtils.paginatedResponse(new GenericEntity<List<ReservationDto>>(reservations) {
+        }, uriInfo, page, AMOUNT_OF_RESERVATIONS, totalReservations);
     }
 
-    @RequestMapping(path = { "/reset-password" }, method = RequestMethod.POST)
-    public ModelAndView updatePassword(
-            @RequestParam(name="token", required=true) final String token,
-            @Valid @ModelAttribute("passwordForm") final PasswordForm form,
-            final BindingResult errors) {
-
-        if (errors != null && errors.hasErrors()) {
-            return updatePasswordForm(token, form, errors);
+    //READ USER LIKES
+    @GET
+    @Path("/{userId}/likes")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("@authComponent.isUser(#userId)")
+    public Response userLikesRestaurants(@PathParam("userId") final Long userId, @QueryParam("restaurantId") List<Long> restaurantIds, @Context HttpServletRequest request) {
+        if (restaurantIds == null) {
+            restaurantIds = new ArrayList<>();
         }
-
-        User user;
-        try {
-            user = userService.updatePasswordByToken(token, form.getPassword());
-        } catch (TokenExpiredException e) {
-            LOGGER.error("token {} is expired", token);
-            return new ModelAndView("redirect:/forgot-password").addObject("expiredToken", true);
-        } catch (TokenDoesNotExistException e) {
-            LOGGER.warn("token {} does not exist", token);
-            return new ModelAndView("requestedResetPassword").addObject("invalidToken", true);
-        } catch (Exception e) {
-            // Ignore
-            // Unexpected error happened, showing register screen with generic error message
-            return new ModelAndView("redirect:/login").addObject("tokenError", true);
+        List<Long> likedIds = likesService.userLikesRestaurants(userId, restaurantIds).stream().map(l -> l.getRestaurant().getId()).collect(Collectors.toList());
+        List<LikeDto> likes = new ArrayList<>();
+        for (Long id : restaurantIds) {
+            LikeDto like = new LikeDto(false, id, userId);
+            if (likedIds.contains(id)) {
+                like.setLiked(true);
+            }
+            likes.add(like);
         }
+        return Response.ok(new GenericEntity<List<LikeDto>>(likes) {
+        }).build();
+    }
 
-        UserDetails userDetails = pawUserDetailsService.loadUserByUsername(user.getEmail());
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,
-                userDetails.getPassword(), userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+    //READ USER RATING
+    @GET
+    @Path("/{userId}/ratings")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    public Response getRestaurantRate(@PathParam("userId") final Long userId,
+                                      @QueryParam("restaurantId") final Long restaurantId,
+                                      @Context HttpServletRequest request) {
 
-        return new ModelAndView("redirect:/");
-
+        Optional<Rating> maybeRating = ratingService.getRating(userId, restaurantId);
+        Double rate = maybeRating.isPresent() ? maybeRating.get().getRating() : 0;
+        return Response.ok(new RatingDto(rate)).build();
     }
 }

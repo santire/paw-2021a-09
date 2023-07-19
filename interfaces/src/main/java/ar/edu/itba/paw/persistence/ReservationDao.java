@@ -15,20 +15,22 @@ public interface ReservationDao {
 
     // READ
     public List<Reservation> findByUser(int page, int amountOnPage, long userId, LocalDateTime currentTime);
-    public int findByUserPageCount(int amountOnPage, long userId, LocalDateTime currentTime);
+    public int findByUserCount(long userId, LocalDateTime currentTime);
 
     public List<Reservation> findByUserHistory(int page, int amountOnPage, long userId, LocalDateTime currentTime);
-    public int findByUserHistoryPageCount(int amountOnPage, long userId, LocalDateTime currentTime);
+    public int findByUserHistoryCount(long userId, LocalDateTime currentTime);
 
     public List<Reservation> findByRestaurant(int page, int amountOnPage, long restaurantId);
-    public int findByRestaurantPageCount(int amountOnPage, long restaurantId);
+    public int findByRestaurantCount(long restaurantId);
 
     public List<Reservation> findConfirmedByRestaurant(int page, int amountOnPage, long restaurantId, LocalDateTime currentTime);
-    public int findConfirmedByRestaurantPageCount(int amountOnPage, long restaurantId, LocalDateTime currentTime);
+    public int findConfirmedByRestaurantCount(long restaurantId, LocalDateTime currentTime);
 
     public List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId, LocalDateTime currentTime);
-    public int findPendingByRestaurantPageCount(int amountOnPage, long restaurantId, LocalDateTime currentTime);
+    public int findPendingByRestaurantCount(long restaurantId, LocalDateTime currentTime);
 
+    public List<Reservation> findHistoryByRestaurant(int page, int amountOnPage, long restaurantId, LocalDateTime currentTime);
+    public int findHistoryByRestaurantCount(long restaurantId, LocalDateTime currentTime);
 
     public Optional<Reservation> findById(long id);
 

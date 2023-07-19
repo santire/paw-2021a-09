@@ -49,27 +49,6 @@ public class Reservation {
         this.confirmed = false;
     }
 
-    public Reservation(Long id, long quantity, boolean confirmed, User user, Restaurant restaurant) {
-        this.id = id;
-        this.quantity = quantity;
-        this.confirmed = confirmed;
-        this.user = user;
-        this.restaurant = restaurant;
-    }
-
-    public Reservation(Long id, long quantity, User user, Restaurant restaurant) {
-        this.id = id;
-        this.quantity = quantity;
-        this.user = user;
-        this.restaurant = restaurant;
-    }
-
-    public Reservation(long quantity,User user, Restaurant restaurant) {
-        this.quantity = quantity;
-        this.user = user;
-        this.restaurant = restaurant;
-    }
-
     public Long getId() {
         return this.id;
     }

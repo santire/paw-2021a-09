@@ -68,7 +68,7 @@ public class ReservationJpaDao implements ReservationDao {
     }
 
     @Override
-    public int findConfirmedByRestaurantPageCount(int amountOnPage, long restaurantId, LocalDateTime currentTime){
+    public int findConfirmedByRestaurantCount( long restaurantId, LocalDateTime currentTime){
         Timestamp currentTimestamp = Timestamp.valueOf(currentTime);
         Query nativeQuery = em.createNativeQuery(
                 "SELECT reservation_id FROM reservations"
@@ -78,10 +78,7 @@ public class ReservationJpaDao implements ReservationDao {
         nativeQuery.setParameter("restaurantId", restaurantId);
         nativeQuery.setParameter("currTime", currentTimestamp);
 
-        int amountOfRestaurants = nativeQuery.getResultList().size();
-        int pageAmount = (int) Math.ceil((double) amountOfRestaurants / amountOnPage);
-
-        return pageAmount <= 0 ? 1 : pageAmount;
+        return nativeQuery.getResultList().size();
     }
 
 
@@ -129,7 +126,7 @@ public class ReservationJpaDao implements ReservationDao {
 
 
 	@Override
-	public int findByUserPageCount(int amountOnPage, long userId, LocalDateTime currentTime) {
+	public int findByUserCount(long userId, LocalDateTime currentTime) {
         Timestamp currentTimestamp = Timestamp.valueOf(currentTime);
         Query nativeQuery = em.createNativeQuery(
                 "SELECT reservation_id FROM reservations"
@@ -139,10 +136,8 @@ public class ReservationJpaDao implements ReservationDao {
         nativeQuery.setParameter("userId", userId);
         nativeQuery.setParameter("currentTimestamp", currentTimestamp);
 
-        int amountOfRestaurants = nativeQuery.getResultList().size();
-        int pageAmount = (int) Math.ceil((double) amountOfRestaurants / amountOnPage);
+        return nativeQuery.getResultList().size();
 
-        return pageAmount <= 0 ? 1 : pageAmount;
 	}
 
     @Override
@@ -177,7 +172,7 @@ public class ReservationJpaDao implements ReservationDao {
 
 
     @Override
-    public int findByUserHistoryPageCount(int amountOnPage, long userId, LocalDateTime currentTime) {
+    public int findByUserHistoryCount(long userId, LocalDateTime currentTime) {
         Timestamp currentTimestamp = Timestamp.valueOf(currentTime);
         Query nativeQuery = em.createNativeQuery(
                 "SELECT reservation_id FROM reservations"
@@ -187,10 +182,7 @@ public class ReservationJpaDao implements ReservationDao {
         nativeQuery.setParameter("userId", userId);
         nativeQuery.setParameter("currentTimestamp", currentTimestamp);
 
-        int amountOfRestaurants = nativeQuery.getResultList().size();
-        int pageAmount = (int) Math.ceil((double) amountOfRestaurants / amountOnPage);
-
-        return pageAmount <= 0 ? 1 : pageAmount;
+        return nativeQuery.getResultList().size();
     }
 
 
@@ -258,7 +250,7 @@ public class ReservationJpaDao implements ReservationDao {
 
 
 	@Override
-	public int findByRestaurantPageCount(int amountOnPage, long restaurantId) {
+	public int findByRestaurantCount(long restaurantId) {
         Query nativeQuery = em.createNativeQuery(
                 "SELECT reservation_id FROM reservations"
                 +
@@ -266,15 +258,12 @@ public class ReservationJpaDao implements ReservationDao {
                 );
         nativeQuery.setParameter("restaurantId", restaurantId);
 
-        int amountOfRestaurants = nativeQuery.getResultList().size();
-        int pageAmount = (int) Math.ceil((double) amountOfRestaurants / amountOnPage);
-
-        return pageAmount <= 0 ? 1 : pageAmount;
+        return nativeQuery.getResultList().size();
 	}
 
 
 	@Override
-	public int findPendingByRestaurantPageCount(int amountOnPage, long restaurantId, LocalDateTime currentTime) {
+	public int findPendingByRestaurantCount( long restaurantId, LocalDateTime currentTime) {
         Timestamp currentTimestamp = Timestamp.valueOf(currentTime);
         Query nativeQuery = em.createNativeQuery(
                 "SELECT reservation_id FROM reservations"
@@ -284,10 +273,53 @@ public class ReservationJpaDao implements ReservationDao {
         nativeQuery.setParameter("restaurantId", restaurantId);
         nativeQuery.setParameter("currTime", currentTimestamp);
 
-        int amountOfRestaurants = nativeQuery.getResultList().size();
-        int pageAmount = (int) Math.ceil((double) amountOfRestaurants / amountOnPage);
+        return nativeQuery.getResultList().size();
 
-        return pageAmount <= 0 ? 1 : pageAmount;
+	}
+
+        @Override
+	public List<Reservation> findHistoryByRestaurant(int page, int amountOnPage, long restaurantId,
+			LocalDateTime currentTime) {
+        Timestamp currentTimestamp = Timestamp.valueOf(currentTime);
+        Query nativeQuery = em.createNativeQuery(
+                "SELECT reservation_id FROM reservations"
+                +
+                " WHERE restaurant_id = :restaurantId AND date < :currTime"
+                +
+                " ORDER BY date ASC"
+                );
+
+        nativeQuery.setParameter("restaurantId", restaurantId);
+        nativeQuery.setParameter("currTime", currentTimestamp);
+        nativeQuery.setFirstResult((page - 1) * amountOnPage);
+        nativeQuery.setMaxResults(amountOnPage);
+        @SuppressWarnings("unchecked")
+        List<Long> filteredIds = (List<Long>) nativeQuery.getResultList().stream().map(e -> Long.valueOf(e.toString()))
+                .collect(Collectors.toList());
+
+        if (filteredIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        final TypedQuery<Reservation> query = em.createQuery("from Reservation where id IN :filteredIds",
+                Reservation.class);
+        query.setParameter("filteredIds", filteredIds);
+
+        return query.getResultList().stream().sorted(Comparator.comparing(v->filteredIds.indexOf(v.getId()))).collect(Collectors.toList());
+	}
+
+        @Override
+	public int findHistoryByRestaurantCount(long restaurantId, LocalDateTime currentTime) {
+        Timestamp currentTimestamp = Timestamp.valueOf(currentTime);
+        Query nativeQuery = em.createNativeQuery(
+                "SELECT reservation_id FROM reservations"
+                +
+                " WHERE restaurant_id = :restaurantId AND confirmed = false AND date < :currTime"
+                );
+        nativeQuery.setParameter("restaurantId", restaurantId);
+        nativeQuery.setParameter("currTime", currentTimestamp);
+
+        return nativeQuery.getResultList().size();
 	}
 
 

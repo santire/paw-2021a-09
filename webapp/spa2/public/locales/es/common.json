@@ -1,0 +1,474 @@
+{
+  "theme": {
+    "light": "Claro",
+    "dark": "Oscuro"
+  },
+  "header": {
+    "browse": "Ver todos",
+    "reservations": "Mis Reservas",
+    "restaurants": "Mis Restaurantes",
+    "search": "Buscar",
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "userMenu": {
+      "restaurants": {
+        "title": "Restaurantes",
+        "register": "Registre un restaurante",
+        "restaurants": "Administre sus restaurantes",
+        "reservations": "Administre sus reservas"
+      },
+      "settings": {
+        "title": "Configuración",
+        "account": "Perfil",
+        "logout": "Cerrar sesión"
+      }
+    }
+  },
+  "footer": {
+    "copyright": "Derechos reservados",
+    "weAre": "Nosotros",
+    "contactUs": "Contacto"
+  },
+  "restaurantCard": {
+    "more": "Ver más",
+    "liked": "A {{likes}} personas les gusta esto",
+    "tagsTitle": "Ideal para vos, si te gusta",
+    "likeTooltip": "Debe estar logueado para dar me gusta",
+    "rateTooltip": "Debe estar logueado para puntuar"
+  },
+  "userRestaurantCard": {
+    "more": "Ver más",
+    "edit": "Editar",
+    "viewReservations": "Ver reservas",
+    "delete": "Eliminar",
+    "pending": "Tiene {{reservationsCount}} reservas pendientes",
+    "liked": "A {{likes}} personas les gusta esto",
+    "tagsTitle": "Ideal para vos, si te gusta",
+    "deleteModal": {
+      "title": "¿Seguro quieres eliminar?",
+      "text": "Esta acción no podrá ser deshecha y la información de tu restaurante se perderá.",
+      "confirm": "Confirmar"
+    }
+  },
+  "error": {
+    "title": "Encontraste un lugar secreto",
+    "description": "Lamentablemente esto es solo una página de 404. Es posible que hayas escrito mal la dirección o que la página se haya movido",
+    "takeMeBack": "Volver al inicio",
+    "takeMeBackForgot": "Volver a reiniciar contraseña"
+  },
+  "errors": {
+    "invalidCredentials": "Email o contraseña inválido",
+    "repeatPassword": "Las contraseñas deben ser iguales",
+    "tokenExpired": "El token ha expirado, por favor regístrese devuelta.",
+    "tokenDoesNotExist": "Hubo un problema con el link, por favor intente nuevamente.",
+    "userNotFound": "Este email no está asociado a un usuario válido",
+    "invalidPhone": "Número de teléfono inválido"
+  },
+  "tags": {
+    "arabe": "Árabe",
+    "americano": "Americana",
+    "argentino": "Argentina",
+    "armenio": "Armenia",
+    "asiatico": "Asiática",
+    "autoctono": "Autóctona",
+    "bodegon": "Bodegón",
+    "chino": "China",
+    "cocinacasera": "Casera",
+    "contemporanea": "Contemporanea",
+    "deautor": "De Autor",
+    "defusion": "Fusión",
+    "español": "Española",
+    "frances": "Francesa",
+    "indio": "India",
+    "internacional": "Internacional",
+    "italiano": "Italiana",
+    "japones": "Japonesa",
+    "latino": "Latina",
+    "mediterraneo": "Mediterranea",
+    "mexicano": "Mexicana",
+    "parrilla": "Parrila",
+    "peruano": "Peruana",
+    "pescadosymariscos": "Pescado",
+    "picadas": "Picadas",
+    "pizzeria": "Pizza",
+    "vegetariano": "Vegetariana"
+  },
+  "filter": {
+    "priceInput": {
+      "minLargerThanMax": "El precio mínimo tiene que ser menor al máximo",
+      "maxSmallerThanMin": "El precio máximo tiene que ser mayor al mínimo"
+    }
+  },
+  "pages": {
+    "home": {
+      "hot": "Restaurantes destacados",
+      "hotTooltip": "Restaurantes con muchas reservas",
+      "popular": "Restaurantes populares",
+      "popularTooltip": "Restaurantes más gustados",
+      "heading": "Descubra y reserve los mejores restaurantes"
+    },
+    "reservations": {
+      "cancel": "Cancelar",
+      "accept": "Aceptar",
+      "deny": "Rechazar",
+      "pending": "Pendiente",
+      "confirmed": "Confirmado",
+      "title": "Mis Reservaciones"
+    },
+    "restaurant": {
+      "reservationButton": "Hacer una reserva",
+      "notifTitle": "Reserva pendiente",
+      "pendingReservation": "Su reserva fue enviada correctamente y espera a ser confirmada por el restaurante",
+      "menu": {
+        "title": "Menu",
+        "notFound": "Este restaurante no tiene menu todavía",
+        "ownerHint": "¡Agrega uno para hacerlo visible!",
+        "price": {
+          "label": "Precio",
+          "placeholder": "$$$"
+        },
+        "name": {
+          "label": "Nombre",
+          "placeholder": "Nombre"
+        },
+        "description": {
+          "label": "Descripción",
+          "placeholder": "Descripción"
+        },
+        "submit": "Agregar",
+        "error": "No se pudo agregar elemento."
+      },
+      "reviews": {
+        "title": "Dejar una reseña",
+        "submit": "Agregar",
+        "notFound": "Este restaurante no tiene reseñas todavía",
+        "hint": "Se el primero en dejar una!"
+      }
+    },
+    "restaurants": {
+      "title": "Todos los restaurantes",
+      "notFound": "No hay restaurantes disponibles con ese criterio de filtros",
+      "filter": {
+        "title": "Filtros",
+        "min": {
+          "label": "Precio promedio mínimo",
+          "placeholder": "1"
+        },
+        "max": {
+          "label": "Precio promeido máximo",
+          "placeholder": "10000"
+        },
+        "sort": {
+          "label": "Clasificar",
+          "placeholder": "Seleccione una clasificación",
+          "name": "nombre",
+          "hot": "destacados",
+          "price": "precio",
+          "likes": "me gustas"
+        },
+        "order": {
+          "label": "Orden",
+          "placeholder": "Seleccione un ordenamiento",
+          "asc": "ascendente",
+          "desc": "descendente"
+        },
+        "tags": {
+          "label": "Categorias",
+          "placeholder": "Seleccione categorias"
+        },
+        "submit": "Aplicar",
+        "clear": "Limpiar filtros"
+      }
+    },
+    "userRestaurants": {
+      "title": "Tus restaurantes",
+      "notFound": "Parece que no tienes ningún restaurante",
+      "createOne": "Crea tu restaurante"
+    },
+    "userReservations": {
+      "title": "Tus reservas",
+      "adminTitle": "Reservas a tus restaurantes",
+      "notFound": "Parece que no tienes ninguna reserva",
+      "pending": "Esperando confirmación",
+      "confirmed": "Confirmada",
+      "finished": "Terminada",
+      "createOne": "Haz una reserva",
+      "partySize": "Elige la cantidad de invitados",
+      "guests": "Invitados",
+      "pickDate": "Elige una fecha",
+      "pickTime": "Elige un horario",
+      "confirm": "Confirmar",
+      "reservationDate": "Fecha",
+      "history": "Ver historial de reservas",
+      "table": {
+        "customers": "Cantidad de comensales",
+        "date": "Fecha",
+        "restaurant": "Restaurante",
+        "state": "Estado"
+      },
+      "denyModal": {
+        "cancelTitle": "Cancelar reserva",
+        "goBackButton": "Volver",
+        "cancelButton": "Cancelar",
+        "text": "¿Seguro quiere cancelar su reserva?",
+        "success": "Reserva cancelada exitosamente"
+      }
+    },
+    "restaurantReservations": {
+      "title": "Administrar reservas",
+      "notFound": "Parece que este restaurante no tiene ninguna reserva todavia",
+      "notFoundPending": "Parece que no tienes ninguna reserva pendiente",
+      "notFoundConfirmed": "Parece que no tienes ninguna reserva confirmada",
+      "history": "Ver historial de reservas",
+      "table": {
+        "customers": "Cantidad de comensales",
+        "date": "Fecha",
+        "user": "Cliente",
+        "customerName": "Cliente",
+        "customerPhone": "Contacto"
+      },
+      "tabs": {
+        "pending": {
+          "title": "Reservas pendientes"
+        },
+        "confirmed": {
+          "title": "Reservas confirmadas"
+        }
+      },
+      "confirmModal": {
+        "confirmTitle": "Confirm reservation",
+        "goBackButton": "Go back",
+        "confirmButton": "Confirm",
+        "text": "Are you sure you wish to confirm this reservation?",
+        "success": "Reservation confirmed"
+      },
+      "confirmButton": "Confirmar",
+      "denyButton": "Rechazar",
+      "cancelButton": "Cancelar",
+      "denyModal": {
+        "denyTitle": "Rechazar reserva",
+        "cancelTitle": "Cancelar reserva",
+        "message": "Mensaje",
+        "placeholder": "Explica los motivos al usuario",
+        "denyButton": "Rechazar",
+        "goBackButton": "Volver",
+        "cancelButton": "Cancelar",
+        "success": "Reserva denegada exitosamente",
+        "form": {
+          "requiredError": "El campo mensaje es requerido",
+          "minLengthError": "El mensaje debe contener como mínimo 5 caracteres",
+          "maxLengthError": "El mensaje no puede exceder los 100 caracteres"
+        }
+      }
+    },
+    "restaurantHistoryReservations": {
+      "title": "Historial de reservas",
+      "current": "Volver a las reservas actuales"
+    },
+    "login": {
+      "alert": "Usuario o contraseña inválido",
+      "confirmAlert": "Usuario verificado, por favor inicie sesión",
+      "updatedAlert": "Contraseña actualizada, por favor inicie sesión",
+      "welcomeBack": "Bienvenido devuelta!",
+      "createAccount": {
+        "title": "¿No tienes una cuenta?",
+        "prompt": "Crear cuenta"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "tu@gourmetable.com"
+      },
+      "password": {
+        "label": "Contraseña",
+        "placeholder": "Tu contraseña",
+        "forgot": "¿Olvidaste tu contraseña?"
+      },
+      "rememberMe": {
+        "label": "Remember me"
+      },
+      "signIn": "Iniciar sesión"
+    },
+    "forgot": {
+      "title": "Cambiar contraseña",
+      "confirmation": {
+        "title": "Solicitud de cambio de contraseña",
+        "subtitle": "Por favor siga las instrucciones que le han llegado por correo para actualizar su contraseña"
+      },
+      "account": {
+        "title": "¿Ya tienes una cuenta?",
+        "prompt": "Iniciar sesión aquí"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "tu@gourmetable.com"
+      },
+      "submit": "Enviar correo"
+    },
+    "reset": {
+      "title": "Actualizar contraseña",
+      "confirmation": {
+        "title": "Solicitud de cambio de contraseña",
+        "subtitle": "Por favor siga las instrucciones que le han llegado por correo para actualizar su contraseña"
+      },
+      "account": {
+        "title": "¿Ya tienes una cuenta?",
+        "prompt": "Iniciar sesión aquí"
+      },
+      "password": {
+        "label": "Contraseña",
+        "placeholder": "Tu contraseña"
+      },
+      "confirmPassword": {
+        "label": "Confirmar contraseña",
+        "placeholder": "Tu contraseña"
+      },
+      "error": {
+        "title": "Oops!",
+        "subtitle": "Algo no está funcionando, por favor verifique la dirección"
+      },
+      "submit": "Actualizar contraseña"
+    },
+    "register": {
+      "loginDivider": "Sesión",
+      "contactDivider": "Contacto",
+      "title": "Bienvenido a Gourmetable!",
+      "subtitle": "Por favor regístrese",
+      "confirmation": {
+        "title": "Ya casi!",
+        "subtitle": "Por favor siga las instrucciones que le han llegado por correo para activar su cuenta"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "tu@gourmetable.com",
+        "taken": "El correo electronico ya fue registrado"
+      },
+      "username": {
+        "label": "Usuario",
+        "placeholder": "johndoe123",
+        "taken": "El usuario ya fue registrado"
+      },
+      "password": {
+        "label": "Contraseña",
+        "placeholder": "Tu contraseña"
+      },
+      "confirmPassword": {
+        "label": "Confirmar contraseña",
+        "placeholder": "Tu contraseña"
+      },
+      "firstName": {
+        "label": "Nombre",
+        "placeholder": "Juan"
+      },
+      "lastName": {
+        "label": "Apellido",
+        "placeholder": "Pérez"
+      },
+      "phone": {
+        "label": "Número de teléfono",
+        "placeholder": "1123456789"
+      },
+      "submit": "Registrarse"
+    },
+    "registerRestaurant": {
+      "loginDivider": "General",
+      "contactDivider": "Información de contacto",
+      "socialMediaDivider": "Redes Sociales",
+      "title": "Registre su restaurante",
+      "tagsDivider": "Categoría",
+      "profileImage": "Imagen de perfil",
+      "dropImage": "Arrastre la imagen aquí o haga click para seleccionar un archivo",
+      "dropImageSize": "La imagen no debe superar los 400kb",
+      "tagsSelection": "Al menos 1 categoría es requerida",
+      "errors": {
+        "imageTooLarge": "La imagen es muy grande",
+        "imageMissing": "La imagen es obligatoria",
+        "imageInvalidType": "No es un tipo de imagen válido"
+      },
+      "name": {
+        "label": "Nombre del restaurante",
+        "placeholder": "Mi restaurante"
+      },
+      "address": {
+        "label": "Dirección",
+        "placeholder": "Av. Siempreviva 123"
+      },
+      "phone": {
+        "label": "Número de teléfono",
+        "placeholder": "1123456789"
+      },
+      "facebook": {
+        "label": "Facebook",
+        "placeholder": "facebook.com/suSitio"
+      },
+      "instagram": {
+        "label": "Instagram",
+        "placeholder": "instagram.com/suSitio"
+      },
+      "twitter": {
+        "label": "Twitter",
+        "placeholder": "twitter.com/suSitio"
+      }
+    },
+    "editRestaurant": {
+      "loginDivider": "General",
+      "contactDivider": "Información de contacto",
+      "socialMediaDivider": "Redes Sociales",
+      "title": "Editar restaurante",
+      "tagsDivider": "Categoría",
+      "profileImage": "Imagen de perfil",
+      "dropImage": "Arrastre las imagenes aquí o haga click para seleccionar un archivo",
+      "tagsSelection": "Al menos 1 categoría es requerida",
+      "name": {
+        "label": "Nombre del restaurante",
+        "placeholder": "Mi restaurante",
+        "taken": "El nombre del restaurante ya ha sido elegido"
+      },
+      "address": {
+        "label": "Dirección",
+        "placeholder": "Av. Siempreviva 123"
+      },
+      "phone": {
+        "label": "Número de teléfono",
+        "placeholder": "1123456789"
+      },
+      "facebook": {
+        "label": "Facebook",
+        "placeholder": "facebook.com/suSitio"
+      },
+      "instagram": {
+        "label": "Instagram",
+        "placeholder": "instagram.com/suSitio"
+      },
+      "twitter": {
+        "label": "Twitter",
+        "placeholder": "twitter.com/suSitio"
+      },
+      "submit": "Editar"
+    },
+    "profile": {
+      "profile": "Mi información",
+      "notFound": "No se pudo cargar la información del usuario",
+      "successAlert": "Se actualizó la información exitosamente",
+      "email": {
+        "label": "Email"
+      },
+      "username": {
+        "label": "Nombre de usuario",
+        "placeholder": "Nombre de usuario"
+      },
+      "firstName": {
+        "label": "Nombre",
+        "placeholder": "Nombre"
+      },
+      "lastName": {
+        "label": "Apellido",
+        "placeholder": "Apellido"
+      },
+      "phoneNumber": {
+        "label": "Número de teléfono",
+        "placeholder": "Número de teléfono"
+      },
+      "submit": "Confirmar"
+    }
+  }
+}

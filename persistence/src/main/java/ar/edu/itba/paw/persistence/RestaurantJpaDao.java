@@ -11,6 +11,8 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -32,21 +34,32 @@ public class RestaurantJpaDao implements RestaurantDao {
     // CREATE
 
     @Override
-    public Restaurant registerRestaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner) {
-        final Restaurant restaurant = new Restaurant(name, address, phoneNumber, tags, owner);
+    public Restaurant registerRestaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner, String facebook, String twitter, String instagram) {
+        final Restaurant restaurant = new Restaurant(name, address, phoneNumber, tags, owner, facebook, twitter, instagram);
         em.persist(restaurant);
         return restaurant;
     }
 
     @Override
     public boolean setImageByRestaurantId(Image image, long restaurantId) {
-        final Optional<Restaurant> maybeRestaurant = findById(restaurantId);
-        if (!maybeRestaurant.isPresent()) {
-            return false;
-        }
-        Restaurant restaurant = maybeRestaurant.get();
+        final Restaurant restaurant = findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
+        image.setRestaurant(restaurant);
+        if (restaurant.getProfileImage() != null) {
+            LOGGER.debug("Merging image");
+            Image img = restaurant.getProfileImage();
+            img.setData(image.getData());
+            img.increaseVersion();
+            em.merge(img);
+        } else {
+        LOGGER.debug("Creating Image of size {}", image.getData().length);
+        image.setRestaurant(restaurant);
+//        em.merge(image);
         restaurant.setProfileImage(image);
+        LOGGER.debug("Set profile image: {}", restaurant.getProfileImage() != null);
+        em.persist(image);
         em.persist(restaurant);
+        LOGGER.debug("Set profile image: {}", restaurant.getProfileImage() != null);
+        }
 
         return true;
     }
@@ -57,6 +70,7 @@ public class RestaurantJpaDao implements RestaurantDao {
     public Optional<Restaurant> findById(long id) {
         return Optional.ofNullable(em.find(Restaurant.class, id));
     }
+
 
     @Override
     public Optional<Restaurant> findByIdWithMenu(int page, int amountOnPage, long id){
@@ -70,11 +84,9 @@ public class RestaurantJpaDao implements RestaurantDao {
         Query nativeQuery = em.createNativeQuery(
                 "SELECT menu_item_id"
                 +
-                " FROM restaurants r LEFT JOIN menu_items m"
+                " FROM menu_items"
                 +
-                " ON r.restaurant_id = m.restaurant_id"
-                +
-                " WHERE r.restaurant_id = :rid"
+                " WHERE restaurant_id = :rid"
                 +
                 " ORDER BY menu_item_id ASC"
                 );
@@ -101,57 +113,20 @@ public class RestaurantJpaDao implements RestaurantDao {
     }
 
     @Override
-    public int findByIdWithMenuPageCount(int amountOnPage, long id){
+    public int findByIdWithMenuCount(long id){
         Query nativeQuery = em.createNativeQuery(
                 "SELECT menu_item_id"
                 +
-                " FROM restaurants r LEFT JOIN menu_items m"
+                " FROM menu_items"
                 +
-                " ON r.restaurant_id = m.restaurant_id"
-                +
-                " WHERE r.restaurant_id = :rid"
+                " WHERE restaurant_id = :rid"
                 +
                 " ORDER BY menu_item_id ASC"
                 );
 
         nativeQuery.setParameter("rid", id);
-        int amountOfRestaurants = nativeQuery.getResultList().size();
-        int pageAmount = (int) Math.ceil((double) amountOfRestaurants / amountOnPage);
-
-        return pageAmount <= 0 ? 1 : pageAmount;
+        return nativeQuery.getResultList().size();
     }
-
-    @Override
-    public List<Restaurant> getAllRestaurants(int page, int amountOnPage, String searchTerm) {
-        Query nativeQuery = em.createNativeQuery("SELECT restaurant_id FROM restaurants WHERE lower(name) LIKE ?1");
-        nativeQuery.setParameter(1, "%" + searchTerm.trim().toLowerCase() + "%");
-        nativeQuery.setFirstResult((page - 1) * amountOnPage);
-        nativeQuery.setMaxResults(amountOnPage);
-        @SuppressWarnings("unchecked")
-        List<Long> filteredIds = (List<Long>) nativeQuery.getResultList().stream().map(e -> Long.valueOf(e.toString()))
-                .collect(Collectors.toList());
-
-        if (filteredIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        final TypedQuery<Restaurant> query = em.createQuery("from Restaurant where id IN :filteredIds",
-                Restaurant.class);
-        query.setParameter("filteredIds", filteredIds);
-        return query.getResultList();
-    }
-
-    @Override
-    public int getAllRestaurantPagesCount(int amountOnPage, String searchTerm) {
-        Query nativeQuery = em.createNativeQuery("SELECT restaurant_id FROM restaurants WHERE lower(name) LIKE ?1");
-        nativeQuery.setParameter(1, "%" + searchTerm.trim().toLowerCase() + "%");
-
-        int amountOfRestaurants = nativeQuery.getResultList().size();
-        int pageAmount = (int) Math.ceil((double) amountOfRestaurants / amountOnPage);
-
-        return pageAmount <= 0 ? 1 : pageAmount;
-    }
-
     @Override
     public List<Restaurant> getHotRestaurants(int limit, int lastDays) {
         Query nativeQuery = em.createNativeQuery(
@@ -227,21 +202,20 @@ public class RestaurantJpaDao implements RestaurantDao {
         if (filteredIds.isEmpty()) {
             return Collections.emptyList();
         }
+        LOGGER.debug("list: {}", filteredIds);
 
         final TypedQuery<Restaurant> query = em.createQuery("from Restaurant where id IN :filteredIds",
                 Restaurant.class);
         query.setParameter("filteredIds", filteredIds);
-        return query.getResultList();
+        return query.getResultList().stream().sorted(Comparator.comparing(v->filteredIds.indexOf(v.getId()))).collect(Collectors.toList());
+//        return query.getResultList();
     }
 
-    public int getRestaurantsFromOwnerPagesCount(int amountOnPage, long userId) {
+    public int getRestaurantsFromOwnerCount(long userId) {
         Query nativeQuery = em.createNativeQuery("SELECT restaurant_id FROM restaurants WHERE user_id = :userId");
         nativeQuery.setParameter("userId", userId);
 
-        int amountOfRestaurants = nativeQuery.getResultList().size();
-        int pageAmount = (int) Math.ceil((double) amountOfRestaurants / amountOnPage);
-
-        return pageAmount <= 0 ? 1 : pageAmount;
+        return nativeQuery.getResultList().size();
     }
 
     @Override
@@ -262,6 +236,8 @@ public class RestaurantJpaDao implements RestaurantDao {
 
         if(!desc)
             order="ASC";
+        if(page <= 0)
+            page = 1;
 
         Query nativeQuery = em.createNativeQuery(
                 "SELECT restaurant_id FROM ("
@@ -341,7 +317,7 @@ public class RestaurantJpaDao implements RestaurantDao {
     }
 
     @Override
-    public int getRestaurantsFilteredByPageCount(int amountOnPage, String name, List<Tags> tags, double minAvgPrice,
+    public int getRestaurantsFilteredByCount(String name, List<Tags> tags, double minAvgPrice,
             double maxAvgPrice) {
         String TAG_CHECK_QUERY = " ";
         if(!tags.isEmpty()){
@@ -381,47 +357,11 @@ public class RestaurantJpaDao implements RestaurantDao {
         nativeQuery.setParameter("searchTerm", "%" + name.trim().toLowerCase() + "%");
         nativeQuery.setParameter("low", minAvgPrice);
         nativeQuery.setParameter("high", maxAvgPrice);
-        int amountOfRestaurants = nativeQuery.getResultList().size();
-        int pageAmount = (int) Math.ceil((double) amountOfRestaurants / amountOnPage);
-
-        return pageAmount <= 0 ? 1 : pageAmount;
+        return nativeQuery.getResultList().size();
     }
 
-
-
-    @Override
-    public List<Restaurant> getLikedRestaurantsPreview(int limit, long userId) {
-        Query nativeQuery = em.createNativeQuery(
-                " SELECT r.restaurant_id FROM restaurants r"
-                +
-                " RIGHT JOIN likes l ON r.restaurant_id = l.restaurant_id"
-                +
-                " WHERE l.user_id = ?1"
-                +
-                " ORDER BY l.like_id DESC"
-                );
-        nativeQuery.setParameter(1, userId);
-        nativeQuery.setMaxResults(limit);
-
-        @SuppressWarnings("unchecked")
-        List<Long> filteredIds = (List<Long>) nativeQuery.getResultList().stream().map(e -> Long.valueOf(e.toString()))
-                .collect(Collectors.toList());
-
-        if (filteredIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-        LOGGER.debug("list: {}", filteredIds.toString());
-
-        final TypedQuery<Restaurant> query = em.createQuery("from Restaurant where id IN :filteredIds",
-                Restaurant.class);
-        query.setParameter("filteredIds", filteredIds);
-
-        return query.getResultList().stream().sorted(Comparator.comparing(v->filteredIds.indexOf(v.getId()))).collect(Collectors.toList());
-    }
 
     // UPDATE
-
-
     @Override
     public boolean menuBelongsToRestaurant(long restaurantId, long menuId) {
         Query nativeQuery = em.createNativeQuery("SELECT menu_item_id FROM restaurants r LEFT JOIN menu_items m ON r.restaurant_id = m.restaurant_id WHERE r.restaurant_id = :rid AND m.menu_item_id = :mid");
@@ -434,12 +374,12 @@ public class RestaurantJpaDao implements RestaurantDao {
     // DELETE
     @Override
     public boolean deleteRestaurantById(long id) {
-        Optional<Restaurant> maybeRestaurant = findById(id);
-        if (maybeRestaurant.isPresent()) {
-            em.remove(maybeRestaurant.get());
-            return true;
+        Restaurant restaurant = findById(id).orElseThrow(RestaurantNotFoundException::new);
+        if (restaurant.getProfileImage() != null) {
+            em.remove(restaurant.getProfileImage());
         }
-        return false;
+        em.remove(restaurant);
+        return true;
     }
 
 }

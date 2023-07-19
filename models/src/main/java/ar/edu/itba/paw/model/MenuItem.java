@@ -1,15 +1,6 @@
 package ar.edu.itba.paw.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "menu_items")
@@ -29,31 +20,23 @@ public class MenuItem {
     private String description;
 
     @Column
-    private float price;
+    private Float price;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.MERGE)
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
     MenuItem() {
         //Just for hibernate
     }
-
-    public MenuItem(Long id, String name, String description, float price, Restaurant restaurant) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.restaurant = restaurant;
-    }
     
-    public MenuItem(Long id, String name, String description, float price) {
+    public MenuItem(Long id, String name, String description, Float price) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
     }
-    public MenuItem(String name, String description, float price) {
+    public MenuItem(String name, String description, Float price) {
         this.id = null;
         this.name = name;
         this.description = description;
@@ -72,7 +55,7 @@ public class MenuItem {
         return description;
     }
 
-    public float getPrice() {
+    public Float getPrice() {
         return price;
     }
 
@@ -88,7 +71,7 @@ public class MenuItem {
         this.description = description;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(Float price) {
         this.price = price;
     }
 

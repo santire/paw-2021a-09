@@ -20,19 +20,20 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.servlet.i18n.CookieLocaleResolver;
-import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
-import org.springframework.web.servlet.view.JstlView;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+//import org.springframework.web.servlet.LocaleResolver;
+//import org.springframework.web.servlet.ViewResolver;
+//import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+//import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+//import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+//import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+////import org.springframework.web.servlet.i18n.CookieLocaleResolver;
+//import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+//import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+////import org.springframework.web.servlet.view.InternalResourceViewResolver;
+////import org.springframework.web.servlet.view.JstlView;
+//import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
@@ -47,7 +48,6 @@ import java.util.Properties;
 @EnableAsync
 @EnableTransactionManagement
 @EnableScheduling
-@EnableWebMvc
 @ComponentScan({ "ar.edu.itba.paw.webapp.controller", "ar.edu.itba.paw.service", "ar.edu.itba.paw.persistence", })
 @Configuration
 public class WebConfig {
@@ -55,36 +55,30 @@ public class WebConfig {
   @Value("classpath:schema.sql")
   private Resource schemaSql;
 
-  @Bean
-  public ViewResolver viewResolver() {
-    final InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
-
-    viewResolver.setViewClass(JstlView.class);
-    viewResolver.setPrefix("/WEB-INF/jsp/");
-    viewResolver.setSuffix(".jsp");
-
-    return viewResolver;
-  }
+//  @Bean
+//  public ViewResolver viewResolver() {
+//    final InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
+//
+//    viewResolver.setViewClass(JstlView.class);
+//    viewResolver.setPrefix("/WEB-INF/jsp/");
+//    viewResolver.setSuffix(".jsp");
+//
+//    return viewResolver;
+//  }
 
   @Bean
   public DataSource dataSource() {
 
     final SimpleDriverDataSource ds = new SimpleDriverDataSource();
     ds.setDriverClass(org.postgresql.Driver.class);
-     // ds.setUrl("jdbc:postgresql://localhost/paw");
-     // ds.setUsername("root");
-     // ds.setPassword("root");
+      ds.setUrl("jdbc:postgresql://localhost/paw");
+      ds.setUsername("root");
+      ds.setPassword("root");
 
-    // paw server
-    ds.setUrl("jdbc:postgresql://10.16.1.110/paw-2021a-09");
-    ds.setUsername("paw-2021a-09");
-    ds.setPassword("6jnqLFj1g");
-
-    // remote testing database (very slow)
-
-    // ds.setUrl("jdbc:postgresql://santire.heliohost.us/santire_paw");
-    // ds.setUsername("santire_root");
-    // ds.setPassword("santire_root");
+//    // paw server
+//    ds.setUrl("jdbc:postgresql://10.16.1.110/paw-2021a-09");
+//    ds.setUsername("paw-2021a-09");
+//    ds.setPassword("6jnqLFj1g");
 
     return ds;
   }
@@ -99,6 +93,13 @@ public class WebConfig {
 
     return ms;
   }
+  @Bean
+  public LocalValidatorFactoryBean getValidator() {
+    LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
+    bean.setValidationMessageSource(messageSource());
+    return bean;
+  }
+
 
   @Bean
   public DataSourceInitializer DataSourceInitializer(final DataSource ds) {
@@ -153,7 +154,7 @@ public class WebConfig {
 
     
     // Local Machine only, don't deploy!
-    props.put("mail.debug", "false");
+    // props.put("mail.debug", "false");
 
 
     return mailSender;
@@ -168,23 +169,23 @@ public class WebConfig {
 
 
 
-  @Bean
-  public LocaleResolver localeResolver() {
-    CookieLocaleResolver clr = new CookieLocaleResolver();
-    return clr;
-  }
+//  @Bean
+//  public LocaleResolver localeResolver() {
+//    CookieLocaleResolver clr = new CookieLocaleResolver();
+//    return clr;
+//  }
 
-  @Bean
-  public WebMvcConfigurer configurer(){
-    return new WebMvcConfigurerAdapter() {
-      @Override
-      public void addInterceptors (InterceptorRegistry registry) {
-        LocaleChangeInterceptor l = new LocaleChangeInterceptor();
-        l.setParamName("lang");
-        registry.addInterceptor(l);
-      }
-    };
-  }
+//  @Bean
+//  public WebMvcConfigurer configurer(){
+//    return new WebMvcConfigurerAdapter() {
+//      @Override
+//      public void addInterceptors (InterceptorRegistry registry) {
+//        LocaleChangeInterceptor l = new LocaleChangeInterceptor();
+//        l.setParamName("lang");
+//        registry.addInterceptor(l);
+//      }
+//    };
+//  }
 
   @Bean
   public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
@@ -201,8 +202,8 @@ public class WebConfig {
     jpaProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQL92Dialect");
 
     // Local Machine only, don't deploy!
-/*    jpaProperties.setProperty("hibernate.show_sql", "true");
-    jpaProperties.setProperty("format_sql", "true");*/
+//     jpaProperties.setProperty("hibernate.show_sql", "true");
+//     jpaProperties.setProperty("format_sql", "true");
 
     entityFactory.setJpaProperties(jpaProperties);
     return entityFactory;

@@ -31,15 +31,6 @@ public class Comment {
         // Just for hibernate
     }
 
-    public Comment(Long id, User user, Restaurant restaurant, String userComment, LocalDate date){
-        this.id = id;
-        this.user = user;
-        this.restaurant = restaurant;
-        this.userComment = userComment;
-        this.date = date;
-    }
-
-
     public Comment(String userComment, LocalDate date){
         this.userComment = userComment;
         this.date = date;

@@ -21,6 +21,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -48,7 +49,7 @@ public class Restaurant {
     private float rating;
     
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "user_id")
     private User owner;
 
@@ -81,6 +82,8 @@ public class Restaurant {
     @Column(length = 100)
     private String twitter;
 
+    @Formula("(SELECT COUNT(*) FROM reservations r WHERE r.restaurant_id = restaurant_id AND r.confirmed=false AND r.date > CURRENT_DATE)")
+    private int reservationsCount;
 
     // private List<Reservation> reservations; ?
 
@@ -91,49 +94,20 @@ public class Restaurant {
     Restaurant() {
         // Just for hibernate
     }
-
-    public Restaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner) {
+    public Restaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner, String facebook, String twitter, String instagram) {
         this.name = name;
         this.address = address;
         this.phoneNumber = phoneNumber;
         this.tags = tags;
         this.owner = owner;
-        // this.likes = 0;
-        this.rating = 0;
+        this.facebook = facebook;
+        this.twitter = twitter;
+        this.instagram = instagram;
+         this.likes = new ArrayList<>();
+        this.ratings = new ArrayList<>();
         this.menu = new ArrayList<>();
     }
 
-    public Restaurant(Long id, String name, String address, String phoneNumber, float rating, User owner){
-        this.id = id;
-        this.name = name;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.rating = rating;
-        this.owner = owner;
-        // this.likes = 0;
-        this.menu = new ArrayList<>();
-    }
-
-    public Restaurant(Long id, String name, String address, String phoneNumber, float rating, User owner, int likes){
-        this.id = id;
-        this.name = name;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.rating = rating;
-        this.owner = owner;
-        // this.likes = likes;
-        this.menu = new ArrayList<>();
-    }
-
-    public Restaurant(Long id, String name, String address, String phoneNumber, User owner){
-        this.id = id;
-        this.name = name;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.owner = owner;
-        // this.likes=0;
-        this.menu = new ArrayList<>();
-    }
 
     public Long getId(){ return this.id; }
     public String getName(){ return this.name; }
@@ -142,16 +116,14 @@ public class Restaurant {
     public List<Rating> getRatings(){ return this.ratings; }
     public double getRating() { 
         DecimalFormat df = new DecimalFormat("#,##");
-        double result = new Double(df.format(
-        ratings
+        return Double.parseDouble(df.format(
+        this.ratings
         .stream()
-        .mapToDouble(r -> r.getRating()).average().orElse(0)));
-        
-        return result;
+        .mapToDouble(Rating::getRating).average().orElse(0)));
     }
     public User getOwner() { return owner; }
     public int getLikes() { return likes.size(); }
-    // public int getLikes() { return likes; }
+    public int getReservationsCount() { return reservationsCount; }
     public List<MenuItem> getMenu() { return this.menuPage; }
     public List<Tags> getTags() {return this.tags;}
     public Image getProfileImage() { return this.profileImage; }
@@ -159,7 +131,6 @@ public class Restaurant {
     public String getFacebook() { return facebook; }
     public String getInstagram() { return instagram; }
     public String getTwitter() { return twitter; }
-
 
 
     public void setId(Long id) { this.id = id; }
@@ -170,7 +141,10 @@ public class Restaurant {
     public void setOwner(User owner) { this.owner = owner; }
     // public void setLikes(int likes) { this.likes = likes; }
     public void setTags(List<Tags> tags) { this.tags = tags; }
+    public void setReservationCount(int reservationsCount) { this.reservationsCount = reservationsCount; }
     public void setMenu(List<MenuItem> menu) { this.menu = menu; }
+    public void setRatings(List<Rating> ratings) { this.ratings = ratings; }
+    public void setLikes(List<Like> likes) { this.likes = likes; }
     public void addMenuItem(MenuItem menuItem) { this.menu.add(menuItem); }
     public void setProfileImage(Image profileImage) { this.profileImage = profileImage; }
 

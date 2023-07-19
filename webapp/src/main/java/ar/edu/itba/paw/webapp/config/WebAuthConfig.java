@@ -1,40 +1,54 @@
 package ar.edu.itba.paw.webapp.config;
 
 
+import ar.edu.itba.paw.webapp.auth.ApiEntryPoint;
+import ar.edu.itba.paw.webapp.auth.filters.BasicAuthenticationWithJwtHeaderFilter;
+import ar.edu.itba.paw.webapp.auth.filters.CorsFilter;
+import ar.edu.itba.paw.webapp.auth.filters.JwtRequestFilter;
+
+import ar.edu.itba.paw.webapp.utils.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@ComponentScan({"ar.edu.itba.paw.webapp.auth"})
+@ComponentScan({"ar.edu.itba.paw.webapp.auth", "ar.edu.itba.paw.webapp.utils", "ar.edu.itba.paw.webapp.controller"})
 @Configuration
 public class WebAuthConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private UserDetailsService userDetails;
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-        }
+    }
+
 
     @Override
     @Bean
@@ -42,71 +56,53 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception{
-        auth.userDetailsService(userDetails)
-                .passwordEncoder(passwordEncoder());
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    protected void configure(final HttpSecurity http) throws Exception {
+        // Configure filters
+        http.userDetailsService(userDetailsService)
+                .addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class)
+                .addFilterBefore(new JwtRequestFilter(userDetailsService, jwtTokenUtil), BasicAuthenticationFilter.class)
+                .addFilterAt(new BasicAuthenticationWithJwtHeaderFilter(authenticationManager(), new ApiEntryPoint(), jwtTokenUtil, userDetailsService), BasicAuthenticationFilter.class)
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .headers()
+                .cacheControl().disable()
+                .and()
+                .csrf().disable()
+                .logout().disable()
+                .rememberMe().disable()
+                .authorizeRequests()
+                .antMatchers(HttpMethod.GET,
+                        "/api/restaurants",
+                        "/api/restaurants/*",
+                        "/api/restaurants/*/image",
+                        "/api/restaurants/*/menu",
+                        "/api/restaurants/*/reviews",
+                        "/api/tags"
+                ).permitAll()
+                .antMatchers(HttpMethod.POST, "/api/users").permitAll()
+                .antMatchers(HttpMethod.PUT, "/api/users").permitAll()
+                .antMatchers("/api/**").authenticated()
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(new ApiEntryPoint())
+                .and()
+                .httpBasic();
 
-        String key ="";
-        try {
-            key = getFileFromResources("key.txt");
-        } catch (Exception e) {
-            // Ignore
-        }
-
-
-        http.sessionManagement()
-                .invalidSessionUrl("/")
-                .and().authorizeRequests()
-                .antMatchers("/login", "/register").anonymous()
-                .antMatchers("/user/*",
-                             "/user/edit",
-                             "/register/restaurant",
-                             "/restaurants/user/*").hasRole("USER")
-                .antMatchers("/reservations",
-                             "/reservations/*/cancel",
-                             "/reservations/history",
-                             "/restaurant/*/rate",
-                             "/restaurant/*/dislike",
-                             "/restaurant/*/like",
-                             "/restaurant/*/reviews/delete"
-                             ).hasRole("USER")
-                .antMatchers("/restaurant/*/edit",
-                             "/restaurant/*/delete",
-                             "/restaurant/*/menu",
-                             "/restaurant/*/delete/*",
-                             "/restaurant/*/manage/confirmed",
-                             "/reservations/*/*/cancel",
-                             "/reservations/*/*/reject",
-                             "/reservations/*/*/confirm",
-                             "/restaurant/*/manage/pending").hasRole("RESTAURANTOWNER")
-                .and().formLogin()
-                .loginPage("/login")
-                .usernameParameter("email")
-                .passwordParameter("password")
-                .defaultSuccessUrl("/", false)
-                .and().rememberMe()
-                .rememberMeParameter("rememberme")
-                .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(365))
-                .key(key)
-                .and().logout()
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login")
-                .and().exceptionHandling()
-                .accessDeniedPage("/403")
-                .and().csrf().disable();
     }
-
     @Override
-    public void configure(WebSecurity web) throws Exception{
-              web.ignoring()
-                      .antMatchers("/css/**", "/images/**", "/js/**", "/favicon.ico" );
-            }
-
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring()
+                .antMatchers("/static/**", "/index.html", "/", "/locales/**")
+                .antMatchers("/**.png", "/**.json", "/**.ico", "/**.txt");
+    }
 
 
     public static String getFileFromResources(String fileName) throws Exception {
@@ -118,5 +114,4 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
         }
         return text;
     }
-
 }

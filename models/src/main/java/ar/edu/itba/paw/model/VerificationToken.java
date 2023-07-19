@@ -30,7 +30,7 @@ public class VerificationToken {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     private User user;
@@ -66,12 +66,6 @@ public class VerificationToken {
     public VerificationToken(String token, LocalDateTime timestamp, User user) {
         this.setToken(token);
         this.setCreatedAt(timestamp);
-        this.user = user;
-    }
-
-    public VerificationToken(String token, Timestamp timestamp, User user) {
-        this.setToken(token);
-        this.setCreatedAt(timestamp.toLocalDateTime());
         this.user = user;
     }
 }

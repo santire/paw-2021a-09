@@ -1,422 +1,494 @@
 package ar.edu.itba.paw.webapp.controller;
 
 import ar.edu.itba.paw.model.*;
+import ar.edu.itba.paw.model.exceptions.CommentNotFoundException;
+import ar.edu.itba.paw.model.exceptions.EmptyBodyException;
 import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
-import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
-
-import javax.validation.Valid;
-
-
-import ar.edu.itba.paw.service.MenuService;
-import ar.edu.itba.paw.service.ReservationService;
-
 import ar.edu.itba.paw.service.*;
-import ar.edu.itba.paw.webapp.forms.CommentForm;
-import ar.edu.itba.paw.webapp.forms.MenuItemForm;
-import ar.edu.itba.paw.webapp.forms.RatingForm;
-import ar.edu.itba.paw.webapp.forms.ReservationForm;
-import ar.edu.itba.paw.webapp.forms.RestaurantForm;
-
-
+import ar.edu.itba.paw.webapp.dto.*;
+import ar.edu.itba.paw.webapp.forms.*;
+import ar.edu.itba.paw.webapp.utils.CachingUtils;
+import ar.edu.itba.paw.webapp.utils.PageUtils;
+import ar.edu.itba.paw.webapp.validators.ImageFileValidator;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.stereotype.Component;
 
-
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import java.io.IOException;
+import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
-@Controller
+
+@Component
+@Path("/restaurants")
 public class RestaurantController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
     private static final int AMOUNT_OF_MENU_ITEMS = 8;
-    private static final int AMOUNT_OF_RESTAURANTS = 10;
+    private static final int MAX_AMOUNT_PER_PAGE = 10;
     private static final int AMOUNT_OF_REVIEWS = 4;
+    private static final int AMOUNT_OF_RESERVATIONS = 10;
+
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private ReservationService reservationService;
-
     @Autowired
     private RestaurantService restaurantService;
-
-    @Autowired
-    private RatingService ratingService;
-
-    @Autowired
-    private LikesService likesService;
-
-    @Autowired
-    private MenuService menuService;
-
-    @Autowired
-    private SocialMediaService socialMediaService;
-
     @Autowired
     private CommentService commentService;
-
     @Autowired
-    private CommonAttributes ca;
+    private MenuService menuService;
+    @Autowired
+    private RatingService ratingService;
+    @Autowired
+    private LikesService likesService;
+    @Autowired
+    private ReservationService reservationService;
+    @Context
+    private Validator validator;
 
+    @Context
+    private UriInfo uriInfo;
 
-    @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.GET)
-    public ModelAndView restaurant(@ModelAttribute("reservationForm") final ReservationForm form,
-            @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
-            @ModelAttribute("ratingForm") final RatingForm ratingForm,
-            @RequestParam(defaultValue="1") Integer page,
-            @PathVariable("restaurantId") final long restaurantId) {
-        final ModelAndView mav = new ModelAndView("restaurant");
+    //READ RESTAURANTS
+    @GET
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    public Response getRestaurants(@QueryParam("page") @DefaultValue("1") Integer page,
+                                   @QueryParam("pageAmount") @DefaultValue("10") Integer pageAmount,
+                                   @QueryParam("search") @DefaultValue("") String search,
+                                   @QueryParam("tags") List<Integer> tags,
+                                   @QueryParam("min") @DefaultValue("1") Integer min,
+                                   @QueryParam("max") @DefaultValue("10000") Integer max,
+                                   @QueryParam("sort") @DefaultValue("name") String sortBy,
+                                   @QueryParam("order") @DefaultValue("asc") String order,
+                                   @QueryParam("filterBy") @DefaultValue("") String filterBy) {
 
-        User loggedUser = ca.loggedUser();
-
-        int maxPages = restaurantService.findByIdWithMenuPagesCount(AMOUNT_OF_MENU_ITEMS, restaurantId);
-
-        if(page == null || page <1) {
-            page=1;
-        }else if (page > maxPages) {
-            page = maxPages;
+        if (filterBy.equalsIgnoreCase("hot")) {
+            List<RestaurantDto> restaurants = restaurantService.getHotRestaurants(pageAmount, 365)
+                    .stream()
+                    .map(u -> RestaurantDto.fromRestaurant(u, uriInfo))
+                    .collect(Collectors.toList());
+            return Response.ok(new GenericEntity<List<RestaurantDto>>(restaurants) {
+            }).build();
         }
-        mav.addObject("maxPages", maxPages);
-
-
-        Restaurant restaurant = restaurantService.findByIdWithMenu(restaurantId, page, AMOUNT_OF_MENU_ITEMS).orElseThrow(RestaurantNotFoundException::new);
-
-        mav.addObject("facebook", false);
-        mav.addObject("instagram", false);
-        mav.addObject("twitter", false);
-
-
-        if(restaurant.getFacebook() != null && !restaurant.getFacebook().isEmpty()){
-            mav.addObject("facebook", true);
-        }
-        if(restaurant.getInstagram() != null && !restaurant.getInstagram().isEmpty()){
-            mav.addObject("instagram", true);
-        }
-        if(restaurant.getTwitter() != null && !restaurant.getTwitter().isEmpty()){
-            mav.addObject("twitter", true);
+        if (filterBy.equalsIgnoreCase("popular")) {
+            List<RestaurantDto> restaurants = restaurantService.getPopularRestaurants(pageAmount, 2)
+                    .stream()
+                    .map(u -> RestaurantDto.fromRestaurant(u, uriInfo))
+                    .collect(Collectors.toList());
+            return Response.ok(new GenericEntity<List<RestaurantDto>>(restaurants) {
+            }).build();
         }
 
+        if (!Objects.equals(search, "")) {
+            search = search.trim().replaceAll("[^a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]+", "");
+        }
 
-        if(loggedUser != null){
-            Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
-            boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
-            if (isTheRestaurantOwner) {
-                mav.addObject("isTheOwner", true);
+        List<Tags> tagsSelected = new ArrayList<>();
+//        List<Integer> tagsChecked = new ArrayList<>();
+        if (tags != null) {
+            for (int i : tags) {
+                if (Tags.valueOf(i) == null) {
+                    LOGGER.warn("Tag {} does not exist. Ignoring...", i);
+                } else {
+                    tagsSelected.add(Tags.valueOf(i));
+//                    tagsChecked.add(i);
+                }
             }
-
-            mav.addObject("userRatingToRestaurant", 0);
-
-
-            if(userRating.isPresent()){
-                mav.addObject("rated", true);
-                mav.addObject("userRatingToRestaurant", userRating.get().getRating());
-            }
-
-            mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
-            List<String> times = restaurantService.availableStringTime(restaurantId);
-            mav.addObject("times", times);
         }
 
+        Sorting sort = Sorting.NAME;
+        try {
+            sort = Sorting.valueOf(sortBy.toUpperCase());
+        } catch (Exception e) {
+            LOGGER.warn("Invalid sorting option {}, defaulting to NAME", sortBy);
+        }
 
-        LOGGER.error("page value: {}", page);
-        mav.addObject("restaurant", restaurant);
+        boolean desc = order != null && order.equalsIgnoreCase("DESC");
+        if (pageAmount > MAX_AMOUNT_PER_PAGE) {
+            pageAmount = MAX_AMOUNT_PER_PAGE;
+        }
 
-        return mav;
+        int totalRestaurants = restaurantService.getRestaurantsFilteredByCount(search, tagsSelected, min, max);
+        List<RestaurantDto> restaurants = restaurantService.getRestaurantsFilteredBy(
+                        page, pageAmount, search, tagsSelected, min, max, sort, desc, 7)
+                .stream()
+                .map(u -> RestaurantDto.fromRestaurant(u, uriInfo))
+                .collect(Collectors.toList());
+        LOGGER.info(String.valueOf(restaurants.size()));
+
+        return PageUtils.paginatedResponse(new GenericEntity<List<RestaurantDto>>(restaurants) {
+        }, uriInfo, page, pageAmount, totalRestaurants);
     }
 
-    @RequestMapping(path = { "/restaurant/{restaurantId}" }, method = RequestMethod.POST)
-    public ModelAndView reservationAndMenu(@Valid @ModelAttribute("reservationForm") final ReservationForm form,
-                                           final BindingResult errors,
-                                           @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
-                                           final BindingResult menuErrors,
-                                           @ModelAttribute("ratingForm") final RatingForm ratingForm,
-                                           final BindingResult ratingError,
-                                           @RequestParam(defaultValue="1") Integer page,
-                                           @PathVariable("restaurantId") final long restaurantId,
-                                           RedirectAttributes redirectAttributes) {
-
-        User loggedUser = ca.loggedUser();
-        if (errors.hasErrors()) {
-            return restaurant(form, menuForm, ratingForm, page, restaurantId);
-        }
-
-        if (loggedUser != null) {
-            LocalTime time = form.getTime();
-            LocalDate date = form.getDate();
-            LocalDateTime dateAt = date.atTime(time.getHour(), time.getMinute());
-            reservationService.addReservation(loggedUser.getId(), restaurantId, dateAt, Long.parseLong(form.getQuantity()), ca.getUri());
-            redirectAttributes.addFlashAttribute("madeReservation", true);
-        } else {
-            return new ModelAndView("redirect:/login");
-        }
-
-        return new ModelAndView("redirect:/restaurant/" + restaurantId);
+    //READ A RESTAURANT
+    @GET
+    @Path("/{restaurantId}")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    public Response findRestaurantByID(@PathParam("restaurantId") final long restaurantId) {
+        final Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
+        final RestaurantDto restaurantDto = RestaurantDto.fromRestaurant(restaurant, uriInfo);
+        return Response.ok(new GenericEntity<RestaurantDto>(restaurantDto) {
+        }).build();
     }
 
-    @RequestMapping(path = { "/restaurant/{restaurantId}/reviews" }, method = RequestMethod.GET)
-    public ModelAndView restaurantReviews(@ModelAttribute("reservationForm") final ReservationForm form,
-                                          @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
-                                   @ModelAttribute("ratingForm") final RatingForm ratingForm,
-                                   @ModelAttribute("commentForm") final CommentForm commentForm,
-                                   @RequestParam(defaultValue="1") Integer page,
-                                   @PathVariable("restaurantId") final long restaurantId) {
-        final ModelAndView mav = new ModelAndView("restaurantReviews");
-        User loggedUser = ca.loggedUser();
-        //int maxPages = restaurantService.findByIdWithMenuPagesCount(AMOUNT_OF_MENU_ITEMS, restaurantId);
-        int maxPages = commentService.findByRestaurantPageCount(AMOUNT_OF_REVIEWS, restaurantId);
+    @GET
+    @Path("/{restaurantId}/image")
+    @Produces(value = {MediaType.APPLICATION_JSON, "image/jpg"})
+    public Response getRestaurantImage(@PathParam("restaurantId") final long restaurantId) throws IOException {
+        CacheControl cache = CachingUtils.getCaching(CachingUtils.HOUR_TO_SEC);
+        Date expireDate = CachingUtils.getExpirationDate(CachingUtils.HOUR_TO_SEC);
+        final Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
+        final Image image = restaurant.getProfileImage();
+        LOGGER.debug("Image: {}", image);
+        final byte[] imageData = image != null ? image.getData() : Image.getPlaceholderImage();
 
-        if(page == null || page <1) {
-            page=1;
-        }else if (page > maxPages) {
-            page = maxPages;
-        }
-        mav.addObject("maxPages", maxPages);
-
-        Restaurant restaurant = restaurantService.findByIdWithMenu(restaurantId, page, AMOUNT_OF_MENU_ITEMS).orElseThrow(RestaurantNotFoundException::new);
-
-        mav.addObject("facebook", false);
-        mav.addObject("instagram", false);
-        mav.addObject("twitter", false);
-
-
-        if(restaurant.getFacebook() != null && !restaurant.getFacebook().isEmpty()){
-            mav.addObject("facebook", true);
-        }
-        if(restaurant.getInstagram() != null && !restaurant.getInstagram().isEmpty()){
-            mav.addObject("instagram", true);
-        }
-        if(restaurant.getTwitter() != null && !restaurant.getTwitter().isEmpty()){
-            mav.addObject("twitter", true);
-        }
-
-        if(loggedUser != null){
-            Optional<Rating> userRating = ratingService.getRating(loggedUser.getId(), restaurantId);
-            boolean isTheRestaurantOwner = userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
-            if (isTheRestaurantOwner) {
-                mav.addObject("isTheOwner", true);
-            }
-
-            mav.addObject("userRatingToRestaurant", 0);
-
-            if(userRating.isPresent()){
-                mav.addObject("rated", true);
-                mav.addObject("userRatingToRestaurant", userRating.get().getRating());
-            }
-
-            mav.addObject("userLikesRestaurant", likesService.userLikesRestaurant(loggedUser.getId(), restaurantId));
-            List<String> times = restaurantService.availableStringTime(restaurantId);
-            mav.addObject("times", times);
-
-            Optional<Comment> maybeComment = commentService.findByUserAndRestaurantId(loggedUser.getId(), restaurantId);
-            if(maybeComment.isPresent()){
-                mav.addObject("userMadeComment", true);
-                mav.addObject("userReview", maybeComment.get());
-            }
-            else{
-                mav.addObject("userMadeComment", false);
-            }
-            mav.addObject("hasOnceReserved", true);
-        }
-
-        LOGGER.error("page value: {}", page);
-        mav.addObject("restaurant", restaurant);
-        mav.addObject("reviews", commentService.findByRestaurant(page, AMOUNT_OF_REVIEWS, restaurantId));
-        return mav;
+        return Response.ok(imageData)
+                .header("Content-Type", "image/jpg")
+                .cacheControl(cache).expires(expireDate).build();
     }
 
-    @RequestMapping(path = { "/restaurant/{restaurantId}/reviews" }, method = RequestMethod.POST)
-    public ModelAndView addRestaurantReview(@PathVariable("restaurantId") final long restaurantId,
-                                            @Valid @ModelAttribute("commentForm") final CommentForm commentForm,
-                                            final BindingResult errors,
-                                            @ModelAttribute("reservationForm") final ReservationForm form,
-                                            @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
-                                            @ModelAttribute("ratingForm") final RatingForm ratingForm,
-                                            @RequestParam(defaultValue="1") Integer page
-                                            ) {
-        if(errors.hasErrors()) {
-            return(restaurantReviews(form, menuForm, ratingForm, commentForm, page, restaurantId));
-        }
-        User loggedUser = ca.loggedUser();
-        if (loggedUser == null) {
-            throw new UserNotFoundException();
-        }
-        commentService.addComment(loggedUser.getId(), restaurantId, commentForm.getReview());
-        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/reviews");
+    //READ RESTAURANT MENU
+    @GET
+    @Path("/{restaurantId}/menu")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    public Response findRestaurantMenu(@PathParam("restaurantId") final long restaurantId, @QueryParam("page") @DefaultValue("1") Integer page) {
+
+        int amountOfMenuItems = restaurantService.findByIdWithMenuCount(restaurantId);
+        LOGGER.debug("Amount of menu items: {}", amountOfMenuItems);
+        final Restaurant restaurant = restaurantService.findByIdWithMenu(restaurantId, page, AMOUNT_OF_MENU_ITEMS)
+                .orElseThrow(RestaurantNotFoundException::new);
+
+        List<MenuItemDto> menu = restaurant.getMenu()
+                .stream()
+                .map(MenuItemDto::fromMenuItem)
+                .collect(Collectors.toList());
+
+        return PageUtils.paginatedResponse(new GenericEntity<List<MenuItemDto>>(menu) {
+        }, uriInfo, page, AMOUNT_OF_MENU_ITEMS, amountOfMenuItems);
     }
 
-    @RequestMapping(path = { "/restaurant/{restaurantId}/reviews/{reviewId}/delete" }, method = RequestMethod.POST)
-    @PreAuthorize("@authComponent.isReviewOwner(#reviewId)")
-    public ModelAndView deleteReview(@PathVariable("restaurantId") final long restaurantId,
-                                     @PathVariable("reviewId") final long reviewId) {
+    //READ RESTAURANT REVIEWS
+    @GET
+    @Path("/{restaurantId}/reviews")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    public Response findRestaurantReviews(@PathParam("restaurantId") final long restaurantId, @QueryParam("page") @DefaultValue("1") Integer page) {
+        int amountOfReviews = commentService.findByRestaurantCount(restaurantId);
+
+        List<CommentDto> reviews = commentService.findByRestaurant(page, AMOUNT_OF_REVIEWS, restaurantId)
+                .stream()
+                .map(u -> CommentDto.fromComment(u, uriInfo))
+                .collect(Collectors.toList());
+
+
+        return PageUtils.paginatedResponse(new GenericEntity<List<CommentDto>>(reviews) {
+        }, uriInfo, page, AMOUNT_OF_REVIEWS, amountOfReviews);
+    }
+
+    //CREATE REVIEW
+    @POST
+    @Path("/{restaurantId}/reviews")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @Consumes(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
+    public Response addRestaurantReview(@PathParam("restaurantId") final Long restaurantId,
+                                        final @Valid @NotNull CommentForm comment, @Context HttpServletRequest request) {
+        User user = getLoggedUser();
+        LOGGER.debug("review: {}", comment.getReview());
+        final Comment rev = commentService.addComment(user.getId(), restaurantId, comment.getReview());
+        final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(rev.getId())).build();
+        return Response.created(uri).entity(CommentDto.fromComment(rev, uriInfo)).build();
+    }
+
+    //DELETE REVIEW
+    @DELETE
+    @Path("/{restaurantId}/reviews/{reviewId}")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("@authComponent.isReviewOwner(#reviewId) OR hasRole('ROLE_ADMIN')")
+    public Response deleteRestaurantReview(@PathParam("restaurantId") final Long restaurantId,
+                                           @PathParam("reviewId") final Long reviewId, @Context HttpServletRequest request) {
+        Comment review = commentService.findById(reviewId).orElseThrow(CommentNotFoundException::new);
         commentService.deleteComment(reviewId);
-        return new ModelAndView("redirect:/restaurant/" + restaurantId + "/reviews");
+        return Response.noContent().build();
     }
 
-
-    @RequestMapping(path = { "/restaurant/{restaurantId}/menu" }, method = RequestMethod.POST)
+    //ADD MENU ITEM
+    @POST
+    @Path("/{restaurantId}/menu")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @Consumes(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isRestaurantOwner(#restaurantId)")
-    public ModelAndView addMenu(@ModelAttribute("reservationForm") final ReservationForm form,
-             @Valid @ModelAttribute("menuItemForm") final MenuItemForm menuForm,
-             final BindingResult errors,
-             @ModelAttribute("ratingForm") final RatingForm ratingForm,
-             final BindingResult ratingErrors,
-             @RequestParam(defaultValue="1") Integer page,
-             @PathVariable("restaurantId") final long restaurantId,
-             RedirectAttributes redirectAttributes) {
-        if(errors.hasErrors()) {
-            return restaurant(form, menuForm, ratingForm, page, restaurantId);
-        }
-        MenuItem item = new MenuItem(
-                menuForm.getName(),
-                menuForm.getDescription(),
-                menuForm.getPrice());
-        menuService.addItemToRestaurant(restaurantId, item);
-        return new ModelAndView("redirect:/restaurant/" + restaurantId);
-    }
-    
-
-    @RequestMapping(path = { "/register/restaurant" }, method = RequestMethod.GET)
-    public ModelAndView registerRestaurant(@ModelAttribute("RestaurantForm") final RestaurantForm form) {
-
-        ModelAndView mav =  new ModelAndView("registerRestaurant");
-        mav.addObject("tags", Tags.allTags());
-        return mav;
+    public Response addRestaurantMenuItem(@PathParam("restaurantId") final Long restaurantId,
+                                          final @Valid @NotNull MenuItemForm menuItem, @Context HttpServletRequest request) {
+        final MenuItem item = new MenuItem(menuItem.getId(), menuItem.getName(), menuItem.getDescription(), menuItem.getPrice());
+        final MenuItem createdItem = menuService.addItemToRestaurant(restaurantId, item);
+        final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(createdItem.getId())).build();
+        return Response.created(uri).entity(MenuItemDto.fromMenuItem(createdItem)).build();
     }
 
-
-
-    @RequestMapping(path = { "/register/restaurant" }, method = RequestMethod.POST)
-    public ModelAndView registerRestaurant(@Valid @ModelAttribute("RestaurantForm") final RestaurantForm form, final BindingResult errors) {
-
-        User loggedUser = ca.loggedUser();
-
-        if (errors.hasErrors()) {
-            LOGGER.debug("Form has errors at /register/restaurant");
-            return registerRestaurant(form);
-        }
-        LOGGER.debug("Creating restaurant for user {}", loggedUser.getName());
-        List<Tags> tagList = Arrays.asList(form.getTags()).stream().map((i) -> Tags.valueOf(i)).collect(Collectors.toList());
-        LOGGER.debug("tags: {}", tagList);
-        final Restaurant restaurant = restaurantService.registerRestaurant(form.getName(), form.getAddress(),
-                form.getPhoneNumber(), tagList, loggedUser);
-        updateAuthorities();
-
-                if (form.getFacebook() != null){
-                    socialMediaService.updateFacebook(form.getFacebook(), restaurant.getId());
-                }
-                if (form.getInstagram() != null){
-                    socialMediaService.updateInstagram(form.getInstagram(), restaurant.getId());
-                }
-                if (form.getTwitter() != null){
-                    socialMediaService.updateTwitter(form.getTwitter(), restaurant.getId());
-                }
-
-        if (form.getProfileImage() != null && !form.getProfileImage().isEmpty()) {
-            try {
-            Image image = new Image(form.getProfileImage().getBytes());
-            restaurantService.setImageByRestaurantId(image, restaurant.getId());
-            } catch (IOException e) {
-                LOGGER.error("error while setting restaurant profile image");
-            }
-        }
-        return new ModelAndView("redirect:/restaurant/" + restaurant.getId());
-    }
-
-    @RequestMapping(path = {"restaurant/{restaurantId}/like"}, method = RequestMethod.POST)
-    public ModelAndView like(@PathVariable("restaurantId") final long restaurantId){
-        User loggedUser = ca.loggedUser();
-        long userId = loggedUser.getId();
-        likesService.like(userId, restaurantId);
-        return new ModelAndView("redirect:/restaurant/" + restaurantId);
-    }
-
-    @RequestMapping(path = {"restaurant/{restaurantId}/dislike"}, method = RequestMethod.POST)
-    public ModelAndView dislike(@PathVariable("restaurantId") final long restaurantId){
-        User loggedUser = ca.loggedUser();
-        long userId = loggedUser.getId();
-        likesService.dislike(userId, restaurantId);
-        return new ModelAndView("redirect:/restaurant/" + restaurantId);
-    }
-
-    @RequestMapping(path ={  "/restaurant/{restaurantId}/delete/{menuId}" }, method=RequestMethod.POST)
-    @PreAuthorize("@authComponent.isRestaurantAndMenuOwner(#restaurantId, #menuId)")
-    public ModelAndView deleteMenuItem(@PathVariable("restaurantId") final long restaurantId,
-            @PathVariable("menuId") final long menuId) {
-
+    //DELETE MENU ITEM
+    @DELETE
+    @Path("/{restaurantId}/menu/{menuId}")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    // Restaurant owner and menu item belongs to said restaurant
+    @PreAuthorize("@authComponent.isRestaurantAndMenuOwner(#restaurantId, #menuId) or hasRole('ROLE_ADMIN')")
+    public Response deleteRestaurantMenuItem(@PathParam("restaurantId") final Long restaurantId,
+                                             @PathParam("menuId") final Long menuId, @Context HttpServletRequest request) {
         menuService.deleteItemById(menuId);
-        return new ModelAndView("redirect:/restaurant/" + restaurantId);
+        return Response.noContent().build();
     }
 
-
-    @RequestMapping(path={ "/restaurants/user/{userId}" }, method=RequestMethod.GET)
-    public ModelAndView userRestaurants(@PathVariable("userId") final long userId,
-            @RequestParam(defaultValue = "1") Integer page) {
-
-        final ModelAndView mav = new ModelAndView("myRestaurants");
-        int maxPages = restaurantService.getRestaurantsFromOwnerPagesCount(AMOUNT_OF_RESTAURANTS, userId);
-
-        if(page == null || page <1) {
-            page=1;
-        }else if (page > maxPages) {
-            page = maxPages;
+    //REGISTER RESTAURANT
+    @POST
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @Consumes(value = {MediaType.APPLICATION_JSON})
+    public Response registerRestaurant(final @Valid @NotNull RegisterRestaurantForm restaurantForm,
+                                       @Context HttpServletRequest request) {
+        User user = getLoggedUser();
+        List<Tags> tagList = new ArrayList<>();
+        if (restaurantForm.getTags() != null) {
+            tagList = Arrays
+                    .stream(restaurantForm.getTags())
+                    .map(Tags::valueOf)
+                    .collect(Collectors.toList());
+            LOGGER.debug("tags: {}", tagList);
         }
-        mav.addObject("maxPages", maxPages);
-        List<Restaurant> restaurants = restaurantService.getRestaurantsFromOwner(page, AMOUNT_OF_RESTAURANTS, userId);
-        mav.addObject("userHasRestaurants", !restaurants.isEmpty());
-        mav.addObject("restaurants", restaurants);
-        return mav;
+
+        final Restaurant restaurant = restaurantService.registerRestaurant(
+                restaurantForm.getName(),
+                restaurantForm.getAddress(),
+                restaurantForm.getPhoneNumber(),
+                tagList,
+                user,
+                restaurantForm.getFacebook(),
+                restaurantForm.getTwitter(),
+                restaurantForm.getInstagram()
+        );
+
+        final URI uri = uriInfo.getAbsolutePathBuilder()
+                .path(String.valueOf(restaurant.getId())).build();
+        LOGGER.info("Restaurant created in : " + uri);
+        return Response.created(uri).entity(RestaurantDto.fromRestaurant(restaurant, uriInfo)).build();
     }
 
+    @PUT
+    @Path("/{restaurantId}/image")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @Consumes(value = {MediaType.MULTIPART_FORM_DATA})
+    @PreAuthorize("@authComponent.isRestaurantOwner(#restaurantId)")
+    public Response setImage(@PathParam("restaurantId") final Long restaurantId,
+                             @FormDataParam("image") final FormDataBodyPart body,
+                             @FormDataParam("image") final byte[] bytes,
+                             @Context HttpServletRequest request) throws IOException {
+        // Throws InvalidImageException if not valid
+        ImageFileValidator imageFileValidator = new ImageFileValidator();
+        imageFileValidator.isValid(body, null);
+        String contentType = body.getMediaType().toString();
+        LOGGER.debug("Image type: {}", contentType);
+        LOGGER.debug("Image size: {}", bytes.length / 1024);
+        Image image = new Image(bytes);
+        LOGGER.debug("Created image: {}", image);
+        restaurantService.setImageByRestaurantId(image, restaurantId);
+        final URI uri = uriInfo.getAbsolutePathBuilder().build();
+        return Response.ok(uri).entity(bytes).build();
+    }
 
-
-
-    @RequestMapping(path = { "/restaurant/{restaurantId}/rate" }, method = RequestMethod.POST)
-    public ModelAndView rateRestaurant(@PathVariable("restaurantId") final long restaurantId,
-                                        @Valid @ModelAttribute("ratingForm") final RatingForm ratingForm,
-                                        final BindingResult errors) {
-        User loggedUser = ca.loggedUser();
-        if(errors.hasErrors()) {
-            return new ModelAndView("redirect:/restaurant/" + restaurantId);
+    @PUT
+    @Path("/{restaurantId}")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @Consumes(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("@authComponent.isRestaurantOwner(#restaurantId)")
+    public Response updateRestaurant(
+            @PathParam("restaurantId") final Long restaurantId,
+            final @Valid @NotNull RegisterRestaurantForm restaurantForm,
+            @Context HttpServletRequest request) {
+        List<Tags> tagList = new ArrayList<>();
+        if (restaurantForm.getTags() != null) {
+            tagList = Arrays.stream(restaurantForm.getTags()).map(Tags::valueOf).collect(Collectors.toList());
+            LOGGER.debug("tags: {}", tagList);
         }
-        ratingService.rateRestaurant(loggedUser.getId(), restaurantId, ratingForm.getRating());
-        return new ModelAndView("redirect:/restaurant/" + restaurantId);
+        restaurantService.updateRestaurant(
+                restaurantId,
+                restaurantForm.getName(),
+                restaurantForm.getAddress(),
+                restaurantForm.getPhoneNumber(),
+                tagList,
+                restaurantForm.getFacebook(),
+                restaurantForm.getTwitter(),
+                restaurantForm.getInstagram()
+        );
+        return Response.noContent().build();
+    }
+
+    //DELETE RESTAURANT
+    @DELETE
+    @Path("/{restaurantId}")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("@authComponent.isRestaurantOwner(#restaurantId)")
+    public Response deleteRestaurant(@PathParam("restaurantId") final Long restaurantId,
+                                     @Context HttpServletRequest request) {
+        restaurantService.deleteRestaurantById(restaurantId);
+        return Response.noContent().build();
+    }
+
+
+    //LIKE RESTAURANT
+    @POST
+    @Path("/{restaurantId}/likes")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
+    public Response likeRestaurant(@PathParam("restaurantId") final Long restaurantId,
+                                   @Context HttpServletRequest request) {
+        User user = getLoggedUser();
+        likesService.like(user.getId(), restaurantId);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @DELETE
+    @Path("/{restaurantId}/likes")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
+    public Response dislikeRestaurant(@PathParam("restaurantId") final Long restaurantId,
+                                      @Context HttpServletRequest request) {
+        User user = getLoggedUser();
+        likesService.dislike(user.getId(), restaurantId);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    //GET USER LIKE
+    @GET
+    @Path("/{restaurantId}/likes")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    public Response getRestaurantlikes(
+            @PathParam("restaurantId") final Long restaurantId,
+            @QueryParam("userId") final Long userId,
+            @Context HttpServletRequest request) {
+
+        Boolean like = likesService.userLikesRestaurant(userId, restaurantId);
+        return Response.ok(new LikeDto(like)).build();
+    }
+
+    //RATE RESTAURANT
+    @POST
+    @Path("/{restaurantId}/ratings")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
+    public Response rateRestaurant(@PathParam("restaurantId") final Long restaurantId,
+                                   @Valid @NotNull RatingForm rating, @Context HttpServletRequest request) {
+        User user = getLoggedUser();
+        ratingService.rateRestaurant(user.getId(), restaurantId, rating.getRating());
+        return Response.noContent().build();
     }
 
 
 
-
-
-    public void updateAuthorities() {
-        User loggedUser = ca.loggedUser();
-        if(loggedUser!=null){
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            Collection<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
-            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-            if(userService.isRestaurantOwner(loggedUser.getId())){
-                authorities.add(new SimpleGrantedAuthority("ROLE_RESTAURANTOWNER"));
-            }
-            Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
-            SecurityContextHolder.getContext().setAuthentication(newAuth);
+    //READ RESTAURANT RESERVATIONS
+    @GET
+    @Path("/{restaurantId}/reservations")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("@authComponent.isRestaurantOwner(#restaurantId)")
+    public Response findRestaurantReservations(@PathParam("restaurantId") final Long restaurantId,
+                                               @QueryParam("filterBy") @DefaultValue("") String filterBy,
+                                               @QueryParam("page") @DefaultValue("1") Integer page,
+                                               @Context HttpServletRequest request) {
+        int totalReservations;
+        List<ReservationDto> reservations;
+        LOGGER.debug("Filtering reservations by: {}", filterBy);
+        if (filterBy.equalsIgnoreCase("pending")) {
+            totalReservations = reservationService.findPendingByRestaurantCount(restaurantId);
+            reservations = reservationService.findPendingByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
+        } else if (filterBy.equalsIgnoreCase("confirmed")) {
+            totalReservations = reservationService.findConfirmedByRestaurantCount( restaurantId);
+            reservations = reservationService.findConfirmedByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
+        } else if (filterBy.equalsIgnoreCase("history")) {
+            totalReservations = reservationService.findHistoryByRestaurantCount(restaurantId);
+            reservations = reservationService.findHistoryByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
+        } else {
+            totalReservations = reservationService.findByRestaurantCount(restaurantId);
+            reservations = reservationService.findByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
         }
+        return PageUtils.paginatedResponse(new GenericEntity<List<ReservationDto>>(reservations) {
+        }, uriInfo, page, AMOUNT_OF_RESERVATIONS, totalReservations);
     }
+
+    //ADD RESERVATION
+    @POST
+    @Path("/{restaurantId}/reservations")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @Consumes(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
+    public Response addRestaurantReservation(
+            @PathParam("restaurantId") final Long restaurantId,
+            @Valid @NotNull ReservationForm reservationDto, @Context HttpServletRequest request) {
+        User user = getLoggedUser();
+        String baseUrl = request.getHeader("Origin");
+        if (baseUrl == null) {
+            baseUrl = uriInfo.getBaseUri().toString();
+        }
+        final Reservation res = reservationService.addReservation(
+                user.getId(),
+                restaurantId,
+                LocalDateTime.of(reservationDto.getDate(), reservationDto.getTime()),
+                reservationDto.getQuantity(),
+                baseUrl);
+
+        final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(res.getId())).build();
+        return Response.created(uri).entity(ReservationDto.fromReservation(res, uriInfo)).build();
+    }
+
+    // USER CANCEL RESERVATION
+    @DELETE
+    @Path("/{restaurantId}/reservations/{reservationId}")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("@authComponent.isReservationUser(#reservationId)")
+    public Response cancelRestaurantReservation(
+            @PathParam("restaurantId") final Long restaurantId,
+            @PathParam("reservationId") final long reservationId,
+            @Context HttpServletRequest request) {
+        reservationService.userCancelReservation(reservationId);
+        return Response.noContent().build();
+    }
+
+    // OWNER CONFIRM OR DENY RESERVATION
+    @PUT
+    @Path("/{restaurantId}/reservations/{reservationId}")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("@authComponent.isReservationOwner(#reservationId)")
+    public Response confirmRestaurantReservation(@PathParam("restaurantId") final Long restaurantId,
+                                                 @PathParam("reservationId") final Long reservationId,
+                                                 @QueryParam("action") final String action,
+                                                 @Valid final CancelMessageForm cancelMessageForm,
+                                                 @Context HttpServletRequest request) {
+        if (action.equalsIgnoreCase("confirm")) {
+            reservationService.confirmReservation(reservationId);
+        } else if (action.equalsIgnoreCase("deny") && cancelMessageForm != null) {
+            reservationService.ownerCancelReservation(reservationId, cancelMessageForm.getMessage());
+        } else {
+            throw new EmptyBodyException();
+        }
+        return Response.noContent().build();
+    }
+
+
+    private User getLoggedUser() {
+        return userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName())
+                // This shouldn't happen as authority is handled before
+                .orElseThrow(() -> new AccessDeniedException("Unauthorized"));
+    }
+
 
 }

@@ -1,9 +1,18 @@
 package ar.edu.itba.paw.persistence;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import ar.edu.itba.paw.model.Like;
@@ -12,7 +21,7 @@ import ar.edu.itba.paw.model.User;
 
 @Repository
 public class LikeJpaDao implements LikesDao {
-
+	private static final Logger LOGGER = LoggerFactory.getLogger(LikeJpaDao.class);
 	@PersistenceContext
 	private EntityManager em;
 
@@ -39,6 +48,34 @@ public class LikeJpaDao implements LikesDao {
 		query.setParameter(2, restaurantId);
 
 		return query.getResultList().stream().findFirst().isPresent();
+	}
+	@Override
+	public List<Like> userLikesRestaurants(long userId, List<Long> restaurantIds) {
+		if(restaurantIds.isEmpty()){
+			return Collections.emptyList();
+		}
+
+		TypedQuery<Like> query = em.createQuery("from Like where user.id = :userId and restaurant.id in :restaurantIds", Like.class);
+		query.setParameter("userId", userId);
+		query.setParameter("restaurantIds", restaurantIds);
+
+		return query.getResultList().stream().collect(Collectors.toList());
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Long> getLikesByUserId(long userId){
+		Query query = em.createNativeQuery("SELECT restaurant_id FROM likes WHERE user_id = ?1");
+		query.setParameter(1, userId);
+
+		List<Integer> resultList = query.getResultList();
+		List<Long> likes = new ArrayList<>();
+
+		for (Integer result : resultList) {
+			likes.add(result.longValue());
+		}
+
+		return likes;
 	}
 
 }

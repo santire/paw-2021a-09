@@ -2,14 +2,7 @@ package ar.edu.itba.paw.model;
 
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "users")
@@ -21,7 +14,7 @@ public class User {
   @SequenceGenerator(sequenceName = "users_user_id_seq", name = "users_user_id_seq", allocationSize = 1)
   private Long id;
 
-  @Column(length = 100)
+  @Column(length = 100, unique = true)
   private String username;
 
   @Column(length = 100)
@@ -42,10 +35,9 @@ public class User {
   @Column(name = "is_active", columnDefinition = "boolean default false")
   private Boolean active;
 
-  @OneToMany(orphanRemoval = true, mappedBy = "owner")
+  @OneToMany(orphanRemoval = true, mappedBy = "owner", fetch = FetchType.LAZY)
   private List<Restaurant> ownedRestaurants;
 
-  // private List<Reservation> reservations; ?
 
   User() {
     // Just for hibernate
@@ -71,18 +63,6 @@ public class User {
     this.email = email;
     this.phone = phone;
     this.active = active;
-  }
-
-  public User(Long id, String username, String password, String firstName, String lastName, String email,
-      String phone) {
-    this.id = id;
-    this.username = username;
-    this.password = password;
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.email = email;
-    this.phone = phone;
-    this.active = false;
   }
 
   public Boolean isActive() {

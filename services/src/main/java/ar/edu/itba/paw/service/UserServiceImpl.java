@@ -7,10 +7,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 
+import ar.edu.itba.paw.model.exceptions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -21,11 +23,6 @@ import ar.edu.itba.paw.model.Email;
 import ar.edu.itba.paw.model.EmailTemplate;
 import ar.edu.itba.paw.model.PasswordToken;
 import ar.edu.itba.paw.model.VerificationToken;
-import ar.edu.itba.paw.model.exceptions.EmailInUseException;
-import ar.edu.itba.paw.model.exceptions.TokenCreationException;
-import ar.edu.itba.paw.model.exceptions.TokenDoesNotExistException;
-import ar.edu.itba.paw.model.exceptions.TokenExpiredException;
-import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
 import ar.edu.itba.paw.persistence.UserDao;
 import org.springframework.context.MessageSource;
 
@@ -34,6 +31,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @Service
+@Component
 public class UserServiceImpl implements UserService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
@@ -46,7 +44,7 @@ public class UserServiceImpl implements UserService {
 
   @Autowired
   private EmailService emailService;
-  
+
   @Autowired
   private MessageSource messageSource;
 
@@ -55,55 +53,35 @@ public class UserServiceImpl implements UserService {
     return userDao.findById(id);
   }
 
-  @Transactional
+  @Transactional(rollbackFor = {UsernameInUseException.class, EmailInUseException.class, TokenCreationException.class})
   @Override
   public User register(String username, String password, String firstName, String lastName, String email,
-      String phone, String baseUrl) throws EmailInUseException, TokenCreationException {
-      Locale locale = LocaleContextHolder.getLocale();
+                       String phone, String baseUrl)
+          throws UsernameInUseException, EmailInUseException, TokenCreationException {
+    User user = userDao.register(username,encoder.encode(password), firstName, lastName, email, phone);
+    if (user == null) return null;
+    String url = baseUrl + "/paw-2021a-09/register?type=activate&token=";
 
-      User user = userDao.register(username,encoder.encode(password), firstName, lastName, email, phone);
-      String url = baseUrl + "/activate?token=";
+    String token = UUID.randomUUID().toString();
+    LocalDateTime createdAt = LocalDateTime.now();
 
-      String token = UUID.randomUUID().toString();
-      LocalDateTime createdAt = LocalDateTime.now();
+    userDao.assignTokenToUser(token, createdAt, user.getId());
+    emailService.sendRegistrationEmail(user.getEmail(), user.getFirstName(), url+token);
 
-      userDao.assignTokenToUser(token, createdAt, user.getId());
-        String plainText = messageSource.getMessage("mail.register.plain",new Object[]{user.getFirstName()},locale)+"\n"+url+token+"\n";
-        Email myemail = new Email();
-        myemail.setMailTo(user.getEmail());
-        myemail.setMailSubject(messageSource.getMessage("mail.register.subject",null,locale));
-        Map<String, Object> args = new HashMap<>();
-        args.put("titleMessage", "");
-        args.put("bodyMessage",messageSource.getMessage("mail.register.body",new Object[]{user.getFirstName()},locale));
-        args.put("buttonMessage",messageSource.getMessage("mail.register.button",null,locale));
-        args.put("link", url+token);
-
-        emailService.sendEmail(myemail,plainText, args, EmailTemplate.BUTTON);
-    
     return  user;
   }
 
   @Transactional
   @Override
   public void requestPasswordReset(String email, String baseUrl) throws TokenCreationException {
+    LOGGER.debug("Requesting reset for {}", email);
     User user = userDao.findByEmail(email).orElseThrow(UserNotFoundException::new);
-    String url = baseUrl + "/reset-password?token=";
+    String url = baseUrl + "/paw-2021a-09/reset?type=reset&token=";
     String token = UUID.randomUUID().toString();
     LocalDateTime createdAt = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.systemDefault());
-    Locale locale = LocaleContextHolder.getLocale();
 
     userDao.assignPasswordTokenToUser(token, createdAt, user.getId());
-    String plainText = messageSource.getMessage("mail.forgot.plain",new Object[]{user.getFirstName()},locale)+"\n"+url+token+"\n";
-    Email myemail = new Email();
-    myemail.setMailTo(user.getEmail());
-    myemail.setMailSubject(messageSource.getMessage("mail.forgot.subject",null,locale));
-    Map<String, Object> args = new HashMap<>();
-    args.put("titleMessage", "");
-    args.put("bodyMessage",messageSource.getMessage("mail.forgot.body",new Object[]{user.getFirstName()},locale));
-    args.put("buttonMessage",messageSource.getMessage("mail.forgot.button",null,locale));
-    args.put("link", url+token);
-
-    emailService.sendEmail(myemail,plainText, args, EmailTemplate.BUTTON);
+    emailService.sendPasswordResetEmail(user.getEmail(), user.getFirstName(), url+token);
   }
 
   @Override
@@ -112,8 +90,8 @@ public class UserServiceImpl implements UserService {
 
 
     Optional<VerificationToken> maybeToken = userDao.getToken(token);
-    LOGGER.debug("GOT TOKEN {}", maybeToken.get().getToken());
-    LOGGER.debug("WITH UID {}", maybeToken.get().getUser().getId());
+    LOGGER.debug("GOT TOKEN {}", maybeToken.isPresent() ? maybeToken.get().getToken() : null);
+    LOGGER.debug("WITH UID {}", maybeToken.isPresent() ? maybeToken.get().getUser().getId(): null);
     VerificationToken verificationToken = maybeToken.orElseThrow(TokenDoesNotExistException::new);
     LocalDateTime expiryDate = verificationToken.getCreatedAt().plusDays(1);
 
@@ -132,12 +110,13 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public User updatePasswordByToken(String token, String password) throws TokenExpiredException {
+  public User updatePasswordByToken(String token, String password) throws TokenExpiredException, TokenDoesNotExistException {
 
     Optional<PasswordToken> maybeToken = userDao.getPasswordToken(token);
-    LOGGER.debug("GOT TOKEN {}", maybeToken.get().getToken());
-    LOGGER.debug("WITH UID {}", maybeToken.get().getUser().getId());
     PasswordToken passwordToken = maybeToken.orElseThrow(TokenDoesNotExistException::new);
+    LOGGER.debug("GOT TOKEN {}", passwordToken.getToken());
+    LOGGER.debug("WITH UID {}", passwordToken.getUser().getId());
+
     LocalDateTime expiryDate = passwordToken.getCreatedAt().plusDays(1);
 
     if(LocalDateTime.now().isAfter(expiryDate)) {
@@ -147,20 +126,22 @@ public class UserServiceImpl implements UserService {
 
     User user = passwordToken.getUser();
 
-    updateUser(user.getId(), 
-                user.getName(),
-                encoder.encode(password),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getPhone());
+    updateUser(user.getId(),
+            password,
+            user.getFirstName(),
+            user.getLastName(),
+            user.getPhone());
 
     userDao.deleteAssociatedPasswordTokens(user);
     return user;
   }
 
   @Override
+  public Optional<User> findByUsername(String username) { return userDao.findByUsername(username); }
+
+  @Override
   public Optional<User> findByEmail(String email) {
+    if (email == null) return Optional.empty();
     return userDao.findByEmail(email);
   }
 
@@ -168,30 +149,28 @@ public class UserServiceImpl implements UserService {
   public boolean isTheRestaurantOwner(long userId, long restaurantId) {
     User user = userDao.findById(userId).orElseThrow(UserNotFoundException::new);
     return user
-      .getOwnedRestaurants()
-      .stream()
-      .filter((r) -> r.getId().equals(restaurantId))
-      .findFirst()
-      .isPresent();
+            .getOwnedRestaurants()
+            .stream()
+            .filter((r) -> r.getId().equals(restaurantId))
+            .findFirst()
+            .isPresent();
   }
 
   @Override
   public boolean isRestaurantOwner(long userId) {
     User user = userDao.findById(userId).orElseThrow(UserNotFoundException::new);
-     return user.getOwnedRestaurants().size() > 0;
+    return user.getOwnedRestaurants().size() > 0;
   }
 
 
   @Override
   @Transactional
-  public void updateUser(long id, String username, String password, String firstName, String lastName, String email, String phone) {
+  public void updateUser(long id, String password, String firstName, String lastName, String phone) {
     User user = userDao.findById(id).orElseThrow(UserNotFoundException::new);
-    user.setUsername(username);
-    user.setPassword(password);
-    user.setFirstName(firstName);
-    user.setLastName(lastName);
-    user.setEmail(email);
-    user.setPhone(phone);
+    if(password != null && !password.isEmpty()) user.setPassword(encoder.encode(password));
+    if(firstName != null && !firstName.isEmpty()) user.setFirstName(firstName);
+    if(lastName != null && !lastName.isEmpty()) user.setLastName(lastName);
+    if(phone != null && !phone.isEmpty()) user.setPhone(phone);
   }
 
 }
