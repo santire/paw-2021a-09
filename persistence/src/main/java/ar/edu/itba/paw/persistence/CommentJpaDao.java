@@ -84,7 +84,7 @@ public class CommentJpaDao implements CommentDao {
         return query.getResultList().stream().sorted(Comparator.comparing(v -> filteredIds.indexOf(v.getId()))).collect(Collectors.toList());
     }
 
-    public int findByRestaurantPageCount(int amountOnPage, long restaurantId) {
+    public int findByRestaurantCount( long restaurantId) {
         Query nativeQuery = em.createNativeQuery(
                 "SELECT comment_id FROM comments"
                         +
@@ -92,10 +92,8 @@ public class CommentJpaDao implements CommentDao {
         );
         nativeQuery.setParameter("restaurantId", restaurantId);
 
-        int amountOfRestaurants = nativeQuery.getResultList().size();
-        int pageAmount = (int) Math.ceil((double) amountOfRestaurants / amountOnPage);
+        return nativeQuery.getResultList().size();
 
-        return pageAmount <= 0 ? 1 : pageAmount;
     }
 
 

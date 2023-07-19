@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const ReviewSchemaBase = z.object({
-  userComment: z.string().min(1).max(144),
+  review: z.string().min(1).max(144),
 });
 
 const HasID = z.object({

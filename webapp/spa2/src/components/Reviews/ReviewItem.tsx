@@ -44,7 +44,7 @@ export function ReviewItem({ item, restaurantId }: ReviewProps) {
         withBorder
         radius="md"
         className={classes.comment}
-        key={item.id || item.userComment}
+        key={item.id || item.review}
         mb={20}
         w={"100%"}
         miw={400}
@@ -60,7 +60,7 @@ export function ReviewItem({ item, restaurantId }: ReviewProps) {
                 </Text>
               </div>
             </Group>
-            <Text className={classes.body}>{item.userComment}</Text>
+            <Text className={classes.body}>{item.review}</Text>
           </Flex>
 
           {isReviewOwner ? (

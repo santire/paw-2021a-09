@@ -187,20 +187,16 @@ public class RestaurantController {
     @Path("/{restaurantId}/reviews")
     @Produces(value = {MediaType.APPLICATION_JSON})
     public Response findRestaurantReviews(@PathParam("restaurantId") final long restaurantId, @QueryParam("page") @DefaultValue("1") Integer page) {
-        int maxPages = commentService.findByRestaurantPageCount(AMOUNT_OF_REVIEWS, restaurantId);
+        int amountOfReviews = commentService.findByRestaurantCount(restaurantId);
 
         List<CommentDto> reviews = commentService.findByRestaurant(page, AMOUNT_OF_REVIEWS, restaurantId)
                 .stream()
                 .map(u -> CommentDto.fromComment(u, uriInfo))
                 .collect(Collectors.toList());
 
-        return Response.ok(new GenericEntity<List<CommentDto>>(reviews) {
-                })
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", maxPages).build(), "last")
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.max((page - 1), 1)).build(), "prev")
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.min((page + 1), maxPages)).build(), "next")
-                .build();
+
+        return PageUtils.paginatedResponse(new GenericEntity<List<CommentDto>>(reviews) {
+        }, uriInfo, page, AMOUNT_OF_REVIEWS, amountOfReviews);
     }
 
     //CREATE REVIEW

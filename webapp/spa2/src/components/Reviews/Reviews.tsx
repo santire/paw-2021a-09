@@ -53,23 +53,6 @@ export function Reviews({ restaurant }: ReviewsProps) {
     resolver: zodResolver(ReviewRegisterSchema),
   });
 
-  const Reviews = () => {
-    if (!data || data.data.length === 0) {
-      return (
-        <Text align="center" mt={30}>
-          {t("pages.restaurant.reviews.noReviews")}
-        </Text>
-      );
-    }
-    return (
-      <Container mt="xl" w={"100%"}>
-        {data?.data.map((i) => (
-          <ReviewItem key={i.id} item={i} restaurantId={restaurant.id} />
-        ))}
-      </Container>
-    );
-  };
-
   if (isLoading) {
     return (
       <Flex justify="center" align="center" h={"100%"}>
@@ -79,6 +62,7 @@ export function Reviews({ restaurant }: ReviewsProps) {
   }
 
   if (data && data.meta.total <= 0) {
+    console.log(data);
     return (
       <Flex direction="column" align="center" w="100%">
         <Flex
@@ -111,8 +95,8 @@ export function Reviews({ restaurant }: ReviewsProps) {
                   <Textarea
                     mb={10}
                     w={"100%"}
-                    error={errors.userComment?.message}
-                    {...register("userComment")}
+                    error={errors.review?.message}
+                    {...register("review")}
                   />
                 </Flex>
                 <Button
@@ -159,8 +143,8 @@ export function Reviews({ restaurant }: ReviewsProps) {
                 <Textarea
                   mb={10}
                   w={"100%"}
-                  error={errors.userComment?.message}
-                  {...register("userComment")}
+                  error={errors.review?.message}
+                  {...register("review")}
                 />
               </Flex>
               <Button

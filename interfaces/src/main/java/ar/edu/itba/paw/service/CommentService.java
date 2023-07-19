@@ -15,7 +15,7 @@ public interface CommentService {
     // READ
     public Optional<Comment> findById(long commentId);
     public Optional<Comment> findByUserAndRestaurantId(long userId, long restaurantId);
-    public int findByRestaurantPageCount(int amountOnPage, long restaurantId);
+    public int findByRestaurantCount( long restaurantId);
     public List<Comment> findByRestaurant(int page, int amountOnPage, long restaurantId);
 
     // DESTROY

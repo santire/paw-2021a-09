@@ -4,6 +4,8 @@ import {
   Flex,
   Text,
   Image,
+  Center,
+  Loader,
 } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import homeImageSrc from "../assets/images/home_image.png";
@@ -11,7 +13,10 @@ import {
   useGetHotRestaurants,
   useGetPopularRestaurants,
 } from "../hooks/restaurant.hooks";
-import { RestaurantCarousel } from "../components/RestaurantCarousel/RestaurantCarousel";
+import {
+  CarouselWrapper,
+  RestaurantCarousel,
+} from "../components/RestaurantCarousel/RestaurantCarousel";
 
 const useStyles = createStyles((theme) => ({
   heading: {
@@ -44,8 +49,8 @@ const useStyles = createStyles((theme) => ({
 export function HomePage() {
   const { classes } = useStyles();
   const { t } = useTranslation();
-  const popularRestaurants = useGetPopularRestaurants();
-  const hotRestaurants = useGetHotRestaurants();
+  const { data: popularRestaurants } = useGetPopularRestaurants();
+  const { data: hotRestaurants } = useGetHotRestaurants();
 
   return (
     <>
@@ -60,20 +65,40 @@ export function HomePage() {
         </Flex>
       </div>
       <Container size="xl" my="xl">
-        <RestaurantCarousel
-          restaurants={popularRestaurants.data?.data}
-          title={t("pages.home.popular")}
-          tooltip={t("pages.home.popularTooltip")}
-          loading={popularRestaurants.isLoading}
-        />
+        {popularRestaurants ? (
+          <RestaurantCarousel
+            restaurants={popularRestaurants.data}
+            title={t("pages.home.hot")}
+            tooltip={t("pages.home.hotTooltip")}
+          />
+        ) : (
+          <CarouselWrapper
+            title={t("pages.home.hot")}
+            tooltip={t("pages.home.hotTooltip")}
+          >
+            <Center w={"100%"} mih={200}>
+              <Loader variant="dots" color="orange" size={65} />
+            </Center>
+          </CarouselWrapper>
+        )}
       </Container>
       <Container size="xl" my="xl">
-        <RestaurantCarousel
-          restaurants={hotRestaurants.data?.data}
-          title={t("pages.home.hot")}
-          tooltip={t("pages.home.hotTooltip")}
-          loading={hotRestaurants.isLoading}
-        />
+        {hotRestaurants ? (
+          <RestaurantCarousel
+            restaurants={hotRestaurants.data}
+            title={t("pages.home.hot")}
+            tooltip={t("pages.home.hotTooltip")}
+          />
+        ) : (
+          <CarouselWrapper
+            title={t("pages.home.hot")}
+            tooltip={t("pages.home.hotTooltip")}
+          >
+            <Center w={"100%"} mih={200}>
+              <Loader variant="dots" color="orange" size={65} />
+            </Center>
+          </CarouselWrapper>
+        )}
       </Container>
     </>
   );

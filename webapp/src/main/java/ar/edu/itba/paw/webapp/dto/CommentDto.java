@@ -11,7 +11,7 @@ import java.net.URI;
 public class CommentDto {
 
     private Long id;
-    private String userComment;
+    private String review;
     private String date;
     private String username;
 
@@ -22,7 +22,7 @@ public class CommentDto {
         final CommentDto dto = new CommentDto();
 
         dto.id = comment.getId();
-        dto.userComment = comment.getUserComment();
+        dto.review = comment.getUserComment();
         dto.date = comment.getDate().toString();
         dto.username = comment.getUser().getUsername();
 
@@ -35,7 +35,7 @@ public class CommentDto {
 
     public Long getId() { return id; }
 
-    public String getUserComment() { return userComment; }
+    public String getReview() { return review; }
 
     public String getDate() { return date; }
 
@@ -48,7 +48,7 @@ public class CommentDto {
 
     public void setId(Long id) { this.id = id; }
 
-    public void setUserComment(String userComment) { this.userComment = userComment; }
+    public void setReview(String userComment) { this.review = userComment; }
 
     public void setDate(LocalDate date) { this.date = date.toString(); }
 

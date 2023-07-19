@@ -127,9 +127,11 @@ export function useTabSearchParam(
 export function usePageSearchParams(
   initialPageParams?: PageParams,
   pageName?: string
-): [PageParams | undefined, (p?: PageParams) => void] {
+): [PageParams, (p?: PageParams) => void] {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [pageParams, setPageParams] = useState(initialPageParams);
+  const [pageParams, setPageParams] = useState(
+    initialPageParams || { page: 1 }
+  );
   const pageP = pageName ?? "page";
 
   // If search param changes, update internal state

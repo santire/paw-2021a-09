@@ -18,11 +18,10 @@ const reviewKeys = {
     [...reviewKeys.lists(restaurantId), { filters }] as const,
 };
 
-export function useGetReviews(restaurantId: number, params?: PageParams) {
+export function useGetReviews(restaurantId: number, params: PageParams) {
   const [searchParams, setSearchParams] = useSearchParams();
   return useQuery<Page<IReview[]>>({
     queryKey: reviewKeys.list(restaurantId, params),
-    enabled: !!params,
     queryFn: () => ReviewService.getAll(restaurantId, params!),
     onSuccess: (data) => {
       const page = parseInt(searchParams.get("page") || "NaN");

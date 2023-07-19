@@ -48,11 +48,8 @@ async function _getAll(
     });
     return pagedResponse(response);
   } catch (error) {
-    throw new Error("Restaurant Get Error", {
-      cause: apiErrorHandler(error, {
-        Unauthorized: { code: "invalid_credentials" },
-        // TODO: NotFound?
-      }),
+    throw new Error("General Error", {
+      cause: apiErrorHandler(error),
     });
   }
 }

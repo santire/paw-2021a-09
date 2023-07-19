@@ -1,5 +1,4 @@
 import { z } from "zod";
-import i18n from "../../i18n";
 
 const facebookRegex = /^(https?:\/\/)?facebook\.com\/.*$/;
 const instagramRegex = /^(https?:\/\/)?instagram\.com\/.*$/;
@@ -10,9 +9,9 @@ const RestaurantSchemaBase = z.object({
   address: z.string().min(6).max(100),
   phoneNumber: z
     .string()
-    .regex(/[0-9]+/, i18n.t("errors.invalidPhone") || "invalid phone")
+    .regex(/[0-9]+/, "errors.invalidPhone")
     .min(8)
-    .max(15),
+    .max(30),
   facebook: z.string().max(100).optional(),
   instagram: z.string().max(100).optional(),
   twitter: z.string().max(100).optional(),

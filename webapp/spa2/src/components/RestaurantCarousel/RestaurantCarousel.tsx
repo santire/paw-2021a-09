@@ -9,8 +9,7 @@ import { IconInfoCircle } from "@tabler/icons-react";
 interface RestaurantCarouselProps {
   title: string;
   tooltip: string;
-  restaurants?: IRestaurant[];
-  loading: boolean;
+  restaurants: IRestaurant[];
 }
 
 const useStyles = createStyles((theme, _params, getRef) => ({
@@ -54,21 +53,10 @@ export function RestaurantCarousel({
   title,
   tooltip,
   restaurants,
-  loading,
 }: RestaurantCarouselProps) {
   const { t } = useTranslation();
 
-  if (loading) {
-    return (
-      <CarouselWrapper tooltip={tooltip} title={title}>
-        <Center w={"100%"} mih={200}>
-          <Loader variant="dots" color="orange" size={65} />
-        </Center>
-      </CarouselWrapper>
-    );
-  }
-
-  if (!loading && restaurants && restaurants.length > 0) {
+  if (restaurants && restaurants.length > 0) {
     // If exactly 5 restaurants looping breaks, so double array to fix loop
     if (restaurants.length == 5) {
       restaurants = [...restaurants, ...restaurants];
@@ -107,7 +95,7 @@ type WrapperProps = {
   children: string | JSX.Element | JSX.Element[];
   withControls?: boolean;
 };
-function CarouselWrapper({
+export function CarouselWrapper({
   title,
   tooltip,
   withControls,
@@ -121,7 +109,7 @@ function CarouselWrapper({
         <Tooltip label={tooltip} position="right" withArrow>
           <Text color="dimmed" sx={{ cursor: "help" }}>
             <Center>
-              <IconInfoCircle size="1.1rem" stroke={1.5} />
+              <IconInfoCircle size={18} stroke={1.5} />
             </Center>
           </Text>
         </Tooltip>

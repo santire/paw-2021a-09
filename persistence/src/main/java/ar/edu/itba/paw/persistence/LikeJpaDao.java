@@ -1,6 +1,5 @@
 package ar.edu.itba.paw.persistence;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -69,10 +68,10 @@ public class LikeJpaDao implements LikesDao {
 		Query query = em.createNativeQuery("SELECT restaurant_id FROM likes WHERE user_id = ?1");
 		query.setParameter(1, userId);
 
-		List<BigInteger> resultList = query.getResultList();
+		List<Integer> resultList = query.getResultList();
 		List<Long> likes = new ArrayList<>();
 
-		for (BigInteger result : resultList) {
+		for (Integer result : resultList) {
 			likes.add(result.longValue());
 		}
 

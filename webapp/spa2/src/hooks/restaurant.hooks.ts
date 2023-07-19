@@ -45,8 +45,7 @@ export function useGetRestaurants(
   const [searchParams, setSearchParams] = useSearchParams();
   return useQuery<Page<IRestaurant[]>>({
     queryKey: restaurantKeys.list(userId, params),
-    enabled: !!params,
-    queryFn: async () =>
+    queryFn: () =>
       withLikes(
         () => RestaurantService.getAll({ ...params! }),
         isAuthenticated,
@@ -67,7 +66,7 @@ export function useGetRestaurant(restaurantId: number) {
   const { isAuthenticated, userId } = useAuth();
   return useQuery<IRestaurant>({
     queryKey: restaurantKeys.detail(userId, restaurantId),
-    queryFn: async () =>
+    queryFn: () =>
       withLike(
         () => RestaurantService.getById(restaurantId),
         isAuthenticated,
@@ -82,7 +81,7 @@ export function useGetOwnedRestaurants(params?: PageParams) {
   return useQuery<Page<IRestaurant[]>>({
     queryKey: restaurantKeys.owned(userId, params),
     enabled: !!params && !!userId,
-    queryFn: async () =>
+    queryFn: () =>
       withLikes(
         () =>
           RestaurantService.getOwnedRestaurants(userId, {
@@ -106,8 +105,8 @@ export function useGetPopularRestaurants() {
   const { isAuthenticated, userId } = useAuth();
   return useQuery<Page<IRestaurant[]>>({
     queryKey: restaurantKeys.popular(userId),
-    queryFn: async () =>
-      withLikes(() => RestaurantService.getPopular(), isAuthenticated, userId),
+    queryFn: () =>
+      withLikes(RestaurantService.getPopular, isAuthenticated, userId),
   });
 }
 
@@ -115,7 +114,7 @@ export function useGetHotRestaurants() {
   const { isAuthenticated, userId } = useAuth();
   return useQuery<Page<IRestaurant[]>>({
     queryKey: restaurantKeys.hot(userId),
-    queryFn: async () =>
+    queryFn: () =>
       withLikes(() => RestaurantService.getHot(), isAuthenticated, userId),
   });
 }
@@ -280,7 +279,7 @@ async function withLikes(
   getter: () => Promise<Page<IRestaurantResponse[]>>,
   isAuthenticated: boolean,
   userId: number
-) {
+): Promise<Page<IRestaurant[]>> {
   const { data, meta } = await getter();
   // If user is authenticated, stiches likedBy status
   if (isAuthenticated && !!userId) {

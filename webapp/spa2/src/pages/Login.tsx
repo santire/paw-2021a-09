@@ -78,7 +78,7 @@ export function LoginPage() {
         {t("pages.login.welcomeBack")}
       </Title>
       <Text color="dimmed" size="sm" align="center" my={5}>
-        {t("pages.login.createAccount.title")}{" "}
+        {t("pages.login.createAccount.title")}
         <Anchor size="sm" color="orange" onClick={() => navigate("/register")}>
           {t("pages.login.createAccount.prompt")}
         </Anchor>

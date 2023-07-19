@@ -1,8 +1,7 @@
 import axios from "axios";
 
 const BASE_CONFIG = {
-  baseURL:
-    import.meta.env.REACT_APP_HOST_API || "http://localhost:8080/app/api",
+  baseURL: import.meta.env.VITE_HOST_API || "http://localhost:8080/app/api",
   paramsSerializer: {
     indexes: null,
   },
