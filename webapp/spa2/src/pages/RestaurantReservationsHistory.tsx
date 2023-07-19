@@ -1,9 +1,6 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { NotFoundPage } from "./NotFound";
-import {
-  usePageSearchParams,
-  useTabSearchParam,
-} from "../hooks/searchParams.hooks";
+import { usePageSearchParams } from "../hooks/searchParams.hooks";
 import {
   Center,
   Container,
@@ -11,15 +8,11 @@ import {
   Loader,
   Pagination,
   Table,
-  Tabs,
   Text,
   createStyles,
 } from "@mantine/core";
 import { useTranslation } from "react-i18next";
-import {
-  useGetRestaurantReservation,
-} from "../hooks/reservation.hooks";
-import { IconAlertCircle, IconCircleCheck } from "@tabler/icons-react";
+import { useGetRestaurantReservation } from "../hooks/reservation.hooks";
 import { RestaurantReservation } from "../components/RestaurantReservation/RestaurantReservation";
 import { useGetRestaurant } from "../hooks/restaurant.hooks";
 import { useEffect, useState } from "react";
@@ -35,7 +28,6 @@ const useStyles = createStyles((theme) => ({
     opacity: 0.8,
     paddingTop: theme.spacing.xl,
     paddingBottom: theme.spacing.xl,
-    paddingLeft: theme.spacing.md,
     paddingRight: theme.spacing.md,
   },
   headingWrapper: {
@@ -54,11 +46,9 @@ const useStyles = createStyles((theme) => ({
   },
   title: {
     fontSize: theme.fontSizes.xl * 1.8,
-    paddingLeft: theme.spacing.sm,
   },
   subtitle: {
     fontSize: theme.fontSizes.md,
-    paddingLeft: theme.spacing.sm,
   },
   empty: {
     align: "center",
@@ -71,14 +61,12 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export function RestaurantReservationsPage({
+export function RestaurantReservationsHistoryPage({
   restaurantId,
 }: {
   restaurantId: number;
 }) {
-  const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
-  const [tabParam, setTabParam] = useTabSearchParam("pending");
   const [first, setFirst] = useState(true);
   const navigate = useNavigate();
   const { data, isLoading } = useGetRestaurant(restaurantId);
@@ -99,42 +87,18 @@ export function RestaurantReservationsPage({
   return (
     <Wrapper restaurantId={restaurantId}>
       <Flex justify={"center"}>
-        <Tabs
-          value={tabParam ?? "pending"}
-          onTabChange={setTabParam}
-          style={{ width: "80%", justifyContent: "center" }}
-        >
-          <Tabs.List>
-            <Tabs.Tab value="pending" icon={<IconAlertCircle size={16} />}>
-              {t`pages.restaurantReservations.tabs.pending.title`}
-            </Tabs.Tab>
-            <Tabs.Tab value="confirmed" icon={<IconCircleCheck size={16} />}>
-              {t`pages.restaurantReservations.tabs.confirmed.title`}
-            </Tabs.Tab>
-          </Tabs.List>
-
-          <Tabs.Panel value="pending" pt="xs">
-            <PendingReservations restaurantId={restaurantId} />
-          </Tabs.Panel>
-
-          <Tabs.Panel value="confirmed" pt="xs">
-            <ConfirmedReservations restaurantId={restaurantId} />
-          </Tabs.Panel>
-        </Tabs>
+        <Reservations restaurantId={restaurantId} />
       </Flex>
     </Wrapper>
   );
 }
 
-function PendingReservations({ restaurantId }: { restaurantId: number }) {
+function Reservations({ restaurantId }: { restaurantId: number }) {
   const { t } = useTranslation();
-  const [pendingPageParams, setPendingPageParams] = usePageSearchParams(
-    undefined,
-    "pendingPage"
-  );
-  const { data, isLoading } = useGetRestaurantReservation(
+  const [pendingPageParams, setPendingPageParams] = usePageSearchParams();
+  const { data } = useGetRestaurantReservation(
     restaurantId,
-    "pending",
+    "history",
     pendingPageParams
   );
 
@@ -167,7 +131,11 @@ function PendingReservations({ restaurantId }: { restaurantId: number }) {
             </thead>
             <tbody>
               {data.data.map((r) => (
-                <RestaurantReservation key={r.reservationId} reservation={r} />
+                <RestaurantReservation
+                  key={r.reservationId}
+                  reservation={r}
+                  isHistory={true}
+                />
               ))}
             </tbody>
           </Table>
@@ -191,79 +159,16 @@ function PendingReservations({ restaurantId }: { restaurantId: number }) {
   );
 }
 
-function ConfirmedReservations({ restaurantId }: { restaurantId: number }) {
-  const { t } = useTranslation();
-  const [pendingPageParams, setPendingPageParams] = usePageSearchParams(
-    undefined,
-    "confirmedPage"
-  );
-  const { data } = useGetRestaurantReservation(
-    restaurantId,
-    "confirmed",
-    pendingPageParams
-  );
-
-  if (data && data.meta.total <= 0) {
-    return (
-      <Flex align="flex-start" justify={"center"} w="100%">
-        <Flex direction="column" justify="center">
-          <Text size={30} mb={5} align="left">
-            {t("pages.restaurantReservations.notFoundConfirmed")}
-          </Text>
-        </Flex>
-      </Flex>
-    );
-  }
-  if (data) {
-    return (
-      <Center mt={50}>
-        <Flex direction="column" align="center">
-          <Table>
-            <thead>
-              <tr>
-                <th>{t("pages.restaurantReservations.table.customerName")}</th>
-                <th>{t("pages.restaurantReservations.table.customerPhone")}</th>
-                <th>{t("pages.userReservations.table.customers")}</th>
-                <th>{t("pages.userReservations.table.date")}</th>
-                <th>{t("pages.userReservations.table.state")}</th>
-                <th></th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.data.map((r) => (
-                <RestaurantReservation key={r.reservationId} reservation={r} />
-              ))}
-            </tbody>
-          </Table>
-          <div style={{ marginTop: "2rem", textAlign: "center" }}></div>
-          <Pagination
-            total={data.meta.maxPages ?? 1}
-            siblings={3}
-            page={pendingPageParams?.page}
-            onChange={(e) => setPendingPageParams({ page: e })}
-            align="center"
-            color="orange"
-          />
-        </Flex>
-      </Center>
-    );
-  }
-  return (
-    <Flex justify="center" align="center" h={"100%"}>
-      <Loader color="orange" />
-    </Flex>
-  );
-}
-
-export function ValidateRestaurantReservation() {
+export function ValidateRestaurantReservationHistory() {
   const params = useParams();
   const restaurantId = params?.restaurantId?.match(/\d+/);
   if (!restaurantId) {
     return <NotFoundPage />;
   }
   return (
-    <RestaurantReservationsPage restaurantId={parseInt(restaurantId[0])} />
+    <RestaurantReservationsHistoryPage
+      restaurantId={parseInt(restaurantId[0])}
+    />
   );
 }
 
@@ -292,9 +197,9 @@ function Wrapper({
                 ? theme.colors.gray[3]
                 : theme.colors.gray[8],
           }}
-          to={`/restaurants/${restaurantId}/reservations/history`}
+          to={`/restaurants/${restaurantId}/reservations`}
         >
-          <Text mb="xl">{t`pages.restaurantReservations.history`}</Text>
+          <Text mb="xl">{t`pages.restaurantHistoryReservations.current`}</Text>
         </Link>
         {children}
       </Container>

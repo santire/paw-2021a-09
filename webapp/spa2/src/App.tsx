@@ -20,6 +20,7 @@ import { NotificationsProvider } from "@mantine/notifications";
 import { UserReservationsPage } from "./pages/UserReservations";
 import { UserReservationsHistoryPage } from "./pages/UserReservationsHistory";
 import { ValidateRestaurantReservation } from "./pages/RestaurantReservations";
+import { ValidateRestaurantReservationHistory } from "./pages/RestaurantReservationsHistory";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,6 +57,10 @@ const router = createBrowserRouter(
         {
           path: "/restaurants/:restaurantId/reservations",
           element: <ValidateRestaurantReservation />,
+        },
+        {
+          path: "/restaurants/:restaurantId/reservations/history",
+          element: <ValidateRestaurantReservationHistory />,
         },
         {
           path: "/restaurants/register",
