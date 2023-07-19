@@ -188,7 +188,11 @@ export function RestaurantForm() {
                 placeholder={
                   t("pages.registerRestaurant.facebook.placeholder") || ""
                 }
-                error={errors.facebook?.message}
+                error={
+                  errors.facebook?.message === "errors.facebookRegex"
+                    ? t("errors.facebookRegex")
+                    : errors.facebook?.message
+                }
                 {...register("facebook")}
               />
               <TextInput
@@ -196,7 +200,11 @@ export function RestaurantForm() {
                 placeholder={
                   t("pages.registerRestaurant.instagram.placeholder") || ""
                 }
-                error={errors.instagram?.message}
+                error={
+                  errors.instagram?.message === "errors.instagramRegex"
+                    ? t("errors.instagramRegex")
+                    : errors.instagram?.message
+                }
                 {...register("instagram")}
               />
               <TextInput
@@ -205,7 +213,11 @@ export function RestaurantForm() {
                 placeholder={
                   t("pages.registerRestaurant.twitter.placeholder") || ""
                 }
-                error={errors.twitter?.message}
+                error={
+                  errors.twitter?.message === "errors.twitterRegex"
+                    ? t("errors.twitterRegex")
+                    : errors.twitter?.message
+                }
                 {...register("twitter")}
               />
             </SimpleGrid>
@@ -276,9 +288,7 @@ export function RestaurantForm() {
                   })}
                 >
                   {showMessage && (
-                    <div
-                      className={classes.imageContainer}
-                    >
+                    <div className={classes.imageContainer}>
                       <IconPhoto size={70} stroke={1.5} />
                       <Text size="lg" inline align="start">
                         {t("pages.registerRestaurant.dropImage")}

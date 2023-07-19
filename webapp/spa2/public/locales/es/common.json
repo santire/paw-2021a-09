@@ -63,7 +63,10 @@
     "tokenExpired": "El token ha expirado, por favor regístrese devuelta.",
     "tokenDoesNotExist": "Hubo un problema con el link, por favor intente nuevamente.",
     "userNotFound": "Este email no está asociado a un usuario válido",
-    "invalidPhone": "Número de teléfono inválido"
+    "invalidPhone": "Número de teléfono inválido",
+    "instagramRegex": "Url de instagram inválido",
+    "facebookRegex": "Url de faceboo inválido",
+    "twitterRegex": "Url de twitter inválido"
   },
   "tags": {
     "arabe": "Árabe",

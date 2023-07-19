@@ -79,7 +79,10 @@
     "tokenExpired": "The token has expired, please register again.",
     "tokenDoesNotExist": "Something's wrong with the link, please try again.",
     "userNotFound": "This email is not associated to a valid user",
-    "invalidPhone": "Invalid phone number"
+    "invalidPhone": "Invalid phone number",
+    "instagramRegex": "Invalid instagram url",
+    "facebookRegex": "Invalid facebook url",
+    "twitterRegex": "Invalid twitter url"
   },
   "tags": {
     "arabe": "Arab",

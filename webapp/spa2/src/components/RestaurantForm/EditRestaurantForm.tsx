@@ -216,7 +216,11 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
                 placeholder={
                   t("pages.registerRestaurant.facebook.placeholder") || ""
                 }
-                error={errors.facebook?.message}
+                error={
+                  errors.facebook?.message === "errors.facebookRegex"
+                    ? t("errors.facebookRegex")
+                    : errors.facebook?.message
+                }
                 {...register("facebook")}
               />
               <TextInput
@@ -224,7 +228,11 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
                 placeholder={
                   t("pages.registerRestaurant.instagram.placeholder") || ""
                 }
-                error={errors.instagram?.message}
+                error={
+                  errors.instagram?.message === "errors.instagramRegex"
+                    ? t("errors.instagramRegex")
+                    : errors.instagram?.message
+                }
                 {...register("instagram")}
               />
               <TextInput
@@ -233,7 +241,11 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
                 placeholder={
                   t("pages.registerRestaurant.twitter.placeholder") || ""
                 }
-                error={errors.twitter?.message}
+                error={
+                  errors.twitter?.message === "errors.twitterRegex"
+                    ? t("errors.twitterRegex")
+                    : errors.twitter?.message
+                }
                 {...register("twitter")}
               />
             </SimpleGrid>
