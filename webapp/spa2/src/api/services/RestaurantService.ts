@@ -20,6 +20,7 @@ interface IRestaurantService {
   ): Promise<Page<IRestaurantResponse[]>>;
   getPopular(): Promise<Page<IRestaurantResponse[]>>;
   getHot(): Promise<Page<IRestaurantResponse[]>>;
+  getById(restaurantId: number): Promise<IRestaurantResponse>;
 
   create(params: IRestaurantRegister): Promise<IRestaurantResponse>;
   deleteRestaurant(restaurantId: number): Promise<void>;
@@ -64,6 +65,13 @@ module RestaurantServiceImpl {
 
   export async function getHot() {
     return _getAll(DEFAULT_PAGE, "hot");
+  }
+
+  export async function getById(restaurantId: number) {
+    const response = await apiClient.get<IRestaurantResponse>(
+      `${PATH}/${restaurantId}`
+    );
+    return response.data;
   }
 
   export async function getOwnedRestaurants(

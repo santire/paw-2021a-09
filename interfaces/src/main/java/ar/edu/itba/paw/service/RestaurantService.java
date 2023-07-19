@@ -14,7 +14,7 @@ public interface RestaurantService {
     // READ
     Optional<Restaurant> findById(long id);
     Optional<Restaurant> findByIdWithMenu(long id, int menuPage, int amountOnMenuPage);
-    int findByIdWithMenuCount(int amountOnMenuPage, long id);
+    int findByIdWithMenuCount( long id);
     List<Restaurant> getRestaurantsFromOwner(int page, int amountOnPage, long userId);
     int getRestaurantsFromOwnerCount(long userId);
     List<Restaurant> getPopularRestaurants(int limit, int minValue);

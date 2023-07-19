@@ -39,7 +39,7 @@ public class UserForm {
 
   private boolean emailInUse;
 
-  @Size(min = 6, max = 15)
+  @Size(min = 8, max = 30)
   @Pattern(regexp = "[0-9]+")
   private String phone;
 

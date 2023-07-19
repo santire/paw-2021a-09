@@ -202,8 +202,8 @@ public class WebConfig {
     jpaProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQL92Dialect");
 
     // Local Machine only, don't deploy!
-     jpaProperties.setProperty("hibernate.show_sql", "true");
-     jpaProperties.setProperty("format_sql", "true");
+//     jpaProperties.setProperty("hibernate.show_sql", "true");
+//     jpaProperties.setProperty("format_sql", "true");
 
     entityFactory.setJpaProperties(jpaProperties);
     return entityFactory;

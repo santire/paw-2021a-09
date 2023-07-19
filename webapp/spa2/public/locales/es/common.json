@@ -33,13 +33,15 @@
     "more": "Ver más",
     "liked": "A {{likes}} personas les gusta esto",
     "tagsTitle": "Ideal para vos, si te gusta",
-    "likeTooltip": "Debe estar logueado para dar me gusta"
+    "likeTooltip": "Debe estar logueado para dar me gusta",
+    "rateTooltip": "Debe estar logueado para puntuar"
   },
-  "UserRestaurantCard": {
+  "userRestaurantCard": {
     "more": "Ver más",
     "edit": "Editar",
     "viewReservations": "Ver reservas",
     "delete": "Eliminar",
+    "pending": "Tiene {{reservationsCount}} reservas pendientes",
     "liked": "A {{likes}} personas les gusta esto",
     "tagsTitle": "Ideal para vos, si te gusta",
     "deleteModal": {
@@ -117,6 +119,8 @@
       "reservationButton": "Hacer una reserva",
       "menu": {
         "title": "Menu",
+        "notFound": "Este restaurante no tiene menu todavía",
+        "ownerHint": "¡Agrega uno para hacerlo visible!",
         "price": {
           "label": "Precio",
           "placeholder": "$$$"
@@ -134,7 +138,9 @@
       },
       "reviews": {
         "title": "Dejar una reseña",
-        "submit": "Agregar"
+        "submit": "Agregar",
+        "notFound": "Este restaurante no tiene reseñas todavía",
+        "hint": "Se el primero en dejar una!"
       }
     },
     "restaurants": {

@@ -5,6 +5,7 @@ import { ServerError, isServerError } from "../api/client";
 import { UserService } from "../api/services/UserService";
 import { IRestaurant } from "../types/restaurant/restaurant.models";
 import { IUserUpdate } from "../types/user/user.models";
+import { IReview } from "../types/review/review.models";
 
 const userKeys = {
   all: ["users"] as const,
@@ -18,13 +19,13 @@ interface QueryOptions {
 }
 
 export function useGetUser() {
-  const { userId } = useAuth();
+  const { isAuthenticated, userId } = useAuth();
 
   return useQuery({
     queryKey: userKeys.details(),
     queryFn: () => UserService.getById(userId),
     staleTime: Infinity,
-    enabled: !!userId,
+    enabled: isAuthenticated,
   });
 }
 
@@ -145,14 +146,18 @@ export function useCreateUser(options?: QueryOptions) {
 
 type isOwnerProps = {
   restaurant?: IRestaurant;
-  restaurantId?: number;
+  review?: IReview;
 };
-export function useIsOwner({ restaurant, restaurantId }: isOwnerProps) {
+export function useIsOwner({ restaurant, review }: isOwnerProps) {
   const { userId } = useAuth();
   if (restaurant) {
     const { owner } = restaurant;
     const rid = parseInt(owner.substring(owner.lastIndexOf("/") + 1));
     return userId === rid;
   }
-  return userId === restaurantId;
+  if (review) {
+    const { user } = review;
+    const uid = parseInt(user.substring(user.lastIndexOf("/") + 1));
+    return userId === uid;
+  }
 }

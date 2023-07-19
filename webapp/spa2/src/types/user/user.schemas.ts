@@ -1,5 +1,4 @@
 import { z } from "zod";
-import i18n from "../../i18n";
 
 const UserSchemaBase = z.object({
   email: z.string().email().min(2).max(100),
@@ -7,9 +6,9 @@ const UserSchemaBase = z.object({
   lastName: z.string().min(1).max(100),
   phone: z
     .string()
-    .regex(/[0-9]+/, i18n.t("errors.invalidPhone") || "invalid phone")
-    .min(6)
-    .max(15),
+    .regex(/[0-9]+/, "errors.invalidPhone")
+    .min(8)
+    .max(30),
   username: z
     .string()
     .min(3)

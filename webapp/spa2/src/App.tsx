@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { AuthContextProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -14,17 +14,19 @@ import { RestaurantsPage } from "./pages/Restaurants";
 import { ProfilePage } from "./pages/Profile";
 import { RegisterRestaurantPage } from "./pages/RegisterRestaurant";
 import { UserRestaurantsPage } from "./pages/UserRestaurants";
+import { ValidateRestaurant } from "./pages/Restaurant";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
+      // retry: false,
       // refetchOnWindowFocus: false, // default: true
       // staleTime: Infinity,
     },
   },
 });
 
-const basename = import.meta.env.VITE_CONTEXT || "";
+// const basename = import.meta.env.VITE_CONTEXT || "";
 const router = createBrowserRouter(
   [
     {
@@ -37,6 +39,10 @@ const router = createBrowserRouter(
         {
           path: "/restaurants",
           element: <RestaurantsPage />,
+        },
+        {
+          path: "/restaurants/:restaurantId",
+          element: <ValidateRestaurant />,
         },
         {
           path: "/restaurants/register",
@@ -73,10 +79,14 @@ const router = createBrowserRouter(
       ],
     },
   ],
-  { basename: basename }
+  { basename: import.meta.env.BASE_URL }
 );
 
 function App() {
+  const [, rerenderer] = useState(0);
+  useEffect(() => {
+    rerenderer(Math.random());
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <Suspense fallback={<Layout />}>

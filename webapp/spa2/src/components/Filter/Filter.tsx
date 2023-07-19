@@ -49,8 +49,8 @@ export function Filter() {
     setMax(undefined);
     setSort(undefined);
     setOrder(undefined);
-    setFilterParams({});
     setPageParams();
+    setFilterParams({});
   };
 
   return (
@@ -94,7 +94,7 @@ export function Filter() {
               searchable
               clearable
               mb="sm"
-              value={sort}
+              value={sort || null}
               onChange={(e) => setSort(e ?? undefined)}
             />
             <Select
@@ -115,7 +115,7 @@ export function Filter() {
               searchable
               clearable
               mb="sm"
-              value={order}
+              value={order || null}
               onChange={(e) => setOrder(e ?? undefined)}
             />
 

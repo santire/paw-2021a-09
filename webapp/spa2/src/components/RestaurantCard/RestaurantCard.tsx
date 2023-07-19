@@ -37,6 +37,7 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
           alt={name}
           height={180}
           width={355}
+          withPlaceholder
           placeholder={<Skeleton height={180} width={355} />}
         />
       </Card.Section>

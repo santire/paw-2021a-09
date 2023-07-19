@@ -82,11 +82,9 @@ public class RestaurantJpaDao implements RestaurantDao {
         Query nativeQuery = em.createNativeQuery(
                 "SELECT menu_item_id"
                 +
-                " FROM restaurants r LEFT JOIN menu_items m"
+                " FROM menu_items"
                 +
-                " ON r.restaurant_id = m.restaurant_id"
-                +
-                " WHERE r.restaurant_id = :rid"
+                " WHERE restaurant_id = :rid"
                 +
                 " ORDER BY menu_item_id ASC"
                 );
@@ -113,15 +111,13 @@ public class RestaurantJpaDao implements RestaurantDao {
     }
 
     @Override
-    public int findByIdWithMenuCount(int amountOnPage, long id){
+    public int findByIdWithMenuCount(long id){
         Query nativeQuery = em.createNativeQuery(
                 "SELECT menu_item_id"
                 +
-                " FROM restaurants r LEFT JOIN menu_items m"
+                " FROM menu_items"
                 +
-                " ON r.restaurant_id = m.restaurant_id"
-                +
-                " WHERE r.restaurant_id = :rid"
+                " WHERE restaurant_id = :rid"
                 +
                 " ORDER BY menu_item_id ASC"
                 );

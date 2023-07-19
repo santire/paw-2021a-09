@@ -11,6 +11,8 @@ import { LikeService } from "../api/services/LikeService";
 import { RestaurantFilterParams } from "../types/filters";
 import { useSearchParams } from "react-router-dom";
 import { ServerError, isServerError } from "../api/client";
+import { RatingService } from "../api/services/RatingService";
+import { ratingKeys } from "./ratings.hooks";
 
 interface QueryOptions {
   onSuccess?: () => void;
@@ -30,8 +32,10 @@ const restaurantKeys = {
   popular: (userId: number) =>
     [...restaurantKeys.lists(userId), "popular"] as const,
   hot: (userId: number) => [...restaurantKeys.lists(userId), "hot"] as const,
-  details: () => [...restaurantKeys.all, "detail"] as const,
-  detail: (id: number) => [...restaurantKeys.details(), id] as const,
+  details: (userId: number) =>
+    [...restaurantKeys.all, "detail", userId] as const,
+  detail: (userId: number, id?: number) =>
+    [...restaurantKeys.details(userId), id] as const,
 };
 
 export function useGetRestaurants(
@@ -41,8 +45,7 @@ export function useGetRestaurants(
   const [searchParams, setSearchParams] = useSearchParams();
   return useQuery<Page<IRestaurant[]>>({
     queryKey: restaurantKeys.list(userId, params),
-    enabled: !!params,
-    queryFn: async () =>
+    queryFn: () =>
       withLikes(
         () => RestaurantService.getAll({ ...params! }),
         isAuthenticated,
@@ -59,13 +62,26 @@ export function useGetRestaurants(
   });
 }
 
+export function useGetRestaurant(restaurantId: number) {
+  const { isAuthenticated, userId } = useAuth();
+  return useQuery<IRestaurant>({
+    queryKey: restaurantKeys.detail(userId, restaurantId),
+    queryFn: () =>
+      withLike(
+        () => RestaurantService.getById(restaurantId),
+        isAuthenticated,
+        userId
+      ),
+  });
+}
+
 export function useGetOwnedRestaurants(params?: PageParams) {
   const { isAuthenticated, userId } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   return useQuery<Page<IRestaurant[]>>({
     queryKey: restaurantKeys.owned(userId, params),
     enabled: !!params && !!userId,
-    queryFn: async () =>
+    queryFn: () =>
       withLikes(
         () =>
           RestaurantService.getOwnedRestaurants(userId, {
@@ -89,8 +105,8 @@ export function useGetPopularRestaurants() {
   const { isAuthenticated, userId } = useAuth();
   return useQuery<Page<IRestaurant[]>>({
     queryKey: restaurantKeys.popular(userId),
-    queryFn: async () =>
-      withLikes(() => RestaurantService.getPopular(), isAuthenticated, userId),
+    queryFn: () =>
+      withLikes(RestaurantService.getPopular, isAuthenticated, userId),
   });
 }
 
@@ -98,7 +114,7 @@ export function useGetHotRestaurants() {
   const { isAuthenticated, userId } = useAuth();
   return useQuery<Page<IRestaurant[]>>({
     queryKey: restaurantKeys.hot(userId),
-    queryFn: async () =>
+    queryFn: () =>
       withLikes(() => RestaurantService.getHot(), isAuthenticated, userId),
   });
 }
@@ -161,42 +177,100 @@ export function useDeleteRestaurant(options?: QueryOptions) {
 
 export function useLikeRestaurant() {
   const queryClient = useQueryClient();
+  const { userId } = useAuth();
 
   return useMutation({
     mutationFn: LikeService.like,
     onSuccess: (_, restaurantId, _2) => {
-      queryClient.setQueriesData<Page<IRestaurant[]>>(
-        restaurantKeys.all,
-        (prev) => ({
-          meta: prev!.meta,
-          data: prev!.data.map((r) =>
-            r.id === restaurantId
-              ? { ...r, likes: r.likes + 1, likedByUser: true }
-              : r
-          ),
-        })
-      );
+      if (
+        queryClient.getQueryData(restaurantKeys.detail(userId, restaurantId))
+      ) {
+        queryClient.setQueryData<IRestaurant>(
+          restaurantKeys.detail(userId, restaurantId),
+          (prev) => ({ ...prev!, likes: prev!.likes + 1, likedByUser: true })
+        );
+      }
+
+      // For all queries of type list, if they have data => update like
+      for (const query of queryClient.getQueriesData(
+        restaurantKeys.lists(userId)
+      )) {
+        if (query[1]) {
+          queryClient.setQueryData<Page<IRestaurant[]>>(query[0], (prev) => ({
+            meta: prev!.meta,
+            data: prev!.data.map((r) =>
+              r.id === restaurantId
+                ? { ...r, likes: r.likes + 1, likedByUser: true }
+                : r
+            ),
+          }));
+        }
+      }
     },
   });
 }
 
 export function useDislikeRestaurant() {
   const queryClient = useQueryClient();
+  const { userId } = useAuth();
 
   return useMutation({
     mutationFn: LikeService.dislike,
+
     onSuccess: (_, restaurantId, _2) => {
-      queryClient.setQueriesData<Page<IRestaurant[]>>(
-        restaurantKeys.all,
-        (prev) => ({
-          meta: prev!.meta,
-          data: prev!.data.map((r) =>
-            r.id === restaurantId
-              ? { ...r, likes: r.likes - 1, likedByUser: false }
-              : r
-          ),
-        })
+      if (
+        queryClient.getQueryData(restaurantKeys.detail(userId, restaurantId))
+      ) {
+        queryClient.setQueryData<IRestaurant>(
+          restaurantKeys.detail(userId, restaurantId),
+          (prev) => ({ ...prev!, likes: prev!.likes - 1, likedByUser: false })
+        );
+      }
+
+      // For all queries of type list, if they have data => update like
+      for (const query of queryClient.getQueriesData(
+        restaurantKeys.lists(userId)
+      )) {
+        if (query[1]) {
+          queryClient.setQueryData<Page<IRestaurant[]>>(query[0], (prev) => ({
+            meta: prev!.meta,
+            data: prev!.data.map((r) =>
+              r.id === restaurantId
+                ? { ...r, likes: r.likes - 1, likedByUser: false }
+                : r
+            ),
+          }));
+        }
+      }
+    },
+  });
+}
+
+export function useRateRestaurant(options?: QueryOptions) {
+  const queryClient = useQueryClient();
+  const { userId } = useAuth();
+  return useMutation({
+    mutationFn: RatingService.rate,
+
+    onSuccess: (_, { restaurantId }) => {
+      // Invalidate because it needs to recalculate rating
+      queryClient.invalidateQueries(restaurantKeys.lists(userId));
+      queryClient.invalidateQueries(ratingKeys.detail(userId, restaurantId));
+      queryClient.invalidateQueries(
+        restaurantKeys.detail(userId, restaurantId)
       );
+
+      if (options?.onSuccess) {
+        options.onSuccess();
+      }
+    },
+
+    onError: ({ cause }) => {
+      if (isServerError(cause) && options?.onError) {
+        options.onError(cause);
+      } else {
+        console.log("An error here shouldn't be happening");
+      }
     },
   });
 }
@@ -205,10 +279,10 @@ async function withLikes(
   getter: () => Promise<Page<IRestaurantResponse[]>>,
   isAuthenticated: boolean,
   userId: number
-) {
+): Promise<Page<IRestaurant[]>> {
   const { data, meta } = await getter();
   // If user is authenticated, stiches likedBy status
-  if (isAuthenticated) {
+  if (isAuthenticated && !!userId) {
     const ids = data.map((r) => r.id);
     const likes = await UserService.getLikesByRestaurants(userId, ids);
     const newData = data.map((r) => ({
@@ -220,4 +294,27 @@ async function withLikes(
 
   const newData = data.map((r) => ({ ...r, likedByUser: false }));
   return { data: newData, meta };
+}
+
+async function withLike(
+  getter: () => Promise<IRestaurantResponse>,
+  isAuthenticated: boolean,
+  userId: number
+) {
+  const restaurant = await getter();
+  // If user is authenticated, stiches likedBy status
+  if (isAuthenticated && !!userId) {
+    const likes = await UserService.getLikesByRestaurants(userId, [
+      restaurant.id,
+    ]);
+    const newData = {
+      ...restaurant,
+      likedByUser:
+        likes.find((l) => l.restaurantId === restaurant.id)?.liked || false,
+    };
+    return newData;
+  }
+
+  const newData = { ...restaurant, likedByUser: false };
+  return newData;
 }

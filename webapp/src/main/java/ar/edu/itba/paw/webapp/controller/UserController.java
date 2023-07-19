@@ -1,19 +1,14 @@
 package ar.edu.itba.paw.webapp.controller;
 
 
+import ar.edu.itba.paw.model.Rating;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.exceptions.EmailInUseException;
 import ar.edu.itba.paw.model.exceptions.EmptyBodyException;
 import ar.edu.itba.paw.model.exceptions.TokenCreationException;
 import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
-import ar.edu.itba.paw.service.LikesService;
-import ar.edu.itba.paw.service.ReservationService;
-import ar.edu.itba.paw.service.RestaurantService;
-import ar.edu.itba.paw.service.UserService;
-import ar.edu.itba.paw.webapp.dto.LikeDto;
-import ar.edu.itba.paw.webapp.dto.ReservationDto;
-import ar.edu.itba.paw.webapp.dto.RestaurantDto;
-import ar.edu.itba.paw.webapp.dto.UserDto;
+import ar.edu.itba.paw.service.*;
+import ar.edu.itba.paw.webapp.dto.*;
 import ar.edu.itba.paw.webapp.forms.PasswordResetForm;
 import ar.edu.itba.paw.webapp.forms.RegisterUserForm;
 import ar.edu.itba.paw.webapp.forms.UpdateUserForm;
@@ -31,6 +26,7 @@ import javax.ws.rs.core.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -49,6 +45,8 @@ public class UserController {
     private ReservationService reservationService;
     @Autowired
     private LikesService likesService;
+    @Autowired
+    private RatingService ratingService;
 
     @Context
     private UriInfo uriInfo;
@@ -187,5 +185,18 @@ public class UserController {
         }
         return Response.ok(new GenericEntity<List<LikeDto>>(likes) {
         }).build();
+    }
+
+    //READ USER RATING
+    @GET
+    @Path("/{userId}/ratings")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    public Response getRestaurantRate(@PathParam("userId") final Long userId,
+                                      @QueryParam("restaurantId") final Long restaurantId,
+                                      @Context HttpServletRequest request) {
+
+        Optional<Rating> maybeRating = ratingService.getRating(userId, restaurantId);
+        Double rate = maybeRating.isPresent() ? maybeRating.get().getRating() : 0;
+        return Response.ok(new RatingDto(rate)).build();
     }
 }

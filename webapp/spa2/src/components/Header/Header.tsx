@@ -10,13 +10,12 @@ import {
 import {
   IconChevronDown,
   IconLogout,
-  IconMessagePlus,
   IconSearch,
   IconSettings,
   IconSquarePlus,
   IconToolsKitchen2,
 } from "@tabler/icons-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Link,
@@ -31,6 +30,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { useGetUser } from "../../hooks/user.hooks";
 import { IUser } from "../../types/user/user.models";
 import { useQueryClient } from "react-query";
+import { useFilterSearchParams } from "../../hooks/searchParams.hooks";
 
 interface NavItemProps extends LinkProps {
   label: string;
@@ -56,8 +56,13 @@ function SearchBar() {
   const { classes } = useStyles();
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
-  // const [searchParams, setSearchParams] = useSearchParams();
+  const [filterParams, setFilterParams] = useFilterSearchParams();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setSearch(filterParams?.search ?? "");
+  }, [filterParams]);
+
   return (
     <Autocomplete
       className={classes.search}
@@ -68,9 +73,7 @@ function SearchBar() {
       data={[]}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
-          // searchParams.set("search", search);
-          // setSearchParams({ search: search });
-          setSearch("");
+          setFilterParams({ search: search });
           navigate({
             pathname: "restaurants",
             search: `${createSearchParams({ search: search })}`,

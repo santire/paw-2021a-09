@@ -59,8 +59,8 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public int findByRestaurantPageCount(int amountOnPage, long restaurantId){
-        return commentDao.findByRestaurantPageCount(amountOnPage, restaurantId);
+    public int findByRestaurantCount(long restaurantId){
+        return commentDao.findByRestaurantCount( restaurantId);
     }
 
     // DESTROY
