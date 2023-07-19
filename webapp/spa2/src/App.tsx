@@ -15,11 +15,12 @@ import { ProfilePage } from "./pages/Profile";
 import { RegisterRestaurantPage } from "./pages/RegisterRestaurant";
 import { UserRestaurantsPage } from "./pages/UserRestaurants";
 import { ValidateRestaurant } from "./pages/Restaurant";
+import { ValidateRestaurantUpdate } from "./pages/UpdateRestaurant";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // retry: false,
+      retry: false,
       // refetchOnWindowFocus: false, // default: true
       // staleTime: Infinity,
     },
@@ -43,6 +44,10 @@ const router = createBrowserRouter(
         {
           path: "/restaurants/:restaurantId",
           element: <ValidateRestaurant />,
+        },
+        {
+          path: "/restaurants/:restaurantId/edit",
+          element: <ValidateRestaurantUpdate />,
         },
         {
           path: "/restaurants/register",
@@ -89,13 +94,13 @@ function App() {
   }, []);
   return (
     <QueryClientProvider client={queryClient}>
-      <Suspense fallback={<Layout />}>
-        <ThemeProvider>
-          <AuthContextProvider>
+      <AuthContextProvider>
+        <Suspense fallback={<Layout />}>
+          <ThemeProvider>
             <RouterProvider router={router} />
-          </AuthContextProvider>
-        </ThemeProvider>
-      </Suspense>
+          </ThemeProvider>
+        </Suspense>
+      </AuthContextProvider>
     </QueryClientProvider>
   );
 }

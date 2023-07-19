@@ -46,7 +46,8 @@ public class RestaurantDto {
         dto.likes = restaurant.getLikes();
         dto.tags = restaurant.getTags().stream().map(Enum::name).collect(Collectors.toList());
         dto.reservationsCount = restaurant.getReservationsCount();
-        dto.image = uriInfo.getBaseUriBuilder().path(PATH).path(String.valueOf(restaurant.getId())).path("image").build();
+        dto.image = uriInfo.getBaseUriBuilder().path(PATH).path(String.valueOf(restaurant.getId())).path("image")
+                .queryParam("v",String.valueOf(restaurant.getProfileImage().getVersion()) ).build();
         dto.menu = uriInfo.getBaseUriBuilder().path(PATH).path(String.valueOf(restaurant.getId())).path("menu").build();
         dto.reviews = uriInfo.getBaseUriBuilder().path(PATH).path(String.valueOf(restaurant.getId())).path("reviews").build();
         dto.owner = uriInfo.getBaseUriBuilder().path("users").path(restaurant.getOwner().getId().toString()).build();

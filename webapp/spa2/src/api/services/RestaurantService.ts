@@ -9,11 +9,16 @@ import {
   IRestaurant,
   IRestaurantRegister,
   IRestaurantResponse,
+  IRestaurantUpdate,
 } from "../../types/restaurant/restaurant.models";
 import { apiClient, apiErrorHandler } from "../client";
 import { pagedResponse } from "../utils";
 
 const PATH = "/restaurants";
+interface UpdateProps {
+  restaurantId: number;
+  restaurant: IRestaurantUpdate;
+}
 interface IRestaurantService {
   getAll(
     params: PageParams & RestaurantFilterParams
@@ -23,6 +28,7 @@ interface IRestaurantService {
   getById(restaurantId: number): Promise<IRestaurantResponse>;
 
   create(params: IRestaurantRegister): Promise<IRestaurantResponse>;
+  update(params: UpdateProps): Promise<void>;
   deleteRestaurant(restaurantId: number): Promise<void>;
   getOwnedRestaurants(
     userId: number,
@@ -107,6 +113,28 @@ module RestaurantServiceImpl {
       },
     });
     return imgResponse.data;
+  }
+
+  export async function update({ restaurant, restaurantId }: UpdateProps) {
+    try {
+      const url = `${PATH}/${restaurantId}`;
+      const { image, ...data } = restaurant;
+      const response = await apiClient.put(url, data);
+      if (response.status === 204 && image) {
+        const formData = new FormData();
+        formData.append("image", image);
+        await setImage(url, image);
+      }
+      return response.data;
+    } catch (error) {
+      throw new Error("Response Error", {
+        cause: apiErrorHandler(error, {
+          Unauthorized: { code: "invalid_credentials" },
+          ConstraintViolationException: { code: "validation_error" },
+          InvalidImageException: { code: "invalid_image" },
+        }),
+      });
+    }
   }
 
   export async function create(restaurant: IRestaurantRegister) {

@@ -43,10 +43,12 @@ public class RestaurantJpaDao implements RestaurantDao {
     @Override
     public boolean setImageByRestaurantId(Image image, long restaurantId) {
         final Restaurant restaurant = findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
+        image.setRestaurant(restaurant);
         if (restaurant.getProfileImage() != null) {
             LOGGER.debug("Merging image");
             Image img = restaurant.getProfileImage();
             img.setData(image.getData());
+            img.increaseVersion();
             em.merge(img);
         } else {
         LOGGER.debug("Creating Image of size {}", image.getData().length);

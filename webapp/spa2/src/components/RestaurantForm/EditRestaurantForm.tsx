@@ -19,13 +19,19 @@ import { Dropzone, IMAGE_MIME_TYPE, FileWithPath } from "@mantine/dropzone";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import useStyles from "./RestaurantForm.styles";
-import { useState } from "react";
-import { IRestaurantRegister } from "../../types/restaurant/restaurant.models";
-import { RestaurantRegisterSchema } from "../../types/restaurant/restaurant.schemas";
-import { useCreateRestaurant } from "../../hooks/restaurant.hooks";
+import { useEffect, useState } from "react";
+import {
+  IRestaurant,
+  IRestaurantUpdate,
+} from "../../types/restaurant/restaurant.models";
+import { RestaurantUdpdateSchema } from "../../types/restaurant/restaurant.schemas";
+import { useUpdateRestaurant } from "../../hooks/restaurant.hooks";
 import { useGetTags } from "../../hooks/tags.hooks";
 
-export function RestaurantForm() {
+interface EditRestaurantFormProps {
+  restaurant: IRestaurant;
+}
+export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
   const { classes } = useStyles();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -34,6 +40,7 @@ export function RestaurantForm() {
 
   const [files, setFiles] = useState<FileWithPath[]>([]);
   const [showMessage, setShowMessage] = useState(true);
+  const [showPrevious, setShowPrevious] = useState(true);
 
   const tagsList = useGetTags();
 
@@ -44,14 +51,14 @@ export function RestaurantForm() {
     setError,
     clearErrors,
     setValue,
-  } = useForm<IRestaurantRegister>({
+  } = useForm<IRestaurantUpdate>({
     mode: "onTouched",
-    resolver: zodResolver(RestaurantRegisterSchema),
+    resolver: zodResolver(RestaurantUdpdateSchema),
   });
 
-  const { mutate, isLoading } = useCreateRestaurant({
+  const { mutate, isLoading } = useUpdateRestaurant({
     onSuccess: () => {
-      navigate("/user/restaurants");
+      navigate(`/restaurants/${restaurant.id}`);
     },
     onError: (error) => {
       if (error.code === "invalid_image") {
@@ -67,6 +74,31 @@ export function RestaurantForm() {
     },
   });
 
+  useEffect(() => {
+    setValue("name", restaurant.name);
+    setValue("address", restaurant.address);
+    setValue("phoneNumber", restaurant.phoneNumber);
+    setValue("facebook", restaurant.facebook);
+    setValue("twitter", restaurant.twitter);
+    setValue("instagram", restaurant.instagram);
+    setShowMessage(false);
+  }, []);
+
+  useEffect(() => {
+    if (tagsList.data) {
+      setChips(restaurant.tags.map((t) => tagsList.data.indexOf(t) + ""));
+      setValue(
+        "tags",
+        restaurant.tags.map((t) => tagsList.data.indexOf(t) + "")
+      );
+    }
+  }, [tagsList.data]);
+
+  const previous = (
+    <div className={classes.imageContainer}>
+      <Image width="200px" height="200px" src={restaurant.image} />
+    </div>
+  );
   const previews = files.map((file, index) => {
     setValue("image", file);
     const imageURL = URL.createObjectURL(file);
@@ -75,7 +107,7 @@ export function RestaurantForm() {
         <Image
           width="200px"
           height="200px"
-          src={imageURL}
+          src={imageURL || restaurant.image}
           imageProps={{ onLoad: () => URL.revokeObjectURL(imageURL) }}
         />
       </div>
@@ -94,17 +126,7 @@ export function RestaurantForm() {
         <form
           className={classes.form}
           onSubmit={handleSubmit((data) => {
-            if (!data.image) {
-              setError("image", {
-                type: "custom",
-                message:
-                  t("pages.registerRestaurant.errors.imageMissing") ||
-                  "Image is required",
-              });
-              setShowMessage(true);
-            } else {
-              mutate(data);
-            }
+            mutate({ restaurantId: restaurant.id, restaurant: data });
           })}
         >
           <Text
@@ -276,9 +298,7 @@ export function RestaurantForm() {
                   })}
                 >
                   {showMessage && (
-                    <div
-                      className={classes.imageContainer}
-                    >
+                    <div className={classes.imageContainer}>
                       <IconPhoto size={70} stroke={1.5} />
                       <Text size="lg" inline align="start">
                         {t("pages.registerRestaurant.dropImage")}
@@ -289,6 +309,7 @@ export function RestaurantForm() {
                       </Text>
                     </div>
                   )}
+                  {showPrevious && previous}
                   {previews}
                   {errors.image?.message ? (
                     <Text color="red" mt={5}>
@@ -308,6 +329,7 @@ export function RestaurantForm() {
                         setValue("image", null);
                         clearErrors("image");
                         setShowMessage(true);
+                        setShowPrevious(false);
                       }}
                     >
                       <IconX size={20} stroke={2} />
@@ -355,7 +377,7 @@ export function RestaurantForm() {
               {isLoading ? (
                 <Loader variant="dots" color="orange" />
               ) : (
-                t("pages.register.submit")
+                t("pages.editRestaurant.submit")
               )}
             </Button>
           </Group>

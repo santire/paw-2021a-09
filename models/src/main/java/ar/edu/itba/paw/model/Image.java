@@ -22,6 +22,9 @@ public class Image {
     @Column(name="image_data")
     private byte[] data;
 
+    @Column(name="version", nullable = false)
+    private long version;
+
     @OneToOne
 //    @PrimaryKeyJoinColumn(name = "restaurant_id")
     @JoinColumn(name ="restaurant_id", nullable = false)
@@ -38,6 +41,8 @@ public class Image {
     }
 
     public byte[] getData(){ return this.data; }
+    public long getImageId() {return this.imageId; }
+    public long getVersion() {return this.version;}
 
     public static byte[] getPlaceholderImage() {
         byte[] data = Base64.getEncoder().encode(placeHolder.getBytes(StandardCharsets.UTF_8));
@@ -48,6 +53,7 @@ public class Image {
 
     public Restaurant getRestaurant() { return restaurant; }
     public void setData(byte[] data) { this.data = data; }
+    public void increaseVersion() {this.version++;}
     public void setRestaurant(Restaurant restaurant) { this.restaurant = restaurant; }
 
 

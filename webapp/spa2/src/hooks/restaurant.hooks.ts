@@ -151,6 +151,34 @@ export function useCreateRestaurant(options?: QueryOptions) {
   });
 }
 
+export function useUpdateRestaurant(options?: QueryOptions) {
+  const queryClient = useQueryClient();
+  const { userId } = useAuth();
+
+  return useMutation({
+    mutationFn: RestaurantService.update,
+    onSuccess: (_, { restaurantId }) => {
+      // Invalidate because might change page order
+      queryClient.invalidateQueries(restaurantKeys.lists(userId));
+      queryClient.invalidateQueries(
+        restaurantKeys.detail(userId, restaurantId)
+      );
+
+      if (options?.onSuccess) {
+        options.onSuccess();
+      }
+    },
+
+    onError: ({ cause }) => {
+      if (isServerError(cause) && options?.onError) {
+        options.onError(cause);
+      } else {
+        console.log("An error here shouldn't be happening");
+      }
+    },
+  });
+}
+
 export function useDeleteRestaurant(options?: QueryOptions) {
   const queryClient = useQueryClient();
   const { userId } = useAuth();

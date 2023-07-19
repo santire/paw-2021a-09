@@ -14,7 +14,7 @@ import { usePageSearchParams } from "../hooks/searchParams.hooks";
 import { RestaurantCardSkeleton } from "../components/RestaurantCard/RestaurantCardSkeleton";
 import { UserRestaurantCard } from "../components/UserRestaurantCard/UserRestaurantCard";
 import { useAuth } from "../hooks/useAuth";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const useStyles = createStyles((theme) => ({
@@ -41,8 +41,12 @@ export function UserRestaurantsPage() {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [first, setFirst] = useState(true);
   useEffect(() => {
-    if (!isAuthenticated) {
+    // Gives userAuth a chance to check auth before redirecting
+    if (first) {
+      setFirst(false);
+    } else if (!isAuthenticated) {
       navigate("/");
     }
   }, [isAuthenticated]);
