@@ -2,6 +2,7 @@ package ar.edu.itba.paw.service;
 
 
 import ar.edu.itba.paw.model.Restaurant;
+import ar.edu.itba.paw.model.Tags;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.VerificationToken;
 import ar.edu.itba.paw.persistence.UserDao;
@@ -61,15 +62,8 @@ public class UserServiceTest {
     public void testCreateUser(){
         Mockito.when(encoder.encode(PASSWORD)).thenReturn(PASSWORD);
 
-        User u = new User();
-        u.setUsername(USERNAME);
-        u.setPassword(PASSWORD);
-        u.setFirstName(FIRSTNAME);
-        u.setLastName(LASTNAME);
-        u.setEmail(EMAIL);
-        u.setPhone(PHONE);
-        u.setId(ID);
-        u.setActive(false);
+        User u = new User(ID, USERNAME, PASSWORD, FIRSTNAME, LASTNAME, EMAIL, PHONE, false);
+
 
         Mockito.when(userDao.register(USERNAME,PASSWORD,FIRSTNAME,LASTNAME,EMAIL,PHONE)).thenReturn(u);
         Mockito.doNothing().when(userDao).assignTokenToUser(Mockito.anyString(),Mockito.any(),Mockito.anyLong());
@@ -92,15 +86,7 @@ public class UserServiceTest {
 
         LocalDateTime time = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.systemDefault());
 
-        User u = new User();
-        u.setUsername(USERNAME);
-        u.setPassword(PASSWORD);
-        u.setFirstName(FIRSTNAME);
-        u.setLastName(LASTNAME);
-        u.setEmail(EMAIL);
-        u.setPhone(PHONE);
-        u.setId(ID);
-        u.setActive(false);
+        User u = new User(ID, USERNAME, PASSWORD, FIRSTNAME, LASTNAME, EMAIL, PHONE, false);
 
         Mockito.when(userDao.getToken(TOKEN)).thenReturn(Optional.of(verificationToken));
         Mockito.when(verificationToken.getCreatedAt()).thenReturn(time);
@@ -116,14 +102,7 @@ public class UserServiceTest {
     @Test
     public void testUpdateUser(){
 
-        User u = new User();
-        u.setUsername(USERNAME);
-        u.setPassword(PASSWORD);
-        u.setFirstName(FIRSTNAME);
-        u.setLastName(LASTNAME);
-        u.setEmail(EMAIL);
-        u.setPhone(PHONE);
-        u.setId(ID);
+        User u = new User(ID, USERNAME, PASSWORD, FIRSTNAME, LASTNAME, EMAIL, PHONE, false);
         u.setActive(true);
 
         Mockito.when(userDao.findById(ID)).thenReturn(Optional.of(u));
@@ -139,22 +118,15 @@ public class UserServiceTest {
     @Test
     public void testRestaurantOwner(){
 
-        User u = new User();
-        u.setUsername(USERNAME);
-        u.setPassword(PASSWORD);
-        u.setFirstName(FIRSTNAME);
-        u.setLastName(LASTNAME);
-        u.setEmail(EMAIL);
-        u.setPhone(PHONE);
-        u.setId(ID);
-        u.setActive(true);
+        User u = new User(ID, USERNAME, PASSWORD, FIRSTNAME, LASTNAME, EMAIL, PHONE, true);
 
-        Restaurant r = new Restaurant();
+        Restaurant r = new Restaurant(RESTAURANT_NAME,
+                RESTAURANT_ADDRESS,
+                RESTAURANT_PHONE,
+                new ArrayList<>(),
+                u, "", "", "");
         r.setId(RESTAURANT_ID);
-        r.setName(RESTAURANT_NAME);
-        r.setAddress(RESTAURANT_ADDRESS);
-        r.setPhoneNumber(RESTAURANT_PHONE);
-        r.setOwner(u);
+        
 
         List<Restaurant> restaurantList = new ArrayList<>();
         restaurantList.add(r);

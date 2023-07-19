@@ -23,7 +23,6 @@ export function ReservationModal({ restaurant, show, setShow }: Props) {
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
 
-
   const {
     handleSubmit,
     formState: { errors },
@@ -39,7 +38,7 @@ export function ReservationModal({ restaurant, show, setShow }: Props) {
     onSuccess: () => {
       setShow(false);
       showNotification({
-        color: 'green',
+        color: "green",
         icon: <IconCheck />,
         autoClose: 5000,
         title: t("pages.restaurant.notifTitle"),
@@ -134,7 +133,17 @@ export function ReservationModal({ restaurant, show, setShow }: Props) {
         min={1}
         max={15}
         value={quantity}
-        onChange={(value: number) => setQuantity(value)}
+        onChange={(value: number) =>
+          setQuantity(
+            value < 1 || value > 15
+              ? value < 1
+                ? 1
+                : value > 15
+                ? 15
+                : value
+              : value
+          )
+        }
         error={errors?.quantity?.message}
       />
 
@@ -142,8 +151,10 @@ export function ReservationModal({ restaurant, show, setShow }: Props) {
         placeholder="Pick date"
         label={t("pages.userReservations.pickDate")}
         withAsterisk
+        clearable={false}
         minDate={new Date()}
         maxDate={DateUtils.getNextWeek(new Date())}
+        defaultValue={date}
         value={date}
         onChange={handleDateChange}
         error={errors.date?.message}

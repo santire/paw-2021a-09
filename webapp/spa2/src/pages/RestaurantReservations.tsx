@@ -94,7 +94,7 @@ export function RestaurantReservationsPage({
     if (!isLoading && !isOwner) {
       navigate("/");
     }
-  }, [first, isAuthenticated]);
+  }, [first, isAuthenticated, isOwner]);
 
   return (
     <Wrapper restaurantId={restaurantId}>

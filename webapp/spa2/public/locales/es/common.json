@@ -236,11 +236,11 @@
         }
       },
       "confirmModal": {
-        "confirmTitle": "Confirm reservation",
-        "goBackButton": "Go back",
-        "confirmButton": "Confirm",
-        "text": "Are you sure you wish to confirm this reservation?",
-        "success": "Reservation confirmed"
+        "confirmTitle": "Confirmar reserva",
+        "goBackButton": "Volver",
+        "confirmButton": "Confirmar",
+        "text": "¿Seguro desea confirmar esta reserva?",
+        "success": "Reserva confirmada"
       },
       "confirmButton": "Confirmar",
       "denyButton": "Rechazar",

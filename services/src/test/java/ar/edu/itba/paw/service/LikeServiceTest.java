@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -50,22 +51,15 @@ public class LikeServiceTest {
     @Test(expected = AlreadyLikedException.class)
     public void testLikeAlreadyLiked(){
 
-        User u = new User();
-        u.setUsername(USERNAME);
-        u.setPassword(PASSWORD);
-        u.setFirstName(FIRSTNAME);
-        u.setLastName(LASTNAME);
-        u.setEmail(EMAIL);
-        u.setPhone(PHONE);
-        u.setId(ID);
-        u.setActive(false);
+        User u = new User(ID, USERNAME, PASSWORD, FIRSTNAME, LASTNAME, EMAIL, PHONE, false);
+        u.setActive(true);
 
-        Restaurant r = new Restaurant();
+        Restaurant r = new Restaurant(RESTAURANT_NAME,
+                RESTAURANT_ADDRESS,
+                RESTAURANT_PHONE,
+                new ArrayList<>(),
+                u, "", "", "");
         r.setId(RESTAURANT_ID);
-        r.setName(RESTAURANT_NAME);
-        r.setAddress(RESTAURANT_ADDRESS);
-        r.setPhoneNumber(RESTAURANT_PHONE);
-        r.setOwner(u);
 
 
         Mockito.when(userDao.findById(ID)).thenReturn(Optional.of(u));
@@ -79,23 +73,15 @@ public class LikeServiceTest {
     @Test(expected = NotLikedException.class)
     public void testDislikeNotLiked(){
 
-        User u = new User();
-        u.setUsername(USERNAME);
-        u.setPassword(PASSWORD);
-        u.setFirstName(FIRSTNAME);
-        u.setLastName(LASTNAME);
-        u.setEmail(EMAIL);
-        u.setPhone(PHONE);
-        u.setId(ID);
-        u.setActive(false);
+        User u = new User(ID, USERNAME, PASSWORD, FIRSTNAME, LASTNAME, EMAIL, PHONE, false);
+        u.setActive(true);
 
-        Restaurant r = new Restaurant();
+        Restaurant r = new Restaurant(RESTAURANT_NAME,
+                RESTAURANT_ADDRESS,
+                RESTAURANT_PHONE,
+                new ArrayList<>(),
+                u, "", "", "");
         r.setId(RESTAURANT_ID);
-        r.setName(RESTAURANT_NAME);
-        r.setAddress(RESTAURANT_ADDRESS);
-        r.setPhoneNumber(RESTAURANT_PHONE);
-        r.setOwner(u);
-
 
         Mockito.when(userDao.findById(ID)).thenReturn(Optional.of(u));
         Mockito.when(restaurantDao.findById(RESTAURANT_ID)).thenReturn(Optional.of(r));

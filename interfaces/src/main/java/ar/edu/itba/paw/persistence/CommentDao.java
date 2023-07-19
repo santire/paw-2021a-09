@@ -10,14 +10,14 @@ import java.util.Optional;
 
 public interface CommentDao {
     // CREATE
-    public Comment addComment(User user, Restaurant restaurant, String comment, LocalDate date);
+    Comment addComment(User user, Restaurant restaurant, String comment, LocalDate date);
 
     // READ
-    public Optional<Comment> findById(long id);
-    public Optional<Comment> findByUserAndRestaurantId(long userId, long restaurantId);
-    public List<Comment> findByRestaurant(int page, int amountOnPage, long restaurantId);
-    public int findByRestaurantCount(long restaurantId);
+    Optional<Comment> findById(long id);
+    Optional<Comment> findByUserAndRestaurantId(long userId, long restaurantId);
+    List<Comment> findByRestaurant(int page, int amountOnPage, long restaurantId);
+    int findByRestaurantCount(long restaurantId);
 
     // DESTROY
-    public boolean deleteComment(long id);
+    boolean deleteComment(long id);
 }

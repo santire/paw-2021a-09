@@ -150,8 +150,8 @@ public class RestaurantController {
     @Path("/{restaurantId}/image")
     @Produces(value = {MediaType.APPLICATION_JSON, "image/jpg"})
     public Response getRestaurantImage(@PathParam("restaurantId") final long restaurantId) throws IOException {
-        CacheControl cache = CachingUtils.getCaching(CachingUtils.HOUR_TO_SEC);
-        Date expireDate = CachingUtils.getExpirationDate(CachingUtils.HOUR_TO_SEC);
+        CacheControl cache = CachingUtils.getCaching(24*CachingUtils.HOUR_TO_SEC);
+        Date expireDate = CachingUtils.getExpirationDate(24*CachingUtils.HOUR_TO_SEC);
         final Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
         final Image image = restaurant.getProfileImage();
         LOGGER.debug("Image: {}", image);

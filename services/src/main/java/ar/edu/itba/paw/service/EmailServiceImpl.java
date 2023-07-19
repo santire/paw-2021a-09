@@ -193,20 +193,4 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-
-
-    @Override
-    public EmailTemplate emailTemplateModel(int type){
-        if(type == RESERVATION || type == REGISTER || type == PASSWORD_RESET){
-            return EmailTemplate.BUTTON;
-        }
-        else if(type == RESERVATION_OWNER_CANCEL
-                || type == RESERVATION_USER_CANCEL
-                || type == RESERVATION_CONFIRM
-                || type == RESERVATION_PENDING){
-            return EmailTemplate.BASIC;
-        }
-        return EmailTemplate.BASIC;
-    }
-
 }

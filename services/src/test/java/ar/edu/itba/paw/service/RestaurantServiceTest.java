@@ -2,6 +2,7 @@ package ar.edu.itba.paw.service;
 
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.Tags;
+import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.persistence.RestaurantDao;
 import ar.edu.itba.paw.persistence.UserDao;
 import org.junit.Assert;
@@ -26,6 +27,13 @@ public class RestaurantServiceTest {
     private static final String RESTAURANT_FACEBOOK = "facebook.com/rest";
     private static final String RESTAURANT_INSTAGRAM = "instagram.com/rest";
     private static final String RESTAURANT_TWITTER = "twitter.com/rest";
+    private static final String USERNAME = "username";
+    private static final String PASSWORD = "password00";
+    private static final String FIRSTNAME = "myfirstname";
+    private static final String LASTNAME = "mylastname";
+    private static final String EMAIL = "username@email.com";
+    private static final String PHONE = "123456789";
+    private static final Long ID = 1l;
 
     @InjectMocks
     private RestaurantServiceImpl restaurantService = new RestaurantServiceImpl();
@@ -35,15 +43,17 @@ public class RestaurantServiceTest {
 
     @Test
     public void testUpdateRestaurant(){
-
-        Restaurant r = new Restaurant();
-        r.setName(RESTAURANT_NAME);
-        r.setAddress(RESTAURANT_ADDRESS);
-        r.setPhoneNumber(RESTAURANT_PHONE);
-        r.setId(RESTAURANT_ID);
-        List<Tags> tags = new ArrayList();
+        List<Tags> tags = new ArrayList<>();
         tags.add(Tags.ARABE);
-        r.setTags(tags);
+        User u = new User(ID, USERNAME, PASSWORD, FIRSTNAME, LASTNAME, EMAIL, PHONE, false);
+        u.setActive(true);
+        Restaurant r = new Restaurant(RESTAURANT_NAME,
+                RESTAURANT_ADDRESS,
+                RESTAURANT_PHONE,
+                tags,
+                u, "", "", "");
+        r.setId(RESTAURANT_ID);
+
         r.setFacebook(RESTAURANT_FACEBOOK);
         r.setInstagram(RESTAURANT_INSTAGRAM);
         r.setTwitter(RESTAURANT_TWITTER);

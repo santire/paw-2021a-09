@@ -60,10 +60,4 @@ public class LikesServiceImpl implements LikesService {
     public List<Like> userLikesRestaurants(long userId, List<Long> restaurantIds){
         return likesDao.userLikesRestaurants(userId, restaurantIds);
     }
-
-    @Override
-    @Transactional
-    public List<Long> getLikesByUserId(long userId){
-        return likesDao.getLikesByUserId(userId);
-    }
 }

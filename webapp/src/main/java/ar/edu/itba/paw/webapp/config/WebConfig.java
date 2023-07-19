@@ -55,17 +55,6 @@ public class WebConfig {
   @Value("classpath:schema.sql")
   private Resource schemaSql;
 
-//  @Bean
-//  public ViewResolver viewResolver() {
-//    final InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
-//
-//    viewResolver.setViewClass(JstlView.class);
-//    viewResolver.setPrefix("/WEB-INF/jsp/");
-//    viewResolver.setSuffix(".jsp");
-//
-//    return viewResolver;
-//  }
-
   @Bean
   public DataSource dataSource() {
 
@@ -173,18 +162,6 @@ public class WebConfig {
 //  public LocaleResolver localeResolver() {
 //    CookieLocaleResolver clr = new CookieLocaleResolver();
 //    return clr;
-//  }
-
-//  @Bean
-//  public WebMvcConfigurer configurer(){
-//    return new WebMvcConfigurerAdapter() {
-//      @Override
-//      public void addInterceptors (InterceptorRegistry registry) {
-//        LocaleChangeInterceptor l = new LocaleChangeInterceptor();
-//        l.setParamName("lang");
-//        registry.addInterceptor(l);
-//      }
-//    };
 //  }
 
   @Bean

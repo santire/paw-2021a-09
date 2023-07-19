@@ -11,7 +11,7 @@ import ar.edu.itba.paw.model.exceptions.UsernameInUseException;
 public interface UserService {
 
   // CREATE
-  public User register(final String username,
+  User register(final String username,
                        final String password,
                        final String firstName,
                        final String lastName,
@@ -20,16 +20,16 @@ public interface UserService {
                        String baseUrl) throws EmailInUseException, TokenCreationException, UsernameInUseException;
 
   // READ
-  public Optional<User> findById(long id);
-  public Optional<User> findByUsername(String username);
-  public Optional<User> findByEmail(String email);
-  public boolean isRestaurantOwner(long userId);
-  public boolean isTheRestaurantOwner(long userId,long restaurantId);
+  Optional<User> findById(long id);
+  Optional<User> findByUsername(String username);
+  Optional<User> findByEmail(String email);
+  boolean isRestaurantOwner(long userId);
+  boolean isTheRestaurantOwner(long userId,long restaurantId);
 
   // UPDATE
-  public User activateUserByToken(String token) throws TokenExpiredException;
-  public User updatePasswordByToken(String token, String password) throws TokenExpiredException;
-  public void updateUser(long id, String password, String firstName, String lastName, String phone);
-  public void requestPasswordReset(String email, String baseUrl) throws TokenCreationException;
+  User activateUserByToken(String token) throws TokenExpiredException;
+  User updatePasswordByToken(String token, String password) throws TokenExpiredException;
+  void updateUser(long id, String password, String firstName, String lastName, String phone);
+  void requestPasswordReset(String email, String baseUrl) throws TokenCreationException;
 
 }

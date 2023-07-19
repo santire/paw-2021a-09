@@ -10,14 +10,13 @@ import java.util.Optional;
 
 public interface CommentService {
     // CREATE
-    public Comment addComment(long userId, long restaurantId, String comment);
+    Comment addComment(long userId, long restaurantId, String comment);
 
     // READ
-    public Optional<Comment> findById(long commentId);
-    public Optional<Comment> findByUserAndRestaurantId(long userId, long restaurantId);
-    public int findByRestaurantCount( long restaurantId);
-    public List<Comment> findByRestaurant(int page, int amountOnPage, long restaurantId);
+    Optional<Comment> findById(long commentId);
+    int findByRestaurantCount( long restaurantId);
+    List<Comment> findByRestaurant(int page, int amountOnPage, long restaurantId);
 
     // DESTROY
-    public boolean deleteComment(long id);
+    boolean deleteComment(long id);
 }
