@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.persistence;
 
+import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -11,19 +12,23 @@ import java.util.Optional;
 import javax.sql.DataSource;
 
 import ar.edu.itba.paw.model.*;
+import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
-import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
+
+import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.MenuItem;
+import ar.edu.itba.paw.model.Restaurant;
+import ar.edu.itba.paw.model.Tags;
+
 import ar.edu.itba.paw.persistence.config.TestConfig;
 
 // @Rollback
@@ -60,38 +65,34 @@ public class RestaurantJpaDaoTest {
     @Test
     public void testRegister() {
         Restaurant restaurant = restaurantDao.registerRestaurant(NAME, ADDRESS, PHONE_NUMBER, TAGS, OWNER, "", "", "");
-        // Restaurant restaurant2 = restaurantDao.registerRestaurant(NAME, ADDRESS,
-        // PHONE_NUMBER, TAGS, OWNER);
-        // Restaurant restaurant3 = restaurantDao.registerRestaurant(NAME, ADDRESS,
-        // PHONE_NUMBER, TAGS, OWNER);
-        // Restaurant restaurantAgain =
-        // restaurantDao.findById(1L).orElseThrow(RestaurantNotFoundException::new);
-
-        // System.out.println("RESTAURANT ID: " + restaurant.getId());
-        // System.out.println("RESTAURANT ID: " + restaurant2.getId());
-        // System.out.println("RESTAURANT ID: " + restaurant3.getId());
-        // System.out.println("RESTAURANT ID: " + restaurantAgain.getId());
-        // System.out.println("RESTAURANT NAME: " + restaurantAgain.getName());
-        // System.out.println("RESTAURANT NAME: " + restaurant.getName());
-        // System.out.println("RESTAURANT ADDRESS: " + restaurant.getAddress());
-        // System.out.println("RESTAURANT PHONE_NUMBER: " +
-        // restaurant.getPhoneNumber());
-        // System.out.println("OWNER NAME: " + restaurant.getOwner().getName());
-        // System.out.println("OWNER ID: " + restaurant.getOwner().getId());
 
         assertEquals(NAME, restaurant.getName());
         assertEquals(ADDRESS, restaurant.getAddress());
         assertEquals(PHONE_NUMBER, restaurant.getPhoneNumber());
         assertEquals(Long.valueOf(1), restaurant.getOwner().getId());
 
-        // assertEquals(INSERTED_SIZE + 1, JdbcTestUtils.countRowsInTable(jdbcTemplate,
-        // "restaurants"));
+        Optional<Restaurant> maybeRestaurant = restaurantDao.findById(restaurant.getId());
+        assertTrue(maybeRestaurant.isPresent());
     }
 
-    // @Test
+    @Test
     public void testFindById() {
 
         Optional<Restaurant> maybeRestaurant = restaurantDao.findById(999L);
+
+        assertTrue(maybeRestaurant.isPresent());
+        Restaurant restaurant = maybeRestaurant.get();
+
+        assertEquals("KFC", restaurant.getName());
+        assertEquals("La Pampa 319", restaurant.getAddress());
+        assertEquals("1121146545", restaurant.getPhoneNumber());
+        assertEquals(Long.valueOf(999), restaurant.getOwner().getId());
+    }
+
+    @Test
+    public void testFindByIdWithMenu() {
+
+        Optional<Restaurant> maybeRestaurant = restaurantDao.findByIdWithMenu(1,5,999L);
 
         assertTrue(maybeRestaurant.isPresent());
         Restaurant restaurant = maybeRestaurant.get();
@@ -120,63 +121,127 @@ public class RestaurantJpaDaoTest {
         assertEquals(menuExpected.get(2).getPrice(), menuActual.get(2).getPrice(), 0.01);
     }
 
-//    @Test
-//    public void testFindAllRestaurantsPageCount() {
-//        // There are 3 restaurants, so:
-//        final List<Tags> noTags = new ArrayList<>();
-//
-//        // When amount on page is 1 there should be 3 pages
-//        assertEquals(3, restaurantDao.getRestaurantsFilteredByPageCount(1, "",noTags, 0, Integer.MAX_VALUE));
-//
-//        // When amount on page is 2 there should be 3 pages
-//        assertEquals(2, restaurantDao.getRestaurantsFilteredByPageCount(2, "",noTags, 0, Integer.MAX_VALUE));
-//
-//        // When amount on page is >=3 there should be 1 pages
-//        assertEquals(1, restaurantDao.getRestaurantsFilteredByPageCount(5, "",noTags, 0, Integer.MAX_VALUE));
-//        assertEquals(1, restaurantDao.getRestaurantsFilteredByPageCount(3, "",noTags, 0, Integer.MAX_VALUE));
-//    }
+    @Test
+    public void testRestaurantNotFound() {
+        Optional<Restaurant> maybeRestaurant = restaurantDao.findById(950L);
+        assertFalse(maybeRestaurant.isPresent());
+    }
 
-//    @Test
-//    public void testFindAllRestaurants() {
-//        final int amountOnPage = 2;
-//        final int expectedPage1 = 2;
-//        final int expectedPage2 = 1;
-//        final Sorting sort = Sorting.NAME;
-//        final boolean desc = false;
-//        final List<Tags> noTags = new ArrayList<>();
-//        final int lastDays = 7;
-//
-//        final List<Restaurant> allRestaurantsPage1 = restaurantDao.getRestaurantsFilteredBy(1, amountOnPage, "",noTags, 0, Integer.MAX_VALUE, sort, desc, lastDays);
-//        final List<Restaurant> allRestaurantsPage2 = restaurantDao.getAllRestaurants(2, amountOnPage, "");
-//
-//        assertEquals(expectedPage1, allRestaurantsPage1.size());
-//        assertEquals(expectedPage2, allRestaurantsPage2.size());
-//    }
-//
-//    @Test
-//    public void testFindRestaurantsLikeKfc() {
-//        final String searchTerm = "kf";
-//        final List<Restaurant> filteredRestaurants = restaurantDao.getAllRestaurants(1, INSERTED_SIZE, searchTerm);
-//
-//        // I should only have 1 page with just kfc
-//        assertEquals(1, restaurantDao.getAllRestaurantPagesCount(INSERTED_SIZE, searchTerm));
-//        assertEquals(1, filteredRestaurants.size());
-//
-//        final Restaurant restaurant = filteredRestaurants.get(0);
-//
-//        assertEquals("KFC", restaurant.getName());
-//        assertEquals("La Pampa 319", restaurant.getAddress());
-//        assertEquals("1121146545", restaurant.getPhoneNumber());
-//        assertEquals(Long.valueOf(999), restaurant.getOwner().getId());
-//    }
-//
-//    @Test
-//    public void testNoResultsStillOnePage() {
-//        final String searchTerm = "This string doesn't match any restaurant";
-//        final List<Restaurant> filteredRestaurants = restaurantDao.getAllRestaurants(1, INSERTED_SIZE, searchTerm);
-//
-//        // I should only have 1 page with no results
-//        assertEquals(1, restaurantDao.getAllRestaurantPagesCount(INSERTED_SIZE, searchTerm));
-//        assertEquals(0, filteredRestaurants.size());
-//    }
+    @Test(expected = RestaurantNotFoundException.class)
+    public void testDeleteRestaurantNotFound() {
+        restaurantDao.deleteRestaurantById(950L);
+    }
+
+    @Test
+    public void testFindRestaurantsLikeKfc() {
+        final String searchTerm = "kf";
+        List<Tags> tags = new ArrayList<>();
+        tags.add(Tags.AMERICANO);
+        final List<Restaurant> filteredRestaurants = restaurantDao.getRestaurantsFilteredBy(1, INSERTED_SIZE, searchTerm, tags, 1, 100, Sorting.NAME, false, 900);
+
+        final Restaurant restaurant = filteredRestaurants.get(0);
+
+        assertEquals("KFC", restaurant.getName());
+        assertEquals("La Pampa 319", restaurant.getAddress());
+        assertEquals("1121146545", restaurant.getPhoneNumber());
+        assertEquals(Long.valueOf(999), restaurant.getOwner().getId());
+    }
+
+    @Test
+    public void testGetPopularRestaurants() {
+        final List<Restaurant> restaurantList = restaurantDao.getPopularRestaurants(2, 1);
+
+        assertEquals(2, restaurantList.size());
+
+        assertEquals("KFC", restaurantList.get(0).getName());
+        assertEquals("BurgerKing", restaurantList.get(1).getName());
+    }
+    /*
+    @Test
+    public void testFindAllRestaurantsPageCount() {
+        // There are 3 restaurants, so:
+        final List<Tags> noTags = new ArrayList<>();
+        // When amount on page is 1 there should be 4 pages
+        assertEquals(4, restaurantDao.getAllRestaurantPagesCount(1, ""));
+
+        // When amount on page is 2 there should be 2 pages
+        assertEquals(2, restaurantDao.getAllRestaurantPagesCount(2, ""));
+
+        // When amount on page is >=4 there should be 1 pages
+        assertEquals(1, restaurantDao.getAllRestaurantPagesCount(4, ""));
+        assertEquals(1, restaurantDao.getAllRestaurantPagesCount(5, ""));
+    }
+
+    @Test
+    public void testFindAllRestaurants() {
+        final int amountOnPage = 2;
+        final int expectedPage1 = 2;
+        final int expectedPage2 = 2;
+
+        final List<Restaurant> allRestaurantsPage1 = restaurantDao.getAllRestaurants(1, amountOnPage, "");
+        final List<Restaurant> allRestaurantsPage2 = restaurantDao.getAllRestaurants(2, amountOnPage, "");
+
+        assertEquals(expectedPage1, allRestaurantsPage1.size());
+        assertEquals(expectedPage2, allRestaurantsPage2.size());
+    }
+
+
+
+    @Test
+    public void testNoResultsStillOnePage() {
+        final String searchTerm = "This string doesn't match any restaurant";
+        final List<Restaurant> filteredRestaurants = restaurantDao.getAllRestaurants(1, INSERTED_SIZE, searchTerm);
+
+        // I should only have 1 page with no results
+        assertEquals(1, restaurantDao.getAllRestaurantPagesCount(INSERTED_SIZE, searchTerm));
+        assertEquals(0, filteredRestaurants.size());
+    }
+
+    @Test
+    public void testFindByName() {
+        assertTrue(restaurantDao.findByName("BurgerKing"));
+        assertFalse(restaurantDao.findByName("notExistingRestaurantName"));
+    }
+
+    @Test
+    public void testGetLikedRestaurants() {
+        List<Restaurant> restaurantList = restaurantDao.getLikedRestaurantsPreview(2,999l);
+
+        assertEquals(2, restaurantList.size());
+        assertEquals("KFC", restaurantList.get(0).getName());
+        assertEquals("BurgerQueen",restaurantList.get(1).getName());
+    }
+    */
+    @Test
+    public void testMenuBelongsToRestaurant() {
+        assertTrue(restaurantDao.menuBelongsToRestaurant(999l,999l));
+        assertFalse(restaurantDao.menuBelongsToRestaurant(999l,996l));
+    }
+
+    @Test
+    public void testGetRestaurantsFromOwner() {
+        List<Restaurant> restaurantList = restaurantDao.getRestaurantsFromOwner(3,1, 999);
+
+        assertEquals(1, restaurantList.size());
+        assertEquals("BurgerQueen", restaurantList.get(0).getName());
+
+        restaurantList = restaurantDao.getRestaurantsFromOwner(2,2, 999);
+        assertEquals(2, restaurantList.size());
+        assertEquals("BurgerQueen", restaurantList.get(0).getName());
+        assertEquals("KFC", restaurantList.get(1).getName());
+    }
+
+    @Test
+    public void testDeleteRestaurant() {
+        long ID = 996l;
+
+        Optional<Restaurant> maybeRestaurant = restaurantDao.findById(ID);
+        assertTrue(maybeRestaurant.isPresent());
+        final Restaurant r = maybeRestaurant.get();
+
+        restaurantDao.deleteRestaurantById(r.getId());
+
+        Optional<Restaurant> notRestaurant = restaurantDao.findById(ID);
+        assertFalse(notRestaurant.isPresent());
+    }
 }
