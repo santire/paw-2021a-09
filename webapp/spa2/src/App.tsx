@@ -17,6 +17,8 @@ import { UserRestaurantsPage } from "./pages/UserRestaurants";
 import { ValidateRestaurant } from "./pages/Restaurant";
 import { ValidateRestaurantUpdate } from "./pages/UpdateRestaurant";
 import { NotificationsProvider } from "@mantine/notifications";
+import { UserReservationsPage } from "./pages/UserReservations";
+import { UserReservationsHistoryPage } from "./pages/UserReservationsHistory";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -73,6 +75,14 @@ const router = createBrowserRouter(
         {
           path: "/user/edit",
           element: <ProfilePage />,
+        },
+        {
+          path: "/user/reservations",
+          element: <UserReservationsPage />,
+        },
+        {
+          path: "/user/reservations/history",
+          element: <UserReservationsHistoryPage />,
         },
         {
           path: "/user/restaurants",

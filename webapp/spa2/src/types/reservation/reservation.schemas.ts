@@ -6,7 +6,7 @@ const ReservationSchemaBase = z.object({
 });
 
 const HasID = z.object({
-  id: z.number().int().gt(0),
+  reservationId: z.number().int().gt(0),
 });
 
 const HasURLs = z.object({
@@ -22,5 +22,6 @@ const HasDateTimeString = z.object({
 export const ReservationRegisterSchema = ReservationSchemaBase.omit({
   date: true,
 }).merge(HasDateTimeString);
-export const ReservationSchema =
-  ReservationSchemaBase.merge(HasID).merge(HasURLs);
+export const ReservationSchema = ReservationSchemaBase.merge(HasID)
+  .merge(HasURLs)
+  .merge(z.object({ confirmed: z.boolean() }));

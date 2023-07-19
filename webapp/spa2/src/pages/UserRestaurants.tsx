@@ -49,7 +49,7 @@ export function UserRestaurantsPage() {
     } else if (!isAuthenticated) {
       navigate("/");
     }
-  }, [isAuthenticated]);
+  }, [first, isAuthenticated]);
 
   if (error) {
     return (

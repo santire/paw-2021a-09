@@ -152,17 +152,18 @@ public class UserController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isUser(#userId)")
     public Response getUserReservations(@PathParam("userId") final Long userId, @QueryParam("filterBy") @DefaultValue("") String filterBy, @QueryParam("page") @DefaultValue("1") Integer page, @Context HttpServletRequest request) {
-        List<ReservationDto> reservation;
-        int maxPages;
+        List<ReservationDto> reservations;
+        int totalReservations;
         if (filterBy.equalsIgnoreCase("history")) {
-            maxPages = reservationService.findByUserHistoryPageCount(AMOUNT_OF_RESERVATIONS, userId);
-            reservation = reservationService.findByUserHistory(page, AMOUNT_OF_RESERVATIONS, userId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
+            totalReservations = reservationService.findByUserHistoryCount(userId);
+            reservations = reservationService.findByUserHistory(page, AMOUNT_OF_RESERVATIONS, userId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
         } else {
-            maxPages = reservationService.findByUserPageCount(AMOUNT_OF_RESERVATIONS, userId);
-            reservation = reservationService.findByUser(page, AMOUNT_OF_RESERVATIONS, userId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
+            totalReservations = reservationService.findByUserCount(userId);
+            reservations = reservationService.findByUser(page, AMOUNT_OF_RESERVATIONS, userId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
         }
-        return Response.ok(new GenericEntity<List<ReservationDto>>(reservation) {
-        }).link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first").link(uriInfo.getAbsolutePathBuilder().queryParam("page", maxPages).build(), "last").link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.max((page - 1), 1)).build(), "prev").link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.min((page + 1), maxPages)).build(), "next").build();
+
+        return PageUtils.paginatedResponse(new GenericEntity<List<ReservationDto>>(reservations) {
+        }, uriInfo, page, AMOUNT_OF_RESERVATIONS, totalReservations);
     }
 
     //READ USER LIKES

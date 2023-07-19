@@ -22,7 +22,7 @@ export function UpdateRestaurantPage({
     } else if (!isAuthenticated) {
       navigate("/");
     }
-  }, [isAuthenticated]);
+  }, [first, isAuthenticated]);
 
   if (isLoading) {
     return (

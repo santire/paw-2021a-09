@@ -15,10 +15,10 @@ public interface ReservationService {
     public Optional<Reservation> findById(long reservationId);
 
     public List<Reservation> findByUser(int page, int amountOnPage, long userId);
-    public int findByUserPageCount(int amountOnPage, long userId);
+    public int findByUserCount( long userId);
 
     public List<Reservation> findByUserHistory(int page, int amountOnPage, long userId);
-    public int findByUserHistoryPageCount(int amountOnPage, long userId);
+    public int findByUserHistoryCount(long userId);
 
     public List<Reservation> findByRestaurant(int page, int amountOnPage, long restaurantId);
     public int findByRestaurantPageCount(int amountOnPage, long restaurantId);

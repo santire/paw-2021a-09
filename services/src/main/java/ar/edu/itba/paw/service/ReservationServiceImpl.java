@@ -85,9 +85,9 @@ public class ReservationServiceImpl implements ReservationService{
 
      @Override
      @Transactional
-     public int findByUserPageCount(int amountOnPage, long userId) {
+     public int findByUserCount(long userId) {
         LocalDateTime currentTime = LocalDateTime.now();
-        return reservationDao.findByUserPageCount(amountOnPage, userId, currentTime);
+        return reservationDao.findByUserCount(userId, currentTime);
     }
 
 
@@ -101,9 +101,9 @@ public class ReservationServiceImpl implements ReservationService{
 
      @Override
      @Transactional
-     public int findByUserHistoryPageCount(int amountOnPage, long userId) {
+     public int findByUserHistoryCount(long userId) {
          LocalDateTime currentTime = LocalDateTime.now();
-         return reservationDao.findByUserHistoryPageCount(amountOnPage, userId, currentTime);
+         return reservationDao.findByUserHistoryCount( userId, currentTime);
      }
 
 	  @Override

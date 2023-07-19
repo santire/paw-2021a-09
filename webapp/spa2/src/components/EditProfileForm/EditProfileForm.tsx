@@ -118,29 +118,27 @@ export function EditProfileForm({ user }: EditProfileFormProps) {
                 {...register("lastName")}
               />
             </SimpleGrid>
-            <SimpleGrid cols={2} breakpoints={[{ maxWidth: "sm", cols: 1 }]}>
-              <PasswordInput
-                label={t("pages.register.password.label")}
-                placeholder={t("pages.register.password.placeholder") || ""}
-                required
-                error={errors.password?.message}
-                {...register("password")}
-              />
-              <PasswordInput
-                label={t("pages.register.confirmPassword.label")}
-                placeholder={
-                  t("pages.register.confirmPassword.placeholder") || ""
-                }
-                required
-                error={
-                  errors.repeatPassword
-                    ? t(errors.repeatPassword.message || "") ||
-                      "The passwords do not match"
-                    : null
-                }
-                {...register("repeatPassword")}
-              />
-            </SimpleGrid>
+            {/* <SimpleGrid cols={2} breakpoints={[{ maxWidth: "sm", cols: 1 }]}> */}
+            {/*   <PasswordInput */}
+            {/*     label={t("pages.register.password.label")} */}
+            {/*     placeholder={t("pages.register.password.placeholder") || ""} */}
+            {/*     error={errors.password?.message} */}
+            {/*     {...register("password")} */}
+            {/*   /> */}
+            {/*   <PasswordInput */}
+            {/*     label={t("pages.register.confirmPassword.label")} */}
+            {/*     placeholder={ */}
+            {/*       t("pages.register.confirmPassword.placeholder") || "" */}
+            {/*     } */}
+            {/*     error={ */}
+            {/*       errors.repeatPassword */}
+            {/*         ? t(errors.repeatPassword.message || "") || */}
+            {/*           "The passwords do not match" */}
+            {/*         : null */}
+            {/*     } */}
+            {/*     {...register("repeatPassword")} */}
+            {/*   /> */}
+            {/* </SimpleGrid> */}
             <SimpleGrid
               cols={2}
               mt="md"

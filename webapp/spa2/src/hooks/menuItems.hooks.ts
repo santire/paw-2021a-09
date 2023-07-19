@@ -18,12 +18,11 @@ const menuKeys = {
     [...menuKeys.lists(restaurantId), { filters }] as const,
 };
 
-export function useGetMenuItems(restaurantId: number, params?: PageParams) {
+export function useGetMenuItems(restaurantId: number, params: PageParams) {
   const [searchParams, setSearchParams] = useSearchParams();
   return useQuery<Page<IMenuItem[]>>({
     queryKey: menuKeys.list(restaurantId, params),
-    enabled: !!params,
-    queryFn: () => MenuItemService.getAll(restaurantId, params!),
+    queryFn: () => MenuItemService.getAll(restaurantId, params),
     onSuccess: (data) => {
       const page = parseInt(searchParams.get("page") || "NaN");
       // If page is invalid resets back to first

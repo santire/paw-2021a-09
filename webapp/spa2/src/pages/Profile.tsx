@@ -1,5 +1,5 @@
 import { Flex, Loader, Text } from "@mantine/core";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useGetUser } from "../hooks/user.hooks";
@@ -12,12 +12,15 @@ export function ProfilePage() {
   const { isAuthenticated } = useAuth();
   const { data: user, isLoading } = useGetUser();
 
+  const [first, setFirst] = useState(true);
   useEffect(() => {
-    if (!isAuthenticated) {
+    // Gives userAuth a chance to check auth before redirecting
+    if (first) {
+      setFirst(false);
+    } else if (!isAuthenticated) {
       navigate("/");
-      return;
     }
-  }, []);
+  }, [first, isAuthenticated]);
 
   if (isLoading) {
     return (

@@ -68,13 +68,13 @@ export function HomePage() {
         {popularRestaurants ? (
           <RestaurantCarousel
             restaurants={popularRestaurants.data}
-            title={t("pages.home.hot")}
-            tooltip={t("pages.home.hotTooltip")}
+            title={t("pages.home.popular")}
+            tooltip={t("pages.home.popularTooltip")}
           />
         ) : (
           <CarouselWrapper
-            title={t("pages.home.hot")}
-            tooltip={t("pages.home.hotTooltip")}
+            title={t("pages.home.popular")}
+            tooltip={t("pages.home.popularTooltip")}
           >
             <Center w={"100%"} mih={200}>
               <Loader variant="dots" color="orange" size={65} />

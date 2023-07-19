@@ -209,13 +209,69 @@
       "title": "Your reservations",
       "adminTitle": "Reservations made to your restaurant",
       "notFound": "Looks like you do not have any reservations",
+      "pending": "Pending confirmation",
+      "confirmed": "Confirmed",
+      "finished": "Finished",
       "createOne": "Make a reservation",
       "partySize": "Choose the party size",
       "guests": "Guests",
       "pickDate": "Pick a Date",
       "pickTime": "Pick a Time",
       "confirm": "Confirm",
-      "reservationDate": "Date"
+      "reservationDate": "Date",
+      "history": "Go to reservation history",
+      "table": {
+        "customers": "Customers quantity",
+        "date": "Date",
+        "restaurant": "Restaurant",
+        "state": "State"
+      },
+      "denyModal": {
+        "cancelTitle": "Cancel reservation",
+        "goBackButton": "Go back",
+        "cancelButton": "Cancel",
+        "text": "Are you sure you want to cancel your reservation?",
+        "success": "Reservation cancelled"
+      }
+    },
+    "restaurantReservations": {
+      "title": "Manage restaurants reservations",
+      "notFound": "Looks like this restaurant does not have any reservations yet...",
+      "history":  "Go to reservation history",
+      "table": {
+        "customers": "Customers quantity",
+        "date": "Date",
+        "user": "Client"
+      },
+      "tabs": {
+        "pending": {
+          "title": "Pending reservations"
+        },
+        "confirmed": {
+          "title": "Confirmed reservations"
+        }
+      },
+      "confirmButton": "Confirm",
+      "denyButton": "Deny",
+      "cancelButton": "Cancel",
+      "denyModal": {
+        "denyTitle": "Reject reservation",
+        "cancelTitle": "Cancel reservation",
+        "message": "Message",
+        "placeholder": "Explain the reason to your clients",
+        "denyButton": "Reject",
+        "goBackButton": "Go back",
+        "cancelButton": "Cancel",
+        "form": {
+          "requiredError": "Message is required",
+          "minLengthError": "Message must be at least 5 characters long",
+          "maxLengthError": "Message cannot exceed 100 characters"
+        }
+      }
+    },
+    "restaurantHistoryReservations": {
+      "title": "Reservations history",
+      "current": "Go back to current reservations"
     },
     "login": {
       "alert": "Invalid username or password",

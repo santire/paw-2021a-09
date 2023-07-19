@@ -189,13 +189,69 @@
       "title": "Tus reservas",
       "adminTitle": "Reservas a tus restaurantes",
       "notFound": "Parece que no tienes ninguna reserva",
+      "pending": "Esperando confirmación",
+      "confirmed": "Confirmada",
+      "finished": "Terminada",
       "createOne": "Haz una reserva",
       "partySize": "Elige la cantidad de invitados",
       "guests": "Invitados",
       "pickDate": "Elige una fecha",
       "pickTime": "Elige un horario",
       "confirm": "Confirmar",
-      "reservationDate": "Fecha"
+      "reservationDate": "Fecha",
+      "history": "Ver historial de reservas",
+      "table": {
+        "customers": "Cantidad de comensales",
+        "date": "Fecha",
+        "restaurant": "Restaurante",
+        "state": "Estado"
+      },
+      "denyModal": {
+        "cancelTitle": "Cancelar reserva",
+        "goBackButton": "Volver",
+        "cancelButton": "Cancelar",
+        "text": "¿Seguro quiere cancelar su reserva?",
+        "success": "Reserva cancelada exitosamente"
+      }
+    },
+    "restaurantReservations": {
+      "title": "Administrar reservas",
+      "notFound": "Parece que este restaurante no tiene ninguna reserva todavia...",
+      "history": "Ver historial de reservas",
+      "table": {
+        "customers": "Cantidad de comensales",
+        "date": "Fecha",
+        "user": "Cliente"
+      },
+      "tabs": {
+        "pending": {
+          "title": "Reservas pendientes"
+        },
+        "confirmed": {
+          "title": "Reservas confirmadas"
+        }
+      },
+      "confirmButton": "Confirmar",
+      "denyButton": "Rechazar",
+      "cancelButton": "Cancelar",
+      "denyModal": {
+        "denyTitle": "Rechazar reserva",
+        "cancelTitle": "Cancelar reserva",
+        "message": "Mensaje",
+        "placeholder": "Explica los motivos al usuario",
+        "denyButton": "Rechazar",
+        "goBackButton": "Volver",
+        "cancelButton": "Cancelar",
+        "form": {
+          "requiredError": "El campo mensaje es requerido",
+          "minLengthError": "El mensaje debe contener como mínimo 5 caracteres",
+          "maxLengthError": "El mensaje no puede exceder los 100 caracteres"
+        }
+      }
+    },
+    "restaurantHistoryReservations": {
+      "title": "Historial de reservas",
+      "current": "Volver a las reservas actuales"
     },
     "login": {
       "alert": "Usuario o contraseña inválido",

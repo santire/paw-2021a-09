@@ -129,7 +129,7 @@ public class ReservationJpaDao implements ReservationDao {
 
 
 	@Override
-	public int findByUserPageCount(int amountOnPage, long userId, LocalDateTime currentTime) {
+	public int findByUserCount(long userId, LocalDateTime currentTime) {
         Timestamp currentTimestamp = Timestamp.valueOf(currentTime);
         Query nativeQuery = em.createNativeQuery(
                 "SELECT reservation_id FROM reservations"
@@ -139,10 +139,8 @@ public class ReservationJpaDao implements ReservationDao {
         nativeQuery.setParameter("userId", userId);
         nativeQuery.setParameter("currentTimestamp", currentTimestamp);
 
-        int amountOfRestaurants = nativeQuery.getResultList().size();
-        int pageAmount = (int) Math.ceil((double) amountOfRestaurants / amountOnPage);
+        return nativeQuery.getResultList().size();
 
-        return pageAmount <= 0 ? 1 : pageAmount;
 	}
 
     @Override
@@ -177,7 +175,7 @@ public class ReservationJpaDao implements ReservationDao {
 
 
     @Override
-    public int findByUserHistoryPageCount(int amountOnPage, long userId, LocalDateTime currentTime) {
+    public int findByUserHistoryCount(long userId, LocalDateTime currentTime) {
         Timestamp currentTimestamp = Timestamp.valueOf(currentTime);
         Query nativeQuery = em.createNativeQuery(
                 "SELECT reservation_id FROM reservations"
@@ -187,10 +185,7 @@ public class ReservationJpaDao implements ReservationDao {
         nativeQuery.setParameter("userId", userId);
         nativeQuery.setParameter("currentTimestamp", currentTimestamp);
 
-        int amountOfRestaurants = nativeQuery.getResultList().size();
-        int pageAmount = (int) Math.ceil((double) amountOfRestaurants / amountOnPage);
-
-        return pageAmount <= 0 ? 1 : pageAmount;
+        return nativeQuery.getResultList().size();
     }
 
 

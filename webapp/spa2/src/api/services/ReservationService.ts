@@ -1,8 +1,10 @@
+import { MAX_PAGE_AMOUNT, Page, PageParams } from "../../types/page";
 import {
   IReservation,
   IReservationRegister,
 } from "../../types/reservation/reservation.models";
 import { apiClient, apiErrorHandler } from "../client";
+import { pagedResponse } from "../utils";
 
 const PATH = (restaurantId: number) =>
   `/restaurants/${restaurantId}/reservations`;
@@ -27,7 +29,7 @@ interface IReservationService {
   deny(params: DenyReservationParams): Promise<void>;
   cancel(params: ActionReservationParams): Promise<void>;
 
-  // getUserReservations();
+  getUserReservations(userId: number, params: PageParams): Promise<Page<IReservation[]>>;
   // getRestaurantReservations();
 }
 
@@ -106,6 +108,31 @@ module ReservationServiceImpl {
         cause: apiErrorHandler(error, {
           Unauthorized: { code: "invalid_credentials" },
           ConstraintViolationException: { code: "validation_error" },
+        }),
+      });
+    }
+  }
+
+  export async function getUserReservations(
+    userId: number,
+    params: PageParams
+  ) {
+    if ((params?.pageAmount ?? 0) > MAX_PAGE_AMOUNT) {
+      params.pageAmount = MAX_PAGE_AMOUNT;
+    }
+    try {
+      const response = await apiClient.get<IReservation[]>(
+        `/users/${userId}/reservations`,
+        {
+          params,
+        }
+      );
+      return pagedResponse(response);
+    } catch (error) {
+      throw new Error("Get Reservations Error", {
+        cause: apiErrorHandler(error, {
+          Unauthorized: { code: "invalid_credentials" },
+          AccessDeniedException: { code: "access_denied" },
         }),
       });
     }
