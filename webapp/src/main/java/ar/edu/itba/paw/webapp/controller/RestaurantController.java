@@ -465,7 +465,7 @@ public class RestaurantController {
             @PathParam("reservationId") final long reservationId,
             @Context HttpServletRequest request) {
         reservationService.userCancelReservation(reservationId);
-        return Response.status(Response.Status.ACCEPTED).build();
+        return Response.noContent().build();
     }
 
     // OWNER CONFIRM OR DENY RESERVATION

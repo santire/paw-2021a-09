@@ -38,6 +38,7 @@ public class Image {
     public Image(byte[] data) {
         this.imageId = null;
         this.data = data;
+        this.version = 0;
     }
 
     public byte[] getData(){ return this.data; }

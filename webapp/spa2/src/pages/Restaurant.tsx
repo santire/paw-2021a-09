@@ -12,6 +12,7 @@ import {
   Loader,
   Center,
   Badge,
+  Modal,
 } from "@mantine/core";
 import {
   IconMapPin,
@@ -33,6 +34,9 @@ import { RatingStars } from "../components/RatingStars/RatingStars";
 import { MenuItems } from "../components/MenuItems/MenuItems";
 import { useTabSearchParam } from "../hooks/searchParams.hooks";
 import { Reviews } from "../components/Reviews/Reviews";
+import { useAuth } from "../hooks/useAuth";
+import { useState } from "react";
+import { ReservationModal } from "../components/ReservationModal/ReservationModal";
 
 const useStyles = createStyles((theme) => ({
   title: {
@@ -158,7 +162,11 @@ function RestaurantHeader({ restaurant }: { restaurant: IRestaurant }) {
   const { classes, theme } = useStyles();
   const { t } = useTranslation();
   const isOwner = useIsOwner({ restaurant });
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  const [showReservationModal, setShowReservationModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const {
     name,
     address,
@@ -286,7 +294,13 @@ function RestaurantHeader({ restaurant }: { restaurant: IRestaurant }) {
                   color="orange"
                   variant="outline"
                   size="xl"
-                  // onClick={toggleReservation}
+                  onClick={() => {
+                    if (isAuthenticated) {
+                      setShowReservationModal(true);
+                    } else {
+                      setShowLoginModal(true);
+                    }
+                  }}
                 >
                   {t("pages.restaurant.reservationButton")}
                 </Button>
@@ -295,6 +309,34 @@ function RestaurantHeader({ restaurant }: { restaurant: IRestaurant }) {
           </div>
         </Flex>
       </Grid.Col>
+      <ReservationModal
+        restaurant={restaurant}
+        show={showReservationModal}
+        setShow={setShowReservationModal}
+      />
+
+      <Modal
+        title={"Oops!"}
+        opened={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        centered
+      >
+        <Center>
+          <Text size="md" mb="xl">
+            {t("restaurantCard.likeTooltip")}
+          </Text>
+        </Center>
+
+        <Button
+          color="orange"
+          variant="outline"
+          size="md"
+          fullWidth
+          onClick={() => navigate("/login")}
+        >
+          {t("pages.login.signIn")}
+        </Button>
+      </Modal>
     </Grid>
   );
 }

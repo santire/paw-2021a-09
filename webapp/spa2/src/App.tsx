@@ -16,6 +16,7 @@ import { RegisterRestaurantPage } from "./pages/RegisterRestaurant";
 import { UserRestaurantsPage } from "./pages/UserRestaurants";
 import { ValidateRestaurant } from "./pages/Restaurant";
 import { ValidateRestaurantUpdate } from "./pages/UpdateRestaurant";
+import { NotificationsProvider } from "@mantine/notifications";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -97,7 +98,9 @@ function App() {
       <AuthContextProvider>
         <Suspense fallback={<Layout />}>
           <ThemeProvider>
-            <RouterProvider router={router} />
+            <NotificationsProvider>
+              <RouterProvider router={router} />
+            </NotificationsProvider>
           </ThemeProvider>
         </Suspense>
       </AuthContextProvider>

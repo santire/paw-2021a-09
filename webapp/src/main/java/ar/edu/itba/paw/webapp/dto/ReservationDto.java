@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.webapp.dto;
 
 import ar.edu.itba.paw.model.Reservation;
+import ar.edu.itba.paw.model.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
@@ -27,7 +28,7 @@ public class ReservationDto {
     private long quantity;
     private boolean confirmed;
 
-    private String username;
+    private URI user;
     private URI restaurant;
 
     public static ReservationDto fromReservation(Reservation reservation, UriInfo uriInfo){
@@ -37,9 +38,9 @@ public class ReservationDto {
         dto.date = reservation.getDate();
         dto.quantity = reservation.getQuantity();
         dto.confirmed = reservation.getConfirmed();
-        dto.username = reservation.getUser().getUsername();
-
-        dto.restaurant = uriInfo.getBaseUriBuilder().path("restaurants/"+reservation.getRestaurant().getId()).build();
+        dto.user = uriInfo.getBaseUriBuilder().path("users").path(reservation.getUser().getId().toString()).build();
+        dto.restaurant = uriInfo.getBaseUriBuilder().path("restaurants").path(reservation.getRestaurant().getId().toString()).build();
+//        dto.restaurant = uriInfo.getBaseUriBuilder().path("restaurants/"+reservation.getRestaurant().getId()).build();
 
 
         return  dto;
@@ -58,8 +59,8 @@ public class ReservationDto {
         return confirmed;
     }
 
-    public String getUsername() {
-        return username;
+    public URI getUser() {
+        return user;
     }
 
     public URI getRestaurant() {
@@ -78,8 +79,8 @@ public class ReservationDto {
         this.confirmed = confirmed;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUser(URI user) {
+        this.user = user;
     }
 
     public void setRestaurant(URI restaurant) {

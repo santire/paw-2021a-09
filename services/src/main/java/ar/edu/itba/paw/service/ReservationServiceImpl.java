@@ -46,7 +46,7 @@ public class ReservationServiceImpl implements ReservationService{
     User user = userService.findById(userId).orElseThrow(UserNotFoundException::new);
     User owner = restaurant.getOwner();
     Reservation reservation = reservationDao.addReservation(user, restaurant,date,quantity);
-    String url =baseUrl+"/restaurant/"+restaurant.getId()+"/manage/pending";
+    String url =baseUrl+"/restaurants/"+restaurant.getId()+"/reservations?tab=pending";
 
     emailService.sendNewReservationOwnerEmail(
             owner.getEmail(),

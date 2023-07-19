@@ -133,6 +133,8 @@
     },
     "restaurant": {
       "reservationButton": "Make a Reservation",
+      "notifTitle": "Pending reservation",
+      "pendingReservation": "Your reservation has been sent successfully and is waiting for the restaurant's confirmation",
       "menu": {
         "title": "Menu",
         "notFound": "This restaurant doesn't have menu items yet",
@@ -211,6 +213,7 @@
       "partySize": "Choose the party size",
       "guests": "Guests",
       "pickDate": "Pick a Date",
+      "pickTime": "Pick a Time",
       "confirm": "Confirm",
       "reservationDate": "Date"
     },

@@ -117,6 +117,8 @@
     },
     "restaurant": {
       "reservationButton": "Hacer una reserva",
+      "notifTitle": "Reserva pendiente",
+      "pendingReservation": "Su reserva fue enviada correctamente y espera a ser confirmada por el restaurante",
       "menu": {
         "title": "Menu",
         "notFound": "Este restaurante no tiene menu todavía",
@@ -188,9 +190,10 @@
       "adminTitle": "Reservas a tus restaurantes",
       "notFound": "Parece que no tienes ninguna reserva",
       "createOne": "Haz una reserva",
-      "partySize": "Elige la cantidad de comensales",
+      "partySize": "Elige la cantidad de invitados",
       "guests": "Invitados",
       "pickDate": "Elige una fecha",
+      "pickTime": "Elige un horario",
       "confirm": "Confirmar",
       "reservationDate": "Fecha"
     },
