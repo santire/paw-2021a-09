@@ -323,7 +323,7 @@ function RestaurantHeader({ restaurant }: { restaurant: IRestaurant }) {
       >
         <Center>
           <Text size="md" mb="xl">
-            {t("restaurantCard.likeTooltip")}
+            {t("restaurantCard.reservationTooltip")}
           </Text>
         </Center>
 

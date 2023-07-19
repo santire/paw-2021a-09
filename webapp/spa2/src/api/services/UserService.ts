@@ -43,6 +43,10 @@ module UserServiceImpl {
         cause: apiErrorHandler(error, {
           Unauthorized: { code: "invalid_credentials" },
           ConstraintViolationException: { code: "validation_error" },
+          PersistenceException: {
+            code: "validation_error",
+            errors: [{ subject: "username", message: "username in use" }],
+          },
           UsernameInUseException: {
             code: "validation_error",
             errors: [{ subject: "username", message: "username in use" }],
@@ -64,6 +68,10 @@ module UserServiceImpl {
         cause: apiErrorHandler(error, {
           Unauthorized: { code: "invalid_credentials" },
           ConstraintViolationException: { code: "validation_error" },
+          PersistenceException: {
+            code: "validation_error",
+            errors: [{ subject: "username", message: "username in use" }],
+          },
           UsernameInUseException: {
             code: "validation_error",
             errors: [{ subject: "username", message: "username in use" }],

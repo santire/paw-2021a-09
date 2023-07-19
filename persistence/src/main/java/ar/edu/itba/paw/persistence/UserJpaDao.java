@@ -1,24 +1,24 @@
 package ar.edu.itba.paw.persistence;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import javax.persistence.*;
-
-import ar.edu.itba.paw.model.exceptions.UsernameInUseException;
-import org.postgresql.util.PSQLException;
-import org.postgresql.util.ServerErrorMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Repository;
-
 import ar.edu.itba.paw.model.PasswordToken;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.VerificationToken;
 import ar.edu.itba.paw.model.exceptions.EmailInUseException;
 import ar.edu.itba.paw.model.exceptions.TokenCreationException;
 import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
+import ar.edu.itba.paw.model.exceptions.UsernameInUseException;
+import org.hibernate.exception.ConstraintViolationException;
+import org.postgresql.util.PSQLException;
+import org.postgresql.util.ServerErrorMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
+
+import javax.persistence.*;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Optional;
 
 @Repository
 public class UserJpaDao implements UserDao {
@@ -45,14 +45,20 @@ public class UserJpaDao implements UserDao {
                     ServerErrorMessage postgresError = psqlEx.getServerErrorMessage();
                     if (postgresError != null) {
                         String constraint = postgresError.getConstraint();
-                        switch (constraint.toLowerCase()) {
-                            case "users_email_key":
-                                throw new EmailInUseException("Email " + email + " already in use", email);
-                            case "user_name_unq":
-                                throw new UsernameInUseException("Username " + username + " already in use", username);
+                        if (constraint != null) {
+                            switch (constraint.toLowerCase()) {
+                                case "users_email_key":
+                                    throw new EmailInUseException("Email " + email + " already in use", email);
+                                case "user_name_unq":
+                                    throw new UsernameInUseException("Username " + username + " already in use", username);
+                            }
                         }
+
                     }
                 }
+            }
+            if (ex instanceof ConstraintViolationException) {
+                throw new UsernameInUseException("Username " + username + " already in use", username);
             }
 
             // If it gets here without throwing something else catch and release :)

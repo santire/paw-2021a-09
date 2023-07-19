@@ -34,6 +34,7 @@
     "liked": "{{likes}} people liked this",
     "tagsTitle": "Perfect for you, if you enjoy",
     "likeTooltip": "Must be logged in to like",
+    "reservationTooltip": "Must be logged in to make a reservation",
     "rateTooltip": "Must be logged in to rate"
   },
   "userRestaurantCard": {

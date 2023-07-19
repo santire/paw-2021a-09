@@ -2,8 +2,16 @@ import { z } from "zod";
 
 const UserSchemaBase = z.object({
   email: z.string().email().min(2).max(100),
-  firstName: z.string().min(1).max(100),
-  lastName: z.string().min(1).max(100),
+  firstName: z
+    .string()
+    .min(1)
+    .max(100)
+    .regex(/[a-zA-ZñÑáéíóúÁÉÍÓÚ]+[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*/),
+  lastName: z
+    .string()
+    .min(1)
+    .max(100)
+    .regex(/[a-zA-ZñÑáéíóúÁÉÍÓÚ]+[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*/),
   phone: z
     .string()
     .regex(/[0-9]+/, "errors.invalidPhone")
