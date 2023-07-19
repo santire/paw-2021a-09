@@ -27,6 +27,7 @@ import {
 import { RestaurantUdpdateSchema } from "../../types/restaurant/restaurant.schemas";
 import { useUpdateRestaurant } from "../../hooks/restaurant.hooks";
 import { useGetTags } from "../../hooks/tags.hooks";
+import { useIsOwner } from "../../hooks/user.hooks";
 
 interface EditRestaurantFormProps {
   restaurant: IRestaurant;
@@ -43,6 +44,8 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
   const [showPrevious, setShowPrevious] = useState(true);
 
   const tagsList = useGetTags();
+
+  const isOwner = useIsOwner({ restaurant });
 
   const {
     register,
@@ -75,6 +78,9 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
   });
 
   useEffect(() => {
+    if (!isOwner) {
+      navigate(`/restaurants/${restaurant.id}`);
+    }
     setValue("name", restaurant.name);
     setValue("address", restaurant.address);
     setValue("phoneNumber", restaurant.phoneNumber);

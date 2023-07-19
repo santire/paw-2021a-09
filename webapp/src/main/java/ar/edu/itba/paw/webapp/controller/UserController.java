@@ -110,7 +110,7 @@ public class UserController {
     @GET
     @Path("/{userId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
-    @PreAuthorize("@authComponent.isUser(#userId)")
+//    @PreAuthorize("@authComponent.isUser(#userId)")
     public Response getUser(@PathParam("userId") final Long userId, @Context HttpServletRequest request) {
         final User user = userService.findById(userId).orElseThrow(UserNotFoundException::new);
         return Response.ok(UserDto.fromUser(user, request.getRequestURL().toString(), uriInfo)).build();

@@ -27,13 +27,7 @@ export function UpdateRestaurantPage({
   if (isLoading) {
     return (
       <Center mt="xl">
-        <Paper
-          shadow="md"
-          radius="lg"
-          h={"60vh"}
-          w={"50vw"}
-          style={{ border: "1px solid red" }}
-        >
+        <Paper shadow="md" radius="lg" h={"60vh"} w={"50vw"}>
           <Flex align="center" justify="center" h="100%">
             <Loader color="orange" size="lg" />
           </Flex>

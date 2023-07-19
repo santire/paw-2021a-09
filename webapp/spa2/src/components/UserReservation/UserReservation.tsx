@@ -5,6 +5,7 @@ import { DateUtils } from "../../utils/DateUtils";
 import { useTranslation } from "react-i18next";
 import { CancelModal } from "../ReservationModal/CancelModal";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 interface UserReservationProps {
   reservation: IReservation;
@@ -30,7 +31,21 @@ export function UserReservation({
       <tr key={reservation.reservationId}>
         <td>{reservation.quantity}</td>
         <td>{formattedDate}</td>
-        <td>{restaurantData.name}</td>
+        <td>
+          <Link
+            style={{
+              textDecoration: "none",
+              fontWeight: 700,
+              color:
+                theme.colorScheme === "dark"
+                  ? theme.colors.gray[5]
+                  : theme.colors.gray[8],
+            }}
+            to={`/restaurants/${restaurantData.id}`}
+          >
+            {restaurantData.name}
+          </Link>
+        </td>
         <td>
           <Text
             style={{

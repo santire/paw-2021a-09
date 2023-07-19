@@ -21,16 +21,16 @@ public interface ReservationService {
     public int findByUserHistoryCount(long userId);
 
     public List<Reservation> findByRestaurant(int page, int amountOnPage, long restaurantId);
-    public int findByRestaurantPageCount(int amountOnPage, long restaurantId);
+    public int findByRestaurantCount(long restaurantId);
 
     public List<Reservation> findConfirmedByRestaurant(int page, int amountOnPage, long restaurantId);
-    public int findConfirmedByRestaurantPageCount(int amountOnPage, long restaurantId);
+    public int findConfirmedByRestaurantCount( long restaurantId);
 
     public List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId);
-    public int findPendingByRestaurantPageCount(int amountOnPage, long restaurantId);
+    public int findPendingByRestaurantCount(long restaurantId);
 
     public List<Reservation> findHistoryByRestaurant(int page, int amountOnPage, long restaurantId);
-    public int findHistoryByRestaurantPageCount(int amountOnPage, long restaurantId);
+    public int findHistoryByRestaurantCount( long restaurantId);
 
     // UPDATE
     public boolean confirmReservation(long reservationId);

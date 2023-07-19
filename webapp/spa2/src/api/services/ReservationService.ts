@@ -29,8 +29,17 @@ interface IReservationService {
   deny(params: DenyReservationParams): Promise<void>;
   cancel(params: ActionReservationParams): Promise<void>;
 
-  getUserReservations(userId: number, params: PageParams): Promise<Page<IReservation[]>>;
-  // getRestaurantReservations();
+  getUserReservations(
+    userId: number,
+    filterType: string,
+    params: PageParams
+  ): Promise<Page<IReservation[]>>;
+
+  getRestaurantReservations(
+    restaurantId: number,
+    filterType: string,
+    params: PageParams
+  ): Promise<Page<IReservation[]>>;
 }
 
 module ReservationServiceImpl {
@@ -82,7 +91,7 @@ module ReservationServiceImpl {
       const response = await apiClient.put(
         `${PATH(restaurantId)}/${reservationId}`,
         { message },
-        { params: { action: "confirm" } }
+        { params: { action: "deny" } }
       );
       return response.data;
     } catch (error) {
@@ -115,6 +124,7 @@ module ReservationServiceImpl {
 
   export async function getUserReservations(
     userId: number,
+    filterType: string,
     params: PageParams
   ) {
     if ((params?.pageAmount ?? 0) > MAX_PAGE_AMOUNT) {
@@ -124,7 +134,41 @@ module ReservationServiceImpl {
       const response = await apiClient.get<IReservation[]>(
         `/users/${userId}/reservations`,
         {
-          params,
+          params: {
+            filterBy: filterType,
+            page: params.page,
+            pageAmount: params.pageAmount,
+          },
+        }
+      );
+      return pagedResponse(response);
+    } catch (error) {
+      throw new Error("Get Reservations Error", {
+        cause: apiErrorHandler(error, {
+          Unauthorized: { code: "invalid_credentials" },
+          AccessDeniedException: { code: "access_denied" },
+        }),
+      });
+    }
+  }
+
+  export async function getRestaurantReservations(
+    restaurantId: number,
+    filterType: string,
+    params: PageParams
+  ) {
+    if ((params?.pageAmount ?? 0) > MAX_PAGE_AMOUNT) {
+      params.pageAmount = MAX_PAGE_AMOUNT;
+    }
+    try {
+      const response = await apiClient.get<IReservation[]>(
+        `/restaurants/${restaurantId}/reservations`,
+        {
+          params: {
+            filterBy: filterType,
+            page: params.page,
+            pageAmount: params.pageAmount,
+          },
         }
       );
       return pagedResponse(response);

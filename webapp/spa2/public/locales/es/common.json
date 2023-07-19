@@ -216,12 +216,16 @@
     },
     "restaurantReservations": {
       "title": "Administrar reservas",
-      "notFound": "Parece que este restaurante no tiene ninguna reserva todavia...",
+      "notFound": "Parece que este restaurante no tiene ninguna reserva todavia",
+      "notFoundPending": "Parece que no tienes ninguna reserva pendiente",
+      "notFoundConfirmed": "Parece que no tienes ninguna reserva confirmada",
       "history": "Ver historial de reservas",
       "table": {
         "customers": "Cantidad de comensales",
         "date": "Fecha",
-        "user": "Cliente"
+        "user": "Cliente",
+        "customerName": "Cliente",
+        "customerPhone": "Contacto"
       },
       "tabs": {
         "pending": {
@@ -230,6 +234,13 @@
         "confirmed": {
           "title": "Reservas confirmadas"
         }
+      },
+      "confirmModal": {
+        "confirmTitle": "Confirm reservation",
+        "goBackButton": "Go back",
+        "confirmButton": "Confirm",
+        "text": "Are you sure you wish to confirm this reservation?",
+        "success": "Reservation confirmed"
       },
       "confirmButton": "Confirmar",
       "denyButton": "Rechazar",
@@ -242,6 +253,7 @@
         "denyButton": "Rechazar",
         "goBackButton": "Volver",
         "cancelButton": "Cancelar",
+        "success": "Reserva denegada exitosamente",
         "form": {
           "requiredError": "El campo mensaje es requerido",
           "minLengthError": "El mensaje debe contener como mínimo 5 caracteres",

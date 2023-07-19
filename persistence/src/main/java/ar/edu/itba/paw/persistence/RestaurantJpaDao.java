@@ -202,11 +202,13 @@ public class RestaurantJpaDao implements RestaurantDao {
         if (filteredIds.isEmpty()) {
             return Collections.emptyList();
         }
+        LOGGER.debug("list: {}", filteredIds);
 
         final TypedQuery<Restaurant> query = em.createQuery("from Restaurant where id IN :filteredIds",
                 Restaurant.class);
         query.setParameter("filteredIds", filteredIds);
-        return query.getResultList();
+        return query.getResultList().stream().sorted(Comparator.comparing(v->filteredIds.indexOf(v.getId()))).collect(Collectors.toList());
+//        return query.getResultList();
     }
 
     public int getRestaurantsFromOwnerCount(long userId) {

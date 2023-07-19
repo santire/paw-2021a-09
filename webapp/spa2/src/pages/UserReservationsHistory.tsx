@@ -99,7 +99,7 @@ export function UserReservationsHistoryPage() {
             </thead>
             <tbody>
               {data.data.map((r) => (
-                <UserReservation key={r.id} reservation={r} isHistory={true} />
+                <UserReservation key={r.reservationId} reservation={r} isHistory={true} />
               ))}
             </tbody>
           </Table>

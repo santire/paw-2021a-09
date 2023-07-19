@@ -405,29 +405,24 @@ public class RestaurantController {
                                                @QueryParam("filterBy") @DefaultValue("") String filterBy,
                                                @QueryParam("page") @DefaultValue("1") Integer page,
                                                @Context HttpServletRequest request) {
-        int maxPages;
+        int totalReservations;
         List<ReservationDto> reservations;
         LOGGER.debug("Filtering reservations by: {}", filterBy);
         if (filterBy.equalsIgnoreCase("pending")) {
-            maxPages = reservationService.findPendingByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
+            totalReservations = reservationService.findPendingByRestaurantCount(restaurantId);
             reservations = reservationService.findPendingByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
         } else if (filterBy.equalsIgnoreCase("confirmed")) {
-            maxPages = reservationService.findConfirmedByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
+            totalReservations = reservationService.findConfirmedByRestaurantCount( restaurantId);
             reservations = reservationService.findConfirmedByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
         } else if (filterBy.equalsIgnoreCase("history")) {
-            maxPages = reservationService.findHistoryByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
+            totalReservations = reservationService.findHistoryByRestaurantCount(restaurantId);
             reservations = reservationService.findHistoryByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
         } else {
-            maxPages = reservationService.findByRestaurantPageCount(AMOUNT_OF_RESERVATIONS, restaurantId);
+            totalReservations = reservationService.findByRestaurantCount(restaurantId);
             reservations = reservationService.findByRestaurant(page, AMOUNT_OF_RESERVATIONS, restaurantId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
         }
-        return Response.ok(new GenericEntity<List<ReservationDto>>(reservations) {
-                })
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", 1).build(), "first")
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", maxPages).build(), "last")
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.max((page - 1), 1)).build(), "prev")
-                .link(uriInfo.getAbsolutePathBuilder().queryParam("page", Math.min((page + 1), maxPages)).build(), "next")
-                .build();
+        return PageUtils.paginatedResponse(new GenericEntity<List<ReservationDto>>(reservations) {
+        }, uriInfo, page, AMOUNT_OF_RESERVATIONS, totalReservations);
     }
 
     //ADD RESERVATION

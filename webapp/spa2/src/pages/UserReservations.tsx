@@ -100,7 +100,7 @@ export function UserReservationsPage() {
             </thead>
             <tbody>
               {data.data.map((r) => (
-                <UserReservation key={r.id} reservation={r} isHistory={false} />
+                <UserReservation key={r.reservationId} reservation={r} isHistory={false} />
               ))}
             </tbody>
           </Table>

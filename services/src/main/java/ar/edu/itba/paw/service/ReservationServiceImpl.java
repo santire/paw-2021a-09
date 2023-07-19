@@ -115,8 +115,8 @@ public class ReservationServiceImpl implements ReservationService{
 
     @Override
 
-    public int findByRestaurantPageCount(int amountOnPage, long restaurantId) {
-      return reservationDao.findByRestaurantPageCount(amountOnPage, restaurantId);
+    public int findByRestaurantCount( long restaurantId) {
+      return reservationDao.findByRestaurantCount(restaurantId);
     }
 
     @Override
@@ -129,9 +129,9 @@ public class ReservationServiceImpl implements ReservationService{
 
     @Override
     @Transactional
-    public int findConfirmedByRestaurantPageCount(int amountOnPage, long restaurantId) {
+    public int findConfirmedByRestaurantCount(long restaurantId) {
         LocalDateTime currentTime = LocalDateTime.now();
-        return reservationDao.findConfirmedByRestaurantPageCount(amountOnPage, restaurantId, currentTime);
+        return reservationDao.findConfirmedByRestaurantCount( restaurantId, currentTime);
     }
 
     @Override
@@ -144,9 +144,9 @@ public class ReservationServiceImpl implements ReservationService{
 
     @Override
     @Transactional
-     public int findPendingByRestaurantPageCount(int amountOnPage, long restaurantId) {
+     public int findPendingByRestaurantCount( long restaurantId) {
         LocalDateTime currentTime = LocalDateTime.now();
-        return reservationDao.findPendingByRestaurantPageCount(amountOnPage, restaurantId, currentTime);
+        return reservationDao.findPendingByRestaurantCount(restaurantId, currentTime);
      }
 
      @Override
@@ -159,9 +159,9 @@ public class ReservationServiceImpl implements ReservationService{
  
      @Override
      @Transactional
-      public int findHistoryByRestaurantPageCount(int amountOnPage, long restaurantId) {
+      public int findHistoryByRestaurantCount( long restaurantId) {
          LocalDateTime currentTime = LocalDateTime.now();
-         return reservationDao.findHistoryByRestaurantPageCount(amountOnPage, restaurantId, currentTime);
+         return reservationDao.findHistoryByRestaurantCount(restaurantId, currentTime);
       }
 
 
@@ -172,8 +172,7 @@ public class ReservationServiceImpl implements ReservationService{
 
     @Override
     @Transactional
-    public boolean confirmReservation(long reservationId){  
-        LOGGER.debug("inicio: confirmRerservation");
+    public boolean confirmReservation(long reservationId){
         
         Locale locale = LocaleContextHolder.getLocale();
         Reservation reservation = findById(reservationId).orElseThrow(ReservationNotFoundException::new);

@@ -29,6 +29,13 @@ export function useGetUser() {
   });
 }
 
+export function useGetUserById(userIdP: number) {
+  return useQuery({
+    queryKey: userKeys.detail(userIdP),
+    queryFn: () => UserService.getById(userIdP),
+  });
+}
+
 export function useUpdateUser(options?: QueryOptions) {
   const { userId } = useAuth();
   const queryClient = useQueryClient();

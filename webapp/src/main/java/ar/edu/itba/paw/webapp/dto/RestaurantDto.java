@@ -34,7 +34,10 @@ public class RestaurantDto {
    
     public static RestaurantDto fromRestaurant(Restaurant restaurant, UriInfo uriInfo){
         final RestaurantDto dto = new RestaurantDto();
-
+        Long v = 0L;
+        if (restaurant.getProfileImage() != null) {
+            v = restaurant.getProfileImage().getVersion();
+        }
         dto.id = restaurant.getId();
         dto.name = restaurant.getName();
         dto.address = restaurant.getAddress();
@@ -47,7 +50,7 @@ public class RestaurantDto {
         dto.tags = restaurant.getTags().stream().map(Enum::name).collect(Collectors.toList());
         dto.reservationsCount = restaurant.getReservationsCount();
         dto.image = uriInfo.getBaseUriBuilder().path(PATH).path(String.valueOf(restaurant.getId())).path("image")
-                .queryParam("v",String.valueOf(restaurant.getProfileImage().getVersion()) ).build();
+                .queryParam("v",String.valueOf(v) ).build();
         dto.menu = uriInfo.getBaseUriBuilder().path(PATH).path(String.valueOf(restaurant.getId())).path("menu").build();
         dto.reviews = uriInfo.getBaseUriBuilder().path(PATH).path(String.valueOf(restaurant.getId())).path("reviews").build();
         dto.owner = uriInfo.getBaseUriBuilder().path("users").path(restaurant.getOwner().getId().toString()).build();

@@ -3,6 +3,8 @@ package ar.edu.itba.paw.webapp.auth;
 import java.util.Optional;
 
 import ar.edu.itba.paw.model.Comment;
+import ar.edu.itba.paw.model.Restaurant;
+import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
 import ar.edu.itba.paw.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +54,11 @@ public class AuthComponent {
 
     public boolean isRestaurantOwner(Long restaurantId) {
         User loggedUser = loggedUser();
-        return userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId);
+        LOGGER.debug("Logged user: {} ", loggedUser.getId());
+        Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
+        LOGGER.debug("Restaurant id: {} ", restaurantId);
+        LOGGER.debug("Owner id: {} ", restaurant.getOwner().getId());
+        return loggedUser.getId().equals(restaurant.getOwner().getId());
     }
 
     public boolean isReviewOwner(Long reviewId) {
