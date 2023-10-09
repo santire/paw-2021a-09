@@ -84,6 +84,7 @@ export function RegisterForm({ setPending }: RegisterFormProps) {
             <SimpleGrid cols={2} breakpoints={[{ maxWidth: "sm", cols: 1 }]}>
               <TextInput
                 label={t("pages.register.email.label")}
+                aria-label="email-input"
                 placeholder={t("pages.register.email.placeholder") || ""}
                 required
                 error={errors.email?.message}
@@ -91,6 +92,7 @@ export function RegisterForm({ setPending }: RegisterFormProps) {
               />
               <TextInput
                 label={t("pages.register.username.label")}
+                aria-label="username-input"
                 placeholder={t("pages.register.username.placeholder") || ""}
                 required
                 error={errors.username?.message}
@@ -100,6 +102,7 @@ export function RegisterForm({ setPending }: RegisterFormProps) {
             <SimpleGrid cols={2} breakpoints={[{ maxWidth: "sm", cols: 1 }]}>
               <PasswordInput
                 label={t("pages.register.password.label")}
+                aria-label="pass-input"
                 placeholder={t("pages.register.password.placeholder") || ""}
                 required
                 error={errors.password?.message}
@@ -107,6 +110,7 @@ export function RegisterForm({ setPending }: RegisterFormProps) {
               />
               <PasswordInput
                 label={t("pages.register.confirmPassword.label")}
+                aria-label="repeat-input"
                 placeholder={
                   t("pages.register.confirmPassword.placeholder") || ""
                 }
@@ -124,6 +128,7 @@ export function RegisterForm({ setPending }: RegisterFormProps) {
             <SimpleGrid cols={2} breakpoints={[{ maxWidth: "sm", cols: 1 }]}>
               <TextInput
                 label={t("pages.register.firstName.label")}
+                aria-label="first-name-input"
                 placeholder={t("pages.register.firstName.placeholder") || ""}
                 required
                 error={errors.firstName?.message}
@@ -131,6 +136,7 @@ export function RegisterForm({ setPending }: RegisterFormProps) {
               />
               <TextInput
                 label={t("pages.register.lastName.label")}
+                aria-label="last-name-input"
                 placeholder={t("pages.register.lastName.placeholder") || ""}
                 required
                 error={errors.lastName?.message}
@@ -138,6 +144,7 @@ export function RegisterForm({ setPending }: RegisterFormProps) {
               />
               <TextInput
                 label={t("pages.register.phone.label")}
+                aria-label="phone-input"
                 placeholder={t("pages.register.phone.placeholder") || ""}
                 type="number"
                 required
@@ -153,6 +160,7 @@ export function RegisterForm({ setPending }: RegisterFormProps) {
             <Group position="center" mt="md">
               <Button
                 type="submit"
+                aria-label="register-button"
                 color="orange"
                 fullWidth
                 px="xl"

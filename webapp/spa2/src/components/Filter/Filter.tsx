@@ -122,6 +122,7 @@ export function Filter() {
             <Group position="center" mt="xl">
               <Button
                 onClick={setParams}
+                aria-label="filter-button"
                 color="orange"
                 fullWidth
                 px="xl"
@@ -131,6 +132,7 @@ export function Filter() {
               </Button>
               <Button
                 onClick={clearAll}
+                aria-label="clear-button"
                 color="orange"
                 variant="outline"
                 fullWidth

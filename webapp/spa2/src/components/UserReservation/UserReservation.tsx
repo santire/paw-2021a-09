@@ -67,6 +67,7 @@ export function UserReservation({
           <td>
             <Button
               color={"red"}
+              role="button"
               variant="outline"
               onClick={() => setShow(true)}
             >{t`pages.restaurantReservations.cancelButton`}</Button>

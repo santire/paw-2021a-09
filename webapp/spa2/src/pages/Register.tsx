@@ -53,7 +53,9 @@ export function RegisterPage() {
         <Title mt="xl" mb="md">
           {t("pages.register.confirmation.title")}
         </Title>
-        <Text size="xl">{t("pages.register.confirmation.subtitle")}</Text>
+        <Text size="xl" aria-label="confirmation-text">
+          {t("pages.register.confirmation.subtitle")}
+          </Text>
       </Flex>
     );
   }
