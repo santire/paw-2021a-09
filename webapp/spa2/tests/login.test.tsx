@@ -77,9 +77,11 @@ describe('Login tests', () => {
         const emailInput = screen.getByLabelText(/email-input/i);
         const passwordInput = screen.getByLabelText(/pass-input/i);
   
-        await fireEvent.change(emailInput, { target: { value: 'invalid@example.com' } });
+        await fireEvent.change(emailInput, { target: { value: 'invalid' } });
         await fireEvent.change(passwordInput, { target: { value: 'invalidPassword' } });
         const loginButton = screen.getByLabelText(/login-button/i);
         await fireEvent.click(loginButton);
+        const errorMsg = screen.queryByText('Invalid');
+        expect(errorMsg).toBeDefined();
       });
 });
