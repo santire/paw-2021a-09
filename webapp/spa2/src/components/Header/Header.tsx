@@ -52,7 +52,7 @@ function NavItem({ label, to, relative, hidden }: NavItemProps) {
   );
 }
 
-function SearchBar() {
+export function SearchBar() {
   const { classes } = useStyles();
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
@@ -65,6 +65,7 @@ function SearchBar() {
 
   return (
     <Autocomplete
+      aria-label="search-input"
       className={classes.search}
       placeholder={t("header.search") || ""}
       icon={<IconSearch size={16} stroke={1.5} />}
