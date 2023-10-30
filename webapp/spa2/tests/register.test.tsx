@@ -27,8 +27,8 @@ afterAll(
   }  
 )
 
-describe('Register tests', () => {
-    test('Should redirect after successful registration', async () => {
+describe('Register input tests', () => {
+    test('Should show error message when invalid phone input', async () => {
       render(
         <QueryClientProvider client={queryClient}>
             <MemoryRouter>
@@ -78,7 +78,7 @@ describe('Correct data processing', () => {
       const phoneInput = getByLabelText(/phone-input/i);
 
       await fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-      await fireEvent.change(usernameInput, { target: { value: 'password123' } });
+      await fireEvent.change(usernameInput, { target: { value: 'username' } });
       await fireEvent.change(passwordInput, { target: { value: 'password123' } });
       await fireEvent.change(repeatPasswordInput, { target: { value: 'password123' } });
       await fireEvent.change(firstNameInput, { target: { value: 'name' } });

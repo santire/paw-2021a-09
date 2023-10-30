@@ -25,6 +25,7 @@ import { useGetRestaurant } from "../hooks/restaurant.hooks";
 import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useIsOwner } from "../hooks/user.hooks";
+import { Helmet } from "react-helmet-async";
 
 const useStyles = createStyles((theme) => ({
   heading: {
@@ -151,6 +152,7 @@ function PendingReservations({ restaurantId }: { restaurantId: number }) {
   }
   if (data) {
     return (
+      <>
       <Center mt={50}>
         <Flex direction="column" align="center">
           <Table>
@@ -182,6 +184,7 @@ function PendingReservations({ restaurantId }: { restaurantId: number }) {
           />
         </Flex>
       </Center>
+      </>
     );
   }
   return (

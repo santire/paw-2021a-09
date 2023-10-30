@@ -37,6 +37,7 @@ import { Reviews } from "../components/Reviews/Reviews";
 import { useAuth } from "../hooks/useAuth";
 import { useState } from "react";
 import { ReservationModal } from "../components/ReservationModal/ReservationModal";
+import { Helmet } from "react-helmet-async";
 
 const useStyles = createStyles((theme) => ({
   title: {
@@ -120,6 +121,10 @@ export function RestaurantPage({ restaurantId }: { restaurantId: number }) {
   }
   if (!isLoading && !isError && data) {
     return (
+      <>
+      <Helmet>
+        <title>{data.name}: Gourmetable</title>
+      </Helmet>
       <Flex direction="column" w="100%">
         <RestaurantHeader restaurant={data} />
         <Divider m="xl" orientation="horizontal" />
@@ -152,6 +157,7 @@ export function RestaurantPage({ restaurantId }: { restaurantId: number }) {
           </Tabs>
         </Flex>
       </Flex>
+      </>
     );
   }
 

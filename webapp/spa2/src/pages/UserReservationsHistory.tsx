@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import { useGetReservations } from "../hooks/reservation.hooks";
 import { usePageSearchParams } from "../hooks/searchParams.hooks";
 import { UserReservation } from "../components/UserReservation/UserReservation";
+import { Helmet } from "react-helmet-async";
 
 const useStyles = createStyles((theme) => ({
   heading: {

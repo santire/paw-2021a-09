@@ -21,6 +21,7 @@ import { UserReservationsPage } from "./pages/UserReservations";
 import { UserReservationsHistoryPage } from "./pages/UserReservationsHistory";
 import { ValidateRestaurantReservation } from "./pages/RestaurantReservations";
 import { ValidateRestaurantReservationHistory } from "./pages/RestaurantReservationsHistory";
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,59 +41,137 @@ const router = createBrowserRouter(
       children: [
         {
           path: "/",
-          element: <HomePage />,
+          element: 
+          <>
+            <Helmet>
+              <title>Home: Gourmetable</title>
+            </Helmet>
+            <HomePage />
+          </>
         },
         {
           path: "/restaurants",
-          element: <RestaurantsPage />,
+          element: 
+          <>
+            <Helmet>
+              <title>Restaurants: Gourmetable</title>
+            </Helmet>
+            <RestaurantsPage />
+          </>
         },
         {
           path: "/restaurants/:restaurantId",
-          element: <ValidateRestaurant />,
+          element: <ValidateRestaurant />
         },
         {
           path: "/restaurants/:restaurantId/edit",
-          element: <ValidateRestaurantUpdate />,
+          element: 
+          <>
+            <Helmet>
+              <title>Edit restaurant: Gourmetable</title>
+            </Helmet>
+            <ValidateRestaurantUpdate />
+          </>
         },
         {
           path: "/restaurants/:restaurantId/reservations",
-          element: <ValidateRestaurantReservation />,
+          element: 
+          <>
+            <Helmet>
+              <title>Restaurant reservations: Gourmetable</title>
+            </Helmet>
+            <ValidateRestaurantReservation />
+          </>
         },
         {
           path: "/restaurants/:restaurantId/reservations/history",
-          element: <ValidateRestaurantReservationHistory />,
+          element: 
+          <>
+          <Helmet>
+            <title>Restaurant reservations history: Gourmetable</title>
+          </Helmet>
+          <ValidateRestaurantReservationHistory />
+        </>
         },
         {
           path: "/restaurants/register",
-          element: <RegisterRestaurantPage />,
+          element: 
+          <>
+            <Helmet>
+              <title>Register restaurant: Gourmetable</title>
+            </Helmet>
+            <RegisterRestaurantPage />
+          </>
         },
         {
           path: "/login",
-          element: <LoginPage />,
+          element: 
+          <>
+            <Helmet>
+              <title>Login: Gourmetable</title>
+            </Helmet>
+            <LoginPage />
+          </>
         },
         {
           path: "/register",
-          element: <RegisterPage />,
+          element: 
+          <>
+            <Helmet>
+              <title>Register: Gourmetable</title>
+            </Helmet>
+            <RegisterPage />
+          </>
         },
         {
           path: "/forgot",
-          element: <ForgotPage />,
+          element: 
+          <>
+            <Helmet>
+              <title>Forgot: Gourmetable</title>
+            </Helmet>
+            <ForgotPage />
+          </>
         },
         {
           path: "/reset",
-          element: <ResetPage />,
+          element: 
+          <>
+            <Helmet>
+              <title>Reset password: Gourmetable</title>
+            </Helmet>
+            <ResetPage />
+          </>
         },
         {
           path: "/user/edit",
-          element: <ProfilePage />,
+          element: 
+          <>
+            <Helmet>
+              <title>Profile: Gourmetable</title>
+            </Helmet>
+            <ProfilePage />
+          </>,
         },
         {
           path: "/user/reservations",
-          element: <UserReservationsPage />,
+          element: 
+          <>
+            <Helmet>
+              <title>Reservations: Gourmetable</title>
+            </Helmet>
+            <UserReservationsPage />
+          </>
         },
         {
           path: "/user/reservations/history",
-          element: <UserReservationsHistoryPage />,
+          element: 
+          <>
+            <Helmet>
+              <title>Reservations history: Gourmetable</title>
+            </Helmet>
+            <UserReservationsHistoryPage />
+          </>
         },
         {
           path: "/user/restaurants",
@@ -119,7 +198,12 @@ function App() {
         <Suspense fallback={<Layout />}>
           <ThemeProvider>
             <NotificationsProvider>
-              <RouterProvider router={router} />
+              <HelmetProvider>
+                <Helmet>
+                  <title>Gourmetable</title>
+                </Helmet>
+                <RouterProvider router={router} />
+              </HelmetProvider>
             </NotificationsProvider>
           </ThemeProvider>
         </Suspense>

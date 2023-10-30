@@ -16,6 +16,7 @@ import { UserRestaurantCard } from "../components/UserRestaurantCard/UserRestaur
 import { useAuth } from "../hooks/useAuth";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 
 const useStyles = createStyles((theme) => ({
   title: {
