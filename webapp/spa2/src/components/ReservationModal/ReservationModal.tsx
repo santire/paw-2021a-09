@@ -161,7 +161,7 @@ export function ReservationModal({ restaurant, show, setShow }: Props) {
       />
 
       <Select
-        label={t("pages.userReservations.pickDate")}
+        label={t("pages.userReservations.pickTime")}
         withAsterisk
         value={
           time

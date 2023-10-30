@@ -64,6 +64,8 @@ public class CommentJpaDao implements CommentDao {
                 "SELECT comment_id FROM comments"
                         +
                         " WHERE restaurant_id = :restaurantId"
+                        +
+                        " ORDER BY date DESC"
         );
 
         nativeQuery.setParameter("restaurantId", restaurantId);
