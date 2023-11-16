@@ -8,6 +8,7 @@ import java.util.List;
 public interface LikesService {
     boolean like(long userId, long restaurantId);
     boolean dislike(long userId, long restaurantId);
+    public List<Like> getUserLikes(long userId);
     boolean userLikesRestaurant(long userId, long restaurantId);
     List<Like> userLikesRestaurants(long userId, List<Long> restaurantId);
 }

@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.webapp.controller;
 
 
+import ar.edu.itba.paw.model.Like;
 import ar.edu.itba.paw.model.Rating;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.exceptions.EmailInUseException;
@@ -172,13 +173,10 @@ public class UserController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isUser(#userId)")
     public Response userLikesRestaurants(@PathParam("userId") final Long userId, @QueryParam("restaurantId") List<Long> restaurantIds, @Context HttpServletRequest request) {
-        if (restaurantIds == null) {
-            restaurantIds = new ArrayList<>();
-        }
         List<Long> likedIds = likesService.userLikesRestaurants(userId, restaurantIds).stream().map(l -> l.getRestaurant().getId()).collect(Collectors.toList());
         List<LikeDto> likes = new ArrayList<>();
         for (Long id : restaurantIds) {
-            LikeDto like = new LikeDto(false, id, userId);
+            LikeDto like = new LikeDto(false, id, userId, request.getRequestURL().toString(), uriInfo);
             if (likedIds.contains(id)) {
                 like.setLiked(true);
             }

@@ -1,27 +1,38 @@
 package ar.edu.itba.paw.webapp.dto;
 
+import java.net.URI;
+
+import javax.ws.rs.core.UriInfo;
+
+import ar.edu.itba.paw.model.Like;
+
 public class LikeDto {
-    private boolean isLiked;
+    private static final String USERS_PATH = "users/";
+    private static final String LIKES_PATH = "likes/";
     private long restaurantId;
-    private long userId;
+    private URI self;
+    private boolean liked;
 
-    public LikeDto(boolean isLiked, long restaurantId, long userId) {
-        this.isLiked = isLiked;
+    public LikeDto() {}
+
+    public LikeDto(boolean liked, long restaurantId, long userId, String url, UriInfo uriInfo) {
+        this.liked = liked;
         this.restaurantId = restaurantId;
-        this.userId = userId;
+        this.self = uriInfo.getBaseUriBuilder()
+            .path(USERS_PATH).path(String.valueOf(userId))
+            .path(LIKES_PATH).path(String.valueOf(restaurantId)).build();
     }
 
-    public LikeDto(boolean isLiked) {
-        this.isLiked = isLiked;
+    public static LikeDto fromLike(Like like, String url, UriInfo uriInfo){
+        final LikeDto dto = new LikeDto();
+
+        dto.restaurantId = like.getRestaurant().getId();
+        dto.self = uriInfo.getBaseUriBuilder()
+            .path(USERS_PATH).path(String.valueOf(like.getUser().getId()))
+            .path(LIKES_PATH).path(String.valueOf(dto.restaurantId)).build();
+        return dto;
     }
 
-    public boolean isLiked() {
-        return isLiked;
-    }
-
-    public void setLiked(boolean liked) {
-        isLiked = liked;
-    }
 
     public long getRestaurantId() {
         return restaurantId;
@@ -31,11 +42,19 @@ public class LikeDto {
         this.restaurantId = restaurantId;
     }
 
-    public long getUserId() {
-        return userId;
+    public URI getSelf(){
+        return self;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setSelf(URI selfUri){
+        this.self = selfUri;
+    }
+
+    public boolean getLiked(){
+        return liked;
+    }
+
+    public void setLiked(boolean liked){
+        this.liked = liked;
     }
 }

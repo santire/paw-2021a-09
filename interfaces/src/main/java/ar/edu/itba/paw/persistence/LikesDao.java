@@ -13,5 +13,5 @@ public interface LikesDao {
     boolean dislike(long userId, long restaurantId);
     boolean userLikesRestaurant(long userId, long restaurantId);
      List<Like> userLikesRestaurants(long userId, List<Long> restaurantId);
-    List<Long> getLikesByUserId(long userId);
+    List<Like> getLikesByUserId(long userId);
 }

@@ -51,6 +51,12 @@ public class LikesServiceImpl implements LikesService {
     }
 
     @Override
+    @Transactional 
+    public List<Like> getUserLikes(long userId){
+        return likesDao.getLikesByUserId(userId);
+    }
+
+    @Override
     @Transactional
     public boolean userLikesRestaurant(long userId, long restaurantId){
     return likesDao.userLikesRestaurant(userId, restaurantId);

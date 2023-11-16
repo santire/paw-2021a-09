@@ -369,19 +369,6 @@ public class RestaurantController {
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
-    //GET USER LIKE
-    @GET
-    @Path("/{restaurantId}/likes")
-    @Produces(value = {MediaType.APPLICATION_JSON})
-    public Response getRestaurantlikes(
-            @PathParam("restaurantId") final Long restaurantId,
-            @QueryParam("userId") final Long userId,
-            @Context HttpServletRequest request) {
-
-        Boolean like = likesService.userLikesRestaurant(userId, restaurantId);
-        return Response.ok(new LikeDto(like)).build();
-    }
-
     //RATE RESTAURANT
     @POST
     @Path("/{restaurantId}/ratings")

@@ -65,18 +65,11 @@ public class LikeJpaDao implements LikesDao {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Long> getLikesByUserId(long userId){
-		Query query = em.createNativeQuery("SELECT restaurant_id FROM likes WHERE user_id = ?1");
-		query.setParameter(1, userId);
+	public List<Like> getLikesByUserId(long userId){
+		TypedQuery<Like> query = em.createQuery("from Like where user.id = :userId", Like.class);
+		query.setParameter("userId", userId);
 
-		List<BigInteger> resultList = query.getResultList();
-		List<Long> likes = new ArrayList<>();
-
-		for (BigInteger result : resultList) {
-			likes.add(result.longValue());
-		}
-
-		return likes;
+		return query.getResultList().stream().collect(Collectors.toList());
 	}
 
 }
