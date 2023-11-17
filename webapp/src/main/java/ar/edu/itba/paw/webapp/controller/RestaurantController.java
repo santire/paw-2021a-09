@@ -346,29 +346,6 @@ public class RestaurantController {
     }
 
 
-    //LIKE RESTAURANT
-    @POST
-    @Path("/{restaurantId}/likes")
-    @Produces(value = {MediaType.APPLICATION_JSON})
-    @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
-    public Response likeRestaurant(@PathParam("restaurantId") final Long restaurantId,
-                                   @Context HttpServletRequest request) {
-        User user = getLoggedUser();
-        likesService.like(user.getId(), restaurantId);
-        return Response.status(Response.Status.NO_CONTENT).build();
-    }
-
-    @DELETE
-    @Path("/{restaurantId}/likes")
-    @Produces(value = {MediaType.APPLICATION_JSON})
-    @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
-    public Response dislikeRestaurant(@PathParam("restaurantId") final Long restaurantId,
-                                      @Context HttpServletRequest request) {
-        User user = getLoggedUser();
-        likesService.dislike(user.getId(), restaurantId);
-        return Response.status(Response.Status.NO_CONTENT).build();
-    }
-
     //RATE RESTAURANT
     @POST
     @Path("/{restaurantId}/ratings")

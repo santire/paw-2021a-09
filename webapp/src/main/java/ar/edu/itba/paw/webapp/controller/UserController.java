@@ -17,7 +17,9 @@ import ar.edu.itba.paw.webapp.utils.PageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -186,6 +188,31 @@ public class UserController {
         }).build();
     }
 
+    //LIKE RESTAURANT
+    @POST
+    @Path("/{userId}/likes/{restaurantId}")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
+    public Response likeRestaurant(@PathParam("userId") final Long userId,
+                                    @PathParam("restaurantId") final Long restaurantId,
+                                    @Context HttpServletRequest request) {
+        User user = getLoggedUser();
+        likesService.like(user.getId(), restaurantId);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @DELETE
+    @Path("/{userId}/likes/{restaurantId}")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
+    public Response dislikeRestaurant(@PathParam("userId") final Long userId,
+                                        @PathParam("restaurantId") final Long restaurantId,
+                                        @Context HttpServletRequest request) {
+        User user = getLoggedUser();
+        likesService.dislike(user.getId(), restaurantId);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
     //READ USER RATING
     @GET
     @Path("/{userId}/ratings")
@@ -197,5 +224,11 @@ public class UserController {
         Optional<Rating> maybeRating = ratingService.getRating(userId, restaurantId);
         Double rate = maybeRating.isPresent() ? maybeRating.get().getRating() : 0;
         return Response.ok(new RatingDto(rate)).build();
+    }
+
+    private User getLoggedUser() {
+    return userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName())
+            // This shouldn't happen as authority is handled before
+            .orElseThrow(() -> new AccessDeniedException("Unauthorized"));
     }
 }

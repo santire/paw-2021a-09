@@ -208,7 +208,7 @@ export function useLikeRestaurant() {
   const { userId } = useAuth();
 
   return useMutation({
-    mutationFn: LikeService.like,
+    mutationFn: (restaurantId: number) => LikeService.like(userId, restaurantId),
     onSuccess: (_, restaurantId, _2) => {
       if (
         queryClient.getQueryData(restaurantKeys.detail(userId, restaurantId))
@@ -243,8 +243,7 @@ export function useDislikeRestaurant() {
   const { userId } = useAuth();
 
   return useMutation({
-    mutationFn: LikeService.dislike,
-
+    mutationFn: (restaurantId: number) => LikeService.dislike(userId, restaurantId),
     onSuccess: (_, restaurantId, _2) => {
       if (
         queryClient.getQueryData(restaurantKeys.detail(userId, restaurantId))
