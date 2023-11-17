@@ -2,18 +2,15 @@
 /* eslint-disable @typescript-eslint/prefer-namespace-keyword */
 import { apiClient, apiErrorHandler } from "../client";
 
-// const PATH = (id: number) => `/restaurants/${id}/likes`;
-const PATH = (userId: number, restaurantId: number) => `/users/${userId}/likes/${restaurantId}`;
-
 interface ILikeService {
-  like(userId: number, restaurantId: number): Promise<void>;
-  dislike(userId: number, restaurantId: number): Promise<void>;
+  like(likelocation: string): Promise<void>;
+  dislike(likeLocation: string): Promise<void>;
 }
 
 module LikeServiceImpl {
-  export async function like(userId: number, restaurantId: number) {
+  export async function like(likeLocation: string) {
     try {
-      const response = await apiClient.post(PATH(userId, restaurantId), null, {
+      const response = await apiClient.post(likeLocation, null, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -31,9 +28,9 @@ module LikeServiceImpl {
     }
   }
 
-  export async function dislike(userId: number, restaurantId: number) {
+  export async function dislike(likeLocation: string) {
     try {
-      const response = await apiClient.delete(PATH(userId, restaurantId));
+      const response = await apiClient.delete(likeLocation);
 
       return response.data;
     } catch (error) {

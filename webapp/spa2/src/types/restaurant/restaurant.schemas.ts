@@ -31,6 +31,7 @@ const HasURLs = z.object({
   reviews: z.string().url(),
   menu: z.string().url(),
   owner: z.string().url(),
+  likeLocation: z.string().url()
 });
 
 const HasComputedProps = z.object({

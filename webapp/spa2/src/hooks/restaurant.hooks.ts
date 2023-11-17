@@ -203,12 +203,12 @@ export function useDeleteRestaurant(options?: QueryOptions) {
   });
 }
 
-export function useLikeRestaurant() {
+export function useLikeRestaurant(likeLocation: string) {
   const queryClient = useQueryClient();
   const { userId } = useAuth();
 
   return useMutation({
-    mutationFn: (restaurantId: number) => LikeService.like(userId, restaurantId),
+    mutationFn: (restaurantId: number) => LikeService.like(likeLocation),
     onSuccess: (_, restaurantId, _2) => {
       if (
         queryClient.getQueryData(restaurantKeys.detail(userId, restaurantId))
@@ -238,12 +238,12 @@ export function useLikeRestaurant() {
   });
 }
 
-export function useDislikeRestaurant() {
+export function useDislikeRestaurant(likeLocation: string) {
   const queryClient = useQueryClient();
   const { userId } = useAuth();
 
   return useMutation({
-    mutationFn: (restaurantId: number) => LikeService.dislike(userId, restaurantId),
+    mutationFn: (restaurantId: number) => LikeService.dislike(likeLocation),
     onSuccess: (_, restaurantId, _2) => {
       if (
         queryClient.getQueryData(restaurantKeys.detail(userId, restaurantId))
@@ -315,6 +315,7 @@ async function withLikes(
     const newData = data.map((r) => ({
       ...r,
       likedByUser: likes.find((l) => l.restaurantId === r.id)?.liked || false,
+      likeLocation: likes.find((l) => l.restaurantId === r.id)?.self || '',
     }));
     return { data: newData, meta };
   }

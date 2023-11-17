@@ -23,15 +23,15 @@ interface LikeButtonProps {
 }
 
 export function LikeButton({ restaurant }: LikeButtonProps) {
-  const { id, likedByUser } = restaurant;
+  const { id, likedByUser, likeLocation } = restaurant;
   const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
 
-  const like = useLikeRestaurant();
-  const dislike = useDislikeRestaurant();
+  const like = useLikeRestaurant(likeLocation);
+  const dislike = useDislikeRestaurant(likeLocation);
 
   const mutation = likedByUser ? dislike : like;
 
