@@ -198,7 +198,10 @@ public class UserController {
                                     @Context HttpServletRequest request) {
         User user = getLoggedUser();
         likesService.like(user.getId(), restaurantId);
-        return Response.status(Response.Status.NO_CONTENT).build();
+        // Create the location URI
+        URI locationUri = uriInfo.getAbsolutePathBuilder().build(userId, restaurantId);
+
+        return Response.status(Response.Status.NO_CONTENT).location(locationUri).build();
     }
 
     @DELETE
