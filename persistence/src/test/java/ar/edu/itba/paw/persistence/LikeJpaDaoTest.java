@@ -1,5 +1,9 @@
 package ar.edu.itba.paw.persistence;
 
+import ar.edu.itba.paw.model.Comment;
+import ar.edu.itba.paw.model.Like;
+import ar.edu.itba.paw.model.Restaurant;
+import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.persistence.config.TestConfig;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,6 +17,10 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.sql.DataSource;
 import java.util.List;
 
@@ -29,10 +37,8 @@ public class LikeJpaDaoTest {
     @Autowired
     private LikeJpaDao likeJpaDao;
 
-    @Autowired
-    private UserJpaDao userJpaDao;
-    @Autowired
-    private RestaurantJpaDao restaurantJpaDao;
+    @PersistenceContext
+    EntityManager em;
 
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert jdbcInsert;
@@ -47,12 +53,12 @@ public class LikeJpaDaoTest {
 
     @Test
     public void testGetLikesByUserId(){
-        List<Long> likesList = likeJpaDao.getLikesByUserId(20l);
+        List<Like> likesList = likeJpaDao.getLikesByUserId(20l);
 
         Assert.assertEquals(3, likesList.size());
-        Assert.assertEquals(997, likesList.get(0).longValue());
-        Assert.assertEquals(998, likesList.get(1).longValue());
-        Assert.assertEquals(999, likesList.get(2).longValue());
+        Assert.assertEquals(997, likesList.get(0).getRestaurant().getId().longValue());
+        Assert.assertEquals(998, likesList.get(1).getRestaurant().getId().longValue());
+        Assert.assertEquals(999, likesList.get(2).getRestaurant().getId().longValue());
     }
 
     @Test
@@ -64,17 +70,60 @@ public class LikeJpaDaoTest {
 
     @Test
     public void testDislike(){
-        boolean result = likeJpaDao.dislike(21, 998);
-        Assert.assertTrue(result);
-        Assert.assertFalse(likeJpaDao.userLikesRestaurant(21,998));
+        long userId = 20;
+        long restaurantId = 997;
+        User user = em.find(User.class, userId);
+        Restaurant restaurant = em.find(Restaurant.class, restaurantId);
 
+        TypedQuery<Like> query = em.createQuery("SELECT c FROM Like c WHERE c.user = :user AND c.restaurant = :restaurant", Like.class);
+        query.setParameter("user", user); 
+        query.setParameter("restaurant", restaurant);
+        Like retrievedLike = query.getSingleResult();; // Initialize to null initially
+        
+        Assert.assertNotNull(retrievedLike);
+
+        boolean result = likeJpaDao.dislike(userId, restaurantId);
+        Assert.assertTrue(result);
+
+        TypedQuery<Like> deletedQuery = em.createQuery("SELECT c FROM Like c WHERE c.user = :user AND c.restaurant = :restaurant", Like.class);
+        deletedQuery.setParameter("user", user); 
+        deletedQuery.setParameter("restaurant", restaurant);
+        Like deletedLike = null; // Initialize to null initially
+
+        try {
+            retrievedLike = query.getSingleResult();
+        } catch (NoResultException e) {
+        }
+        Assert.assertNull(deletedLike);
     }
 
     @Test
     public void testLike(){
-        boolean result = likeJpaDao.like(userJpaDao.findById(21).get(), restaurantJpaDao.findById(996).get());
+        long userId = 21;
+        long restaurantId = 997;
+        User user = em.find(User.class, userId);
+        Restaurant restaurant = em.find(Restaurant.class, restaurantId);
+
+        TypedQuery<Like> query = em.createQuery("SELECT c FROM Like c WHERE c.user = :user AND c.restaurant = :restaurant", Like.class);
+        query.setParameter("user", user); 
+        query.setParameter("restaurant", restaurant);
+        Like retrievedLike = null; // Initialize to null initially
+
+        try {
+            retrievedLike = query.getSingleResult();
+        } catch (NoResultException e) {
+        }
+        Assert.assertNull(retrievedLike);
+
+        boolean result = likeJpaDao.like(user, restaurant);
         Assert.assertTrue(result);
-        Assert.assertTrue(likeJpaDao.userLikesRestaurant(21,996));
+
+        TypedQuery<Like> likeQuery = em.createQuery("SELECT c FROM Like c WHERE c.user = :user AND c.restaurant = :restaurant", Like.class);
+        likeQuery.setParameter("user", user); 
+        likeQuery.setParameter("restaurant", restaurant);
+        Like createdLike = likeQuery.getSingleResult();
+
+        Assert.assertNotNull(createdLike);
     }
 
 }

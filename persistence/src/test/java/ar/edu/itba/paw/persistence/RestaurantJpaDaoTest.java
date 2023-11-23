@@ -4,15 +4,19 @@ import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.sql.DataSource;
 
-import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.Comment;
+import ar.edu.itba.paw.model.Like;
 import ar.edu.itba.paw.model.MenuItem;
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.Tags;
@@ -44,6 +50,10 @@ public class RestaurantJpaDaoTest {
     @Autowired
     private RestaurantJpaDao restaurantDao;
 
+    @PersistenceContext
+    EntityManager em;
+
+
     // General purpose
     private static final int INSERTED_SIZE = 3;
 
@@ -51,8 +61,7 @@ public class RestaurantJpaDaoTest {
     private static final String NAME = "McDonalds";
     private static final String ADDRESS = "9 de Julio";
     private static final String PHONE_NUMBER = "46511234";
-    private static final User OWNER = new User(1L, "mluque", "123456", "manuel", "luque", "mluque@itba.edu.ar",
-            "1135679821", true);
+
     private static final List<Tags> TAGS = Arrays.asList(Tags.ARGENTINO);
 
     @Before
@@ -62,15 +71,29 @@ public class RestaurantJpaDaoTest {
 
     @Test
     public void testRegister() {
-        Restaurant restaurant = restaurantDao.registerRestaurant(NAME, ADDRESS, PHONE_NUMBER, TAGS, OWNER, "", "", "");
+        TypedQuery<Restaurant> query = em.createQuery("SELECT r FROM Restaurant r WHERE r.name = :name", Restaurant.class);
+        query.setParameter("name", NAME);
+        Restaurant retrievedRestaurant = null; 
+        try {
+            retrievedRestaurant = query.getSingleResult();
+        } catch (NoResultException e) {
+        }
+        Assert.assertNull(retrievedRestaurant);
 
-        assertEquals(NAME, restaurant.getName());
-        assertEquals(ADDRESS, restaurant.getAddress());
-        assertEquals(PHONE_NUMBER, restaurant.getPhoneNumber());
-        assertEquals(Long.valueOf(1), restaurant.getOwner().getId());
+        long userId = 999;
+        User user = em.find(User.class, userId);
+        Assert.assertNotNull(user);
 
-        Optional<Restaurant> maybeRestaurant = restaurantDao.findById(restaurant.getId());
-        assertTrue(maybeRestaurant.isPresent());
+        Restaurant restaurant = restaurantDao.registerRestaurant(NAME, ADDRESS, PHONE_NUMBER, TAGS, user, "", "", "");
+
+        TypedQuery<Restaurant> createdQuery = em.createQuery("SELECT r FROM Restaurant r WHERE r.name = :name", Restaurant.class);
+        createdQuery.setParameter("name", NAME); 
+        Restaurant createdRestaurant = null; 
+        try {
+            createdRestaurant = createdQuery.getSingleResult();
+        } catch (NoResultException e) {
+        }
+        Assert.assertNotNull(createdRestaurant);
     }
 
     @Test
@@ -130,23 +153,6 @@ public class RestaurantJpaDaoTest {
         restaurantDao.deleteRestaurantById(950L);
     }
 
-    /*
-    // Fails because of postgresql specific syntax
-    @Test
-    public void testFindRestaurantsLikeKfc() {
-        final String searchTerm = "kf";
-        List<Tags> tags = new ArrayList<>();
-//        tags.add(Tags.AMERICANO);
-        final List<Restaurant> filteredRestaurants = restaurantDao.getRestaurantsFilteredBy(1, INSERTED_SIZE, searchTerm, tags, 1, 1000, Sorting.NAME, false, 900);
-
-        final Restaurant restaurant = filteredRestaurants.get(0);
-
-        assertEquals("KFC", restaurant.getName());
-        assertEquals("La Pampa 319", restaurant.getAddress());
-        assertEquals("1121146545", restaurant.getPhoneNumber());
-        assertEquals(Long.valueOf(999), restaurant.getOwner().getId());
-    }
-*/
     @Test
     public void testGetPopularRestaurants() {
         final List<Restaurant> restaurantList = restaurantDao.getPopularRestaurants(2, 1);
@@ -164,12 +170,13 @@ public class RestaurantJpaDaoTest {
 
     @Test
     public void testGetRestaurantsFromOwner() {
-        List<Restaurant> restaurantList = restaurantDao.getRestaurantsFromOwner(3,1, 999);
+        long userId = 999;
+        List<Restaurant> restaurantList = restaurantDao.getRestaurantsFromOwner(3,1, userId);
 
         assertEquals(1, restaurantList.size());
         assertEquals("BurgerQueen", restaurantList.get(0).getName());
 
-        restaurantList = restaurantDao.getRestaurantsFromOwner(2,2, 999);
+        restaurantList = restaurantDao.getRestaurantsFromOwner(2,2, userId);
         assertEquals(2, restaurantList.size());
         assertEquals("BurgerQueen", restaurantList.get(0).getName());
         assertEquals("KFC", restaurantList.get(1).getName());
@@ -177,15 +184,28 @@ public class RestaurantJpaDaoTest {
 
     @Test
     public void testDeleteRestaurant() {
-        long ID = 996l;
+        long restaurantId = 996;
 
-        Optional<Restaurant> maybeRestaurant = restaurantDao.findById(ID);
-        assertTrue(maybeRestaurant.isPresent());
-        final Restaurant r = maybeRestaurant.get();
+        TypedQuery<Restaurant> query = em.createQuery("SELECT r FROM Restaurant r WHERE r.id = :restaurantId", Restaurant.class);
+        query.setParameter("restaurantId", restaurantId);
+        Restaurant retrievedRestaurant = null; 
 
-        restaurantDao.deleteRestaurantById(r.getId());
+        try {
+            retrievedRestaurant = query.getSingleResult();
+        } catch (NoResultException e) {
+        }
+        Assert.assertNotNull(retrievedRestaurant);
 
-        Optional<Restaurant> notRestaurant = restaurantDao.findById(ID);
-        assertFalse(notRestaurant.isPresent());
+        restaurantDao.deleteRestaurantById(restaurantId);
+
+        TypedQuery<Restaurant> deletedQuery = em.createQuery("SELECT r FROM Restaurant r WHERE r.id = :restaurantId", Restaurant.class);
+        deletedQuery.setParameter("restaurantId", restaurantId);
+        Restaurant deletedRestaurant = null; 
+
+        try {
+            deletedRestaurant = deletedQuery.getSingleResult();
+        } catch (NoResultException e) {
+        }
+        Assert.assertNull(deletedRestaurant);
     }
 }

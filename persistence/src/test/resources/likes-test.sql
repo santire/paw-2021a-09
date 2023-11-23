@@ -19,14 +19,14 @@ INSERT INTO restaurants(restaurant_id, name, address, phone_number, rating, user
 VALUES(999, 'KFC', 'La Pampa 319', '1121146545', 0, 21);
 
 
-/*Insert Rating Values*/
+/*Insert likes Values*/
 INSERT INTO likes(like_id, user_id, restaurant_id)
 VALUES(11, 20, 997);
 INSERT INTO likes(like_id, user_id, restaurant_id)
 VALUES(12, 20, 998);
 INSERT INTO likes(like_id, user_id, restaurant_id)
 VALUES(13, 20, 999);
-INSERT INTO likes(like_id, user_id, restaurant_id)
-VALUES(14, 21, 997);
+-- INSERT INTO likes(like_id, user_id, restaurant_id)
+-- VALUES(14, 21, 997);
 INSERT INTO likes(like_id, user_id, restaurant_id)
 VALUES(15, 21, 998);

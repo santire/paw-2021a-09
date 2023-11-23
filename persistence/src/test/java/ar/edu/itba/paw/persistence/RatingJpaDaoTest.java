@@ -39,7 +39,9 @@ public class RatingJpaDaoTest {
 
     @Test
     public void testGetRating(){
-        final Optional<Rating> maybeRating = ratingJpaDao.getRating(1, 1);
+        long userId = 1;
+        long restaurantId = 1;
+        final Optional<Rating> maybeRating = ratingJpaDao.getRating(userId, restaurantId);
 
         assertTrue(maybeRating.isPresent());
         final Rating rating = maybeRating.get();

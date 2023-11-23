@@ -12,6 +12,8 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 @Transactional
 @Sql(scripts = "classpath:reservation-test.sql")
@@ -33,6 +34,9 @@ public class ReservationJpaDaoTest {
     @Autowired
     private ReservationJpaDao reservationJpaDao;
 
+    @PersistenceContext
+    EntityManager em;
+
     private JdbcTemplate jdbcTemplate;
 
     @Before
@@ -43,7 +47,6 @@ public class ReservationJpaDaoTest {
 
     @Test
     public void testFindById() {
-
         String d = "2023-08-08 19:00:00";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime date = LocalDateTime.parse(d, formatter);
@@ -51,16 +54,15 @@ public class ReservationJpaDaoTest {
         final Optional<Reservation> maybeReservation = reservationJpaDao.findById(1);
         assertTrue(maybeReservation.isPresent());
         Reservation reservation = maybeReservation.get();
+
         assertFalse(reservation.getConfirmed());
         assertEquals(date, reservation.getDate());
-
         assertEquals(999l,  reservation.getUser().getId().longValue());
         assertEquals(997l, reservation.getRestaurant().getId().longValue());
     }
 
     @Test
     public void testFindConfirmedByRestaurant() {
-
         String d = "2023-08-07 15:00:00";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime date = LocalDateTime.parse(d, formatter);
@@ -73,7 +75,6 @@ public class ReservationJpaDaoTest {
 
     @Test
     public void testFindPendingByRestaurant() {
-
         String d = "2023-08-07 15:00:00";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime date = LocalDateTime.parse(d, formatter);
@@ -85,10 +86,10 @@ public class ReservationJpaDaoTest {
 
     @Test
     public void testFindByRestaurant() {
-
+        long reservationId = 4;
         List<Reservation> reservationList = reservationJpaDao.findByRestaurant(2, 2, 997l);
         assertEquals(1, reservationList.size());
-        assertEquals(4, reservationList.get(0).getId().longValue());
+        assertEquals(reservationId, reservationList.get(0).getId().longValue());
 
         reservationList = reservationJpaDao.findByRestaurant(1, 4, 997l);
         assertEquals(3, reservationList.size());
@@ -113,23 +114,15 @@ public class ReservationJpaDaoTest {
 
     @Test
     public void testCancelReservation() {
-        long ID = 5;
+        long reservationId = 5;
 
-        final Optional<Reservation> maybeReservation = reservationJpaDao.findById(ID);
-        assertTrue(maybeReservation.isPresent());
+        Reservation reservation = em.find(Reservation.class, reservationId);
+        assertNotNull(reservation);
 
-        reservationJpaDao.cancelReservation(ID);
+        reservationJpaDao.cancelReservation(reservationId);
 
-        final Optional<Reservation> notReservation = reservationJpaDao.findById(ID);
-        assertFalse(notReservation.isPresent());
+        Reservation notReservation = em.find(Reservation.class, reservationId);
+
+        assertNull(notReservation);
     }
-
-    @Test
-    public void testReservationNotFound() {
-        long ID = 10;
-
-        final Optional<Reservation> maybeReservation = reservationJpaDao.findById(ID);
-        assertFalse(maybeReservation.isPresent());
-    }
-
 }

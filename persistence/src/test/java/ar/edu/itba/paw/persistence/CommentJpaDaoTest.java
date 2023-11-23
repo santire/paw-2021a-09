@@ -1,6 +1,8 @@
 package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.model.Comment;
+import ar.edu.itba.paw.model.Restaurant;
+import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.persistence.config.TestConfig;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +14,9 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.util.List;
@@ -30,13 +35,16 @@ public class CommentJpaDaoTest {
     @Autowired
     private CommentJpaDao commentJpaDao;
 
+    @PersistenceContext
+    EntityManager em;
+
     @Autowired
     private RestaurantJpaDao restaurantJpaDao;
     @Autowired
     private UserJpaDao userJpaDao;
 
     private JdbcTemplate jdbcTemplate;
-
+    
     @Before
     public void setUp() {
         jdbcTemplate = new JdbcTemplate(ds);
@@ -72,7 +80,6 @@ public class CommentJpaDaoTest {
         List<Comment> commentList = commentJpaDao.findByRestaurant(2, 1, 2);
 
         assertEquals(1, (long)commentList.size());
-
         assertEquals(2, commentList.get(0).getUser().getId().longValue());
         assertEquals(2, commentList.get(0).getRestaurant().getId().longValue());
         assertEquals("secondBQ", commentList.get(0).getUserComment());
@@ -81,25 +88,36 @@ public class CommentJpaDaoTest {
     @Test
     public void testDeleteComment(){
 
-        final Optional<Comment> maybeComment = commentJpaDao.findById(15);
-        assertTrue(maybeComment.isPresent());
+        long commentId = 15;
+        Comment comment = em.find(Comment.class, commentId);
+        assertNotNull(comment);
 
         commentJpaDao.deleteComment(15);
 
-        final Optional<Comment> notComment = commentJpaDao.findById(15);
-        assertFalse(notComment.isPresent());
+        Comment deletedComment = em.find(Comment.class, commentId);
+        assertNull(deletedComment);
     }
 
     @Test
     public void testCreateComment(){
         LocalDate date = LocalDate.now();
 
-        final Comment c = commentJpaDao.addComment(userJpaDao.findById(2).get(), restaurantJpaDao.findById(3).get(), "commentary", date);
+        long userId = 1;
+        long restaurantId = 1;
 
-        final Optional<Comment> maybeComment = commentJpaDao.findById(c.getId());
+        User user = em.find(User.class, userId);
+        Restaurant restaurant = em.find(Restaurant.class, restaurantId);
+        
+        String comment = "good comment";
+        final Comment c = commentJpaDao.addComment(user, restaurant, comment, date);
 
-        assertTrue(maybeComment.isPresent());
-        final Comment comment = maybeComment.get();
-        assertEquals("commentary", comment.getUserComment());
+        TypedQuery<Comment> query = em.createQuery("SELECT c FROM Comment c WHERE c.userComment = :comment", Comment.class);
+        query.setParameter("comment", comment); // Replace "good comment" with the value you're searching for
+
+        Comment retrievedComment = query.getSingleResult();        
+        //int count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM comments WHERE user_comment = ?", Integer.class, comment);
+        
+        assertNotNull(retrievedComment);
+        assertEquals(retrievedComment.getUserComment(), comment);
     }
 }
