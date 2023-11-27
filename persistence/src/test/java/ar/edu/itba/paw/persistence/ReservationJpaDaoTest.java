@@ -67,7 +67,8 @@ public class ReservationJpaDaoTest {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime date = LocalDateTime.parse(d, formatter);
 
-        List<Reservation> reservationList = reservationJpaDao.findConfirmedByRestaurant(1, 2, 997l, date);
+
+        List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 2, null,997l, date, null, true );
         assertEquals(2, reservationList.size());
         assertEquals(3, reservationList.get(0).getId().longValue());
         assertEquals(4, reservationList.get(1).getId().longValue());
@@ -79,19 +80,14 @@ public class ReservationJpaDaoTest {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime date = LocalDateTime.parse(d, formatter);
 
-        List<Reservation> reservationList = reservationJpaDao.findPendingByRestaurant(1, 2, 997l, date);
+        List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 2, null,997l, date, null, false );
         assertEquals(1, reservationList.size());
         assertEquals(1, reservationList.get(0).getId().longValue());
     }
 
     @Test
     public void testFindByRestaurant() {
-        long reservationId = 4;
-        List<Reservation> reservationList = reservationJpaDao.findByRestaurant(2, 2, 997l);
-        assertEquals(1, reservationList.size());
-        assertEquals(reservationId, reservationList.get(0).getId().longValue());
-
-        reservationList = reservationJpaDao.findByRestaurant(1, 4, 997l);
+        List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 4, null,997l, null, null, null );
         assertEquals(3, reservationList.size());
         assertEquals(1, reservationList.get(0).getId().longValue());
         assertEquals(3, reservationList.get(1).getId().longValue());
@@ -104,7 +100,8 @@ public class ReservationJpaDaoTest {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime date = LocalDateTime.parse(d, formatter);
 
-        List<Reservation> reservationList = reservationJpaDao.findByUser(1, 6, 999l, date);
+//        List<Reservation> reservationList = reservationJpaDao.findByUser(1, 6, 999l, date);
+        List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 6, 999l,null, date, null, null );
 
         assertEquals(3, reservationList.size());
         assertEquals(2, reservationList.get(0).getId().longValue());
