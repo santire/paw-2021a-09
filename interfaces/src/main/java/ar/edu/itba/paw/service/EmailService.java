@@ -17,7 +17,6 @@ public interface EmailService {
     int RESERVATION_PENDING = 6;
 
 
-    void sendEmail(Email email, Map<String, Object> args, String plainText, EmailTemplate emailTemplate);
     void sendRegistrationEmail(String userEmail, String name, String urlWithToken);
     void sendNewReservationOwnerEmail(String ownerEmail, String ownerName, String userName, String restaurantName, String url);
     void sendPasswordResetEmail(String userEmail, String name, String urlWithToken);

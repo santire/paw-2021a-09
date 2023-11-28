@@ -142,7 +142,7 @@ public class EmailServiceImpl implements EmailService {
     public void sendNewReservationUserEmail(String userEmail, String userName, String ownerName, String restaurantName, String url){
         Locale locale = LocaleContextHolder.getLocale();
         Map<String, Object> args = new HashMap<>();
-        EmailTemplate emailTemplate = EmailTemplate.BUTTON;
+        EmailTemplate emailTemplate = EmailTemplate.BASIC;
         String plainText = messageSource.getMessage("mail.newReservation.owner.plain",new Object[]{ownerName,userName,restaurantName},locale)+"\n"+url+"\n";
         args.put("titleMessage", "");
         args.put("bodyMessage", messageSource.getMessage("mail.newReservation.customer.body",new Object[]{userName,restaurantName},locale));
@@ -173,8 +173,7 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(mail, args, plainText, emailTemplate);
     }
 
-    @Override
-    public void sendEmail(Email email, Map<String, Object> args, String plainText, EmailTemplate emailTemplate){
+    private void sendEmail(Email email, Map<String, Object> args, String plainText, EmailTemplate emailTemplate){
         MimeMessage mimeMessage = emailSender.createMimeMessage();
         Context thymeleafContext = new Context();
         thymeleafContext.setVariables(args);
