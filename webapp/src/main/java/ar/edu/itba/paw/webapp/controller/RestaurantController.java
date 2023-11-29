@@ -406,9 +406,9 @@ public class RestaurantController {
         final Reservation res = reservationService.addReservation(
                 user.getId(),
                 restaurantId,
-                LocalDateTime.of(reservationDto.getDate(), reservationDto.getTime()),
+                reservationDto.getDate(),
                 reservationDto.getQuantity(),
-                baseUrl);
+                baseUrl, baseUrl);
 
         final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(res.getId())).build();
         return Response.created(uri).entity(ReservationDto.fromReservation(res, uriInfo)).build();

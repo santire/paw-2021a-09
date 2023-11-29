@@ -3,7 +3,7 @@ package ar.edu.itba.paw.model;
 public enum ReservationStatus {
     PENDING("pending"),
     CONFIRMED("confirmed"),
-    HISTORY("history");
+    DENIED("denied");
 
     private final String statusType;
 
@@ -13,5 +13,9 @@ public enum ReservationStatus {
 
     public String getStatusType() {
         return statusType;
+    }
+
+    public static ReservationStatus fromString(final String s) {
+        return ReservationStatus.valueOf(s.toUpperCase());
     }
 }

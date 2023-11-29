@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.model.Reservation;
+import ar.edu.itba.paw.model.ReservationStatus;
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
 
@@ -14,8 +15,8 @@ public interface ReservationDao {
     Reservation addReservation(User user, Restaurant restaurant, LocalDateTime date, long quantity);
 
     // READ
-    List<Reservation> findFilteredReservations(int page, int amountOnPage, Long userId, Long restaurantId, LocalDateTime fromDate, LocalDateTime toDate, Boolean confirmed);
-    int findFilteredReservationsCount(Long userId, Long restaurantId, LocalDateTime fromDate, LocalDateTime toDate, Boolean confirmed);
+    List<Reservation> findFilteredReservations(int page, int amountOnPage, Long userId, Long restaurantId, LocalDateTime fromDate, LocalDateTime toDate, ReservationStatus status, boolean desc);
+    int findFilteredReservationsCount(Long userId, Long restaurantId, LocalDateTime fromDate, LocalDateTime toDate, ReservationStatus status);
     List<Reservation> findByUser(int page, int amountOnPage, long userId, LocalDateTime currentTime);
 
     int findByUserCount(long userId, LocalDateTime currentTime);

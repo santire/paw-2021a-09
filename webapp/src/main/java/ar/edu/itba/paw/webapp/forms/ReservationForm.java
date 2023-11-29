@@ -1,38 +1,49 @@
 package ar.edu.itba.paw.webapp.forms;
 
-import javax.validation.constraints.*;
-
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.NumberFormat;
-
 import ar.edu.itba.paw.webapp.validators.PresentTime;
 import ar.edu.itba.paw.webapp.validators.ValidTime;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-@PresentTime(date = "date", time = "time", daysLimit = 7)
+@PresentTime(date = "date", daysLimit = 7)
 public class ReservationForm {
 
-
     @ValidTime(minHour = 12, maxHour = 23, stepMinutes = 30)
-    @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @NotNull
-    private LocalTime time;
-
-    @DateTimeFormat(pattern = "dd/MM/yyyy")
-    @NotNull
-    private LocalDate date;
+    private LocalDateTime date;
 
     @Min(1)
     @Max(15)
     @NotNull
     private Long quantity;
+    @NotNull
+    private Long userId;
+    @NotNull
+    private Long restaurantId;
 
     public ReservationForm() {
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public Long getRestaurantId() {
+        return restaurantId;
+    }
+
+    public void setRestaurantId(Long restaurantId) {
+        this.restaurantId = restaurantId;
     }
 
     public Long getQuantity() {
@@ -43,17 +54,12 @@ public class ReservationForm {
         this.quantity = quantity;
     }
 
-    public LocalDate getDate() { return date; }
-
-    public void setLocalDate(LocalDate date) { this.date = date; }
-    public void setDate(String date) { setLocalDate(LocalDate.parse(date, DateTimeFormatter.ofPattern("dd/MM/yyyy"))); }
-    public LocalTime getTime() {
-        return this.time;
+    public LocalDateTime getDate() {
+        return date;
     }
 
-    public void setLocalTime(LocalTime time) {
-        this.time = time;
+    public void setDate(String date) {
+        this.date = LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
     }
-    public void setTime(String time) { setLocalTime(LocalTime.parse(time, DateTimeFormatter.ISO_LOCAL_TIME)); }
 
 }

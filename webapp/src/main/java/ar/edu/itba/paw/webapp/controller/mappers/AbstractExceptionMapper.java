@@ -7,17 +7,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import javax.ws.rs.core.Response;
-import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AbstractExceptionMapper {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractExceptionMapper.class);
     public static final String ACCESS_DENIED = "Access denied!";
     public static final String INVALID_REQUEST = "Invalid request";
     public static final String LIST_JOIN_DELIMITER = ",";
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractExceptionMapper.class);
     private static final String ERRORS = "errors";
     private static final String ERROR = "errors";
     private static final String STATUS = "status";
@@ -35,8 +34,8 @@ public class AbstractExceptionMapper {
     }
 
     protected ResponseEntity<Object> getExceptionResponseEntity(final Exception exception,
-                                                              final HttpStatus status,
-                                                              final List<String> errors) {
+                                                                final HttpStatus status,
+                                                                final List<String> errors) {
         final Map<String, Object> body = generalResponseEntityBody(exception, status);
         body.put(ERRORS, errors);
 
@@ -46,6 +45,7 @@ public class AbstractExceptionMapper {
         LOGGER.error("ERRORS: {}", errorsMessage);
         return new ResponseEntity<>(body, status);
     }
+
     protected ResponseEntity<Object> getExceptionResponseEntity(final Exception exception,
                                                                 final HttpStatus status,
                                                                 final String error) {
@@ -53,7 +53,7 @@ public class AbstractExceptionMapper {
         body.put(ERROR, error);
 
         final String errorsMessage = !error.isEmpty() ?
-                error: status.getReasonPhrase();
+                error : status.getReasonPhrase();
         LOGGER.error("ERROR: {}", errorsMessage);
         return new ResponseEntity<>(body, status);
     }

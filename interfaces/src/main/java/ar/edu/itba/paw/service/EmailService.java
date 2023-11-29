@@ -20,7 +20,7 @@ public interface EmailService {
     void sendRegistrationEmail(String userEmail, String name, String urlWithToken);
     void sendNewReservationOwnerEmail(String ownerEmail, String ownerName, String userName, String restaurantName, String url);
     void sendPasswordResetEmail(String userEmail, String name, String urlWithToken);
-    void sendNewReservationUserEmail(String userEmail, String name, String ownerName, String urlWithToken, String url);
+    void sendNewReservationUserEmail(String userEmail, String name, String urlWithToken, String url);
     void sendReservationConfirmationEmail(String userEmail, String restaurantName, LocalDateTime date, long quantity);
     void sendOwnerReservationCancelEmail(String userEmail, String userName, String restaurantName, LocalDateTime date, long quantity, String message);
 

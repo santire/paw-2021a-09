@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.model.Reservation;
+import ar.edu.itba.paw.model.ReservationStatus;
 import ar.edu.itba.paw.persistence.config.TestConfig;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,10 +56,10 @@ public class ReservationJpaDaoTest {
         assertTrue(maybeReservation.isPresent());
         Reservation reservation = maybeReservation.get();
 
-        assertFalse(reservation.getConfirmed());
+        assertEquals(ReservationStatus.PENDING, reservation.getStatus());
         assertEquals(date, reservation.getDate());
-        assertEquals(999l,  reservation.getUser().getId().longValue());
-        assertEquals(997l, reservation.getRestaurant().getId().longValue());
+        assertEquals(999L,  reservation.getUser().getId().longValue());
+        assertEquals(997L, reservation.getRestaurant().getId().longValue());
     }
 
     @Test
@@ -68,7 +69,7 @@ public class ReservationJpaDaoTest {
         LocalDateTime date = LocalDateTime.parse(d, formatter);
 
 
-        List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 2, null,997l, date, null, true );
+        List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 2, null,997l, date, null, ReservationStatus.CONFIRMED, false );
         assertEquals(2, reservationList.size());
         assertEquals(3, reservationList.get(0).getId().longValue());
         assertEquals(4, reservationList.get(1).getId().longValue());
@@ -80,14 +81,14 @@ public class ReservationJpaDaoTest {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime date = LocalDateTime.parse(d, formatter);
 
-        List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 2, null,997l, date, null, false );
+        List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 2, null,997l, date, null, ReservationStatus.PENDING, false );
         assertEquals(1, reservationList.size());
         assertEquals(1, reservationList.get(0).getId().longValue());
     }
 
     @Test
     public void testFindByRestaurant() {
-        List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 4, null,997l, null, null, null );
+        List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 4, null,997l, null, null, null, false );
         assertEquals(3, reservationList.size());
         assertEquals(1, reservationList.get(0).getId().longValue());
         assertEquals(3, reservationList.get(1).getId().longValue());
@@ -101,7 +102,7 @@ public class ReservationJpaDaoTest {
         LocalDateTime date = LocalDateTime.parse(d, formatter);
 
 //        List<Reservation> reservationList = reservationJpaDao.findByUser(1, 6, 999l, date);
-        List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 6, 999l,null, date, null, null );
+        List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 6, 999l,null, date, null, null, false );
 
         assertEquals(3, reservationList.size());
         assertEquals(2, reservationList.get(0).getId().longValue());

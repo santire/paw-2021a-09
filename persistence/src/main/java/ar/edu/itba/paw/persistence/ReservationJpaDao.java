@@ -1,9 +1,12 @@
 package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.model.Reservation;
+import ar.edu.itba.paw.model.ReservationStatus;
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.persistence.utils.JpaUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -20,6 +23,7 @@ import java.util.stream.Collectors;
 
 @Repository
 public class ReservationJpaDao implements ReservationDao {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReservationJpaDao.class);
     @PersistenceContext
     private EntityManager em;
 
@@ -244,8 +248,8 @@ public class ReservationJpaDao implements ReservationDao {
     }
 
     @Override
-    public List<Reservation> findFilteredReservations(int page, int amountOnPage, Long userId, Long restaurantId, LocalDateTime fromDate, LocalDateTime toDate, Boolean confirmed) {
-        Query nativeQuery = findFilteredReservationsQuery(userId, restaurantId, fromDate, toDate, confirmed);
+    public List<Reservation> findFilteredReservations(int page, int amountOnPage, Long userId, Long restaurantId, LocalDateTime fromDate, LocalDateTime toDate, ReservationStatus status, boolean desc) {
+        Query nativeQuery = findFilteredReservationsQuery(userId, restaurantId, fromDate, toDate, status, desc);
         nativeQuery.setFirstResult((page - 1) * amountOnPage);
         nativeQuery.setMaxResults(amountOnPage);
 
@@ -253,20 +257,21 @@ public class ReservationJpaDao implements ReservationDao {
     }
 
     @Override
-    public int findFilteredReservationsCount(Long userId, Long restaurantId, LocalDateTime fromDate, LocalDateTime toDate, Boolean confirmed) {
-        return findFilteredReservationsQuery(userId, restaurantId, fromDate, toDate, confirmed).getResultList().size();
+    public int findFilteredReservationsCount(Long userId, Long restaurantId, LocalDateTime fromDate, LocalDateTime toDate, ReservationStatus status) {
+        return findFilteredReservationsQuery(userId, restaurantId, fromDate, toDate, status, false).getResultList().size();
     }
 
-    private Query findFilteredReservationsQuery(Long userId, Long restaurantId, LocalDateTime fromDate, LocalDateTime toDate, Boolean confirmed) {
+    private Query findFilteredReservationsQuery(Long userId, Long restaurantId, LocalDateTime fromDate, LocalDateTime toDate, ReservationStatus status, boolean desc) {
         Timestamp fromTimestamp = (fromDate != null) ? Timestamp.valueOf(fromDate) : JpaUtils.MIN_TIMESTAMP;
         Timestamp toTimestamp = (toDate != null) ? Timestamp.valueOf(toDate) : JpaUtils.MAX_TIMESTAMP;
 
         String userPart = (userId != null) ? " AND user_id = :userId" : "";
         String restaurantPart = (restaurantId != null) ? " AND restaurant_id = :restaurantId" : "";
-        String confirmedPart = (confirmed != null) ? " AND confirmed = :confirmed": "";
+        String statusPart = (status != null) ? " AND status = :status": "";
+        String orderPart = desc ? "DESC" : "ASC";
 
 
-        Query nativeQuery = em.createNativeQuery("SELECT reservation_id FROM reservations" + " WHERE date BETWEEN :fromTimestamp AND :toTimestamp" + confirmedPart + userPart + restaurantPart + " ORDER BY date ASC");
+        Query nativeQuery = em.createNativeQuery("SELECT reservation_id FROM reservations" + " WHERE date BETWEEN :fromTimestamp AND :toTimestamp" + statusPart + userPart + restaurantPart + " ORDER BY date " + orderPart);
 
         if (userId != null) {
             nativeQuery.setParameter("userId", userId);
@@ -274,8 +279,8 @@ public class ReservationJpaDao implements ReservationDao {
         if (restaurantId != null) {
             nativeQuery.setParameter("restaurantId", restaurantId);
         }
-        if (confirmed != null) {
-            nativeQuery.setParameter("confirmed", confirmed);
+        if (status != null) {
+            nativeQuery.setParameter("status", status.toString());
         }
 
         nativeQuery.setParameter("fromTimestamp", fromTimestamp);
@@ -289,6 +294,10 @@ public class ReservationJpaDao implements ReservationDao {
         List<Long> filteredIds = JpaUtils.getFilteredIds(page, amountOnPage, query);
         final TypedQuery<Reservation> typedQuery = em.createQuery("from Reservation where id IN :filteredIds", Reservation.class);
         typedQuery.setParameter("filteredIds", filteredIds);
+
+        if (filteredIds.isEmpty()) {
+            return Collections.emptyList();
+        }
 
         return typedQuery.getResultList().stream().sorted(Comparator.comparing(v -> filteredIds.indexOf(v.getId()))).collect(Collectors.toList());
     }
