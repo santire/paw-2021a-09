@@ -44,7 +44,7 @@ public class UserController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private static final int AMOUNT_OF_RESTAURANTS = 10;
-   
+
     @Autowired
     private UserService userService;
     @Autowired
