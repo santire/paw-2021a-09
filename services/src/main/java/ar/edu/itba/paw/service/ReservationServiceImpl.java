@@ -19,7 +19,7 @@ import java.util.Optional;
 @Service
 public class ReservationServiceImpl implements ReservationService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReservationServiceImpl.class);
     @Autowired
     private ReservationDao reservationDao;
     @Autowired
@@ -28,8 +28,6 @@ public class ReservationServiceImpl implements ReservationService {
     private UserService userService;
     @Autowired
     private RestaurantService restaurantService;
-    @Autowired
-    private MessageSource messageSource;
 
     // CREATE
     @Override
@@ -54,95 +52,6 @@ public class ReservationServiceImpl implements ReservationService {
     @Transactional
     public Optional<Reservation> findById(long id) {
         return reservationDao.findById(id);
-    }
-
-    @Override
-    @Transactional
-    public List<Reservation> findByUser(int page, int amountOnPage, long userId) {
-        LocalDateTime currentTime = LocalDateTime.now();
-        List<Reservation> reservations = reservationDao.findByUser(page, amountOnPage, userId, currentTime);
-        return reservations;
-    }
-
-    @Override
-    @Transactional
-    public int findByUserCount(long userId) {
-        LocalDateTime currentTime = LocalDateTime.now();
-        return reservationDao.findByUserCount(userId, currentTime);
-    }
-
-
-    @Override
-    @Transactional
-    public List<Reservation> findByUserHistory(int page, int amountOnPage, long userId) {
-        LocalDateTime currentTime = LocalDateTime.now();
-        List<Reservation> reservations = reservationDao.findByUserHistory(page, amountOnPage, userId, currentTime);
-        return reservations;
-    }
-
-    @Override
-    @Transactional
-    public int findByUserHistoryCount(long userId) {
-        LocalDateTime currentTime = LocalDateTime.now();
-        return reservationDao.findByUserHistoryCount(userId, currentTime);
-    }
-
-    @Override
-    @Transactional
-    public List<Reservation> findByRestaurant(int page, int amountOnPage, long restaurantId) {
-        List<Reservation> reservations = reservationDao.findByRestaurant(page, amountOnPage, restaurantId);
-        return reservations;
-    }
-
-    @Override
-
-    public int findByRestaurantCount(long restaurantId) {
-        return reservationDao.findByRestaurantCount(restaurantId);
-    }
-
-    @Override
-    @Transactional
-    public List<Reservation> findConfirmedByRestaurant(int page, int amountOnPage, long restaurantId) {
-        LocalDateTime currentTime = LocalDateTime.now();
-        List<Reservation> reservations = reservationDao.findConfirmedByRestaurant(page, amountOnPage, restaurantId, currentTime);
-        return reservations;
-    }
-
-    @Override
-    @Transactional
-    public int findConfirmedByRestaurantCount(long restaurantId) {
-        LocalDateTime currentTime = LocalDateTime.now();
-        return reservationDao.findConfirmedByRestaurantCount(restaurantId, currentTime);
-    }
-
-    @Override
-    @Transactional
-    public List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId) {
-        LocalDateTime currentTime = LocalDateTime.now();
-        List<Reservation> reservations = reservationDao.findPendingByRestaurant(page, amountOnPage, restaurantId, currentTime);
-        return reservations;
-    }
-
-    @Override
-    @Transactional
-    public int findPendingByRestaurantCount(long restaurantId) {
-        LocalDateTime currentTime = LocalDateTime.now();
-        return reservationDao.findPendingByRestaurantCount(restaurantId, currentTime);
-    }
-
-    @Override
-    @Transactional
-    public List<Reservation> findHistoryByRestaurant(int page, int amountOnPage, long restaurantId) {
-        LocalDateTime currentTime = LocalDateTime.now();
-        List<Reservation> reservations = reservationDao.findHistoryByRestaurant(page, amountOnPage, restaurantId, currentTime);
-        return reservations;
-    }
-
-    @Override
-    @Transactional
-    public int findHistoryByRestaurantCount(long restaurantId) {
-        LocalDateTime currentTime = LocalDateTime.now();
-        return reservationDao.findHistoryByRestaurantCount(restaurantId, currentTime);
     }
 
     @Override
@@ -195,6 +104,7 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setStatus(ReservationStatus.CONFIRMED);
         return reservation;
     }
+
     @Override
     @Transactional
     public Reservation ownerCancelReservation(long reservationId, String message) {
@@ -220,7 +130,6 @@ public class ReservationServiceImpl implements ReservationService {
 
         return reservationDao.cancelReservation(reservationId);
     }
-
 
 
 }

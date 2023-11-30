@@ -19,24 +19,6 @@ public interface ReservationService {
 
     Optional<Reservation> findById(long reservationId);
 
-    List<Reservation> findByUser(int page, int amountOnPage, long userId);
-    int findByUserCount( long userId);
-
-    List<Reservation> findByUserHistory(int page, int amountOnPage, long userId);
-    int findByUserHistoryCount(long userId);
-
-    List<Reservation> findByRestaurant(int page, int amountOnPage, long restaurantId);
-    int findByRestaurantCount(long restaurantId);
-
-    List<Reservation> findConfirmedByRestaurant(int page, int amountOnPage, long restaurantId);
-    int findConfirmedByRestaurantCount( long restaurantId);
-
-    List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId);
-    int findPendingByRestaurantCount(long restaurantId);
-
-    List<Reservation> findHistoryByRestaurant(int page, int amountOnPage, long restaurantId);
-    int findHistoryByRestaurantCount( long restaurantId);
-
     // UPDATE
     Reservation confirmReservation(long reservationId);
 

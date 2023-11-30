@@ -16,30 +16,8 @@ public interface ReservationDao {
 
     // READ
     List<Reservation> findFilteredReservations(int page, int amountOnPage, Long userId, Long restaurantId, LocalDateTime fromDate, LocalDateTime toDate, ReservationStatus status, boolean desc);
+
     int findFilteredReservationsCount(Long userId, Long restaurantId, LocalDateTime fromDate, LocalDateTime toDate, ReservationStatus status);
-    List<Reservation> findByUser(int page, int amountOnPage, long userId, LocalDateTime currentTime);
-
-    int findByUserCount(long userId, LocalDateTime currentTime);
-
-    List<Reservation> findByUserHistory(int page, int amountOnPage, long userId, LocalDateTime currentTime);
-
-    int findByUserHistoryCount(long userId, LocalDateTime currentTime);
-
-    List<Reservation> findByRestaurant(int page, int amountOnPage, long restaurantId);
-
-    int findByRestaurantCount(long restaurantId);
-
-    List<Reservation> findConfirmedByRestaurant(int page, int amountOnPage, long restaurantId, LocalDateTime currentTime);
-
-    int findConfirmedByRestaurantCount(long restaurantId, LocalDateTime currentTime);
-
-    List<Reservation> findPendingByRestaurant(int page, int amountOnPage, long restaurantId, LocalDateTime currentTime);
-
-    int findPendingByRestaurantCount(long restaurantId, LocalDateTime currentTime);
-
-    List<Reservation> findHistoryByRestaurant(int page, int amountOnPage, long restaurantId, LocalDateTime currentTime);
-
-    int findHistoryByRestaurantCount(long restaurantId, LocalDateTime currentTime);
 
     Optional<Reservation> findById(long id);
 

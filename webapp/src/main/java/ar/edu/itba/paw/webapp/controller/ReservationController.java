@@ -99,6 +99,7 @@ public class ReservationController {
     @Path("/{reservationId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("!@authComponent.isReservationOwner(#reservationId)")
     public Response confirmReservation(@PathParam("reservationId") final Long reservationId, @Valid final ReservationStatusForm statusForm) {
         switch (statusForm.getStatus()) {
             case DENIED:
