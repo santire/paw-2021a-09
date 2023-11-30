@@ -14,7 +14,11 @@ public class LikeDto {
     public static LikeDto fromLike(Like like, UriInfo uriInfo) {
         final LikeDto dto = new LikeDto();
 
-        dto.self = uriInfo.getAbsolutePathBuilder().path(like.getRestaurant().getId().toString()).build();
+        dto.self = uriInfo.getBaseUriBuilder()
+                .path("users")
+                .path(like.getUser().getId().toString())
+                .path("likes")
+                .path(like.getRestaurant().getId().toString()).build();
 
         dto.restaurant = uriInfo.getBaseUriBuilder().path("restaurants").path(like.getRestaurant().getId().toString()).build();
         dto.user = uriInfo.getBaseUriBuilder().path("users").path(like.getUser().getId().toString()).build();

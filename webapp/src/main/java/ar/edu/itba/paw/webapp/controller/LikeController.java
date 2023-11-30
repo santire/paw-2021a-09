@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -31,7 +30,10 @@ public class LikeController {
     @GET
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isUser(#userId)")
-    public Response userLikesRestaurants(@PathParam("userId") final Long userId, @QueryParam("page") @DefaultValue("1") Integer page, @QueryParam("pageAmount") @DefaultValue("10") Integer pageAmount, @QueryParam("restaurantId") List<Long> restaurantIds, @Context HttpServletRequest request) {
+    public Response getUserLikes(@PathParam("userId") final Long userId,
+                                         @QueryParam("page") @DefaultValue("1") Integer page,
+                                         @QueryParam("pageAmount") @DefaultValue("10") Integer pageAmount,
+                                         @QueryParam("restaurantId") List<Long> restaurantIds) {
 
         if (restaurantIds != null && !restaurantIds.isEmpty()) {
             return Response.ok(getUserLikesByRestaurantIds(userId, restaurantIds)).build();
@@ -40,15 +42,21 @@ public class LikeController {
             pageAmount = AMOUNT_OF_LIKES;
         }
 
-        List<LikeDto> likes = likesService.getUserLikes(page, pageAmount, userId).stream().map(u -> LikeDto.fromLike(u, uriInfo)).collect(Collectors.toList());
-        int totalLikes = likesService.getUserLikesCount(userId);
+        final List<LikeDto> likes = likesService.getUserLikes(page, pageAmount, userId)
+                .stream()
+                .map(u -> LikeDto.fromLike(u, uriInfo))
+                .collect(Collectors.toList());
+        final int totalLikes = likesService.getUserLikesCount(userId);
 
         return PageUtils.paginatedResponse(new GenericEntity<List<LikeDto>>(likes) {
         }, uriInfo, page, AMOUNT_OF_LIKES, totalLikes);
     }
 
     private GenericEntity<List<LikeDto>> getUserLikesByRestaurantIds(Long userId, List<Long> restaurantIds) {
-        List<LikeDto> likes = likesService.userLikesRestaurants(userId, restaurantIds).stream().map(u -> LikeDto.fromLike(u, uriInfo)).collect(Collectors.toList());
+        final List<LikeDto> likes = likesService.userLikesRestaurants(userId, restaurantIds)
+                .stream()
+                .map(u -> LikeDto.fromLike(u, uriInfo))
+                .collect(Collectors.toList());
 
         return new GenericEntity<List<LikeDto>>(likes) {
         };
@@ -59,9 +67,9 @@ public class LikeController {
     @PreAuthorize("@authComponent.isUser(#userId) && !@authComponent.isRestaurantOwner(#likeForm.restaurantId)")
     public Response likeRestaurant(@PathParam("userId") final Long userId, @Valid LikeForm likeForm) {
 
-        Like like = likesService.like(userId, likeForm.getRestaurantId());
+        final Like like = likesService.like(userId, likeForm.getRestaurantId());
         // Create the location URI
-        URI uri = uriInfo.getAbsolutePathBuilder().path(like.getRestaurant().getId().toString()).build();
+        final URI uri = uriInfo.getAbsolutePathBuilder().path(like.getRestaurant().getId().toString()).build();
         return Response.created(uri).entity(LikeDto.fromLike(like, uriInfo)).build();
     }
 
@@ -69,7 +77,8 @@ public class LikeController {
     @Path("/{restaurantId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isUser(#userId) && !@authComponent.isRestaurantOwner(#restaurantId)")
-    public Response dislikeRestaurant(@PathParam("userId") final Long userId, @PathParam("restaurantId") Long restaurantId) {
+    public Response dislikeRestaurant(@PathParam("userId") final Long userId,
+                                      @PathParam("restaurantId") Long restaurantId) {
         likesService.dislike(userId, restaurantId);
         return Response.ok().build();
     }

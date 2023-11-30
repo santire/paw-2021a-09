@@ -17,9 +17,11 @@ public class UserDto {
     private String lastName;
     private String email;
     private String phone;
+    private URI likes;
+    private URI ratings;
     private URI reservations;
     private URI restaurants;
-    private URI likes;
+
 
     public static UserDto fromUser(User user, String url, UriInfo uriInfo) {
         final UserDto dto = new UserDto();
@@ -33,14 +35,22 @@ public class UserDto {
 
         dto.url = url;
 
-        dto.reservations = uriInfo.getBaseUriBuilder().path("reservations")
-                .queryParam("madeBy", user.getId())
-                .build();
+
         dto.likes = uriInfo.getAbsolutePathBuilder().path("likes").build();
+        dto.ratings = uriInfo.getAbsolutePathBuilder().path("ratings").build();
 
         dto.restaurants = uriInfo.getAbsolutePathBuilder().path("restaurants").build();
+        dto.reservations = uriInfo.getBaseUriBuilder().path("reservations").queryParam("madeBy", user.getId()).build();
 
         return dto;
+    }
+
+    public URI getRatings() {
+        return ratings;
+    }
+
+    public void setRatings(URI ratings) {
+        this.ratings = ratings;
     }
 
     public Long getUserId() {

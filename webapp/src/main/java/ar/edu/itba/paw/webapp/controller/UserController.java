@@ -1,18 +1,14 @@
 package ar.edu.itba.paw.webapp.controller;
 
 
-import ar.edu.itba.paw.model.Rating;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.exceptions.EmailInUseException;
 import ar.edu.itba.paw.model.exceptions.EmptyBodyException;
 import ar.edu.itba.paw.model.exceptions.TokenCreationException;
 import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
-import ar.edu.itba.paw.service.LikesService;
 import ar.edu.itba.paw.service.RatingService;
 import ar.edu.itba.paw.service.RestaurantService;
 import ar.edu.itba.paw.service.UserService;
-import ar.edu.itba.paw.webapp.dto.LikeDto;
-import ar.edu.itba.paw.webapp.dto.RatingDto;
 import ar.edu.itba.paw.webapp.dto.RestaurantDto;
 import ar.edu.itba.paw.webapp.dto.UserDto;
 import ar.edu.itba.paw.webapp.forms.PasswordResetForm;
@@ -22,9 +18,7 @@ import ar.edu.itba.paw.webapp.utils.PageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,9 +26,7 @@ import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -49,9 +41,6 @@ public class UserController {
     private UserService userService;
     @Autowired
     private RestaurantService restaurantService;
-    @Autowired
-    private RatingService ratingService;
-
     @Context
     private UriInfo uriInfo;
 
@@ -150,17 +139,4 @@ public class UserController {
         }, uriInfo, page, pageAmount, totalRestaurants);
     }
 
-    //READ USER RATING
-    @GET
-    @Path("/{userId}/ratings")
-    @Produces(value = {MediaType.APPLICATION_JSON})
-    public Response getRestaurantRate(@PathParam("userId") final Long userId,
-                                      @QueryParam("restaurantId") final Long restaurantId,
-                                      @Context HttpServletRequest request) {
-
-        Optional<Rating> maybeRating = ratingService.getRating(userId, restaurantId);
-        Double rate = maybeRating.isPresent() ? maybeRating.get().getRating() : 0;
-        return Response.ok(new RatingDto(rate)).build();
-    }
-    
 }

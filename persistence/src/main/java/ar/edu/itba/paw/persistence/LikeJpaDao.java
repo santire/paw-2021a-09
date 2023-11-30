@@ -58,7 +58,7 @@ public class LikeJpaDao implements LikesDao {
         query.setParameter("userId", userId);
         query.setParameter("restaurantIds", restaurantIds);
 
-        return query.getResultList().stream().collect(Collectors.toList());
+        return query.getResultList();
     }
 
     @Override

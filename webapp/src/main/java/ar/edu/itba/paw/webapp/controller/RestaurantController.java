@@ -48,8 +48,6 @@ public class RestaurantController {
     private CommentService commentService;
     @Autowired
     private MenuService menuService;
-    @Autowired
-    private RatingService ratingService;
 
     @Context
     private Validator validator;
@@ -337,20 +335,6 @@ public class RestaurantController {
         restaurantService.deleteRestaurantById(restaurantId);
         return Response.noContent().build();
     }
-
-
-    //RATE RESTAURANT
-    @POST
-    @Path("/{restaurantId}/ratings")
-    @Produces(value = {MediaType.APPLICATION_JSON})
-    @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
-    public Response rateRestaurant(@PathParam("restaurantId") final Long restaurantId,
-                                   @Valid @NotNull RatingForm rating, @Context HttpServletRequest request) {
-        User user = getLoggedUser();
-        ratingService.rateRestaurant(user.getId(), restaurantId, rating.getRating());
-        return Response.noContent().build();
-    }
-
 
 
     private User getLoggedUser() {
