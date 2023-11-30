@@ -139,14 +139,15 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
-    public void sendNewReservationUserEmail(String userEmail, String userName, String ownerName, String restaurantName, String url){
+    public void sendNewReservationUserEmail(String userEmail, String userName, String restaurantName, String url){
         Locale locale = LocaleContextHolder.getLocale();
         Map<String, Object> args = new HashMap<>();
         EmailTemplate emailTemplate = EmailTemplate.BUTTON;
-        String plainText = messageSource.getMessage("mail.newReservation.owner.plain",new Object[]{ownerName,userName,restaurantName},locale)+"\n"+url+"\n";
+        String plainText = messageSource.getMessage("mail.newReservation.customer.plain",new Object[]{userName,restaurantName},locale)+"\n"+url+"\n";
         args.put("titleMessage", "");
         args.put("bodyMessage", messageSource.getMessage("mail.newReservation.customer.body",new Object[]{userName,restaurantName},locale));
-
+        args.put("buttonMessage", messageSource.getMessage("mail.newReservation.customer.button",null,locale));
+        args.put("link", url);
         Email mail = new Email();
         mail.setMailTo(userEmail);
         mail.setMailSubject(messageSource.getMessage("mail.newReservation.customer.subject",null,locale));
@@ -173,8 +174,7 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(mail, args, plainText, emailTemplate);
     }
 
-    @Override
-    public void sendEmail(Email email, Map<String, Object> args, String plainText, EmailTemplate emailTemplate){
+    private void sendEmail(Email email, Map<String, Object> args, String plainText, EmailTemplate emailTemplate){
         MimeMessage mimeMessage = emailSender.createMimeMessage();
         Context thymeleafContext = new Context();
         thymeleafContext.setVariables(args);

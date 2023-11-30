@@ -1,15 +1,20 @@
 package ar.edu.itba.paw.webapp.controller;
 
 
-import ar.edu.itba.paw.model.Like;
 import ar.edu.itba.paw.model.Rating;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.exceptions.EmailInUseException;
 import ar.edu.itba.paw.model.exceptions.EmptyBodyException;
 import ar.edu.itba.paw.model.exceptions.TokenCreationException;
 import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
-import ar.edu.itba.paw.service.*;
-import ar.edu.itba.paw.webapp.dto.*;
+import ar.edu.itba.paw.service.LikesService;
+import ar.edu.itba.paw.service.RatingService;
+import ar.edu.itba.paw.service.RestaurantService;
+import ar.edu.itba.paw.service.UserService;
+import ar.edu.itba.paw.webapp.dto.LikeDto;
+import ar.edu.itba.paw.webapp.dto.RatingDto;
+import ar.edu.itba.paw.webapp.dto.RestaurantDto;
+import ar.edu.itba.paw.webapp.dto.UserDto;
 import ar.edu.itba.paw.webapp.forms.PasswordResetForm;
 import ar.edu.itba.paw.webapp.forms.RegisterUserForm;
 import ar.edu.itba.paw.webapp.forms.UpdateUserForm;
@@ -39,13 +44,11 @@ public class UserController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private static final int AMOUNT_OF_RESTAURANTS = 10;
-    private static final int AMOUNT_OF_RESERVATIONS = 10;
+
     @Autowired
     private UserService userService;
     @Autowired
     private RestaurantService restaurantService;
-    @Autowired
-    private ReservationService reservationService;
     @Autowired
     private LikesService likesService;
     @Autowired
@@ -137,36 +140,16 @@ public class UserController {
                                        @QueryParam("page") @DefaultValue("1") Integer page,
                                        @QueryParam("pageAmount") @DefaultValue("10") Integer pageAmount,
                                        @Context HttpServletRequest request) {
-        if(pageAmount > AMOUNT_OF_RESTAURANTS) {
+        if (pageAmount > AMOUNT_OF_RESTAURANTS) {
             pageAmount = AMOUNT_OF_RESTAURANTS;
         }
-        if(pageAmount <= 0) {
+        if (pageAmount <= 0) {
             pageAmount = 1;
         }
         int totalRestaurants = restaurantService.getRestaurantsFromOwnerCount(userId);
         List<RestaurantDto> restaurants = restaurantService.getRestaurantsFromOwner(page, pageAmount, userId).stream().map(u -> RestaurantDto.fromRestaurant(u, uriInfo)).collect(Collectors.toList());
         return PageUtils.paginatedResponse(new GenericEntity<List<RestaurantDto>>(restaurants) {
         }, uriInfo, page, pageAmount, totalRestaurants);
-    }
-
-    //READ USER RESERVATIONS
-    @GET
-    @Path("/{userId}/reservations")
-    @Produces(value = {MediaType.APPLICATION_JSON})
-    @PreAuthorize("@authComponent.isUser(#userId)")
-    public Response getUserReservations(@PathParam("userId") final Long userId, @QueryParam("filterBy") @DefaultValue("") String filterBy, @QueryParam("page") @DefaultValue("1") Integer page, @Context HttpServletRequest request) {
-        List<ReservationDto> reservations;
-        int totalReservations;
-        if (filterBy.equalsIgnoreCase("history")) {
-            totalReservations = reservationService.findByUserHistoryCount(userId);
-            reservations = reservationService.findByUserHistory(page, AMOUNT_OF_RESERVATIONS, userId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
-        } else {
-            totalReservations = reservationService.findByUserCount(userId);
-            reservations = reservationService.findByUser(page, AMOUNT_OF_RESERVATIONS, userId).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
-        }
-
-        return PageUtils.paginatedResponse(new GenericEntity<List<ReservationDto>>(reservations) {
-        }, uriInfo, page, AMOUNT_OF_RESERVATIONS, totalReservations);
     }
 
     //READ USER LIKES
@@ -194,8 +177,8 @@ public class UserController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
     public Response likeRestaurant(@PathParam("userId") final Long userId,
-                                    @PathParam("restaurantId") final Long restaurantId,
-                                    @Context HttpServletRequest request) {
+                                   @PathParam("restaurantId") final Long restaurantId,
+                                   @Context HttpServletRequest request) {
         User user = getLoggedUser();
         likesService.like(user.getId(), restaurantId);
         // Create the location URI
@@ -209,8 +192,8 @@ public class UserController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
     public Response dislikeRestaurant(@PathParam("userId") final Long userId,
-                                        @PathParam("restaurantId") final Long restaurantId,
-                                        @Context HttpServletRequest request) {
+                                      @PathParam("restaurantId") final Long restaurantId,
+                                      @Context HttpServletRequest request) {
         User user = getLoggedUser();
         likesService.dislike(user.getId(), restaurantId);
         return Response.status(Response.Status.NO_CONTENT).build();
@@ -230,8 +213,8 @@ public class UserController {
     }
 
     private User getLoggedUser() {
-    return userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName())
-            // This shouldn't happen as authority is handled before
-            .orElseThrow(() -> new AccessDeniedException("Unauthorized"));
+        return userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName())
+                // This shouldn't happen as authority is handled before
+                .orElseThrow(() -> new AccessDeniedException("Unauthorized"));
     }
 }

@@ -14,15 +14,12 @@ import javax.validation.Payload;
 public @interface PresentTime {
 
     String message() default "Invalid date/time selection";
-    String timeMessage() default "Selected time has already passed";
     String dateMessageBefore() default "Selected date has already passed";
     String dateMessageAfter() default "Selected date is too far in the future";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
-    
-    String time();
 
     String date();
 

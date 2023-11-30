@@ -17,13 +17,13 @@ INSERT INTO restaurants(restaurant_id, name, address, phone_number, rating, user
 VALUES(999, 'KFC', 'La Pampa 319', '1121146545', 0, 999);
 
 /*Insert Reservations Values*/
-INSERT INTO reservations(reservation_id, user_id, restaurant_id, date, quantity, confirmed)
-VALUES (1, 999, 997, '2023-08-08 19:00:00', 4, false)
-    INSERT INTO reservations(reservation_id, user_id, restaurant_id, date, quantity, confirmed)
-VALUES (2, 999, 998, '2023-08-08 18:00:00', 2, true)
-INSERT INTO reservations(reservation_id, user_id, restaurant_id, date, quantity, confirmed)
-VALUES (3, 998, 997, '2023-08-08 19:30:00', 4, true)
-INSERT INTO reservations(reservation_id, user_id, restaurant_id, date, quantity, confirmed)
-VALUES (4, 999, 997, '2023-08-08 20:10:25', 3, true)
-INSERT INTO reservations(reservation_id, user_id, restaurant_id, date, quantity, confirmed)
-VALUES (5, 998, 999, '2023-08-08 21:00:00', 2, false)
+INSERT INTO reservations(reservation_id, user_id, restaurant_id, date, quantity,  status)
+VALUES (1, 999, 997, '2023-08-08 19:00:00', 4,  'PENDING');
+INSERT INTO reservations(reservation_id, user_id, restaurant_id, date, quantity,  status)
+VALUES (2, 999, 998, '2023-08-08 18:00:00', 2,  'CONFIRMED');
+INSERT INTO reservations(reservation_id, user_id, restaurant_id, date, quantity,  status)
+VALUES (3, 998, 997, '2023-08-08 19:30:00', 4,  'CONFIRMED');
+INSERT INTO reservations(reservation_id, user_id, restaurant_id, date, quantity,  status)
+VALUES (4, 999, 997, '2023-08-08 20:10:25', 3,  'CONFIRMED');
+INSERT INTO reservations(reservation_id, user_id, restaurant_id, date, quantity,  status)
+VALUES (5, 998, 999, '2023-08-08 21:00:00', 2,  'PENDING');

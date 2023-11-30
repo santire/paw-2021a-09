@@ -2,16 +2,7 @@ package ar.edu.itba.paw.model;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "reservations")
@@ -29,8 +20,17 @@ public class Reservation {
     @Column
     private long quantity;
 
-    @Column
-    private boolean confirmed;
+    public ReservationStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ReservationStatus status) {
+        this.status = status;
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private ReservationStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
@@ -46,7 +46,7 @@ public class Reservation {
     public Reservation(LocalDateTime date, long quantity) {
         this.date = date;
         this.quantity = quantity;
-        this.confirmed = false;
+        this.status = ReservationStatus.PENDING;
     }
 
     public Long getId() {
@@ -63,18 +63,6 @@ public class Reservation {
 
     public void setQuantity(long quantity) {
         this.quantity = quantity;
-    }
-
-    public boolean isConfirmed() {
-        return this.confirmed;
-    }
-
-    public boolean getConfirmed() {
-        return this.confirmed;
-    }
-
-    public void setConfirmed(boolean confirmed) {
-        this.confirmed = confirmed;
     }
 
     public User getUser() {
