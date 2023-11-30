@@ -53,12 +53,12 @@ public class LikeJpaDaoTest {
 
     @Test
     public void testGetLikesByUserId(){
-        List<Like> likesList = likeJpaDao.getLikesByUserId(20l);
+        List<Like> likesList = likeJpaDao.getLikesByUserId(1, 5,20L);
 
         Assert.assertEquals(3, likesList.size());
-        Assert.assertEquals(997, likesList.get(0).getRestaurant().getId().longValue());
+        Assert.assertEquals(997, likesList.get(2).getRestaurant().getId().longValue());
         Assert.assertEquals(998, likesList.get(1).getRestaurant().getId().longValue());
-        Assert.assertEquals(999, likesList.get(2).getRestaurant().getId().longValue());
+        Assert.assertEquals(999, likesList.get(0).getRestaurant().getId().longValue());
     }
 
     @Test
@@ -115,8 +115,8 @@ public class LikeJpaDaoTest {
         }
         Assert.assertNull(retrievedLike);
 
-        boolean result = likeJpaDao.like(user, restaurant);
-        Assert.assertTrue(result);
+        Like result = likeJpaDao.like(user, restaurant);
+        Assert.assertNotNull(result);
 
         TypedQuery<Like> likeQuery = em.createQuery("SELECT c FROM Like c WHERE c.user = :user AND c.restaurant = :restaurant", Like.class);
         likeQuery.setParameter("user", user); 

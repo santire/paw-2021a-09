@@ -33,12 +33,13 @@ public class UserDto {
 
         dto.url = url;
 
-        dto.reservations = uriInfo.getBaseUriBuilder().path("/reservations")
+        dto.reservations = uriInfo.getBaseUriBuilder().path("reservations")
                 .queryParam("madeBy", user.getId())
                 .build();
+        dto.likes = uriInfo.getAbsolutePathBuilder().path("likes").build();
 
-        dto.restaurants = uriInfo.getAbsolutePathBuilder().path("/restaurants").build();
-        dto.likes = uriInfo.getAbsolutePathBuilder().path("/likes").build();
+        dto.restaurants = uriInfo.getAbsolutePathBuilder().path("restaurants").build();
+
         return dto;
     }
 

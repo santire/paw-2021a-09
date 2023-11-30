@@ -50,8 +50,6 @@ public class UserController {
     @Autowired
     private RestaurantService restaurantService;
     @Autowired
-    private LikesService likesService;
-    @Autowired
     private RatingService ratingService;
 
     @Context
@@ -152,53 +150,6 @@ public class UserController {
         }, uriInfo, page, pageAmount, totalRestaurants);
     }
 
-    //READ USER LIKES
-    @GET
-    @Path("/{userId}/likes")
-    @Produces(value = {MediaType.APPLICATION_JSON})
-    @PreAuthorize("@authComponent.isUser(#userId)")
-    public Response userLikesRestaurants(@PathParam("userId") final Long userId, @QueryParam("restaurantId") List<Long> restaurantIds, @Context HttpServletRequest request) {
-        List<Long> likedIds = likesService.userLikesRestaurants(userId, restaurantIds).stream().map(l -> l.getRestaurant().getId()).collect(Collectors.toList());
-        List<LikeDto> likes = new ArrayList<>();
-        for (Long id : restaurantIds) {
-            LikeDto like = new LikeDto(false, id, userId, request.getRequestURL().toString(), uriInfo);
-            if (likedIds.contains(id)) {
-                like.setLiked(true);
-            }
-            likes.add(like);
-        }
-        return Response.ok(new GenericEntity<List<LikeDto>>(likes) {
-        }).build();
-    }
-
-    //LIKE RESTAURANT
-    @POST
-    @Path("/{userId}/likes/{restaurantId}")
-    @Produces(value = {MediaType.APPLICATION_JSON})
-    @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
-    public Response likeRestaurant(@PathParam("userId") final Long userId,
-                                   @PathParam("restaurantId") final Long restaurantId,
-                                   @Context HttpServletRequest request) {
-        User user = getLoggedUser();
-        likesService.like(user.getId(), restaurantId);
-        // Create the location URI
-        URI locationUri = uriInfo.getAbsolutePathBuilder().build(userId, restaurantId);
-
-        return Response.status(Response.Status.NO_CONTENT).location(locationUri).build();
-    }
-
-    @DELETE
-    @Path("/{userId}/likes/{restaurantId}")
-    @Produces(value = {MediaType.APPLICATION_JSON})
-    @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
-    public Response dislikeRestaurant(@PathParam("userId") final Long userId,
-                                      @PathParam("restaurantId") final Long restaurantId,
-                                      @Context HttpServletRequest request) {
-        User user = getLoggedUser();
-        likesService.dislike(user.getId(), restaurantId);
-        return Response.status(Response.Status.NO_CONTENT).build();
-    }
-
     //READ USER RATING
     @GET
     @Path("/{userId}/ratings")
@@ -211,10 +162,5 @@ public class UserController {
         Double rate = maybeRating.isPresent() ? maybeRating.get().getRating() : 0;
         return Response.ok(new RatingDto(rate)).build();
     }
-
-    private User getLoggedUser() {
-        return userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName())
-                // This shouldn't happen as authority is handled before
-                .orElseThrow(() -> new AccessDeniedException("Unauthorized"));
-    }
+    
 }

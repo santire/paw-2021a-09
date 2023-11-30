@@ -6,9 +6,10 @@ import ar.edu.itba.paw.model.Restaurant;
 import java.util.List;
 
 public interface LikesService {
-    boolean like(long userId, long restaurantId);
+    Like like(long userId, long restaurantId);
     boolean dislike(long userId, long restaurantId);
-    public List<Like> getUserLikes(long userId);
+    List<Like> getUserLikes(int page, int amountOnPage, Long userId);
+    int getUserLikesCount(Long userId);
     boolean userLikesRestaurant(long userId, long restaurantId);
     List<Like> userLikesRestaurants(long userId, List<Long> restaurantId);
 }

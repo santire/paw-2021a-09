@@ -1,60 +1,47 @@
 package ar.edu.itba.paw.webapp.dto;
 
-import java.net.URI;
-
-import javax.ws.rs.core.UriInfo;
-
 import ar.edu.itba.paw.model.Like;
 
+import javax.ws.rs.core.UriInfo;
+import java.net.URI;
+
 public class LikeDto {
-    private static final String USERS_PATH = "users/";
-    private static final String LIKES_PATH = "likes/";
-    private long restaurantId;
     private URI self;
-    private boolean liked;
+    private URI restaurant;
+    private URI user;
 
-    public LikeDto() {}
 
-    public LikeDto(boolean liked, long restaurantId, long userId, String url, UriInfo uriInfo) {
-        this.liked = liked;
-        this.restaurantId = restaurantId;
-        this.self = uriInfo.getBaseUriBuilder()
-            .path(USERS_PATH).path(String.valueOf(userId))
-            .path(LIKES_PATH).path(String.valueOf(restaurantId)).build();
-    }
-
-    public static LikeDto fromLike(Like like, String url, UriInfo uriInfo){
+    public static LikeDto fromLike(Like like, UriInfo uriInfo) {
         final LikeDto dto = new LikeDto();
 
-        dto.restaurantId = like.getRestaurant().getId();
-        dto.self = uriInfo.getBaseUriBuilder()
-            .path(USERS_PATH).path(String.valueOf(like.getUser().getId()))
-            .path(LIKES_PATH).path(String.valueOf(dto.restaurantId)).build();
+        dto.self = uriInfo.getAbsolutePathBuilder().path(like.getRestaurant().getId().toString()).build();
+
+        dto.restaurant = uriInfo.getBaseUriBuilder().path("restaurants").path(like.getRestaurant().getId().toString()).build();
+        dto.user = uriInfo.getBaseUriBuilder().path("users").path(like.getUser().getId().toString()).build();
         return dto;
     }
 
-
-    public long getRestaurantId() {
-        return restaurantId;
-    }
-
-    public void setRestaurantId(long restaurantId) {
-        this.restaurantId = restaurantId;
-    }
-
-    public URI getSelf(){
+    public URI getSelf() {
         return self;
     }
 
-    public void setSelf(URI selfUri){
-        this.self = selfUri;
+    public void setSelf(URI self) {
+        this.self = self;
     }
 
-    public boolean getLiked(){
-        return liked;
+    public URI getRestaurant() {
+        return restaurant;
     }
 
-    public void setLiked(boolean liked){
-        this.liked = liked;
+    public void setRestaurant(URI restaurant) {
+        this.restaurant = restaurant;
+    }
+
+    public URI getUser() {
+        return user;
+    }
+
+    public void setUser(URI user) {
+        this.user = user;
     }
 }
