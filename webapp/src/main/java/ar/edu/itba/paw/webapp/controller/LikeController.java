@@ -64,6 +64,7 @@ public class LikeController {
 
     @POST
     @Produces(value = {MediaType.APPLICATION_JSON})
+    @Consumes(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isUser(#userId) && !@authComponent.isRestaurantOwner(#likeForm.restaurantId)")
     public Response likeRestaurant(@PathParam("userId") final Long userId, @Valid LikeForm likeForm) {
 

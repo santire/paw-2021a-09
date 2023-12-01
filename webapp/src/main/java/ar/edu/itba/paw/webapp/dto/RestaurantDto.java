@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 public class RestaurantDto {
 
-    private static final String PATH = "restaurants/";
     private Long id;
     private String name;
     private String address;
@@ -26,7 +25,6 @@ public class RestaurantDto {
 
     private URI image;
     private URI menu;
-
     private URI owner;
     private URI reservations;
     private URI comments;
@@ -48,9 +46,9 @@ public class RestaurantDto {
         dto.likes = restaurant.getLikes();
         dto.tags = restaurant.getTags().stream().map(Enum::name).collect(Collectors.toList());
         dto.reservationsCount = restaurant.getReservationsCount();
-        dto.image = uriInfo.getBaseUriBuilder().path(PATH).path(String.valueOf(restaurant.getId())).path("image").queryParam("v", String.valueOf(v)).build();
+        dto.image = uriInfo.getBaseUriBuilder().path("restaurants").path(String.valueOf(restaurant.getId())).path("image").queryParam("v", String.valueOf(v)).build();
 
-        dto.menu = uriInfo.getBaseUriBuilder().path(PATH).path(String.valueOf(restaurant.getId())).path("menu").build();
+        dto.menu = uriInfo.getBaseUriBuilder().path("restaurants").path(String.valueOf(restaurant.getId())).path("menu").build();
         dto.owner = uriInfo.getBaseUriBuilder().path("users").path(restaurant.getOwner().getId().toString()).build();
         dto.reservations = uriInfo.getBaseUriBuilder().path("reservations").queryParam("madeTo", restaurant.getId()).build();
         dto.comments = uriInfo.getBaseUriBuilder().path("comments").queryParam("madeTo", restaurant.getId()).build();

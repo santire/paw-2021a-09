@@ -6,8 +6,6 @@ import javax.validation.constraints.*;
 
 public class MenuItemForm {
 
-    private long id;
-
     @Size(min = 1, max = 100)
     @Pattern(regexp = "[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ ()'´¨!.,]+")
     @NotEmpty
@@ -23,13 +21,6 @@ public class MenuItemForm {
     @NotNull
     private Float price;
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;

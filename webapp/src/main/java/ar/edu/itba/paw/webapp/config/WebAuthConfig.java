@@ -84,6 +84,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                         "/api/restaurants/*",
                         "/api/restaurants/*/image",
                         "/api/restaurants/*/menu",
+                        "/api/restaurants/*/menu/*",
                         "/api/comments",
                         "/api/comments/*",
                         "/api/tags"

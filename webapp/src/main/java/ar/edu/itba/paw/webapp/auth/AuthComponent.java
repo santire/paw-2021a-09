@@ -71,16 +71,6 @@ public class AuthComponent {
         return loggedUser.getId().equals(restaurant.getOwner().getId());
     }
 
-
-    public boolean isRestaurantAndMenuOwner(Long restaurantId, Long menuItemId) {
-        User loggedUser = loggedUser();
-        if (loggedUser == null) {
-            return false;
-        }
-        return userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId)
-                && menuService.menuBelongsToRestaurant(menuItemId, restaurantId);
-    }
-
     public boolean isUser(Long userId) {
         User loggedUser = loggedUser();
         if (loggedUser == null) {

@@ -10,6 +10,5 @@ public interface LikesService {
     boolean dislike(long userId, long restaurantId);
     List<Like> getUserLikes(int page, int amountOnPage, Long userId);
     int getUserLikesCount(Long userId);
-    boolean userLikesRestaurant(long userId, long restaurantId);
     List<Like> userLikesRestaurants(long userId, List<Long> restaurantId);
 }

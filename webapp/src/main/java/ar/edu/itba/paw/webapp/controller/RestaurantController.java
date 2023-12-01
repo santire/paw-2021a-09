@@ -43,8 +43,7 @@ public class RestaurantController {
     private UserService userService;
     @Autowired
     private RestaurantService restaurantService;
-    @Autowired
-    private MenuService menuService;
+
 
     @Context
     private Validator validator;
@@ -150,51 +149,7 @@ public class RestaurantController {
                 .cacheControl(cache).expires(expireDate).build();
     }
 
-    //READ RESTAURANT MENU
-    @GET
-    @Path("/{restaurantId}/menu")
-    @Produces(value = {MediaType.APPLICATION_JSON})
-    public Response findRestaurantMenu(@PathParam("restaurantId") final long restaurantId, @QueryParam("page") @DefaultValue("1") Integer page) {
 
-        int amountOfMenuItems = restaurantService.findByIdWithMenuCount(restaurantId);
-        LOGGER.debug("Amount of menu items: {}", amountOfMenuItems);
-        final Restaurant restaurant = restaurantService.findByIdWithMenu(restaurantId, page, AMOUNT_OF_MENU_ITEMS)
-                .orElseThrow(RestaurantNotFoundException::new);
-
-        List<MenuItemDto> menu = restaurant.getMenu()
-                .stream()
-                .map(MenuItemDto::fromMenuItem)
-                .collect(Collectors.toList());
-
-        return PageUtils.paginatedResponse(new GenericEntity<List<MenuItemDto>>(menu) {
-        }, uriInfo, page, AMOUNT_OF_MENU_ITEMS, amountOfMenuItems);
-    }
-
-    //ADD MENU ITEM
-    @POST
-    @Path("/{restaurantId}/menu")
-    @Produces(value = {MediaType.APPLICATION_JSON})
-    @Consumes(value = {MediaType.APPLICATION_JSON})
-    @PreAuthorize("@authComponent.isRestaurantOwner(#restaurantId)")
-    public Response addRestaurantMenuItem(@PathParam("restaurantId") final Long restaurantId,
-                                          final @Valid @NotNull MenuItemForm menuItem, @Context HttpServletRequest request) {
-        final MenuItem item = new MenuItem(menuItem.getId(), menuItem.getName(), menuItem.getDescription(), menuItem.getPrice());
-        final MenuItem createdItem = menuService.addItemToRestaurant(restaurantId, item);
-        final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(createdItem.getId())).build();
-        return Response.created(uri).entity(MenuItemDto.fromMenuItem(createdItem)).build();
-    }
-
-    //DELETE MENU ITEM
-    @DELETE
-    @Path("/{restaurantId}/menu/{menuId}")
-    @Produces(value = {MediaType.APPLICATION_JSON})
-    // Restaurant owner and menu item belongs to said restaurant
-    @PreAuthorize("@authComponent.isRestaurantAndMenuOwner(#restaurantId, #menuId) or hasRole('ROLE_ADMIN')")
-    public Response deleteRestaurantMenuItem(@PathParam("restaurantId") final Long restaurantId,
-                                             @PathParam("menuId") final Long menuId, @Context HttpServletRequest request) {
-        menuService.deleteItemById(menuId);
-        return Response.noContent().build();
-    }
 
     //REGISTER RESTAURANT
     @POST
