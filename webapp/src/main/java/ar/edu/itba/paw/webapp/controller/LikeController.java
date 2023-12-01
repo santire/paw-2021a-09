@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.net.URI;
@@ -33,7 +34,7 @@ public class LikeController {
     public Response getUserLikes(@PathParam("userId") final Long userId,
                                          @QueryParam("page") @DefaultValue("1") Integer page,
                                          @QueryParam("pageAmount") @DefaultValue("10") Integer pageAmount,
-                                         @QueryParam("restaurantId") List<Long> restaurantIds) {
+                                         @QueryParam("restaurantId") final List<Long> restaurantIds) {
 
         if (restaurantIds != null && !restaurantIds.isEmpty()) {
             return Response.ok(getUserLikesByRestaurantIds(userId, restaurantIds)).build();
@@ -66,7 +67,7 @@ public class LikeController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isUser(#userId) && !@authComponent.isRestaurantOwner(#likeForm.restaurantId)")
-    public Response likeRestaurant(@PathParam("userId") final Long userId, @Valid LikeForm likeForm) {
+    public Response likeRestaurant(@PathParam("userId") final Long userId, @Valid @NotNull final LikeForm likeForm) {
 
         final Like like = likesService.like(userId, likeForm.getRestaurantId());
         // Create the location URI
@@ -79,7 +80,7 @@ public class LikeController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isUser(#userId) && !@authComponent.isRestaurantOwner(#restaurantId)")
     public Response dislikeRestaurant(@PathParam("userId") final Long userId,
-                                      @PathParam("restaurantId") Long restaurantId) {
+                                      @PathParam("restaurantId") final Long restaurantId) {
         likesService.dislike(userId, restaurantId);
         return Response.ok().build();
     }

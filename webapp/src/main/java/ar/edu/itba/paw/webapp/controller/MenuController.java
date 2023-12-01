@@ -30,7 +30,7 @@ public class MenuController {
 
     @GET
     @Produces(value = {MediaType.APPLICATION_JSON})
-    public Response findRestaurantMenu(@PathParam("restaurantId") final long restaurantId,
+    public Response findRestaurantMenu(@PathParam("restaurantId") final Long restaurantId,
                                        @QueryParam("page") @DefaultValue("1") Integer page,
                                        @QueryParam("pageAmount") @DefaultValue("8") Integer pageAmount
     ) {
@@ -38,7 +38,7 @@ public class MenuController {
             pageAmount = AMOUNT_OF_MENU_ITEMS;
         }
 
-        int amountOfMenuItems = menuService.getRestaurantMenuCount(restaurantId);
+        final int amountOfMenuItems = menuService.getRestaurantMenuCount(restaurantId);
         final List<MenuItemDto> menu = menuService.getRestaurantMenu(page, pageAmount, restaurantId)
                 .stream()
                 .map(u -> MenuItemDto.fromMenuItem(u, uriInfo))
@@ -61,7 +61,7 @@ public class MenuController {
     @Consumes(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isRestaurantOwner(#restaurantId)")
     public Response addRestaurantMenuItem(@PathParam("restaurantId") final Long restaurantId,
-                                          final @Valid @NotNull MenuItemForm menuItem) {
+                                          @Valid @NotNull final MenuItemForm menuItem) {
         final MenuItem item = new MenuItem(menuItem.getName(), menuItem.getDescription(), menuItem.getPrice());
         final MenuItem createdItem = menuService.addItemToRestaurant(restaurantId, item);
         final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(createdItem.getId())).build();
@@ -76,7 +76,7 @@ public class MenuController {
     public Response updateMenuItem(@PathParam("menuItemId") final Long menuItemId,
                                    @PathParam("restaurantId") final Long restaurantId,
                                    @Valid @NotNull MenuItemForm menuItemForm) {
-        MenuItem newMenuItem = new MenuItem(menuItemForm.getName(), menuItemForm.getDescription(), menuItemForm.getPrice());
+        final MenuItem newMenuItem = new MenuItem(menuItemForm.getName(), menuItemForm.getDescription(), menuItemForm.getPrice());
         menuService.updateMenuItem(menuItemId, newMenuItem);
         return Response.noContent().build();
     }

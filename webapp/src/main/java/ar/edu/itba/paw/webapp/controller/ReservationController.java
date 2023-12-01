@@ -43,8 +43,9 @@ public class ReservationController {
     @GET
     @Path("/{reservationId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
-    public Response findReservationById(@PathParam("reservationId") final long reservationId) {
-        final Reservation reservation = reservationService.findById(reservationId).orElseThrow(ReservationNotFoundException::new);
+    public Response findReservationById(@PathParam("reservationId") final Long reservationId) {
+        final Reservation reservation = reservationService
+                .findById(reservationId).orElseThrow(ReservationNotFoundException::new);
         final ReservationDto reservationDto = ReservationDto.fromReservation(reservation, uriInfo);
         return Response.ok(new GenericEntity<ReservationDto>(reservationDto) {
         }).build();
@@ -52,8 +53,8 @@ public class ReservationController {
 
     @GET
     @Produces(value = {MediaType.APPLICATION_JSON})
-    public Response findReservations(@QueryParam("madeBy") Long madeBy,
-                                     @QueryParam("madeTo") Long madeTo,
+    public Response findReservations(@QueryParam("madeBy") final Long madeBy,
+                                     @QueryParam("madeTo") final Long madeTo,
                                      @QueryParam("status") ReservationStatus status,
                                      @QueryParam("type") ReservationType type,
                                      @QueryParam("page") @DefaultValue("1") Integer page,
@@ -64,8 +65,13 @@ public class ReservationController {
         }
 
         LOGGER.debug("Filtering reservations by: {}", status);
-        List<ReservationDto> reservations = reservationService.findReservations(page, pageAmount, madeBy, madeTo, status, type).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
-        int totalReservations = reservationService.findReservationsCount(madeBy, madeTo, status, type);
+        final List<ReservationDto> reservations = reservationService
+                .findReservations(page, pageAmount, madeBy, madeTo, status, type)
+                .stream()
+                .map(u -> ReservationDto.fromReservation(u, uriInfo))
+                .collect(Collectors.toList());
+
+        final int totalReservations = reservationService.findReservationsCount(madeBy, madeTo, status, type);
 
         return PageUtils.paginatedResponse(new GenericEntity<List<ReservationDto>>(reservations) {
         }, uriInfo, page, pageAmount, totalReservations);
@@ -75,13 +81,28 @@ public class ReservationController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("!@authComponent.isRestaurantOwner(#reservationForm.restaurantId) && @authComponent.isUser(#reservationForm.userId)")
-    public Response addRestaurantReservation(@Valid @NotNull ReservationForm reservationForm, @Context HttpServletRequest request) {
-        URI baseUri = URI.create(request.getRequestURL().toString()).resolve(request.getContextPath());
+    public Response addRestaurantReservation(@Valid @NotNull final ReservationForm reservationForm,
+                                             @Context HttpServletRequest request) {
+        final URI baseUri = URI.create(request.getRequestURL().toString()).resolve(request.getContextPath());
 
-        final String ownerUrl = UriBuilder.fromUri(baseUri).path("restaurants").path(reservationForm.getRestaurantId().toString()).path("reservations").queryParam("tab", "pending").build().toString();
-        final String userUrl = UriBuilder.fromUri(baseUri).path("user").path("reservations").build().toString();
+        final String ownerUrl = UriBuilder.fromUri(baseUri).path("restaurants")
+                .path(reservationForm.getRestaurantId().toString())
+                .path("reservations")
+                .queryParam("tab", "pending")
+                .build().toString();
 
-        final Reservation res = reservationService.addReservation(reservationForm.getUserId(), reservationForm.getRestaurantId(), reservationForm.getDate(), reservationForm.getQuantity(), ownerUrl, userUrl);
+        final String userUrl = UriBuilder.fromUri(baseUri)
+                .path("user")
+                .path("reservations")
+                .build().toString();
+
+        final Reservation res = reservationService.addReservation(
+                reservationForm.getUserId(),
+                reservationForm.getRestaurantId(),
+                reservationForm.getDate(),
+                reservationForm.getQuantity(),
+                ownerUrl,
+                userUrl);
 
         final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(res.getId())).build();
         return Response.created(uri).entity(ReservationDto.fromReservation(res, uriInfo)).build();
@@ -92,7 +113,8 @@ public class ReservationController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("!@authComponent.isReservationOwner(#reservationId)")
-    public Response confirmReservation(@PathParam("reservationId") final Long reservationId, @Valid final ReservationStatusForm statusForm) {
+    public Response confirmReservation(@PathParam("reservationId") final Long reservationId,
+                                       @Valid final ReservationStatusForm statusForm) {
         switch (statusForm.getStatus()) {
             case DENIED:
                 String message = statusForm.getMessage();
@@ -116,7 +138,7 @@ public class ReservationController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isReservationUser(#reservationId)")
     public Response cancelRestaurantReservation(
-            @PathParam("reservationId") final long reservationId) {
+            @PathParam("reservationId") final Long reservationId) {
         reservationService.userCancelReservation(reservationId);
         return Response.noContent().build();
     }

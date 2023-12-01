@@ -36,7 +36,7 @@ public class CommentController {
     @GET
     @Path("/{commentId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
-    public Response findCommentById(@PathParam("commentId") final long commentId) {
+    public Response findCommentById(@PathParam("commentId") final Long commentId) {
         final Comment comment = commentService.findById(commentId).orElseThrow(ReservationNotFoundException::new);
         final CommentDto commentDto = CommentDto.fromComment(comment, uriInfo);
         return Response.ok(new GenericEntity<CommentDto>(commentDto) {
@@ -45,8 +45,8 @@ public class CommentController {
 
     @GET
     @Produces(value = {MediaType.APPLICATION_JSON})
-    public Response findComments(@QueryParam("madeBy") Long madeBy,
-                                 @QueryParam("madeTo") Long madeTo,
+    public Response findComments(@QueryParam("madeBy") final Long madeBy,
+                                 @QueryParam("madeTo") final Long madeTo,
                                  @QueryParam("page") @DefaultValue("1") Integer page,
                                  @QueryParam("pageAmount") @DefaultValue("10") Integer pageAmount,
                                  @Context HttpServletRequest request) {
@@ -54,12 +54,12 @@ public class CommentController {
             pageAmount = AMOUNT_OF_COMMENTS;
         }
 
-        List<CommentDto> comments = commentService.findComments(page, pageAmount, madeBy, madeTo)
+        final List<CommentDto> comments = commentService.findComments(page, pageAmount, madeBy, madeTo)
                 .stream()
                 .map(u -> CommentDto.fromComment(u, uriInfo))
                 .collect(Collectors.toList());
 
-        int totalComments = commentService.findCommentsCount(madeBy, madeTo);
+        final int totalComments = commentService.findCommentsCount(madeBy, madeTo);
 
         return PageUtils.paginatedResponse(new GenericEntity<List<CommentDto>>(comments) {
         }, uriInfo, page, pageAmount, totalComments);
@@ -69,7 +69,7 @@ public class CommentController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("!@authComponent.isRestaurantOwner(#commentForm.restaurantId) && @authComponent.isUser(#commentForm.userId)")
-    public Response createComment(@Valid @NotNull CommentForm commentForm) {
+    public Response createComment(@Valid @NotNull final CommentForm commentForm) {
 
         final Comment comment = commentService.addComment(commentForm.getUserId(), commentForm.getRestaurantId(), commentForm.getMessage());
 
@@ -82,7 +82,7 @@ public class CommentController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isCommentOwner(#commentId)")
     public Response deleteComment(
-            @PathParam("commentId") final long commentId) {
+            @PathParam("commentId") final Long commentId) {
         commentService.deleteComment(commentId);
         return Response.ok().build();
     }

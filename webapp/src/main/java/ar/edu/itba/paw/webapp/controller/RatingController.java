@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.net.URI;
@@ -32,7 +33,7 @@ public class RatingController {
     public Response getRatings(@PathParam("userId") final Long userId,
                                @QueryParam("page") @DefaultValue("1") Integer page,
                                @QueryParam("pageAmount") @DefaultValue("10") Integer pageAmount,
-                               @QueryParam("restaurantId") List<Long> restaurantIds) {
+                               @QueryParam("restaurantId") final List<Long> restaurantIds) {
         if (restaurantIds != null && !restaurantIds.isEmpty()) {
             return Response.ok(getRatingByRestaurantIds(userId, restaurantIds)).build();
         }
@@ -73,7 +74,7 @@ public class RatingController {
     @POST
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isUser(#userId) && !@authComponent.isRestaurantOwner(#ratingForm.restaurantId)")
-    public Response createRating(@PathParam("userId") final Long userId, @Valid RatingForm ratingForm) {
+    public Response createRating(@PathParam("userId") final Long userId, @Valid @NotNull final RatingForm ratingForm) {
 
         final Rating rating = ratingService.rateRestaurant(userId, ratingForm.getRestaurantId(), ratingForm.getRating());
         // Create the location URI
