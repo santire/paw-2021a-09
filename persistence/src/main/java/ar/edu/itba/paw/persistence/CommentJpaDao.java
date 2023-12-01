@@ -3,6 +3,7 @@ package ar.edu.itba.paw.persistence;
 import ar.edu.itba.paw.model.Comment;
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.persistence.utils.JpaUtils;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -22,7 +23,6 @@ public class CommentJpaDao implements CommentDao {
     @PersistenceContext
     private EntityManager em;
 
-    // CREATE
 
     @Override
     public Comment addComment(User user, Restaurant restaurant, String comment, LocalDate date) {
@@ -33,81 +33,58 @@ public class CommentJpaDao implements CommentDao {
         return userComment;
     }
 
-    // READ
-
     @Override
     public Optional<Comment> findById(long id) {
         return Optional.ofNullable(em.find(Comment.class, id));
     }
 
     @Override
-    public Optional<Comment> findByUserAndRestaurantId(long userId, long restaurantId) {
-        Query nativeQuery = em.createNativeQuery(
-                "SELECT comment_id FROM comments WHERE user_id = :userId and restaurant_id = :restaurantId ORDER BY date ASC");
-        nativeQuery.setParameter("userId", userId);
-        nativeQuery.setParameter("restaurantId", restaurantId);
-
-        @SuppressWarnings("unchecked")
-        Long filteredId = (Long) nativeQuery.getResultList().stream().map(e -> Long.valueOf(e.toString())).findFirst().orElse(null);
-        if (filteredId == null) {
-            return Optional.empty();
-        }
-        TypedQuery<Comment> query = em.createQuery("from Comment where id = :filteredId", Comment.class);
-        query.setParameter("filteredId", filteredId);
-        return query.getResultList().stream().findFirst();
-    }
-
-
-    @Override
-    public List<Comment> findByRestaurant(int page, int amountOnPage, long restaurantId) {
-        Query nativeQuery = em.createNativeQuery(
-                "SELECT comment_id FROM comments"
-                        +
-                        " WHERE restaurant_id = :restaurantId"
-                        +
-                        " ORDER BY date DESC"
-        );
-
-        nativeQuery.setParameter("restaurantId", restaurantId);
+    public List<Comment> findFilteredComments(int page, int amountOnPage, Long userId, Long restaurantId, boolean desc) {
+        Query nativeQuery = findCommentsQuery(userId, restaurantId, desc);
         nativeQuery.setFirstResult((page - 1) * amountOnPage);
         nativeQuery.setMaxResults(amountOnPage);
-        @SuppressWarnings("unchecked")
-        List<Long> filteredIds = (List<Long>) nativeQuery.getResultList().stream().map(e -> Long.valueOf(e.toString()))
-                .collect(Collectors.toList());
+
+        return collectComments(page, amountOnPage, nativeQuery);
+    }
+
+    @Override
+    public int findFilteredCommentsCount(Long userId, Long restaurantId) {
+        return findCommentsQuery(userId, restaurantId, true).getResultList().size();
+    }
+
+    @Override
+    public void deleteComment(long commentId) {
+        Optional<Comment> maybeComment = findById(commentId);
+        maybeComment.ifPresent(comment -> em.remove(comment));
+    }
+
+    private Query findCommentsQuery(Long userId, Long restaurantId, boolean desc) {
+        String userPart = (userId != null) ? " AND user_id = :userId" : "";
+        String restaurantPart = (restaurantId != null) ? " AND restaurant_id = :restaurantId" : "";
+        String orderPart = desc ? "DESC" : "ASC";
+
+        // WHERE true is necessary so that query still works regardless of user_id/restaurant_id
+        // as those parts start with " AND..."
+        Query nativeQuery = em.createNativeQuery("SELECT comment_id FROM comments WHERE true" + userPart + restaurantPart + " ORDER BY date " + orderPart);
+
+        if (userId != null) {
+            nativeQuery.setParameter("userId", userId);
+        }
+        if (restaurantId != null) {
+            nativeQuery.setParameter("restaurantId", restaurantId);
+        }
+        return nativeQuery;
+    }
+
+    private List<Comment> collectComments(int page, int amountOnPage, Query query) {
+        List<Long> filteredIds = JpaUtils.getFilteredIds(page, amountOnPage, query);
+        final TypedQuery<Comment> typedQuery = em.createQuery("from Comment where id IN :filteredIds", Comment.class);
+        typedQuery.setParameter("filteredIds", filteredIds);
 
         if (filteredIds.isEmpty()) {
             return Collections.emptyList();
         }
 
-        final TypedQuery<Comment> query = em.createQuery("from Comment where id IN :filteredIds",
-                Comment.class);
-        query.setParameter("filteredIds", filteredIds);
-
-        return query.getResultList().stream().sorted(Comparator.comparing(v -> filteredIds.indexOf(v.getId()))).collect(Collectors.toList());
-    }
-
-    public int findByRestaurantCount( long restaurantId) {
-        Query nativeQuery = em.createNativeQuery(
-                "SELECT comment_id FROM comments"
-                        +
-                        " WHERE restaurant_id = :restaurantId"
-        );
-        nativeQuery.setParameter("restaurantId", restaurantId);
-
-        return nativeQuery.getResultList().size();
-
-    }
-
-
-    // DESTROY
-
-    @Override
-    public boolean deleteComment(long commentId) {
-        Optional<Comment> maybeComment = findById(commentId);
-        if (maybeComment.isPresent()) {
-            em.remove(maybeComment.get());
-            return true;
-        }
-        return false;
+        return typedQuery.getResultList().stream().sorted(Comparator.comparing(v -> filteredIds.indexOf(v.getId()))).collect(Collectors.toList());
     }
 }

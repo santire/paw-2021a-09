@@ -9,15 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CommentDao {
-    // CREATE
     Comment addComment(User user, Restaurant restaurant, String comment, LocalDate date);
-
-    // READ
     Optional<Comment> findById(long id);
-    Optional<Comment> findByUserAndRestaurantId(long userId, long restaurantId);
-    List<Comment> findByRestaurant(int page, int amountOnPage, long restaurantId);
-    int findByRestaurantCount(long restaurantId);
-
-    // DESTROY
-    boolean deleteComment(long id);
+    List<Comment> findFilteredComments(int page, int amountOnPage, Long userId, Long restaurantId, boolean desc);
+    int findFilteredCommentsCount(Long userId, Long restaurantId);
+    void deleteComment(long id);
 }

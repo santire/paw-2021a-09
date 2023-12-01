@@ -39,13 +39,9 @@ public class ReservationJpaDao implements ReservationDao {
     }
 
     @Override
-    public boolean cancelReservation(long reservationId) {
+    public void cancelReservation(long reservationId) {
         Optional<Reservation> maybeReservation = findById(reservationId);
-        if (maybeReservation.isPresent()) {
-            em.remove(maybeReservation.get());
-            return true;
-        }
-        return false;
+        maybeReservation.ifPresent(reservation -> em.remove(reservation));
     }
 
     @Override

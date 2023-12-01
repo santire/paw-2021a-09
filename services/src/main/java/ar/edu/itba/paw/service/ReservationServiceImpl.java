@@ -55,6 +55,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional
     public List<Reservation> findReservations(int page, int amountOnPage, Long userId, Long restaurantId, ReservationStatus status, ReservationType type) {
         LocalDateTime currentTime = LocalDateTime.now();
         if (type == null) {
@@ -73,6 +74,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional
     public int findReservationsCount(Long userId, Long restaurantId, ReservationStatus status, ReservationType type) {
         LocalDateTime currentTime = LocalDateTime.now();
         if (type == null) {
@@ -120,15 +122,13 @@ public class ReservationServiceImpl implements ReservationService {
     // DESTROY
     @Override
     @Transactional
-    public boolean userCancelReservation(long reservationId) {
+    public void userCancelReservation(long reservationId) {
         Reservation reservation = reservationDao.findById(reservationId).orElseThrow(ReservationNotFoundException::new);
         Restaurant restaurant = reservation.getRestaurant();
         User owner = restaurant.getOwner();
         User user = reservation.getUser();
-
+        reservationDao.cancelReservation(reservationId);
         emailService.sendUserReservationCancelEmail(user.getEmail(), owner.getEmail(), user.getName(), owner.getName(), restaurant.getName(), reservation.getDate(), reservation.getQuantity());
-
-        return reservationDao.cancelReservation(reservationId);
     }
 
 

@@ -23,6 +23,6 @@ public interface ReservationDao {
 
 
     // DESTROY
-    boolean cancelReservation(long id);
+    void cancelReservation(long id);
 
 }

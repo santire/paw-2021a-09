@@ -49,7 +49,7 @@ public class LikeController {
         final int totalLikes = likesService.getUserLikesCount(userId);
 
         return PageUtils.paginatedResponse(new GenericEntity<List<LikeDto>>(likes) {
-        }, uriInfo, page, AMOUNT_OF_LIKES, totalLikes);
+        }, uriInfo, page, pageAmount, totalLikes);
     }
 
     private GenericEntity<List<LikeDto>> getUserLikesByRestaurantIds(Long userId, List<Long> restaurantIds) {

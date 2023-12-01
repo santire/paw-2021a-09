@@ -15,12 +15,30 @@ public class PageUtils {
     }
 
     public static Response paginatedResponse(Object body, UriInfo uriInfo, int currentPage, int amountOnPage, int totalAmount) {
+        int maxPages = maxPages(totalAmount, amountOnPage);
+
+        int nextPage = currentPage + 1;
+        if (nextPage > maxPages) {
+            nextPage = maxPages;
+        }
+        if (nextPage < 1) {
+            nextPage = 1;
+        }
+        int prevPage = currentPage - 1;
+        if (prevPage < 1) {
+            prevPage = 1;
+        }
+        if (prevPage > maxPages) {
+            prevPage = maxPages;
+        }
+
+
         return Response.ok(body)
                 .header("X-Total-Count", totalAmount)
                 .link(makePageUrl(uriInfo, 1), "first")
-                .link(makePageUrl(uriInfo, maxPages(totalAmount, amountOnPage)), "last")
-                .link(makePageUrl(uriInfo, Math.max((currentPage - 1), 1)), "prev")
-                .link(makePageUrl(uriInfo, Math.min((currentPage + 1), 1)), "next")
+                .link(makePageUrl(uriInfo, maxPages), "last")
+                .link(makePageUrl(uriInfo, prevPage), "prev")
+                .link(makePageUrl(uriInfo, nextPage), "next")
                 .build();
 
     }

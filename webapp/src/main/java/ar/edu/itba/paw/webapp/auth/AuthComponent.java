@@ -1,9 +1,9 @@
 package ar.edu.itba.paw.webapp.auth;
 
-import java.util.Optional;
-
 import ar.edu.itba.paw.model.Comment;
+import ar.edu.itba.paw.model.Reservation;
 import ar.edu.itba.paw.model.Restaurant;
+import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
 import ar.edu.itba.paw.service.*;
 import org.slf4j.Logger;
@@ -13,8 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import ar.edu.itba.paw.model.Reservation;
-import ar.edu.itba.paw.model.User;
+import java.util.Optional;
 
 @Component
 public class AuthComponent {
@@ -39,8 +38,16 @@ public class AuthComponent {
         User loggedUser = loggedUser();
         Optional<Reservation> maybeReservation = reservationService.findById(reservationId);
         return loggedUser != null
-            && maybeReservation.isPresent()
-            && loggedUser.getId().equals(maybeReservation.get().getUser().getId());
+                && maybeReservation.isPresent()
+                && loggedUser.getId().equals(maybeReservation.get().getUser().getId());
+    }
+
+    public boolean isCommentOwner(Long commentId) {
+        User loggedUser = loggedUser();
+        Optional<Comment> maybeComment = commentService.findById(commentId);
+        return loggedUser != null
+                && maybeComment.isPresent()
+                && loggedUser.getId().equals(maybeComment.get().getUser().getId());
     }
 
     public boolean isReservationOwner(Long reservationId) {
@@ -48,12 +55,15 @@ public class AuthComponent {
         User loggedUser = loggedUser();
 
         return loggedUser != null
-            && maybeReservation.isPresent()
-            && loggedUser.getId().equals(maybeReservation.get().getRestaurant().getOwner().getId());
+                && maybeReservation.isPresent()
+                && loggedUser.getId().equals(maybeReservation.get().getRestaurant().getOwner().getId());
     }
 
     public boolean isRestaurantOwner(Long restaurantId) {
         User loggedUser = loggedUser();
+        if (loggedUser == null) {
+            return false;
+        }
         LOGGER.debug("Logged user: {} ", loggedUser.getId());
         Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
         LOGGER.debug("Restaurant id: {} ", restaurantId);
@@ -61,29 +71,31 @@ public class AuthComponent {
         return loggedUser.getId().equals(restaurant.getOwner().getId());
     }
 
-    public boolean isReviewOwner(Long reviewId) {
-        Optional<Comment> maybeReview = commentService.findById(reviewId);
-        User loggedUser = loggedUser();
-
-        return loggedUser != null
-                && maybeReview.isPresent()
-                && loggedUser.getId().equals(maybeReview.get().getUser().getId());
-    }
 
     public boolean isRestaurantAndMenuOwner(Long restaurantId, Long menuItemId) {
         User loggedUser = loggedUser();
+        if (loggedUser == null) {
+            return false;
+        }
         return userService.isTheRestaurantOwner(loggedUser.getId(), restaurantId)
-            && menuService.menuBelongsToRestaurant(menuItemId, restaurantId);
+                && menuService.menuBelongsToRestaurant(menuItemId, restaurantId);
     }
 
     public boolean isUser(Long userId) {
         User loggedUser = loggedUser();
+        if (loggedUser == null) {
+            return false;
+        }
         LOGGER.debug("logged user: {}", loggedUser.getId());
         LOGGER.debug("path id: {}", userId);
         return loggedUser.getId().equals(userId);
     }
+
     public boolean isUserByEmail(String email) {
         User loggedUser = loggedUser();
+        if (loggedUser == null) {
+            return false;
+        }
         return loggedUser.getEmail().equalsIgnoreCase(email);
     }
 

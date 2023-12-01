@@ -26,9 +26,10 @@ public class RestaurantDto {
 
     private URI image;
     private URI menu;
-    private URI reviews;
+
     private URI owner;
     private URI reservations;
+    private URI comments;
 
     public static RestaurantDto fromRestaurant(Restaurant restaurant, UriInfo uriInfo) {
         final RestaurantDto dto = new RestaurantDto();
@@ -47,14 +48,22 @@ public class RestaurantDto {
         dto.likes = restaurant.getLikes();
         dto.tags = restaurant.getTags().stream().map(Enum::name).collect(Collectors.toList());
         dto.reservationsCount = restaurant.getReservationsCount();
-        dto.image = uriInfo.getBaseUriBuilder().path(PATH).path(String.valueOf(restaurant.getId())).path("image")
-                .queryParam("v", String.valueOf(v)).build();
+        dto.image = uriInfo.getBaseUriBuilder().path(PATH).path(String.valueOf(restaurant.getId())).path("image").queryParam("v", String.valueOf(v)).build();
 
         dto.menu = uriInfo.getBaseUriBuilder().path(PATH).path(String.valueOf(restaurant.getId())).path("menu").build();
-        dto.reviews = uriInfo.getBaseUriBuilder().path(PATH).path(String.valueOf(restaurant.getId())).path("reviews").build();
         dto.owner = uriInfo.getBaseUriBuilder().path("users").path(restaurant.getOwner().getId().toString()).build();
         dto.reservations = uriInfo.getBaseUriBuilder().path("reservations").queryParam("madeTo", restaurant.getId()).build();
+        dto.comments = uriInfo.getBaseUriBuilder().path("comments").queryParam("madeTo", restaurant.getId()).build();
+
         return dto;
+    }
+
+    public URI getComments() {
+        return comments;
+    }
+
+    public void setComments(URI comments) {
+        this.comments = comments;
     }
 
     public URI getReservations() {
@@ -159,14 +168,6 @@ public class RestaurantDto {
 
     public void setMenu(URI menu) {
         this.menu = menu;
-    }
-
-    public URI getReviews() {
-        return reviews;
-    }
-
-    public void setReviews(URI reviews) {
-        this.reviews = reviews;
     }
 
     public URI getImage() {

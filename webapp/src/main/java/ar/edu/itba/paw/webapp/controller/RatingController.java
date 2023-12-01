@@ -47,7 +47,7 @@ public class RatingController {
         final int totalRatings = ratingService.getUserRatingsCount(userId);
 
         return PageUtils.paginatedResponse(new GenericEntity<List<RatingDto>>(ratings) {
-        }, uriInfo, page, AMOUNT_OF_RATINGS, totalRatings);
+        }, uriInfo, page, pageAmount, totalRatings);
     }
 
     private GenericEntity<List<RatingDto>> getRatingByRestaurantIds(Long userId, List<Long> restaurantIds) {

@@ -18,15 +18,6 @@ public class ReservationDto {
     private LocalDateTime date;
     private long quantity;
     private ReservationStatus status;
-
-    public ReservationStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ReservationStatus status) {
-        this.status = status;
-    }
-
     private URI self;
     private URI user;
     private URI restaurant;
@@ -43,6 +34,14 @@ public class ReservationDto {
         dto.self = uriInfo.getBaseUriBuilder().path("reservations").path(reservation.getId().toString()).build();
 
         return dto;
+    }
+
+    public ReservationStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ReservationStatus status) {
+        this.status = status;
     }
 
     public Long getId() {

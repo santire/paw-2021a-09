@@ -9,14 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CommentService {
-    // CREATE
     Comment addComment(long userId, long restaurantId, String comment);
-
-    // READ
     Optional<Comment> findById(long commentId);
-    int findByRestaurantCount( long restaurantId);
-    List<Comment> findByRestaurant(int page, int amountOnPage, long restaurantId);
-
-    // DESTROY
-    boolean deleteComment(long id);
+    List<Comment> findComments(int page, int amountOnPage, Long userId, Long restaurantId);
+    int findCommentsCount(Long userId, Long restaurantId);
+    void deleteComment(long id);
 }

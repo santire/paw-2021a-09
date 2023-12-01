@@ -29,22 +29,16 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestConfig.class)
 public class CommentJpaDaoTest {
+    @PersistenceContext
+    EntityManager em;
     @Autowired
     private DataSource ds;
-
     @Autowired
     private CommentJpaDao commentJpaDao;
 
-    @PersistenceContext
-    EntityManager em;
-
-    @Autowired
-    private RestaurantJpaDao restaurantJpaDao;
-    @Autowired
-    private UserJpaDao userJpaDao;
 
     private JdbcTemplate jdbcTemplate;
-    
+
     @Before
     public void setUp() {
         jdbcTemplate = new JdbcTemplate(ds);
@@ -52,41 +46,41 @@ public class CommentJpaDaoTest {
 
 
     @Test
-    public void testFindById(){
+    public void testFindById() {
         final Optional<Comment> maybeComment = commentJpaDao.findById(11);
 
         assertTrue(maybeComment.isPresent());
         final Comment comment = maybeComment.get();
 
-        assertEquals((long)1, (long)comment.getUser().getId());
-        assertEquals((long)1, (long)comment.getRestaurant().getId());
+        assertEquals(1, comment.getUser().getId().longValue());
+        assertEquals(1, comment.getRestaurant().getId().longValue());
         assertEquals("firstBK", comment.getUserComment());
     }
 
     @Test
-    public void testFindByUserAndRestaurant(){
-        final Optional<Comment> maybeComment = commentJpaDao.findByUserAndRestaurantId(1, 2);
+    public void testFindByUserAndRestaurant() {
+        final List<Comment> maybeComment = commentJpaDao.findFilteredComments(1, 5, 1L, 2L, true);
 
-        assertTrue(maybeComment.isPresent());
-        Comment comment = maybeComment.get();
+        assertNotNull(maybeComment.get(0));
+        Comment comment = maybeComment.get(0);
 
-        assertEquals(1, (long)comment.getUser().getId());
-        assertEquals(2, (long)comment.getRestaurant().getId());
+        assertEquals(1, comment.getUser().getId().longValue());
+        assertEquals(2, comment.getRestaurant().getId().longValue());
         assertEquals("firstBQ", comment.getUserComment());
     }
 
     @Test
-    public void testFindByRestaurant(){
-        List<Comment> commentList = commentJpaDao.findByRestaurant(2, 1, 2);
+    public void testFindByRestaurant() {
+        List<Comment> commentList = commentJpaDao.findFilteredComments(1, 5, null, 2L, true);
 
-        assertEquals(1, (long)commentList.size());
-        assertEquals(2, commentList.get(0).getUser().getId().longValue());
-        assertEquals(2, commentList.get(0).getRestaurant().getId().longValue());
-        assertEquals("secondBQ", commentList.get(0).getUserComment());
+        assertEquals(2, commentList.size());
+        assertEquals(2, commentList.get(1).getUser().getId().longValue());
+        assertEquals(2, commentList.get(1).getRestaurant().getId().longValue());
+        assertEquals("secondBQ", commentList.get(1).getUserComment());
     }
 
     @Test
-    public void testDeleteComment(){
+    public void testDeleteComment() {
 
         long commentId = 15;
         Comment comment = em.find(Comment.class, commentId);
@@ -99,7 +93,7 @@ public class CommentJpaDaoTest {
     }
 
     @Test
-    public void testCreateComment(){
+    public void testCreateComment() {
         LocalDate date = LocalDate.now();
 
         long userId = 1;
@@ -107,16 +101,16 @@ public class CommentJpaDaoTest {
 
         User user = em.find(User.class, userId);
         Restaurant restaurant = em.find(Restaurant.class, restaurantId);
-        
+
         String comment = "good comment";
         final Comment c = commentJpaDao.addComment(user, restaurant, comment, date);
 
         TypedQuery<Comment> query = em.createQuery("SELECT c FROM Comment c WHERE c.userComment = :comment", Comment.class);
         query.setParameter("comment", comment); // Replace "good comment" with the value you're searching for
 
-        Comment retrievedComment = query.getSingleResult();        
+        Comment retrievedComment = query.getSingleResult();
         //int count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM comments WHERE user_comment = ?", Integer.class, comment);
-        
+
         assertNotNull(retrievedComment);
         assertEquals(retrievedComment.getUserComment(), comment);
     }

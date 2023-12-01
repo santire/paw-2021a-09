@@ -3,59 +3,93 @@ package ar.edu.itba.paw.webapp.dto;
 import ar.edu.itba.paw.model.Comment;
 
 import javax.ws.rs.core.UriInfo;
-import java.time.LocalDate;
-
-
 import java.net.URI;
+import java.time.LocalDate;
 
 public class CommentDto {
 
     private Long id;
-    private String review;
+    private String message;
     private String date;
     private String username;
-
+    private URI self;
     private URI user;
     private URI restaurant;
 
-    public static CommentDto fromComment(Comment comment, UriInfo uriInfo){
+    public static CommentDto fromComment(Comment comment, UriInfo uriInfo) {
         final CommentDto dto = new CommentDto();
 
         dto.id = comment.getId();
-        dto.review = comment.getUserComment();
+        dto.message = comment.getUserComment();
         dto.date = comment.getDate().toString();
         dto.username = comment.getUser().getUsername();
 
-        dto.user = uriInfo.getBaseUriBuilder().path("users/"+ comment.getUser().getId()).build();
-        dto.restaurant = uriInfo.getBaseUriBuilder().path("restaurants/"+comment.getRestaurant().getId()).build();
+        dto.user = uriInfo.getBaseUriBuilder().path("users").path(comment.getUser().getId().toString()).build();
+        dto.restaurant = uriInfo.getBaseUriBuilder().path("restaurants").path(comment.getRestaurant().getId().toString()).build();
+        dto.self = uriInfo.getBaseUriBuilder().path("comments").path(comment.getId().toString()).build();
 
 
-        return  dto;
+        return dto;
     }
 
-    public Long getId() { return id; }
+    public URI getSelf() {
+        return self;
+    }
 
-    public String getReview() { return review; }
+    public void setSelf(URI self) {
+        this.self = self;
+    }
 
-    public String getDate() { return date; }
+    public Long getId() {
+        return id;
+    }
 
-    public URI getUser() { return user; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public URI getRestaurant() { return restaurant; }
+    public String getMessage() {
+        return message;
+    }
 
-    public String getUsername() { return username; }
+    public void setMessage(String userComment) {
+        this.message = userComment;
+    }
 
+    public String getDate() {
+        return date;
+    }
 
-    public void setId(Long id) { this.id = id; }
+    public void setDate(String date) {
+        this.date = date;
+    }
 
-    public void setReview(String userComment) { this.review = userComment; }
+    public void setDate(LocalDate date) {
+        this.date = date.toString();
+    }
 
-    public void setDate(LocalDate date) { this.date = date.toString(); }
+    public URI getUser() {
+        return user;
+    }
 
-    public void setUser(URI user) { this.user = user; }
+    public void setUser(URI user) {
+        this.user = user;
+    }
 
-    public void setRestaurant(URI restaurant) { this.restaurant = restaurant; }
+    public URI getRestaurant() {
+        return restaurant;
+    }
 
-    public void setUsername(String username) { this.username = username; }
+    public void setRestaurant(URI restaurant) {
+        this.restaurant = restaurant;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
 }

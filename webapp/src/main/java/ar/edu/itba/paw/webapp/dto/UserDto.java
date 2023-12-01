@@ -20,8 +20,8 @@ public class UserDto {
     private URI likes;
     private URI ratings;
     private URI reservations;
+    private URI comments;
     private URI restaurants;
-
 
     public static UserDto fromUser(User user, String url, UriInfo uriInfo) {
         final UserDto dto = new UserDto();
@@ -41,8 +41,16 @@ public class UserDto {
 
         dto.restaurants = uriInfo.getAbsolutePathBuilder().path("restaurants").build();
         dto.reservations = uriInfo.getBaseUriBuilder().path("reservations").queryParam("madeBy", user.getId()).build();
-
+        dto.comments = uriInfo.getBaseUriBuilder().path("comments").queryParam("madeBy", user.getId()).build();
         return dto;
+    }
+
+    public URI getComments() {
+        return comments;
+    }
+
+    public void setComments(URI comments) {
+        this.comments = comments;
     }
 
     public URI getRatings() {

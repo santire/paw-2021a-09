@@ -52,31 +52,23 @@ public class ReservationController {
 
     @GET
     @Produces(value = {MediaType.APPLICATION_JSON})
-    public Response findReservations(@QueryParam("madeBy") String madeBy, @QueryParam("madeTo") String madeTo, @QueryParam("status") ReservationStatus status, @QueryParam("type") ReservationType type, @QueryParam("page") @DefaultValue("1") Integer page, @QueryParam("pageAmount") @DefaultValue("10") Integer pageAmount, @Context HttpServletRequest request) {
+    public Response findReservations(@QueryParam("madeBy") Long madeBy,
+                                     @QueryParam("madeTo") Long madeTo,
+                                     @QueryParam("status") ReservationStatus status,
+                                     @QueryParam("type") ReservationType type,
+                                     @QueryParam("page") @DefaultValue("1") Integer page,
+                                     @QueryParam("pageAmount") @DefaultValue("10") Integer pageAmount,
+                                     @Context HttpServletRequest request) {
         if (pageAmount > AMOUNT_OF_RESERVATIONS || pageAmount < 1) {
             pageAmount = AMOUNT_OF_RESERVATIONS;
         }
 
-        Long userId;
-        try {
-            userId = Long.valueOf(madeBy);
-        } catch (NumberFormatException e) {
-            userId = null;
-        }
-
-        Long restaurantId;
-        try {
-            restaurantId = Long.valueOf(madeTo);
-        } catch (NumberFormatException e) {
-            restaurantId = null;
-        }
-
         LOGGER.debug("Filtering reservations by: {}", status);
-        List<ReservationDto> reservations = reservationService.findReservations(page, pageAmount, userId, restaurantId, status, type).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
-        int totalReservations = reservationService.findReservationsCount(userId, restaurantId, status, type);
+        List<ReservationDto> reservations = reservationService.findReservations(page, pageAmount, madeBy, madeTo, status, type).stream().map(u -> ReservationDto.fromReservation(u, uriInfo)).collect(Collectors.toList());
+        int totalReservations = reservationService.findReservationsCount(madeBy, madeTo, status, type);
 
         return PageUtils.paginatedResponse(new GenericEntity<List<ReservationDto>>(reservations) {
-        }, uriInfo, page, AMOUNT_OF_RESERVATIONS, totalReservations);
+        }, uriInfo, page, pageAmount, totalReservations);
     }
 
     @POST

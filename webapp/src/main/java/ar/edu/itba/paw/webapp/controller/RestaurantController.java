@@ -38,14 +38,11 @@ public class RestaurantController {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
     private static final int AMOUNT_OF_MENU_ITEMS = 8;
     private static final int MAX_AMOUNT_PER_PAGE = 10;
-    private static final int AMOUNT_OF_REVIEWS = 4;
 
     @Autowired
     private UserService userService;
     @Autowired
     private RestaurantService restaurantService;
-    @Autowired
-    private CommentService commentService;
     @Autowired
     private MenuService menuService;
 
@@ -173,50 +170,6 @@ public class RestaurantController {
         }, uriInfo, page, AMOUNT_OF_MENU_ITEMS, amountOfMenuItems);
     }
 
-    //READ RESTAURANT REVIEWS
-    @GET
-    @Path("/{restaurantId}/reviews")
-    @Produces(value = {MediaType.APPLICATION_JSON})
-    public Response findRestaurantReviews(@PathParam("restaurantId") final long restaurantId, @QueryParam("page") @DefaultValue("1") Integer page) {
-        int amountOfReviews = commentService.findByRestaurantCount(restaurantId);
-
-        List<CommentDto> reviews = commentService.findByRestaurant(page, AMOUNT_OF_REVIEWS, restaurantId)
-                .stream()
-                .map(u -> CommentDto.fromComment(u, uriInfo))
-                .collect(Collectors.toList());
-
-
-        return PageUtils.paginatedResponse(new GenericEntity<List<CommentDto>>(reviews) {
-        }, uriInfo, page, AMOUNT_OF_REVIEWS, amountOfReviews);
-    }
-
-    //CREATE REVIEW
-    @POST
-    @Path("/{restaurantId}/reviews")
-    @Produces(value = {MediaType.APPLICATION_JSON})
-    @Consumes(value = {MediaType.APPLICATION_JSON})
-    @PreAuthorize("!@authComponent.isRestaurantOwner(#restaurantId)")
-    public Response addRestaurantReview(@PathParam("restaurantId") final Long restaurantId,
-                                        final @Valid @NotNull CommentForm comment, @Context HttpServletRequest request) {
-        User user = getLoggedUser();
-        LOGGER.debug("review: {}", comment.getReview());
-        final Comment rev = commentService.addComment(user.getId(), restaurantId, comment.getReview());
-        final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(rev.getId())).build();
-        return Response.created(uri).entity(CommentDto.fromComment(rev, uriInfo)).build();
-    }
-
-    //DELETE REVIEW
-    @DELETE
-    @Path("/{restaurantId}/reviews/{reviewId}")
-    @Produces(value = {MediaType.APPLICATION_JSON})
-    @PreAuthorize("@authComponent.isReviewOwner(#reviewId) OR hasRole('ROLE_ADMIN')")
-    public Response deleteRestaurantReview(@PathParam("restaurantId") final Long restaurantId,
-                                           @PathParam("reviewId") final Long reviewId, @Context HttpServletRequest request) {
-        Comment review = commentService.findById(reviewId).orElseThrow(CommentNotFoundException::new);
-        commentService.deleteComment(reviewId);
-        return Response.noContent().build();
-    }
-
     //ADD MENU ITEM
     @POST
     @Path("/{restaurantId}/menu")
@@ -249,6 +202,7 @@ public class RestaurantController {
     @Consumes(value = {MediaType.APPLICATION_JSON})
     public Response registerRestaurant(final @Valid @NotNull RegisterRestaurantForm restaurantForm,
                                        @Context HttpServletRequest request) {
+        // TODO: pass userId in restaurantForm, check isUser with preAuth
         User user = getLoggedUser();
         List<Tags> tagList = new ArrayList<>();
         if (restaurantForm.getTags() != null) {

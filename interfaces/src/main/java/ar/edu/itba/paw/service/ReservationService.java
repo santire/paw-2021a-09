@@ -24,7 +24,7 @@ public interface ReservationService {
 
     //DESTROY
     Reservation ownerCancelReservation(long reservationId, String message);
-    boolean userCancelReservation(long reservationId);
+    void userCancelReservation(long reservationId);
 
 
 }

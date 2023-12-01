@@ -7,27 +7,38 @@ import javax.validation.constraints.Size;
 
 public class CommentForm {
 
-    private long id;
 
     @Size(min = 1, max = 144)
     @NotEmpty
     @NotNull
-    private String review;
+    private String message;
+    @NotNull
+    private Long userId;
+    @NotNull
+    private Long restaurantId;
 
-    public long getId() {
-        return id;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
-    public String getReview() {
-        return review;
+    public Long getRestaurantId() {
+        return restaurantId;
     }
 
-    public void setReview(String review) {
-        this.review = review;
+    public void setRestaurantId(Long restaurantId) {
+        this.restaurantId = restaurantId;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
 }

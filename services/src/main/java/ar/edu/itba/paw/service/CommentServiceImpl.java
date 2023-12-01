@@ -29,7 +29,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public Comment addComment(long userId, long restaurantId, String comment){
+    public Comment addComment(long userId, long restaurantId, String comment) {
         Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
         User user = userService.findById(userId).orElseThrow(UserNotFoundException::new);
         LocalDate currentDate = LocalDate.now();
@@ -37,31 +37,27 @@ public class CommentServiceImpl implements CommentService {
         return commentDao.addComment(user, restaurant, comment, currentDate);
     }
 
-    // READ
+    @Override
+    @Transactional
+    public List<Comment> findComments(int page, int amountOnPage, Long userId, Long restaurantId) {
+        return commentDao.findFilteredComments(page, amountOnPage, userId, restaurantId, true);
+    }
 
     @Override
     @Transactional
-    public Optional<Comment> findById(long commentId){
+    public int findCommentsCount(Long userId, Long restaurantId) {
+        return commentDao.findFilteredCommentsCount(userId, restaurantId);
+    }
+
+    @Override
+    @Transactional
+    public Optional<Comment> findById(long commentId) {
         return commentDao.findById(commentId);
     }
 
     @Override
     @Transactional
-    public List<Comment> findByRestaurant(int page, int amountOnPage, long restaurantId){
-        List<Comment> comments = commentDao.findByRestaurant(page, amountOnPage, restaurantId);
-        return comments;
-    }
-
-    @Override
-    public int findByRestaurantCount(long restaurantId){
-        return commentDao.findByRestaurantCount( restaurantId);
-    }
-
-    // DESTROY
-
-    @Override
-    @Transactional
-    public boolean deleteComment(long id){
-        return commentDao.deleteComment(id);
+    public void deleteComment(long id) {
+        commentDao.deleteComment(id);
     }
 }
