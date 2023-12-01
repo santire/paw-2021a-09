@@ -1,7 +1,6 @@
 package ar.edu.itba.paw.webapp.controller;
 
 import ar.edu.itba.paw.model.*;
-import ar.edu.itba.paw.model.exceptions.CommentNotFoundException;
 import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
 import ar.edu.itba.paw.service.*;
 import ar.edu.itba.paw.webapp.dto.*;
@@ -14,12 +13,10 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
+
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
@@ -36,11 +33,8 @@ import java.util.stream.Collectors;
 public class RestaurantController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RestaurantController.class);
-    private static final int AMOUNT_OF_MENU_ITEMS = 8;
     private static final int MAX_AMOUNT_PER_PAGE = 10;
 
-    @Autowired
-    private UserService userService;
     @Autowired
     private RestaurantService restaurantService;
 
@@ -51,7 +45,6 @@ public class RestaurantController {
     @Context
     private UriInfo uriInfo;
 
-    //READ RESTAURANTS
     @GET
     @Produces(value = {MediaType.APPLICATION_JSON})
     public Response getRestaurants(@QueryParam("page") @DefaultValue("1") Integer page,
@@ -86,14 +79,12 @@ public class RestaurantController {
         }
 
         List<Tags> tagsSelected = new ArrayList<>();
-//        List<Integer> tagsChecked = new ArrayList<>();
         if (tags != null) {
             for (int i : tags) {
                 if (Tags.valueOf(i) == null) {
                     LOGGER.warn("Tag {} does not exist. Ignoring...", i);
                 } else {
                     tagsSelected.add(Tags.valueOf(i));
-//                    tagsChecked.add(i);
                 }
             }
         }
@@ -106,27 +97,24 @@ public class RestaurantController {
         }
 
         boolean desc = order != null && order.equalsIgnoreCase("DESC");
-        if (pageAmount > MAX_AMOUNT_PER_PAGE) {
+        if (pageAmount > MAX_AMOUNT_PER_PAGE || pageAmount < 1) {
             pageAmount = MAX_AMOUNT_PER_PAGE;
         }
 
-        int totalRestaurants = restaurantService.getRestaurantsFilteredByCount(search, tagsSelected, min, max);
+        final int totalRestaurants = restaurantService.getRestaurantsFilteredByCount(search, tagsSelected, min, max);
         List<RestaurantDto> restaurants = restaurantService.getRestaurantsFilteredBy(
                         page, pageAmount, search, tagsSelected, min, max, sort, desc, 7)
                 .stream()
                 .map(u -> RestaurantDto.fromRestaurant(u, uriInfo))
                 .collect(Collectors.toList());
-        LOGGER.info(String.valueOf(restaurants.size()));
 
         return PageUtils.paginatedResponse(new GenericEntity<List<RestaurantDto>>(restaurants) {
         }, uriInfo, page, pageAmount, totalRestaurants);
     }
-
-    //READ A RESTAURANT
     @GET
     @Path("/{restaurantId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
-    public Response findRestaurantByID(@PathParam("restaurantId") final long restaurantId) {
+    public Response findRestaurantByID(@PathParam("restaurantId") final Long restaurantId) {
         final Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
         final RestaurantDto restaurantDto = RestaurantDto.fromRestaurant(restaurant, uriInfo);
         return Response.ok(new GenericEntity<RestaurantDto>(restaurantDto) {
@@ -135,8 +123,8 @@ public class RestaurantController {
 
     @GET
     @Path("/{restaurantId}/image")
-    @Produces(value = {MediaType.APPLICATION_JSON, "image/jpg"})
-    public Response getRestaurantImage(@PathParam("restaurantId") final long restaurantId) throws IOException {
+    @Produces(value = {"image/jpg"})
+    public Response getRestaurantImage(@PathParam("restaurantId") final Long restaurantId) throws IOException {
         CacheControl cache = CachingUtils.getCaching(24*CachingUtils.HOUR_TO_SEC);
         Date expireDate = CachingUtils.getExpirationDate(24*CachingUtils.HOUR_TO_SEC);
         final Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
@@ -149,16 +137,11 @@ public class RestaurantController {
                 .cacheControl(cache).expires(expireDate).build();
     }
 
-
-
-    //REGISTER RESTAURANT
     @POST
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = {MediaType.APPLICATION_JSON})
-    public Response registerRestaurant(final @Valid @NotNull RegisterRestaurantForm restaurantForm,
-                                       @Context HttpServletRequest request) {
-        // TODO: pass userId in restaurantForm, check isUser with preAuth
-        User user = getLoggedUser();
+    @PreAuthorize("@authComponent.isUser(#restaurantForm.ownerId)")
+    public Response registerRestaurant(@Valid @NotNull final RegisterRestaurantForm restaurantForm) {
         List<Tags> tagList = new ArrayList<>();
         if (restaurantForm.getTags() != null) {
             tagList = Arrays
@@ -173,7 +156,7 @@ public class RestaurantController {
                 restaurantForm.getAddress(),
                 restaurantForm.getPhoneNumber(),
                 tagList,
-                user,
+                restaurantForm.getOwnerId(),
                 restaurantForm.getFacebook(),
                 restaurantForm.getTwitter(),
                 restaurantForm.getInstagram()
@@ -181,19 +164,17 @@ public class RestaurantController {
 
         final URI uri = uriInfo.getAbsolutePathBuilder()
                 .path(String.valueOf(restaurant.getId())).build();
-        LOGGER.info("Restaurant created in : " + uri);
         return Response.created(uri).entity(RestaurantDto.fromRestaurant(restaurant, uriInfo)).build();
     }
 
     @PUT
     @Path("/{restaurantId}/image")
-    @Produces(value = {MediaType.APPLICATION_JSON})
+    @Produces(value = {"image/jpg"})
     @Consumes(value = {MediaType.MULTIPART_FORM_DATA})
     @PreAuthorize("@authComponent.isRestaurantOwner(#restaurantId)")
     public Response setImage(@PathParam("restaurantId") final Long restaurantId,
                              @FormDataParam("image") final FormDataBodyPart body,
-                             @FormDataParam("image") final byte[] bytes,
-                             @Context HttpServletRequest request) throws IOException {
+                             @FormDataParam("image") final byte[] bytes) throws IOException {
         // Throws InvalidImageException if not valid
         ImageFileValidator imageFileValidator = new ImageFileValidator();
         imageFileValidator.isValid(body, null);
@@ -203,8 +184,9 @@ public class RestaurantController {
         Image image = new Image(bytes);
         LOGGER.debug("Created image: {}", image);
         restaurantService.setImageByRestaurantId(image, restaurantId);
-        final URI uri = uriInfo.getAbsolutePathBuilder().build();
-        return Response.ok(uri).entity(bytes).build();
+        return Response.ok()
+                .header("Content-Type", "image/jpg")
+                .entity(bytes).build();
     }
 
     @PUT
@@ -214,8 +196,7 @@ public class RestaurantController {
     @PreAuthorize("@authComponent.isRestaurantOwner(#restaurantId)")
     public Response updateRestaurant(
             @PathParam("restaurantId") final Long restaurantId,
-            final @Valid @NotNull RegisterRestaurantForm restaurantForm,
-            @Context HttpServletRequest request) {
+            @Valid @NotNull final UpdateRestaurantForm restaurantForm) {
         List<Tags> tagList = new ArrayList<>();
         if (restaurantForm.getTags() != null) {
             tagList = Arrays.stream(restaurantForm.getTags()).map(Tags::valueOf).collect(Collectors.toList());
@@ -234,23 +215,13 @@ public class RestaurantController {
         return Response.noContent().build();
     }
 
-    //DELETE RESTAURANT
     @DELETE
     @Path("/{restaurantId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isRestaurantOwner(#restaurantId)")
-    public Response deleteRestaurant(@PathParam("restaurantId") final Long restaurantId,
-                                     @Context HttpServletRequest request) {
+    public Response deleteRestaurant(@PathParam("restaurantId") final Long restaurantId) {
         restaurantService.deleteRestaurantById(restaurantId);
-        return Response.noContent().build();
+        return Response.ok().build();
     }
-
-
-    private User getLoggedUser() {
-        return userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName())
-                // This shouldn't happen as authority is handled before
-                .orElseThrow(() -> new AccessDeniedException("Unauthorized"));
-    }
-
 
 }

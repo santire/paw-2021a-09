@@ -80,7 +80,8 @@ public class ReservationController {
     @POST
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = {MediaType.APPLICATION_JSON})
-    @PreAuthorize("!@authComponent.isRestaurantOwner(#reservationForm.restaurantId) && @authComponent.isUser(#reservationForm.userId)")
+    @PreAuthorize("!@authComponent.isRestaurantOwner(#reservationForm.restaurantId) " +
+            "and @authComponent.isUser(#reservationForm.userId)")
     public Response addRestaurantReservation(@Valid @NotNull final ReservationForm reservationForm,
                                              @Context HttpServletRequest request) {
         final URI baseUri = URI.create(request.getRequestURL().toString()).resolve(request.getContextPath());

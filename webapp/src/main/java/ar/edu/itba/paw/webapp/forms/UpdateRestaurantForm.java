@@ -1,26 +1,24 @@
 package ar.edu.itba.paw.webapp.forms;
 
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.web.multipart.MultipartFile;
-
-import ar.edu.itba.paw.webapp.validators.MultipartFileSizeValid;
-import ar.edu.itba.paw.webapp.validators.ValidImage;
-
-public class RestaurantForm {
+public class UpdateRestaurantForm {
     @Size(min = 2, max = 100)
     @Pattern(regexp = "[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ()'°´¨!&.\\s]+")
+    @NotNull
     private String name;
 
     @Pattern(regexp = "[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ&()'°´¨!.\\s]+")
     @Size(min = 6, max = 100)
+    @NotNull
     private String address;
 
     @Size(min = 8, max = 30)
     @Pattern(regexp = "[0-9]+")
+    @NotNull
     private String phoneNumber;
 
 

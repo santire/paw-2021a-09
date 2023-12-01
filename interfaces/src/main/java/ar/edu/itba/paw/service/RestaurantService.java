@@ -8,13 +8,10 @@ import java.util.Optional;
 public interface RestaurantService {
 
     // CREATE
-    Restaurant registerRestaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner, String facebook, String twitter, String instagram);
+    Restaurant registerRestaurant(String name, String address, String phoneNumber, List<Tags> tags, Long ownerId, String facebook, String twitter, String instagram);
     boolean setImageByRestaurantId(Image image, long restaurantId);
-
     // READ
     Optional<Restaurant> findById(long id);
-    Optional<Restaurant> findByIdWithMenu(long id, int menuPage, int amountOnMenuPage);
-    int findByIdWithMenuCount( long id);
     List<Restaurant> getRestaurantsFromOwner(int page, int amountOnPage, long userId);
     int getRestaurantsFromOwnerCount(long userId);
     List<Restaurant> getPopularRestaurants(int limit, int minValue);

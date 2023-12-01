@@ -24,6 +24,7 @@ public class RestaurantDto {
     private int reservationsCount;
 
     private URI image;
+    private URI self;
     private URI menu;
     private URI owner;
     private URI reservations;
@@ -47,13 +48,21 @@ public class RestaurantDto {
         dto.tags = restaurant.getTags().stream().map(Enum::name).collect(Collectors.toList());
         dto.reservationsCount = restaurant.getReservationsCount();
         dto.image = uriInfo.getBaseUriBuilder().path("restaurants").path(String.valueOf(restaurant.getId())).path("image").queryParam("v", String.valueOf(v)).build();
-
+        dto.self = uriInfo.getBaseUriBuilder().path("restaurants").path(String.valueOf(restaurant.getId())).build();
         dto.menu = uriInfo.getBaseUriBuilder().path("restaurants").path(String.valueOf(restaurant.getId())).path("menu").build();
         dto.owner = uriInfo.getBaseUriBuilder().path("users").path(restaurant.getOwner().getId().toString()).build();
         dto.reservations = uriInfo.getBaseUriBuilder().path("reservations").queryParam("madeTo", restaurant.getId()).build();
         dto.comments = uriInfo.getBaseUriBuilder().path("comments").queryParam("madeTo", restaurant.getId()).build();
 
         return dto;
+    }
+
+    public URI getSelf() {
+        return self;
+    }
+
+    public void setSelf(URI self) {
+        this.self = self;
     }
 
     public URI getComments() {

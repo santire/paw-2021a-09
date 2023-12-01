@@ -73,7 +73,8 @@ public class RatingController {
 
     @POST
     @Produces(value = {MediaType.APPLICATION_JSON})
-    @PreAuthorize("@authComponent.isUser(#userId) && !@authComponent.isRestaurantOwner(#ratingForm.restaurantId)")
+    @PreAuthorize("@authComponent.isUser(#userId) " +
+            "and not @authComponent.isRestaurantOwner(#ratingForm.restaurantId)")
     public Response createRating(@PathParam("userId") final Long userId, @Valid @NotNull final RatingForm ratingForm) {
 
         final Rating rating = ratingService.rateRestaurant(userId, ratingForm.getRestaurantId(), ratingForm.getRating());
@@ -85,7 +86,8 @@ public class RatingController {
     @PUT
     @Path("/{restaurantId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
-    @PreAuthorize("@authComponent.isUser(#userId) && !@authComponent.isRestaurantOwner(#restaurantId)")
+    @PreAuthorize("@authComponent.isUser(#userId) " +
+            "and not @authComponent.isRestaurantOwner(#restaurantId)")
     public Response updateRating(@PathParam("userId") final Long userId,
                                  @PathParam("restaurantId") Long restaurantId,
                                  @Valid UpdateRatingForm ratingForm) {
@@ -96,7 +98,8 @@ public class RatingController {
     @DELETE
     @Path("/{restaurantId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
-    @PreAuthorize("@authComponent.isUser(#userId) && !@authComponent.isRestaurantOwner(#restaurantId)")
+    @PreAuthorize("@authComponent.isUser(#userId) " +
+            "and not @authComponent.isRestaurantOwner(#restaurantId)")
     public Response deleteRating(@PathParam("userId") final Long userId,
                                  @PathParam("restaurantId") Long restaurantId) {
         ratingService.deleteRating(userId, restaurantId);

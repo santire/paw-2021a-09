@@ -2,6 +2,7 @@ package ar.edu.itba.paw.service;
 
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
+import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
 import ar.edu.itba.paw.persistence.RestaurantDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,10 +15,13 @@ import java.util.Optional;
 public class RestaurantServiceImpl implements RestaurantService {
     @Autowired
     private RestaurantDao restaurantDao;
+    @Autowired
+    private UserService userService;
 
     @Override
     @Transactional
-    public Restaurant registerRestaurant(String name, String address, String phoneNumber, List<Tags> tags, User owner, String facebook, String twitter, String instagram) {
+    public Restaurant registerRestaurant(String name, String address, String phoneNumber, List<Tags> tags, Long ownerId, String facebook, String twitter, String instagram) {
+        User owner = userService.findById(ownerId).orElseThrow(UserNotFoundException::new);
         return restaurantDao.registerRestaurant(name, address, phoneNumber, tags, owner, facebook, twitter, instagram);
     }
 
@@ -28,7 +32,6 @@ public class RestaurantServiceImpl implements RestaurantService {
         return true;
     }
 
-    // READ
     @Override
     @Transactional
     public Optional<Restaurant> findById(long id) {
@@ -39,18 +42,6 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Transactional
     public List<Restaurant> getPopularRestaurants(int limit, int minValue) {
         return restaurantDao.getPopularRestaurants(limit, minValue);
-    }
-
-    @Override
-    @Transactional
-    public Optional<Restaurant> findByIdWithMenu(long id, int menuPage, int amountOnMenuPage) {
-        return restaurantDao.findByIdWithMenu(menuPage, amountOnMenuPage, id);
-    }
-
-    @Override
-    @Transactional
-    public int findByIdWithMenuCount(long id) {
-        return restaurantDao.findByIdWithMenuCount( id);
     }
 
     @Override
@@ -83,23 +74,20 @@ public class RestaurantServiceImpl implements RestaurantService {
         return restaurantDao.getRestaurantsFilteredByCount(name, tags, minAvgPrice, maxAvgPrice);
     }
 
-    // UPDATE
     @Override
     @Transactional
     public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber, List<Tags> tags, String facebook, String twitter, String instagram) {
-        Restaurant restaurant = findById(id).orElseThrow(RestaurantNotFoundException::new);
-        if (name != null) restaurant.setName(name);
-        if (address != null) restaurant.setAddress(address);
-        if (phoneNumber != null) restaurant.setPhoneNumber(phoneNumber);
-        if (tags != null) restaurant.setTags(tags);
-        if (facebook != null) restaurant.setFacebook(facebook);
-        if (twitter != null) restaurant.setTwitter(twitter);
-        if (instagram != null) restaurant.setInstagram(instagram);
+        Restaurant restaurant = restaurantDao.findById(id).orElseThrow(RestaurantNotFoundException::new);
+        restaurant.setName(name);
+        restaurant.setAddress(address);
+        restaurant.setPhoneNumber(phoneNumber);
+        restaurant.setTags(tags);
+        restaurant.setFacebook(facebook);
+        restaurant.setTwitter(twitter);
+        restaurant.setInstagram(instagram);
 
         return Optional.of(restaurant);
     }
-
-    // DESTROY
 
     @Override
     @Transactional

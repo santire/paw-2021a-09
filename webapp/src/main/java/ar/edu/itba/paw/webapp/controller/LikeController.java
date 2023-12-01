@@ -66,7 +66,7 @@ public class LikeController {
     @POST
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = {MediaType.APPLICATION_JSON})
-    @PreAuthorize("@authComponent.isUser(#userId) && !@authComponent.isRestaurantOwner(#likeForm.restaurantId)")
+    @PreAuthorize("@authComponent.isUser(#userId) and !@authComponent.isRestaurantOwner(#likeForm.restaurantId)")
     public Response likeRestaurant(@PathParam("userId") final Long userId, @Valid @NotNull final LikeForm likeForm) {
 
         final Like like = likesService.like(userId, likeForm.getRestaurantId());
@@ -78,7 +78,7 @@ public class LikeController {
     @DELETE
     @Path("/{restaurantId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
-    @PreAuthorize("@authComponent.isUser(#userId) && !@authComponent.isRestaurantOwner(#restaurantId)")
+    @PreAuthorize("@authComponent.isUser(#userId) and !@authComponent.isRestaurantOwner(#restaurantId)")
     public Response dislikeRestaurant(@PathParam("userId") final Long userId,
                                       @PathParam("restaurantId") final Long restaurantId) {
         likesService.dislike(userId, restaurantId);
