@@ -15,6 +15,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -35,11 +36,6 @@ public class UserServiceTest {
     private static final String BASEURL = "/";
     private static final Long ID = 1l;
     private static final String TOKEN = "token1234";
-
-    private static final String RESTAURANT_NAME = "myrestaurant";
-    private static final String RESTAURANT_ADDRESS = "9 de Julio";
-    private static final String RESTAURANT_PHONE = "46511234";
-    private static final Long RESTAURANT_ID = 1l;
 
 
     @InjectMocks
@@ -70,7 +66,7 @@ public class UserServiceTest {
         Mockito.doNothing().when(emailService).sendRegistrationEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 
 
-        User user = userService.register(USERNAME, PASSWORD, FIRSTNAME, LASTNAME, EMAIL, PHONE, BASEURL);
+        User user = userService.register(USERNAME, PASSWORD, FIRSTNAME, LASTNAME, EMAIL, PHONE, BASEURL, URI.create(""));
 
         Assert.assertEquals(USERNAME, user.getUsername());
         Assert.assertEquals(PASSWORD, user.getPassword());
@@ -113,28 +109,5 @@ public class UserServiceTest {
         Assert.assertEquals("newfirstname", u.getFirstName());
         Assert.assertEquals("newlastname", u.getLastName());
         Assert.assertEquals("987654321", u.getPhone());
-    }
-
-    @Test
-    public void testRestaurantOwner(){
-
-        User u = new User(ID, USERNAME, PASSWORD, FIRSTNAME, LASTNAME, EMAIL, PHONE, true);
-
-        Restaurant r = new Restaurant(RESTAURANT_NAME,
-                RESTAURANT_ADDRESS,
-                RESTAURANT_PHONE,
-                new ArrayList<>(),
-                u, "", "", "");
-        r.setId(RESTAURANT_ID);
-        
-
-        List<Restaurant> restaurantList = new ArrayList<>();
-        restaurantList.add(r);
-        u.setOwnedRestaurants(restaurantList);
-
-        Mockito.when(userDao.findById(ID)).thenReturn(Optional.of(u));
-
-        Assert.assertTrue(userService.isRestaurantOwner(u.getId()));
-        Assert.assertTrue(userService.isTheRestaurantOwner(u.getId(), r.getId()));
     }
 }

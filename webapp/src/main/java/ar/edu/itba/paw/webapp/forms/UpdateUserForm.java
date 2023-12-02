@@ -1,47 +1,55 @@
 package ar.edu.itba.paw.webapp.forms;
 
 
+import ar.edu.itba.paw.webapp.validators.FieldMatch;
+
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-
-import ar.edu.itba.paw.webapp.validators.FieldMatch;
 
 @FieldMatch(first = "password", second = "repeatPassword")
 public class UpdateUserForm {
 
 
+    @Pattern(regexp = "(reset|activate)")
+    private String action;
+    private String token;
     @Size(min = 3, max = 30)
     @Pattern(regexp = "[a-zA-Z0-9]+")
     private String username;
-
     @Size(min = 8, max = 100)
     private String password;
-
     @Size(min = 8, max = 100)
     private String repeatPassword;
-
-
     @Pattern(regexp = "[a-zA-ZñÑáéíóúÁÉÍÓÚ]+[a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]*")
     @Size(min = 2, max = 100)
     private String firstName;
-
     @Pattern(regexp = "[a-zA-ZñÑáéíóúÁÉÍÓÚ]+[a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]*")
     @Size(min = 2, max = 100)
     private String lastName;
-
     @Size(min = 6, max = 100)
     // @Pattern(regexp =
     // "/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/")
 
     @Pattern(regexp = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$")
     private String email;
-
-
     @Size(min = 6, max = 15)
-    @Pattern(regexp = "[0-9]+")
+    @Pattern(regexp = "\\d+")
     private String phone;
 
-    public UpdateUserForm() {
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getUsername() {

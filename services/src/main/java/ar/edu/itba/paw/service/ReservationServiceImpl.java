@@ -8,10 +8,11 @@ import ar.edu.itba.paw.persistence.ReservationDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -32,12 +33,22 @@ public class ReservationServiceImpl implements ReservationService {
     // CREATE
     @Override
     @Transactional
-    public Reservation addReservation(long userId, long restaurantId, LocalDateTime date, long quantity, String ownerUrl, String userUrl) {
+    public Reservation addReservation(long userId, long restaurantId, LocalDateTime date, long quantity, URI baseUri) {
         Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
         User user = userService.findById(userId).orElseThrow(UserNotFoundException::new);
         User owner = restaurant.getOwner();
         Reservation reservation = reservationDao.addReservation(user, restaurant, date, quantity);
-//        String url = baseUrl + "/paw-2021a-09/restaurants/" + restaurant.getId() + "/reservations?tab=pending";
+
+        final String ownerUrl = UriBuilder.fromUri(baseUri).path("restaurants")
+                .path(reservation.getRestaurant().getId().toString())
+                .path("reservations")
+                .queryParam("tab", "pending")
+                .build().toString();
+
+        final String userUrl = UriBuilder.fromUri(baseUri)
+                .path("user")
+                .path("reservations")
+                .build().toString();
 
         emailService.sendNewReservationOwnerEmail(owner.getEmail(), owner.getFirstName(), user.getName(), restaurant.getName(), ownerUrl);
 
@@ -94,7 +105,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     @Transactional
-    public Reservation confirmReservation(long reservationId) {
+    public void confirmReservation(long reservationId) {
         Reservation reservation = reservationDao.findById(reservationId).orElseThrow(ReservationNotFoundException::new);
         Restaurant restaurant = reservation.getRestaurant();
         User user = reservation.getUser();
@@ -104,19 +115,17 @@ public class ReservationServiceImpl implements ReservationService {
 
         emailService.sendReservationConfirmationEmail(user.getEmail(), restaurant.getName(), reservation.getDate(), reservation.getQuantity());
         reservation.setStatus(ReservationStatus.CONFIRMED);
-        return reservation;
     }
 
     @Override
     @Transactional
-    public Reservation ownerCancelReservation(long reservationId, String message) {
+    public void ownerCancelReservation(long reservationId, String message) {
         Reservation reservation = reservationDao.findById(reservationId).orElseThrow(ReservationNotFoundException::new);
         Restaurant restaurant = reservation.getRestaurant();
         User user = reservation.getUser();
 
         emailService.sendOwnerReservationCancelEmail(user.getEmail(), user.getName(), restaurant.getName(), reservation.getDate(), reservation.getQuantity(), message);
         reservation.setStatus(ReservationStatus.DENIED);
-        return reservation;
     }
 
     // DESTROY

@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.service;
 
+import java.net.URI;
 import java.util.Optional;
 
 import ar.edu.itba.paw.model.User;
@@ -17,19 +18,16 @@ public interface UserService {
                        final String lastName,
                        final String email,
                        final String phone,
-                       String baseUrl) throws EmailInUseException, TokenCreationException, UsernameInUseException;
+                       final String baseUsersUrl,
+                       URI baseUri) throws EmailInUseException, TokenCreationException, UsernameInUseException;
 
   // READ
   Optional<User> findById(long id);
-  Optional<User> findByUsername(String username);
   Optional<User> findByEmail(String email);
-  boolean isRestaurantOwner(long userId);
-  boolean isTheRestaurantOwner(long userId,long restaurantId);
 
-  // UPDATE
-  User activateUserByToken(String token) throws TokenExpiredException;
-  User updatePasswordByToken(String token, String password) throws TokenExpiredException;
+  void activateUserByToken(String token) throws TokenExpiredException;
+  void updatePasswordByToken(String token, String password) throws TokenExpiredException;
   void updateUser(long id, String password, String firstName, String lastName, String phone);
-  void requestPasswordReset(String email, String baseUrl) throws TokenCreationException;
+  void requestPasswordReset(String email, final String baseUsersUrl, URI baseUri) throws TokenCreationException;
 
 }

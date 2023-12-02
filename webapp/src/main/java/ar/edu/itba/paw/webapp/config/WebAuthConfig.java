@@ -90,7 +90,8 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                         "/api/tags"
                 ).permitAll()
                 .antMatchers(HttpMethod.POST, "/api/users").permitAll()
-                .antMatchers(HttpMethod.PUT, "/api/users").permitAll()
+                // For activation and password recovery
+                .antMatchers(HttpMethod.PATCH, "/api/users/*").permitAll()
                 .antMatchers("/api/**").authenticated()
                 .and()
                 .exceptionHandling()

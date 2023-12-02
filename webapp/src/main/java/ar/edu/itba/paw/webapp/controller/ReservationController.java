@@ -58,8 +58,7 @@ public class ReservationController {
                                      @QueryParam("status") ReservationStatus status,
                                      @QueryParam("type") ReservationType type,
                                      @QueryParam("page") @DefaultValue("1") Integer page,
-                                     @QueryParam("pageAmount") @DefaultValue("10") Integer pageAmount,
-                                     @Context HttpServletRequest request) {
+                                     @QueryParam("pageAmount") @DefaultValue("10") Integer pageAmount) {
         if (pageAmount > AMOUNT_OF_RESERVATIONS || pageAmount < 1) {
             pageAmount = AMOUNT_OF_RESERVATIONS;
         }
@@ -86,24 +85,12 @@ public class ReservationController {
                                              @Context HttpServletRequest request) {
         final URI baseUri = URI.create(request.getRequestURL().toString()).resolve(request.getContextPath());
 
-        final String ownerUrl = UriBuilder.fromUri(baseUri).path("restaurants")
-                .path(reservationForm.getRestaurantId().toString())
-                .path("reservations")
-                .queryParam("tab", "pending")
-                .build().toString();
-
-        final String userUrl = UriBuilder.fromUri(baseUri)
-                .path("user")
-                .path("reservations")
-                .build().toString();
-
         final Reservation res = reservationService.addReservation(
                 reservationForm.getUserId(),
                 reservationForm.getRestaurantId(),
                 reservationForm.getDate(),
                 reservationForm.getQuantity(),
-                ownerUrl,
-                userUrl);
+                baseUri);
 
         final URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(res.getId())).build();
         return Response.created(uri).entity(ReservationDto.fromReservation(res, uriInfo)).build();
@@ -114,7 +101,7 @@ public class ReservationController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("!@authComponent.isReservationOwner(#reservationId)")
-    public Response confirmReservation(@PathParam("reservationId") final Long reservationId,
+    public Response updateReservationStatus(@PathParam("reservationId") final Long reservationId,
                                        @Valid final ReservationStatusForm statusForm) {
         switch (statusForm.getStatus()) {
             case DENIED:
@@ -131,7 +118,7 @@ public class ReservationController {
                 throw new InvalidParameterException("status", "Can only be 'confirmed' or 'denied' ");
         }
 
-        return Response.noContent().build();
+        return Response.ok().build();
     }
 
     @DELETE
@@ -141,6 +128,6 @@ public class ReservationController {
     public Response cancelRestaurantReservation(
             @PathParam("reservationId") final Long reservationId) {
         reservationService.userCancelReservation(reservationId);
-        return Response.noContent().build();
+        return Response.ok().build();
     }
 }

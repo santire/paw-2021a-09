@@ -162,11 +162,6 @@ public class RestaurantJpaDaoTest {
         assertEquals("BurgerQueen", restaurantList.get(1).getName());
         assertEquals("BurgerKing", restaurantList.get(0).getName());
     }
-    @Test
-    public void testMenuBelongsToRestaurant() {
-        assertTrue(restaurantDao.menuBelongsToRestaurant(999l,999l));
-        assertFalse(restaurantDao.menuBelongsToRestaurant(999l,996l));
-    }
 
     @Test
     public void testGetRestaurantsFromOwner() {

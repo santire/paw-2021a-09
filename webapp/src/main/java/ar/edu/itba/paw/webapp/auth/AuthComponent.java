@@ -80,6 +80,9 @@ public class AuthComponent {
         LOGGER.debug("path id: {}", userId);
         return loggedUser.getId().equals(userId);
     }
+    public boolean isValidToken(String token) {
+        return token != null;
+    }
 
     public boolean isUserByEmail(String email) {
         User loggedUser = loggedUser();

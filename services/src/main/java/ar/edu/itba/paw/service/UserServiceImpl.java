@@ -1,13 +1,10 @@
 package ar.edu.itba.paw.service;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Optional;
-import java.util.UUID;
-
-
+import ar.edu.itba.paw.model.PasswordToken;
+import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.VerificationToken;
 import ar.edu.itba.paw.model.exceptions.*;
+import ar.edu.itba.paw.persistence.UserDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,162 +12,150 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.context.i18n.LocaleContextHolder;
 
-
-import ar.edu.itba.paw.model.User;
-import ar.edu.itba.paw.model.Email;
-import ar.edu.itba.paw.model.EmailTemplate;
-import ar.edu.itba.paw.model.PasswordToken;
-import ar.edu.itba.paw.model.VerificationToken;
-import ar.edu.itba.paw.persistence.UserDao;
-import org.springframework.context.MessageSource;
-
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Component
 public class UserServiceImpl implements UserService {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
-  @Autowired
-  private PasswordEncoder encoder;
+    @Autowired
+    private PasswordEncoder encoder;
 
-  @Autowired
-  private UserDao userDao;
+    @Autowired
+    private UserDao userDao;
 
-  @Autowired
-  private EmailService emailService;
+    @Autowired
+    private EmailService emailService;
 
-  @Autowired
-  private MessageSource messageSource;
-
-  @Override
-  public Optional<User> findById(long id) {
-    return userDao.findById(id);
-  }
-
-  @Transactional(rollbackFor = {UsernameInUseException.class, EmailInUseException.class, TokenCreationException.class})
-  @Override
-  public User register(String username, String password, String firstName, String lastName, String email,
-                       String phone, String baseUrl)
-          throws UsernameInUseException, EmailInUseException, TokenCreationException {
-    User user = userDao.register(username,encoder.encode(password), firstName, lastName, email, phone);
-    if (user == null) return null;
-    String url = baseUrl + "/paw-2021a-09/register?type=activate&token=";
-
-    String token = UUID.randomUUID().toString();
-    LocalDateTime createdAt = LocalDateTime.now();
-
-    userDao.assignTokenToUser(token, createdAt, user.getId());
-    emailService.sendRegistrationEmail(user.getEmail(), user.getFirstName(), url+token);
-
-    return  user;
-  }
-
-  @Transactional
-  @Override
-  public void requestPasswordReset(String email, String baseUrl) throws TokenCreationException {
-    LOGGER.debug("Requesting reset for {}", email);
-    User user = userDao.findByEmail(email).orElseThrow(UserNotFoundException::new);
-    String url = baseUrl + "/paw-2021a-09/reset?type=reset&token=";
-    String token = UUID.randomUUID().toString();
-    LocalDateTime createdAt = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.systemDefault());
-
-    userDao.assignPasswordTokenToUser(token, createdAt, user.getId());
-    emailService.sendPasswordResetEmail(user.getEmail(), user.getFirstName(), url+token);
-  }
-
-  @Override
-  @Transactional
-  public User activateUserByToken(String token) throws TokenExpiredException {
-
-
-    Optional<VerificationToken> maybeToken = userDao.getToken(token);
-    LOGGER.debug("GOT TOKEN {}", maybeToken.isPresent() ? maybeToken.get().getToken() : null);
-    LOGGER.debug("WITH UID {}", maybeToken.isPresent() ? maybeToken.get().getUser().getId(): null);
-    VerificationToken verificationToken = maybeToken.orElseThrow(TokenDoesNotExistException::new);
-    LocalDateTime expiryDate = verificationToken.getCreatedAt().plusDays(1);
-
-    if(LocalDateTime.now().isAfter(expiryDate)) {
-      LOGGER.warn("verificationToken {} is expired", verificationToken.getToken());
-      throw new TokenExpiredException();
+    @Override
+    @Transactional
+    public Optional<User> findById(long id) {
+        return userDao.findById(id);
     }
 
-    User user = verificationToken.getUser();
-
-    LOGGER.debug("Activating user {}", user.getId());
-    user.setActive(true);
-    userDao.deleteToken(token);
-    return user;
-  }
-
-  @Override
-  @Transactional
-  public User updatePasswordByToken(String token, String password) throws TokenExpiredException, TokenDoesNotExistException {
-
-    Optional<PasswordToken> maybeToken = userDao.getPasswordToken(token);
-    PasswordToken passwordToken = maybeToken.orElseThrow(TokenDoesNotExistException::new);
-    LOGGER.debug("GOT TOKEN {}", passwordToken.getToken());
-    LOGGER.debug("WITH UID {}", passwordToken.getUser().getId());
-
-    LocalDateTime expiryDate = passwordToken.getCreatedAt().plusDays(1);
-
-    if(LocalDateTime.now().isAfter(expiryDate)) {
-      LOGGER.warn("verificationToken {} is expired", passwordToken.getToken());
-      throw new TokenExpiredException();
+    @Override
+    @Transactional
+    public Optional<User> findByEmail(String email) {
+        if (email == null) return Optional.empty();
+        return userDao.findByEmail(email);
     }
 
-    User user = passwordToken.getUser();
+    @Override
+    @Transactional(rollbackFor = {UsernameInUseException.class, EmailInUseException.class, TokenCreationException.class})
+    public User register(String username, String password, String firstName, String lastName, String email,
+                         String phone,
+                         String baseUsersUrl,
+                         URI baseUri)
+            throws UsernameInUseException, EmailInUseException, TokenCreationException {
 
-    updateUser(user.getId(),
-            password,
-            user.getFirstName(),
-            user.getLastName(),
-            user.getPhone());
+        User user = userDao.register(username, encoder.encode(password), firstName, lastName, email, phone);
 
-    userDao.deleteAssociatedPasswordTokens(user);
-    return user;
-  }
+        final URI patchUri = makePatchUri(user, baseUsersUrl);
 
-  @Override
-  public Optional<User> findByUsername(String username) { return userDao.findByUsername(username); }
+        String token = UUID.randomUUID().toString();
+        LocalDateTime createdAt = LocalDateTime.now();
+        String url = UriBuilder.fromUri(baseUri)
+                .path("user")
+                .path("activate")
+                .queryParam("token", token)
+                .queryParam("patchUrl", patchUri)
+                .build()
+                .toString();
 
-  @Override
-  public Optional<User> findByEmail(String email) {
-    if (email == null) return Optional.empty();
-    return userDao.findByEmail(email);
-  }
+        userDao.assignTokenToUser(token, createdAt, user.getId());
+        emailService.sendRegistrationEmail(user.getEmail(), user.getFirstName(), url);
 
-  @Override
-  public boolean isTheRestaurantOwner(long userId, long restaurantId) {
-    User user = userDao.findById(userId).orElseThrow(UserNotFoundException::new);
-    return user
-            .getOwnedRestaurants()
-            .stream()
-            .filter((r) -> r.getId().equals(restaurantId))
-            .findFirst()
-            .isPresent();
-  }
+        return user;
+    }
 
-  @Override
-  public boolean isRestaurantOwner(long userId) {
-    User user = userDao.findById(userId).orElseThrow(UserNotFoundException::new);
-    return user.getOwnedRestaurants().size() > 0;
-  }
+    @Transactional
+    @Override
+    public void requestPasswordReset(String email, String baseUsersUrl, URI baseUri) throws TokenCreationException {
+        User user = userDao.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        LOGGER.debug("Requesting reset for {}", user.getEmail());
+        final URI patchUri = makePatchUri(user, baseUsersUrl);
+
+        String token = UUID.randomUUID().toString();
+        LocalDateTime createdAt = LocalDateTime.now();
+        String url = UriBuilder.fromUri(baseUri)
+                .path("user")
+                .path("reset")
+                .queryParam("token", token)
+                .queryParam("patchUrl", patchUri)
+                .build()
+                .toString();
+        userDao.assignPasswordTokenToUser(token, createdAt, user.getId());
+        LOGGER.debug("Setting reset email url to: {}", url);
+        emailService.sendPasswordResetEmail(user.getEmail(), user.getFirstName(), url);
+    }
+
+    private URI makePatchUri(User user, String baseUsersUrl) {
+        return UriBuilder.
+                fromUri(baseUsersUrl)
+                .path(user.getId().toString())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public void activateUserByToken(String token) throws TokenExpiredException {
 
 
-  @Override
-  @Transactional
-  public void updateUser(long id, String password, String firstName, String lastName, String phone) {
-    User user = userDao.findById(id).orElseThrow(UserNotFoundException::new);
-    if(password != null && !password.isEmpty()) user.setPassword(encoder.encode(password));
-    if(firstName != null && !firstName.isEmpty()) user.setFirstName(firstName);
-    if(lastName != null && !lastName.isEmpty()) user.setLastName(lastName);
-    if(phone != null && !phone.isEmpty()) user.setPhone(phone);
-  }
+        Optional<VerificationToken> maybeToken = userDao.getToken(token);
+        LOGGER.debug("GOT TOKEN {}", maybeToken.isPresent() ? maybeToken.get().getToken() : null);
+        LOGGER.debug("WITH UID {}", maybeToken.isPresent() ? maybeToken.get().getUser().getId() : null);
+        VerificationToken verificationToken = maybeToken.orElseThrow(TokenDoesNotExistException::new);
+        LocalDateTime expiryDate = verificationToken.getCreatedAt().plusDays(1);
+
+        if (LocalDateTime.now().isAfter(expiryDate)) {
+            LOGGER.warn("verificationToken {} is expired", verificationToken.getToken());
+            throw new TokenExpiredException();
+        }
+
+        User user = verificationToken.getUser();
+
+        LOGGER.debug("Activating user {}", user.getId());
+        user.setActive(true);
+        userDao.deleteToken(token);
+    }
+
+    @Override
+    @Transactional
+    public void updatePasswordByToken(String token, String password) throws TokenExpiredException, TokenDoesNotExistException {
+
+        Optional<PasswordToken> maybeToken = userDao.getPasswordToken(token);
+        PasswordToken passwordToken = maybeToken.orElseThrow(TokenDoesNotExistException::new);
+        LOGGER.debug("GOT TOKEN {}", passwordToken.getToken());
+        LOGGER.debug("WITH UID {}", passwordToken.getUser().getId());
+
+        LocalDateTime expiryDate = passwordToken.getCreatedAt().plusDays(1);
+
+        if (LocalDateTime.now().isAfter(expiryDate)) {
+            LOGGER.warn("verificationToken {} is expired", passwordToken.getToken());
+            throw new TokenExpiredException();
+        }
+
+        User user = passwordToken.getUser();
+        if (password != null && !password.isEmpty()) user.setPassword(encoder.encode(password));
+        userDao.deleteAssociatedPasswordTokens(user);
+    }
+
+
+    @Override
+    @Transactional
+    public void updateUser(long id, String password, String firstName, String lastName, String phone) {
+        User user = userDao.findById(id).orElseThrow(UserNotFoundException::new);
+        if (password != null && !password.isEmpty()) user.setPassword(encoder.encode(password));
+        if (firstName != null && !firstName.isEmpty()) user.setFirstName(firstName);
+        if (lastName != null && !lastName.isEmpty()) user.setLastName(lastName);
+        if (phone != null && !phone.isEmpty()) user.setPhone(phone);
+    }
 
 }

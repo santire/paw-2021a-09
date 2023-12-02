@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.webapp.dto;
 
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.webapp.controller.UserController;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.ws.rs.core.UriInfo;
@@ -33,15 +34,39 @@ public class UserDto {
         dto.email = user.getEmail();
         dto.phone = user.getPhone();
 
-        dto.self = uriInfo.getBaseUriBuilder().path("users").path(user.getId().toString()).build();
+        dto.self = uriInfo.getBaseUriBuilder()
+                .path(UserController.PATH)
+                .path(user.getId().toString())
+                .build();
 
 
-        dto.likes = uriInfo.getBaseUriBuilder().path("users").path(user.getId().toString()).path("likes").build();
-        dto.ratings = uriInfo.getBaseUriBuilder().path("users").path(user.getId().toString()).path("ratings").build();
+        dto.likes = uriInfo.getBaseUriBuilder()
+                .path(UserController.PATH)
+                .path(user.getId().toString())
+                .path("likes").build();
 
-        dto.restaurants = uriInfo.getBaseUriBuilder().path("restaurants").queryParam("ownedBy", user.getId()).build();
-        dto.reservations = uriInfo.getBaseUriBuilder().path("reservations").queryParam("madeBy", user.getId()).build();
-        dto.comments = uriInfo.getBaseUriBuilder().path("comments").queryParam("madeBy", user.getId()).build();
+        dto.ratings = uriInfo.getBaseUriBuilder()
+                .path(UserController.PATH)
+                .path(user.getId().toString())
+                .path("ratings")
+                .build();
+
+        dto.restaurants = uriInfo.getBaseUriBuilder()
+                .path("restaurants")
+                .queryParam("ownedBy", user.getId())
+                .build();
+
+        dto.reservations = uriInfo
+                .getBaseUriBuilder()
+                .path("reservations")
+                .queryParam("madeBy", user.getId())
+                .build();
+
+        dto.comments = uriInfo.getBaseUriBuilder()
+                .path("comments")
+                .queryParam("madeBy", user.getId())
+                .build();
+
         return dto;
     }
 
