@@ -61,7 +61,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 );
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
                 LOGGER.info("The user with email {} has been successfully authenticated", userDetails.getUsername());
-                response.addHeader("Authorization", jwtToken);
             }
         }
 

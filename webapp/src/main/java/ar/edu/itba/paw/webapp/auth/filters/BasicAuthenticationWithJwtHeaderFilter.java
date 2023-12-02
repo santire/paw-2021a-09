@@ -40,6 +40,6 @@ public class BasicAuthenticationWithJwtHeaderFilter extends BasicAuthenticationF
                                               HttpServletResponse response, Authentication authentication) throws IOException {
         LOGGER.info("The user with email {} has been successfully authenticated", authentication.getName());
         String jwt = jwtUtility.generateToken(userDetailsService.loadUserByUsername(authentication.getName()));
-        response.addHeader("Authorization", "Bearer " + jwt);
+        response.addHeader("X-Auth-Token", "Bearer " + jwt);
     }
 }
