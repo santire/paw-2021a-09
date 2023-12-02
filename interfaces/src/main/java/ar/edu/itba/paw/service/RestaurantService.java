@@ -15,8 +15,8 @@ public interface RestaurantService {
     List<Restaurant> getRestaurantsFromOwner(int page, int amountOnPage, long userId);
     int getRestaurantsFromOwnerCount(long userId);
     List<Restaurant> getPopularRestaurants(int limit, int minValue);
-    List<Restaurant> getRestaurantsFilteredBy(int page, int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays);
-    int getRestaurantsFilteredByCount(String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice);
+    List<Restaurant> getRestaurantsFilteredBy(int page, int amountOnPage, String name, List<Tags> tags, Long ownedBy, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays);
+    int getRestaurantsFilteredByCount(String name, List<Tags> tags, Long ownedBy, double minAvgPrice, double maxAvgPrice, int lastDays);
     List<Restaurant> getHotRestaurants(int limit, int lastDays);
 
     // UPDATE

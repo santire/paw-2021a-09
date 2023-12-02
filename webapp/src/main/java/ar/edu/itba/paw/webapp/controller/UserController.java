@@ -106,7 +106,7 @@ public class UserController {
 //    @PreAuthorize("@authComponent.isUser(#userId)")
     public Response getUser(@PathParam("userId") final Long userId, @Context HttpServletRequest request) {
         final User user = userService.findById(userId).orElseThrow(UserNotFoundException::new);
-        return Response.ok(UserDto.fromUser(user, request.getRequestURL().toString(), uriInfo)).build();
+        return Response.ok(UserDto.fromUser(user, uriInfo)).build();
 
     }
 
@@ -115,7 +115,7 @@ public class UserController {
     @PreAuthorize("@authComponent.isUserByEmail(#email)")
     public Response getUserByEmail(@QueryParam("email") final String email, @Context HttpServletRequest request) {
         final User user = userService.findByEmail(email).orElseThrow(UserNotFoundException::new);
-        return Response.ok(UserDto.fromUser(user, request.getRequestURL().toString(), uriInfo)).build();
+        return Response.ok(UserDto.fromUser(user, uriInfo)).build();
     }
 
     //READ USER RESTAURANTS

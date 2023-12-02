@@ -16,15 +16,14 @@ public interface RestaurantDao {
     Optional<Restaurant> findById(long id);
     Optional<Restaurant> findByIdWithMenu(int page, int amountOnPage, long id);
     int findByIdWithMenuCount( long id);
-    List<Restaurant> getRestaurantsFilteredBy(int page, int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays);
-    int getRestaurantsFilteredByCount(String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice);
+    List<Restaurant> getRestaurantsFilteredBy(int page, int amountOnPage, String name, List<Tags> tags,Long ownedBy, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays);
+    int getRestaurantsFilteredByCount(String name, List<Tags> tags,Long ownedBy, double minAvgPrice, double maxAvgPrice, int lastDays);
     List<Restaurant> getPopularRestaurants(int limit, int minValue);
     List<Restaurant> getHotRestaurants(int limit, int lastDays);
     List<Restaurant> getRestaurantsFromOwner(int page, int amountOnPage, long userId);
     int getRestaurantsFromOwnerCount(long userId);
 
 
-    boolean menuBelongsToRestaurant(long restaurantId, long menuId);
 
 
 

@@ -64,14 +64,14 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Override
     @Transactional
-    public List<Restaurant> getRestaurantsFilteredBy(int page, int amountOnPage, String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays) {
-        return restaurantDao.getRestaurantsFilteredBy(page, amountOnPage, name, tags, minAvgPrice, maxAvgPrice, sort, desc, lastDays);
+    public List<Restaurant> getRestaurantsFilteredBy(int page, int amountOnPage, String name, List<Tags> tags, Long userId, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays) {
+        return restaurantDao.getRestaurantsFilteredBy(page, amountOnPage, name, tags,userId, minAvgPrice, maxAvgPrice, sort, desc, lastDays);
     }
 
     @Override
     @Transactional
-    public int getRestaurantsFilteredByCount(String name, List<Tags> tags, double minAvgPrice, double maxAvgPrice) {
-        return restaurantDao.getRestaurantsFilteredByCount(name, tags, minAvgPrice, maxAvgPrice);
+    public int getRestaurantsFilteredByCount(String name, List<Tags> tags, Long userId, double minAvgPrice, double maxAvgPrice, int lastDays) {
+        return restaurantDao.getRestaurantsFilteredByCount(name, tags, userId, minAvgPrice, maxAvgPrice, lastDays);
     }
 
     @Override

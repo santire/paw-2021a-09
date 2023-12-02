@@ -1,10 +1,14 @@
 package ar.edu.itba.paw.webapp.controller;
 
-import ar.edu.itba.paw.model.*;
+import ar.edu.itba.paw.model.Image;
+import ar.edu.itba.paw.model.Restaurant;
+import ar.edu.itba.paw.model.Sorting;
+import ar.edu.itba.paw.model.Tags;
 import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
-import ar.edu.itba.paw.service.*;
-import ar.edu.itba.paw.webapp.dto.*;
-import ar.edu.itba.paw.webapp.forms.*;
+import ar.edu.itba.paw.service.RestaurantService;
+import ar.edu.itba.paw.webapp.dto.RestaurantDto;
+import ar.edu.itba.paw.webapp.forms.RegisterRestaurantForm;
+import ar.edu.itba.paw.webapp.forms.UpdateRestaurantForm;
 import ar.edu.itba.paw.webapp.utils.CachingUtils;
 import ar.edu.itba.paw.webapp.utils.PageUtils;
 import ar.edu.itba.paw.webapp.validators.ImageFileValidator;
@@ -13,7 +17,6 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -49,6 +52,7 @@ public class RestaurantController {
     @Produces(value = {MediaType.APPLICATION_JSON})
     public Response getRestaurants(@QueryParam("page") @DefaultValue("1") Integer page,
                                    @QueryParam("pageAmount") @DefaultValue("10") Integer pageAmount,
+                                   @QueryParam("ownedBy") final Long ownedBy,
                                    @QueryParam("search") @DefaultValue("") String search,
                                    @QueryParam("tags") List<Integer> tags,
                                    @QueryParam("min") @DefaultValue("1") Integer min,
@@ -56,6 +60,9 @@ public class RestaurantController {
                                    @QueryParam("sort") @DefaultValue("name") String sortBy,
                                    @QueryParam("order") @DefaultValue("asc") String order,
                                    @QueryParam("filterBy") @DefaultValue("") String filterBy) {
+        if (pageAmount > MAX_AMOUNT_PER_PAGE || pageAmount < 1) {
+            pageAmount = MAX_AMOUNT_PER_PAGE;
+        }
 
         if (filterBy.equalsIgnoreCase("hot")) {
             List<RestaurantDto> restaurants = restaurantService.getHotRestaurants(pageAmount, 365)
@@ -97,13 +104,11 @@ public class RestaurantController {
         }
 
         boolean desc = order != null && order.equalsIgnoreCase("DESC");
-        if (pageAmount > MAX_AMOUNT_PER_PAGE || pageAmount < 1) {
-            pageAmount = MAX_AMOUNT_PER_PAGE;
-        }
 
-        final int totalRestaurants = restaurantService.getRestaurantsFilteredByCount(search, tagsSelected, min, max);
+
+        final int totalRestaurants = restaurantService.getRestaurantsFilteredByCount(search, tagsSelected, ownedBy, min, max, 7);
         List<RestaurantDto> restaurants = restaurantService.getRestaurantsFilteredBy(
-                        page, pageAmount, search, tagsSelected, min, max, sort, desc, 7)
+                        page, pageAmount, search, tagsSelected, ownedBy, min, max, sort, desc, 7)
                 .stream()
                 .map(u -> RestaurantDto.fromRestaurant(u, uriInfo))
                 .collect(Collectors.toList());
@@ -111,6 +116,7 @@ public class RestaurantController {
         return PageUtils.paginatedResponse(new GenericEntity<List<RestaurantDto>>(restaurants) {
         }, uriInfo, page, pageAmount, totalRestaurants);
     }
+
     @GET
     @Path("/{restaurantId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
@@ -125,8 +131,8 @@ public class RestaurantController {
     @Path("/{restaurantId}/image")
     @Produces(value = {"image/jpg"})
     public Response getRestaurantImage(@PathParam("restaurantId") final Long restaurantId) throws IOException {
-        CacheControl cache = CachingUtils.getCaching(24*CachingUtils.HOUR_TO_SEC);
-        Date expireDate = CachingUtils.getExpirationDate(24*CachingUtils.HOUR_TO_SEC);
+        CacheControl cache = CachingUtils.getCaching(24 * CachingUtils.HOUR_TO_SEC);
+        Date expireDate = CachingUtils.getExpirationDate(24 * CachingUtils.HOUR_TO_SEC);
         final Restaurant restaurant = restaurantService.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
         final Image image = restaurant.getProfileImage();
         LOGGER.debug("Image: {}", image);

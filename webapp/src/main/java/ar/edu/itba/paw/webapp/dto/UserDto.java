@@ -12,18 +12,18 @@ public class UserDto {
     private Long userId;
     private String username;
     private String password;
-    private String url;
     private String firstName;
     private String lastName;
     private String email;
     private String phone;
+    private URI self;
     private URI likes;
     private URI ratings;
     private URI reservations;
     private URI comments;
     private URI restaurants;
 
-    public static UserDto fromUser(User user, String url, UriInfo uriInfo) {
+    public static UserDto fromUser(User user, UriInfo uriInfo) {
         final UserDto dto = new UserDto();
 
         dto.userId = user.getId();
@@ -33,13 +33,13 @@ public class UserDto {
         dto.email = user.getEmail();
         dto.phone = user.getPhone();
 
-        dto.url = url;
+        dto.self = uriInfo.getBaseUriBuilder().path("users").path(user.getId().toString()).build();
 
 
-        dto.likes = uriInfo.getAbsolutePathBuilder().path("likes").build();
-        dto.ratings = uriInfo.getAbsolutePathBuilder().path("ratings").build();
+        dto.likes = uriInfo.getBaseUriBuilder().path("users").path(user.getId().toString()).path("likes").build();
+        dto.ratings = uriInfo.getBaseUriBuilder().path("users").path(user.getId().toString()).path("ratings").build();
 
-        dto.restaurants = uriInfo.getAbsolutePathBuilder().path("restaurants").build();
+        dto.restaurants = uriInfo.getBaseUriBuilder().path("restaurants").queryParam("ownedBy", user.getId()).build();
         dto.reservations = uriInfo.getBaseUriBuilder().path("reservations").queryParam("madeBy", user.getId()).build();
         dto.comments = uriInfo.getBaseUriBuilder().path("comments").queryParam("madeBy", user.getId()).build();
         return dto;
@@ -77,12 +77,12 @@ public class UserDto {
         this.username = username;
     }
 
-    public String getUrl() {
-        return url;
+    public URI getSelf() {
+        return self;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setSelf(URI self) {
+        this.self = self;
     }
 
     public String getPassword() {
