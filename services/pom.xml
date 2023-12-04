@@ -92,6 +92,10 @@
           <version>2.1-m05</version>
           <scope>compile</scope>
       </dependency>
+      <dependency>
+          <groupId>io.jsonwebtoken</groupId>
+          <artifactId>jjwt</artifactId>
+      </dependency>
 
   </dependencies>
 

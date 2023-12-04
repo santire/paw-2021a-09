@@ -1,12 +1,11 @@
 package ar.edu.itba.paw.webapp.config;
 
 
+import ar.edu.itba.paw.service.JwtService;
 import ar.edu.itba.paw.webapp.auth.ApiEntryPoint;
 import ar.edu.itba.paw.webapp.auth.filters.BasicAuthenticationWithJwtHeaderFilter;
 import ar.edu.itba.paw.webapp.auth.filters.CorsFilter;
 import ar.edu.itba.paw.webapp.auth.filters.JwtRequestFilter;
-
-import ar.edu.itba.paw.webapp.utils.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -25,8 +24,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.web.servlet.HandlerExceptionResolver;
-import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -40,22 +37,29 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserDetailsService userDetailsService;
-
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private JwtService tokenService;
+
+    public static String getFileFromResources(String fileName) throws Exception {
+        ClassLoader classLoader = WebAuthConfig.class.getClassLoader();
+        InputStream stream = classLoader.getResourceAsStream(fileName);
+        String text = null;
+        try (Scanner scanner = new Scanner(stream, StandardCharsets.UTF_8.name())) {
+            text = scanner.useDelimiter("\\A").next();
+        }
+        return text;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-
     @Override
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -67,8 +71,11 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
         // Configure filters
         http.userDetailsService(userDetailsService)
                 .addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class)
-                .addFilterBefore(new JwtRequestFilter(userDetailsService, jwtTokenUtil), BasicAuthenticationFilter.class)
-                .addFilterAt(new BasicAuthenticationWithJwtHeaderFilter(authenticationManager(), new ApiEntryPoint(), jwtTokenUtil, userDetailsService), BasicAuthenticationFilter.class)
+                .addFilterBefore(new JwtRequestFilter(userDetailsService, tokenService), BasicAuthenticationFilter.class)
+                .addFilterAt(new BasicAuthenticationWithJwtHeaderFilter(authenticationManager(),
+                        new ApiEntryPoint(),
+                        userDetailsService,
+                        tokenService), BasicAuthenticationFilter.class)
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -100,21 +107,11 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic();
 
     }
+
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
                 .antMatchers("/static/**", "/index.html", "/", "/locales/**")
                 .antMatchers("/**.png", "/**.json", "/**.ico", "/**.txt");
-    }
-
-
-    public static String getFileFromResources(String fileName) throws Exception {
-        ClassLoader classLoader = WebAuthConfig.class.getClassLoader();
-        InputStream stream = classLoader.getResourceAsStream(fileName);
-        String text = null;
-        try (Scanner scanner = new Scanner(stream, StandardCharsets.UTF_8.name())) {
-            text = scanner.useDelimiter("\\A").next();
-        }
-        return text;
     }
 }
