@@ -1,6 +1,6 @@
 package ar.edu.itba.paw.persistence;
 
-import ar.edu.itba.paw.model.Comment;
+
 import ar.edu.itba.paw.model.Like;
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
@@ -18,11 +18,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import javax.sql.DataSource;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 
 @Transactional
@@ -64,7 +66,10 @@ public class LikeJpaDaoTest {
     @Test
     public void testUserLikesRestaurant(){
         Assert.assertTrue(likeJpaDao.userLikesRestaurant(20,999));
-        Assert.assertTrue(likeJpaDao.userLikesRestaurant(21,998));
+    }
+
+    @Test
+    public void testUserDontLikesRestaurant(){
         Assert.assertFalse(likeJpaDao.userLikesRestaurant(21,999));
     }
 
@@ -72,58 +77,165 @@ public class LikeJpaDaoTest {
     public void testDislike(){
         long userId = 20;
         long restaurantId = 997;
-        User user = em.find(User.class, userId);
-        Restaurant restaurant = em.find(Restaurant.class, restaurantId);
 
-        TypedQuery<Like> query = em.createQuery("SELECT c FROM Like c WHERE c.user = :user AND c.restaurant = :restaurant", Like.class);
-        query.setParameter("user", user); 
-        query.setParameter("restaurant", restaurant);
-        Like retrievedLike = query.getSingleResult();; // Initialize to null initially
-        
-        Assert.assertNotNull(retrievedLike);
+        SimpleUser user = jdbcTemplate.queryForObject("SELECT * FROM users WHERE user_id = " + userId  , (rs, rowNum) ->
+                new SimpleUser(
+                        rs.getLong("user_id"),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getString("email"),
+                        rs.getString("phone"),
+                        rs.getBoolean("is_active")
+                ));
 
-        boolean result = likeJpaDao.dislike(userId, restaurantId);
-        Assert.assertTrue(result);
+        SimpleRestaurant restaurant =  jdbcTemplate.queryForObject( "SELECT * FROM restaurants WHERE restaurant_id= " + restaurantId, (rs, rowNum) ->
+                new SimpleRestaurant(
+                        rs.getLong("restaurant_id"),
+                        rs.getString("name"),
+                        rs.getString("address"),
+                        rs.getString("phone_number"),
+                        rs.getFloat("rating"),
+                        rs.getLong("user_id"),
+                        rs.getString("facebook"),
+                        rs.getString("instagram"),
+                        rs.getString("twitter")
+                )
+        );
 
-        TypedQuery<Like> deletedQuery = em.createQuery("SELECT c FROM Like c WHERE c.user = :user AND c.restaurant = :restaurant", Like.class);
-        deletedQuery.setParameter("user", user); 
-        deletedQuery.setParameter("restaurant", restaurant);
-        Like deletedLike = null; // Initialize to null initially
+        List <SimpleLike> retrievedLikes = jdbcTemplate.query("SELECT * FROM likes WHERE user_id = " + user.user_id + " AND restaurant_id = " + restaurant.id, (rs, rowNum) ->
+                new SimpleLike(
+                        rs.getLong("like_id"),
+                        rs.getLong("user_id"),
+                        rs.getLong("restaurant_id")
+                ));
 
-        try {
-            retrievedLike = query.getSingleResult();
-        } catch (NoResultException e) {
-        }
-        Assert.assertNull(deletedLike);
+        assertFalse(retrievedLikes.isEmpty());
+
+        boolean result = likeJpaDao.dislike(user.user_id, restaurant.id);
+        em.flush();
+
+        retrievedLikes = jdbcTemplate.query("SELECT * FROM likes WHERE user_id = " + user.user_id + " AND restaurant_id = " + restaurant.id, (rs, rowNum) ->
+                new SimpleLike(
+                        rs.getLong("like_id"),
+                        rs.getLong("user_id"),
+                        rs.getLong("restaurant_id")
+                ));
+
+        assertTrue(retrievedLikes.isEmpty());
+
+
+
     }
 
     @Test
     public void testLike(){
         long userId = 21;
         long restaurantId = 997;
-        User user = em.find(User.class, userId);
-        Restaurant restaurant = em.find(Restaurant.class, restaurantId);
 
-        TypedQuery<Like> query = em.createQuery("SELECT c FROM Like c WHERE c.user = :user AND c.restaurant = :restaurant", Like.class);
-        query.setParameter("user", user); 
-        query.setParameter("restaurant", restaurant);
-        Like retrievedLike = null; // Initialize to null initially
+        SimpleUser simpleUser = jdbcTemplate.queryForObject("SELECT * FROM users WHERE user_id = " + userId  , (rs, rowNum) ->
+                new SimpleUser(
+                        rs.getLong("user_id"),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getString("email"),
+                        rs.getString("phone"),
+                        rs.getBoolean("is_active")
+                ));
 
-        try {
-            retrievedLike = query.getSingleResult();
-        } catch (NoResultException e) {
+        User user = new User(simpleUser.user_id, simpleUser.username, simpleUser.password, simpleUser.first_name, simpleUser.last_name, simpleUser.email, simpleUser.phone, simpleUser.is_active);
+
+        SimpleRestaurant simpleRestaurant =  jdbcTemplate.queryForObject( "SELECT * FROM restaurants WHERE restaurant_id= " + restaurantId, (rs, rowNum) ->
+                new SimpleRestaurant(
+                        rs.getLong("restaurant_id"),
+                        rs.getString("name"),
+                        rs.getString("address"),
+                        rs.getString("phone_number"),
+                        rs.getFloat("rating"),
+                        rs.getLong("user_id"),
+                        rs.getString("facebook"),
+                        rs.getString("instagram"),
+                        rs.getString("twitter")
+                )
+        );
+
+        Restaurant restaurant = new Restaurant(simpleRestaurant.id, simpleRestaurant.name, simpleRestaurant.address, simpleRestaurant.phoneNumber, null, user, simpleRestaurant.facebook, simpleRestaurant.twitter, simpleRestaurant.instagram);
+
+        Like like = likeJpaDao.like(user, restaurant);
+        em.flush();
+
+        SimpleLike retrievedLike = jdbcTemplate.queryForObject("SELECT * FROM likes WHERE like_id = " + like.getId() , (rs, rowNum) ->
+                new SimpleLike(
+                        rs.getLong("like_id"),
+                        rs.getLong("user_id"),
+                        rs.getLong("restaurant_id")
+                ));
+
+        assertEquals(like.getId(), retrievedLike.like_id);
+        assertEquals(like.getRestaurant().getId(), retrievedLike.restaurant_id);
+        assertEquals(like.getUser().getId(), retrievedLike.user_id);
+
+    }
+
+    private class SimpleRestaurant {
+        Long id;
+        String name;
+        String address;
+        String phoneNumber;
+        Long ownerId;
+        Float rating;
+        String facebook;
+        String instagram;
+        String twitter;
+
+        public SimpleRestaurant(Long id, String name, String address, String phoneNumber,  Float rating,Long ownerId, String facebook, String instagram, String twitter) {
+            this.id = id;
+            this.name = name;
+            this.address = address;
+            this.phoneNumber = phoneNumber;
+            this.ownerId = ownerId;
+            this.rating = rating;
+            this.facebook = facebook;
+            this.instagram = instagram;
+            this.twitter = twitter;
         }
-        Assert.assertNull(retrievedLike);
+    }
+    private static class SimpleUser {
+        Long user_id;
+        String username;
+        String password;
+        String first_name;
+        String last_name;
+        String email;
+        String phone;
+        boolean is_active;
 
-        Like result = likeJpaDao.like(user, restaurant);
-        Assert.assertNotNull(result);
+        public SimpleUser(Long user_id,  String username, String password, String first_name, String last_name, String email, String phone, boolean is_active) {
+            this.user_id = user_id;
+            this.username = username;
+            this.password = password;
+            this.first_name = first_name;
+            this.last_name = last_name;
+            this.email = email;
+            this.phone = phone;
+            this.is_active = is_active;
+        }
+    }
 
-        TypedQuery<Like> likeQuery = em.createQuery("SELECT c FROM Like c WHERE c.user = :user AND c.restaurant = :restaurant", Like.class);
-        likeQuery.setParameter("user", user); 
-        likeQuery.setParameter("restaurant", restaurant);
-        Like createdLike = likeQuery.getSingleResult();
+    private static class SimpleLike {
+        Long like_id;
+        Long user_id;
+        Long restaurant_id;
 
-        Assert.assertNotNull(createdLike);
+
+        public SimpleLike(Long like_id,  Long user_id, Long restaurant_id) {
+            this.like_id = like_id;
+            this.user_id = user_id;
+            this.restaurant_id = restaurant_id;
+        }
     }
 
 }

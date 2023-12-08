@@ -15,8 +15,8 @@ INSERT INTO restaurants(restaurant_id, name, address, phone_number, rating, user
 VALUES(2, 'BurgerQueen', 'Salta 129', '1223346545', 0, 1);
 
 /*Insert Rating Values*/
--- INSERT INTO ratings(rating_id, user_id, restaurant_id, rating)
--- VALUES(1, 1, 1, 5);
+INSERT INTO ratings(rating_id, user_id, restaurant_id, rating)
+VALUES(98, 1, 1, 5);
 INSERT INTO ratings(rating_id, user_id, restaurant_id, rating)
 VALUES(99, 1, 2, 3);
 INSERT INTO ratings(rating_id, user_id, restaurant_id, rating)

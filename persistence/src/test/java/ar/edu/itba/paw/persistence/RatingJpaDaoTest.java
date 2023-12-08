@@ -26,6 +26,7 @@ import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 @Transactional
 @Sql(scripts = "classpath:rating-test.sql")
@@ -55,16 +56,15 @@ public class RatingJpaDaoTest {
 
         assertTrue(maybeRating.isPresent());
         final Rating rating = maybeRating.get();
-        List<SimpleRating> list = jdbcTemplate.query("SELECT * FROM ratings", (rs, rowNum) ->
+
+        SimpleRating retrievedRating = jdbcTemplate.queryForObject("SELECT * FROM ratings WHERE restaurant_id = "+ restaurantId + " AND user_id = " + userId , (rs, rowNum) ->
                 new SimpleRating(
                         rs.getFloat("rating"),
                         rs.getLong("rating_id"),
                         rs.getLong("user_id"),
                         rs.getLong("restaurant_id")));
 
-        list.forEach(r -> System.out.println(r.rating));
-
-        assertEquals((double) 5.0, (double) rating.getRating(), (double) 0.01);
+        assertEquals((double) retrievedRating.rating, (double) rating.getRating(), (double) 0.01);
     }
 
     @Test
@@ -76,7 +76,6 @@ public class RatingJpaDaoTest {
         final Rating rating = ratingJpaDao.createRating(user, restaurant, 2.5);
         em.flush();
 
-
         SimpleRating ratingResult = jdbcTemplate.queryForObject("SELECT * FROM ratings where rating_id = " + rating.getId().toString(), (rs, rowNum) ->
                 new SimpleRating(
                         rs.getFloat("rating"),
@@ -85,6 +84,21 @@ public class RatingJpaDaoTest {
                         rs.getLong("restaurant_id")));
 
         assertEquals( 2.5f, ratingResult.rating,  0.01);
+    }
+
+    @Test
+    public void testDeleteRating() {
+
+        Optional<Long> id = jdbcTemplate.query("SELECT * FROM ratings WHERE rating_id = 99",  (rs, row) -> rs.getLong("rating_id")).stream().findFirst();
+
+        assertTrue(id.isPresent());
+
+        ratingJpaDao.deleteRating(99l);
+        em.flush();
+
+        id = jdbcTemplate.query("SELECT * FROM ratings WHERE rating_id = 99",  (rs, row) -> rs.getLong("rating_id")).stream().findFirst();
+
+        assertFalse(id.isPresent());
     }
 
     private static class SimpleRating {
