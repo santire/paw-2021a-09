@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.util.List;
@@ -83,13 +82,29 @@ public class CommentJpaDaoTest {
     public void testDeleteComment() {
 
         long commentId = 15;
-        Comment comment = em.find(Comment.class, commentId);
-        assertNotNull(comment);
 
-        commentJpaDao.deleteComment(15);
+        SimpleComment comment = jdbcTemplate.queryForObject("SELECT * FROM comments WHERE comment_id = " + commentId , (rs, rowNum) ->
+                new SimpleComment(
+                        rs.getLong("comment_id"),
+                        rs.getString("date"),
+                        rs.getString("user_comment"),
+                        rs.getLong("restaurant_id"),
+                        rs.getLong("user_id")
+                ));
 
-        Comment deletedComment = em.find(Comment.class, commentId);
-        assertNull(deletedComment);
+        commentJpaDao.deleteComment(comment.comment_id);
+        em.flush();
+
+        List <SimpleComment> comments = jdbcTemplate.query("SELECT * FROM comments WHERE comment_id = " + commentId , (rs, rowNum) ->
+                new SimpleComment(
+                        rs.getLong("comment_id"),
+                        rs.getString("date"),
+                        rs.getString("user_comment"),
+                        rs.getLong("restaurant_id"),
+                        rs.getLong("user_id")
+                ));
+
+        assertTrue(comments.isEmpty());
     }
 
     @Test
@@ -99,19 +114,115 @@ public class CommentJpaDaoTest {
         long userId = 1;
         long restaurantId = 1;
 
-        User user = em.find(User.class, userId);
-        Restaurant restaurant = em.find(Restaurant.class, restaurantId);
+        SimpleUser simpleUser = jdbcTemplate.queryForObject("SELECT * FROM users WHERE user_id = " + userId  , (rs, rowNum) ->
+                new SimpleUser(
+                        rs.getLong("user_id"),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getString("email"),
+                        rs.getString("phone"),
+                        rs.getBoolean("is_active")
+                ));
 
-        String comment = "good comment";
-        final Comment c = commentJpaDao.addComment(user, restaurant, comment, date);
+        User user = new User(simpleUser.user_id, simpleUser.username, simpleUser.password, simpleUser.first_name, simpleUser.last_name, simpleUser.email, simpleUser.phone, simpleUser.is_active);
 
-        TypedQuery<Comment> query = em.createQuery("SELECT c FROM Comment c WHERE c.userComment = :comment", Comment.class);
-        query.setParameter("comment", comment); // Replace "good comment" with the value you're searching for
+        SimpleRestaurant simpleRestaurant =  jdbcTemplate.queryForObject( "SELECT * FROM restaurants WHERE restaurant_id= " + restaurantId, (rs, rowNum) ->
+                new SimpleRestaurant(
+                        rs.getLong("restaurant_id"),
+                        rs.getString("name"),
+                        rs.getString("address"),
+                        rs.getString("phone_number"),
+                        rs.getFloat("rating"),
+                        rs.getLong("user_id"),
+                        rs.getString("facebook"),
+                        rs.getString("instagram"),
+                        rs.getString("twitter")
+                )
+        );
 
-        Comment retrievedComment = query.getSingleResult();
-        //int count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM comments WHERE user_comment = ?", Integer.class, comment);
+        Restaurant restaurant = new Restaurant(simpleRestaurant.id, simpleRestaurant.name, simpleRestaurant.address, simpleRestaurant.phoneNumber, null, user, simpleRestaurant.facebook, simpleRestaurant.twitter, simpleRestaurant.instagram);
 
-        assertNotNull(retrievedComment);
-        assertEquals(retrievedComment.getUserComment(), comment);
+        String c = "good comment";
+        final Comment comment = commentJpaDao.addComment(user, restaurant, c, date);
+        em.flush();
+
+       SimpleComment retrievedComment = jdbcTemplate.queryForObject("SELECT * FROM comments WHERE comment_id = " + comment.getId() , (rs, rowNum) ->
+                new SimpleComment(
+                        rs.getLong("comment_id"),
+                        rs.getString("date"),
+                        rs.getString("user_comment"),
+                        rs.getLong("restaurant_id"),
+                        rs.getLong("user_id")
+                ));
+
+        assertEquals(comment.getId(), retrievedComment.comment_id);
+        assertEquals(comment.getUserComment(), retrievedComment.user_comment);
+        assertEquals(comment.getRestaurant().getId(), retrievedComment.restaurant_id);
+        assertEquals(comment.getUser().getId(), retrievedComment.user_id);
     }
+
+    private static class SimpleComment {
+        Long comment_id;
+        String date;
+        String user_comment;
+        Long restaurant_id;
+        Long user_id;
+
+        public SimpleComment(Long comment_id, String date, String user_comment, Long restaurant_id, Long user_id) {
+            this.comment_id = comment_id;
+            this.date = date;
+            this.user_comment = user_comment;
+            this.restaurant_id = restaurant_id;
+            this.user_id = user_id;
+        }
+    }
+
+    private class SimpleRestaurant {
+        Long id;
+        String name;
+        String address;
+        String phoneNumber;
+        Long ownerId;
+        Float rating;
+        String facebook;
+        String instagram;
+        String twitter;
+
+        public SimpleRestaurant(Long id, String name, String address, String phoneNumber,  Float rating,Long ownerId, String facebook, String instagram, String twitter) {
+            this.id = id;
+            this.name = name;
+            this.address = address;
+            this.phoneNumber = phoneNumber;
+            this.ownerId = ownerId;
+            this.rating = rating;
+            this.facebook = facebook;
+            this.instagram = instagram;
+            this.twitter = twitter;
+        }
+    }
+    private static class SimpleUser {
+        Long user_id;
+        String username;
+        String password;
+        String first_name;
+        String last_name;
+        String email;
+        String phone;
+        boolean is_active;
+
+        public SimpleUser(Long user_id,  String username, String password, String first_name, String last_name, String email, String phone, boolean is_active) {
+            this.user_id = user_id;
+            this.username = username;
+            this.password = password;
+            this.first_name = first_name;
+            this.last_name = last_name;
+            this.email = email;
+            this.phone = phone;
+            this.is_active = is_active;
+        }
+    }
+
+
 }

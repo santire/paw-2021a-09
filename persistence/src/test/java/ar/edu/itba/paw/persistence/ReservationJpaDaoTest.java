@@ -101,7 +101,6 @@ public class ReservationJpaDaoTest {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime date = LocalDateTime.parse(d, formatter);
 
-//        List<Reservation> reservationList = reservationJpaDao.findByUser(1, 6, 999l, date);
         List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 6, 999l,null, date, null, null, false );
 
         assertEquals(3, reservationList.size());
@@ -114,13 +113,48 @@ public class ReservationJpaDaoTest {
     public void testCancelReservation() {
         long reservationId = 5;
 
-        Reservation reservation = em.find(Reservation.class, reservationId);
-        assertNotNull(reservation);
+        SimpleReservation reservation = jdbcTemplate.queryForObject("SELECT * FROM reservations WHERE reservation_id = " + reservationId , (rs, rowNum) ->
+                new SimpleReservation(
+                        rs.getLong("reservation_id"),
+                        rs.getLong("user_id"),
+                        rs.getLong("restaurant_id"),
+                        rs.getString("date"),
+                        rs.getInt("quantity"),
+                        rs.getString("status")
+                ));
 
-        reservationJpaDao.cancelReservation(reservationId);
+        reservationJpaDao.cancelReservation(reservation.reservation_id);
+        em.flush();
 
-        Reservation notReservation = em.find(Reservation.class, reservationId);
+        List <SimpleReservation> reservations = jdbcTemplate.query("SELECT * FROM reservations WHERE reservation_id = " + reservationId , (rs, rowNum) ->
+                new SimpleReservation(
+                        rs.getLong("reservation_id"),
+                        rs.getLong("user_id"),
+                        rs.getLong("restaurant_id"),
+                        rs.getString("date"),
+                        rs.getInt("quantity"),
+                        rs.getString("status")
+                ));
 
-        assertNull(notReservation);
+        assertTrue(reservations.isEmpty());
+    }
+
+    private static class SimpleReservation {
+        Long reservation_id;
+        Long user_id;
+        Long restaurant_id;
+        String date;
+        int quantity;
+        String status;
+
+        public SimpleReservation(Long reservation_id,  Long user_id, Long restaurant_id, String date, int quantity, String status) {
+            this.reservation_id = reservation_id;
+            this.user_id = user_id;
+            this.restaurant_id = restaurant_id;
+            this.date = date;
+            this.quantity = quantity;
+            this.quantity = quantity;
+            this.status = status;
+        }
     }
 }
