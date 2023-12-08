@@ -24,7 +24,7 @@ public class TokenServiceImpl implements JwtService {
     private static final long REFRESH_TOKEN_DURATION = 15 * 24 * 60 * 60L; // 15 days
     //    private static final long REFRESH_TOKEN_DURATION =  2* 60L; // 2min
 
-//    @Value("${jwt.secret-key}")
+    //    @Value("${jwt.secret-key}")
     private String secret = "secret";
 
     @Autowired
@@ -122,22 +122,21 @@ public class TokenServiceImpl implements JwtService {
 
     @Override
     public Claims getClaims(String token) {
+        Claims claims = null;
         try {
-            return Jwts.parser()
+            claims = Jwts.parser()
                     .setSigningKey(Base64.getEncoder().encode(secret.getBytes()))
                     .parseClaimsJws(token)
                     .getBody();
 
         } catch (ExpiredJwtException ex) {
             LOGGER.error("Token has expired");
-            return null;
         } catch (SignatureException ex) {
             LOGGER.error("Invalid token signature");
-            return null;
         } catch (Exception ex) {
             LOGGER.error("Error validating token: {}", ex.getMessage());
-            return null;
         }
+        return claims;
     }
 
 }
