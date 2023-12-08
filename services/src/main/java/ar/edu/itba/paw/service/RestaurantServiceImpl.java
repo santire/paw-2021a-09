@@ -27,9 +27,8 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Override
     @Transactional
-    public boolean setImageByRestaurantId(Image image, long restaurantId) {
+    public void setImageByRestaurantId(Image image, long restaurantId) {
         restaurantDao.setImageByRestaurantId(image, restaurantId);
-        return true;
     }
 
     @Override
@@ -42,18 +41,6 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Transactional
     public List<Restaurant> getPopularRestaurants(int limit, int minValue) {
         return restaurantDao.getPopularRestaurants(limit, minValue);
-    }
-
-    @Override
-    @Transactional
-    public List<Restaurant> getRestaurantsFromOwner(int page, int amountOnPage, long userId) {
-        return restaurantDao.getRestaurantsFromOwner(page, amountOnPage, userId);
-    }
-
-    @Override
-    @Transactional
-    public int getRestaurantsFromOwnerCount(long userId) {
-        return restaurantDao.getRestaurantsFromOwnerCount(userId);
     }
 
     @Override
@@ -91,8 +78,8 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Override
     @Transactional
-    public boolean deleteRestaurantById(long id) {
-        return restaurantDao.deleteRestaurantById(id);
+    public void deleteRestaurantById(long id) {
+        restaurantDao.deleteRestaurantById(id);
     }
 
 }

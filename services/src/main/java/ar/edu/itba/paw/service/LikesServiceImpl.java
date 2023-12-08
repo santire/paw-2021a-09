@@ -40,13 +40,13 @@ public class LikesServiceImpl implements LikesService {
 
     @Override
     @Transactional
-    public boolean dislike(long userId, long restaurantId) {
+    public void dislike(long userId, long restaurantId) {
         User user = userDao.findById(userId).orElseThrow(UserNotFoundException::new);
         Restaurant restaurant = restaurantDao.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
         if (!likesDao.userLikesRestaurant(user.getId(), restaurant.getId())) {
             throw new NotLikedException();
         }
-        return likesDao.dislike(user.getId(), restaurant.getId());
+        likesDao.dislike(user.getId(), restaurant.getId());
     }
 
     @Override

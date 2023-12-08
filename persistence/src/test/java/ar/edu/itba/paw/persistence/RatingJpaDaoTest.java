@@ -5,6 +5,11 @@ import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.Tags;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.persistence.config.TestConfig;
+import ar.edu.itba.paw.persistence.models.LikeRow;
+import ar.edu.itba.paw.persistence.models.RatingRow;
+import ar.edu.itba.paw.persistence.models.RestaurantRow;
+import ar.edu.itba.paw.persistence.models.UserRow;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,36 +21,39 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 @Transactional
 @Sql(scripts = "classpath:rating-test.sql")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestConfig.class)
 public class RatingJpaDaoTest {
-    @Autowired
-    private DataSource ds;
-
-    @Autowired
-    private RatingJpaDao ratingJpaDao;
-
-    private JdbcTemplate jdbcTemplate;
     @PersistenceContext
     EntityManager em;
+    @Autowired
+    private DataSource ds;
+    @Autowired
+    private RatingJpaDao ratingJpaDao;
+    private JdbcTemplate jdbcTemplate;
 
     @Before
     public void setUp() {
         jdbcTemplate = new JdbcTemplate(ds);
+
+        // Make sure rating 100 is always inserted before each method
+        jdbcTemplate.update("INSERT INTO ratings (rating_id, user_id, restaurant_id, rating) VALUES (100, 2, 1, 3)");
+    }
+
+    @After
+    public void tearDown() {
+        // Delete rating from create rating test
+        jdbcTemplate.update("DELETE FROM ratings WHERE user_id=2 AND restaurant_id=2");
     }
 
     @Test
@@ -57,61 +65,60 @@ public class RatingJpaDaoTest {
         assertTrue(maybeRating.isPresent());
         final Rating rating = maybeRating.get();
 
-        SimpleRating retrievedRating = jdbcTemplate.queryForObject("SELECT * FROM ratings WHERE restaurant_id = "+ restaurantId + " AND user_id = " + userId , (rs, rowNum) ->
-                new SimpleRating(
-                        rs.getFloat("rating"),
-                        rs.getLong("rating_id"),
-                        rs.getLong("user_id"),
-                        rs.getLong("restaurant_id")));
-
-        assertEquals((double) retrievedRating.rating, (double) rating.getRating(), (double) 0.01);
+        assertEquals(5.0, rating.getRating(), 0.01);
     }
 
     @Test
     public void testMakeRating() {
-        User user = new User(1L, "mluque", "12345678", "manuel", "luque", "mluque@itba.edu.ar", "1135679821", true);
-        Restaurant restaurant = new Restaurant("BurgerKing", "Mendoza 2929", "1123346545", new ArrayList<Tags>(), user, "", "", "");
-        restaurant.setId(1L);
+        final long userId = 2L;
+        final long restaurantId = 2L;
 
+        // Check rating didn't exist
+        List<RatingRow> ratingRowList = jdbcTemplate.query("SELECT * FROM ratings WHERE user_id="+ userId + " AND restaurant_id="+restaurantId, RatingRow.rowMapper);
+        assertTrue(ratingRowList.isEmpty());
+
+        // Obtain user and restaurant
+        UserRow userRow = jdbcTemplate.queryForObject("SELECT * FROM users WHERE user_id = " + userId, UserRow.rowMapper);
+        RestaurantRow restaurantRow = jdbcTemplate.queryForObject("SELECT * FROM restaurants WHERE restaurant_id= " + restaurantId, RestaurantRow.rowMapper);
+        User user = userRow.toUser();
+        Restaurant restaurant = restaurantRow.toRestaurant(user);
+
+        // Add rating
         final Rating rating = ratingJpaDao.createRating(user, restaurant, 2.5);
         em.flush();
 
-        SimpleRating ratingResult = jdbcTemplate.queryForObject("SELECT * FROM ratings where rating_id = " + rating.getId().toString(), (rs, rowNum) ->
-                new SimpleRating(
-                        rs.getFloat("rating"),
-                        rs.getLong("rating_id"),
-                        rs.getLong("user_id"),
-                        rs.getLong("restaurant_id")));
+        RatingRow ratingResult = jdbcTemplate.queryForObject("SELECT * FROM ratings where rating_id = " + rating.getId().toString(), RatingRow.rowMapper);
 
-        assertEquals( 2.5f, ratingResult.rating,  0.01);
+        assertEquals(2.5f, ratingResult.getRating(), 0.01);
     }
 
     @Test
     public void testDeleteRating() {
 
-        Optional<Long> id = jdbcTemplate.query("SELECT * FROM ratings WHERE rating_id = 99",  (rs, row) -> rs.getLong("rating_id")).stream().findFirst();
+        final long userId = 2L;
+        final long restaurantId = 1L;
+        final double expectedRating = 3;
 
-        assertTrue(id.isPresent());
+        // Check rating exists before
+        RatingRow ratingRow = jdbcTemplate.queryForObject("SELECT * FROM ratings WHERE user_id="+ userId + " AND restaurant_id="+restaurantId, RatingRow.rowMapper);
+        assertEquals(userId, ratingRow.getUserId().longValue());
+        assertEquals(restaurantId, ratingRow.getRestaurantId(), 0.01);
+        assertEquals(expectedRating, ratingRow.getRating(), 0.01);
 
-        ratingJpaDao.deleteRating(99l);
+        // Obtain user and restaurant
+        UserRow userRow = jdbcTemplate.queryForObject("SELECT * FROM users WHERE user_id = " + userId, UserRow.rowMapper);
+        RestaurantRow restaurantRow = jdbcTemplate.queryForObject("SELECT * FROM restaurants WHERE restaurant_id= " + restaurantId, RestaurantRow.rowMapper);
+        User user = userRow.toUser();
+        Restaurant restaurant = restaurantRow.toRestaurant(user);
+
+        // Delete rating
+        ratingJpaDao.deleteRating(ratingRow.getId());
         em.flush();
 
-        id = jdbcTemplate.query("SELECT * FROM ratings WHERE rating_id = 99",  (rs, row) -> rs.getLong("rating_id")).stream().findFirst();
-
-        assertFalse(id.isPresent());
+        // Check rating doesn't exist anymore
+        List<RatingRow> ratingRowList = jdbcTemplate.query("SELECT * FROM ratings WHERE user_id="+ userId + " AND restaurant_id="+restaurantId, RatingRow.rowMapper);
+        assertTrue(ratingRowList.isEmpty());
     }
 
-    private static class SimpleRating {
-        float rating;
-        long rating_id;
-        long user_id;
-        long restaurant_id;
 
-        public SimpleRating(float rating, long rating_id, long user_id, long restaurant_id) {
-            this.rating = rating;
-            this.rating_id = rating_id;
-            this.user_id = user_id;
-            this.restaurant_id = restaurant_id;
-        }
-    }
 }

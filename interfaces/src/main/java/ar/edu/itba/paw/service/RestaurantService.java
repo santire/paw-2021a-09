@@ -9,11 +9,9 @@ public interface RestaurantService {
 
     // CREATE
     Restaurant registerRestaurant(String name, String address, String phoneNumber, List<Tags> tags, Long ownerId, String facebook, String twitter, String instagram);
-    boolean setImageByRestaurantId(Image image, long restaurantId);
+    void setImageByRestaurantId(Image image, long restaurantId);
     // READ
     Optional<Restaurant> findById(long id);
-    List<Restaurant> getRestaurantsFromOwner(int page, int amountOnPage, long userId);
-    int getRestaurantsFromOwnerCount(long userId);
     List<Restaurant> getPopularRestaurants(int limit, int minValue);
     List<Restaurant> getRestaurantsFilteredBy(int page, int amountOnPage, String name, List<Tags> tags, Long ownedBy, double minAvgPrice, double maxAvgPrice, Sorting sort, boolean desc, int lastDays);
     int getRestaurantsFilteredByCount(String name, List<Tags> tags, Long ownedBy, double minAvgPrice, double maxAvgPrice, int lastDays);
@@ -23,6 +21,6 @@ public interface RestaurantService {
     Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber, List<Tags> tags, String facebook, String twitter, String instagram);
 
     // DESTROY
-    boolean deleteRestaurantById(long id);
+    void deleteRestaurantById(long id);
 
 }

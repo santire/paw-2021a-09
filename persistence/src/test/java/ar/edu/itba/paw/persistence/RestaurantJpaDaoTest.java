@@ -1,22 +1,14 @@
 package ar.edu.itba.paw.persistence;
 
-import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import javax.sql.DataSource;
-
+import ar.edu.itba.paw.model.MenuItem;
+import ar.edu.itba.paw.model.Restaurant;
+import ar.edu.itba.paw.model.Tags;
+import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
-
-import org.junit.Assert;
+import ar.edu.itba.paw.persistence.config.TestConfig;
+import ar.edu.itba.paw.persistence.models.RestaurantRow;
+import ar.edu.itba.paw.persistence.models.UserRow;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,13 +19,17 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
-import ar.edu.itba.paw.model.User;
-import ar.edu.itba.paw.model.MenuItem;
-import ar.edu.itba.paw.model.Restaurant;
-import ar.edu.itba.paw.model.Tags;
-
-import ar.edu.itba.paw.persistence.config.TestConfig;
+import static junit.framework.TestCase.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 // @Rollback
 @Transactional
@@ -42,138 +38,87 @@ import ar.edu.itba.paw.persistence.config.TestConfig;
 @ContextConfiguration(classes = TestConfig.class)
 public class RestaurantJpaDaoTest {
 
+    @PersistenceContext
+    EntityManager em;
     @Autowired
     private DataSource ds;
     @Autowired
     private RestaurantJpaDao restaurantDao;
     private JdbcTemplate jdbcTemplate;
 
-    @PersistenceContext
-    EntityManager em;
-
-
-    // General purpose
-    private static final int INSERTED_SIZE = 3;
-
-    // Restaurant to insert
-    private static final String NAME = "McDonalds";
-    private static final String ADDRESS = "9 de Julio";
-    private static final String PHONE_NUMBER = "46511234";
-
-    private static final List<Tags> TAGS = Arrays.asList(Tags.ARGENTINO);
 
     @Before
     public void setUp() {
         jdbcTemplate = new JdbcTemplate(ds);
+
+        Object[] restaurant = new Object[]{10000L, "MODIFY_TEST_REST", "ADDRESS", "12341234",0, 997L, "f", "t", "i"};
+
+        String sql = "INSERT INTO restaurants(restaurant_id, name, address, phone_number, rating, user_id, facebook, twitter, instagram) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        // Insert test restaurant for delete
+        jdbcTemplate.update(sql, restaurant);
+    }
+    @After
+    public void tearDown() {
+        Object[] restaurantId = new Object[]{10000L};
+
+        String sql = "DELETE FROM restaurants WHERE restaurant_id=?";
+
+        // Delete test restaurant for delete
+        jdbcTemplate.update(sql, restaurantId);
     }
 
     @Test
     public void testRegister() {
-        SimpleUser simpleUser = jdbcTemplate.queryForObject("SELECT * FROM users WHERE user_id = " + 999  , (rs, rowNum) ->
-                new SimpleUser(
-                        rs.getLong("user_id"),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("first_name"),
-                        rs.getString("last_name"),
-                        rs.getString("email"),
-                        rs.getString("phone"),
-                        rs.getBoolean("is_active")
-                ));
+        // Obtain user
+        final long userId = 999;
+        final UserRow userRow = jdbcTemplate.queryForObject("SELECT * FROM users WHERE user_id = " + userId, UserRow.rowMapper);
+        User user = userRow.toUser();
 
-        User user = new User(simpleUser.user_id, simpleUser.username, simpleUser.password, simpleUser.first_name, simpleUser.last_name, simpleUser.email, simpleUser.phone, simpleUser.is_active);
+        final String name = "McDonalds";
+        final String address = "9 de Julio";
+        final String phoneNumber = "46511234";
+
+        final List<Tags> tagsList = new ArrayList<>();
+        tagsList.add(Tags.ARGENTINO);
+
+        final String facebook = "facebook.com/myprofile";
+        final String instagram = "instagram.com/myprofile";
+        final String twitter = "twitter.com/myprofile";
 
 
-        Restaurant restaurant = restaurantDao.registerRestaurant(NAME, ADDRESS, PHONE_NUMBER, TAGS, user, "facebook.com/myprofile", "twitter.com/myprofile", "instagram.com/myprofile");
+        Restaurant restaurant = restaurantDao.registerRestaurant(name, address, phoneNumber, tagsList, user, facebook, twitter, instagram);
         em.flush();
 
-        SimpleRestaurant retrievedRestaurant =  jdbcTemplate.queryForObject( "SELECT * FROM restaurants WHERE restaurant_id= " + restaurant.getId().toString(), (rs, rowNum) ->
-                        new SimpleRestaurant(
-                                rs.getLong("restaurant_id"),
-                                rs.getString("name"),
-                                rs.getString("address"),
-                                rs.getString("phone_number"),
-                                rs.getFloat("rating"),
-                                rs.getLong("user_id"),
-                                rs.getString("facebook"),
-                                rs.getString("instagram"),
-                                rs.getString("twitter")
-                        )
-        );
+        final String sql = String.format("SELECT * FROM restaurants WHERE restaurant_id=%d", restaurant.getId());
+        RestaurantRow restaurantRow = jdbcTemplate.queryForObject(sql, RestaurantRow.rowMapper);
 
-        assertEquals(restaurant.getId(), retrievedRestaurant.id);
-        assertEquals(restaurant.getName(), retrievedRestaurant.name);
-        assertEquals(restaurant.getAddress(), retrievedRestaurant.address);
-        assertEquals(restaurant.getPhoneNumber(), retrievedRestaurant.phoneNumber);
-        assertEquals(restaurant.getOwner().getId(), retrievedRestaurant.ownerId);
-        assertEquals(restaurant.getFacebook(), retrievedRestaurant.facebook);
-        assertEquals(restaurant.getInstagram(), retrievedRestaurant.instagram);
-        assertEquals(restaurant.getTwitter(), retrievedRestaurant.twitter);
+        assertEquals(restaurant.getId(), restaurantRow.getId());
+
+        assertEquals(name, restaurantRow.getName());
+        assertEquals(address, restaurantRow.getAddress());
+        assertEquals(phoneNumber, restaurantRow.getPhoneNumber());
+        assertEquals(userId, restaurantRow.getOwnerId().longValue());
+        assertEquals(facebook, restaurantRow.getFacebook());
+        assertEquals(instagram, restaurantRow.getInstagram());
+        assertEquals(twitter, restaurantRow.getTwitter());
     }
 
     @Test
     public void testFindById() {
-
-        Optional<Restaurant> maybeRestaurant = restaurantDao.findById(999L);
-
+        final Optional<Restaurant> maybeRestaurant = restaurantDao.findById(999L);
         assertTrue(maybeRestaurant.isPresent());
         Restaurant restaurant = maybeRestaurant.get();
-
-        SimpleRestaurant retrievedRestaurant =  jdbcTemplate.queryForObject( "SELECT * FROM restaurants WHERE restaurant_id= " + restaurant.getId().toString(), (rs, rowNum) ->
-                new SimpleRestaurant(
-                        rs.getLong("restaurant_id"),
-                        rs.getString("name"),
-                        rs.getString("address"),
-                        rs.getString("phone_number"),
-                        rs.getFloat("rating"),
-                        rs.getLong("user_id"),
-                        rs.getString("facebook"),
-                        rs.getString("instagram"),
-                        rs.getString("twitter")
-                )
-        );
-
-        assertEquals(retrievedRestaurant.name, restaurant.getName());
-        assertEquals(retrievedRestaurant.address, restaurant.getAddress());
-        assertEquals(retrievedRestaurant.phoneNumber, restaurant.getPhoneNumber());
-        assertEquals(retrievedRestaurant.id, restaurant.getOwner().getId());
-    }
-
-    @Test
-    public void testFindByIdWithMenu() {
-
-        Optional<Restaurant> maybeRestaurant = restaurantDao.findByIdWithMenu(1,5,999L);
-
-        assertTrue(maybeRestaurant.isPresent());
-        Restaurant restaurant = maybeRestaurant.get();
-        List<MenuItem> menuActual = restaurant.getMenuPage();
-
-        List<MenuItem> menuExpected = Arrays.asList(
-                new MenuItem("Fried Chicken Original", "Delicious fried chicken", 3.99f),
-                new MenuItem("Fried Chicken Crispy", "Delicious fried chicken but crispy", 4.99f),
-                new MenuItem("Vegan Friendly Option", "It's literally just water", 10.99f));
 
         assertEquals("KFC", restaurant.getName());
         assertEquals("La Pampa 319", restaurant.getAddress());
         assertEquals("1121146545", restaurant.getPhoneNumber());
-        assertEquals(Long.valueOf(999), restaurant.getOwner().getId());
-
-        assertEquals(menuExpected.get(0).getName(), menuActual.get(0).getName());
-        assertEquals(menuExpected.get(0).getDescription(), menuActual.get(0).getDescription());
-        assertEquals(menuExpected.get(0).getPrice(), menuActual.get(0).getPrice(), 0.01);
-
-        assertEquals(menuExpected.get(1).getName(), menuActual.get(1).getName());
-        assertEquals(menuExpected.get(1).getDescription(), menuActual.get(1).getDescription());
-        assertEquals(menuExpected.get(1).getPrice(), menuActual.get(1).getPrice(), 0.01);
-
-        assertEquals(menuExpected.get(2).getName(), menuActual.get(2).getName());
-        assertEquals(menuExpected.get(2).getDescription(), menuActual.get(2).getDescription());
-        assertEquals(menuExpected.get(2).getPrice(), menuActual.get(2).getPrice(), 0.01);
+        assertEquals(999L, restaurant.getOwner().getId().longValue());
     }
 
     @Test
     public void testRestaurantNotFound() {
-        Optional<Restaurant> maybeRestaurant = restaurantDao.findById(950L);
+        final Optional<Restaurant> maybeRestaurant = restaurantDao.findById(950L);
         assertFalse(maybeRestaurant.isPresent());
     }
 
@@ -195,7 +140,7 @@ public class RestaurantJpaDaoTest {
     @Test
     public void testGetRestaurantsFromOwnerOnePerPage() {
         long userId = 999;
-        List<Restaurant> restaurantList = restaurantDao.getRestaurantsFromOwner(3,1, userId);
+        List<Restaurant> restaurantList = restaurantDao.getRestaurantsFromOwner(3, 1, userId);
 
         assertEquals(1, restaurantList.size());
         assertEquals("BurgerQueen", restaurantList.get(0).getName());
@@ -204,7 +149,7 @@ public class RestaurantJpaDaoTest {
     @Test
     public void testGetRestaurantsFromOwnerTwoPerPage() {
         long userId = 999;
-        List<Restaurant> restaurantList =  restaurantDao.getRestaurantsFromOwner(2,2, userId);
+        List<Restaurant> restaurantList = restaurantDao.getRestaurantsFromOwner(2, 2, userId);
         assertEquals(2, restaurantList.size());
         assertEquals("BurgerQueen", restaurantList.get(0).getName());
         assertEquals("KFC", restaurantList.get(1).getName());
@@ -212,84 +157,27 @@ public class RestaurantJpaDaoTest {
 
     @Test
     public void testDeleteRestaurant() {
-        long restaurantId = 996;
+        long restaurantId = 10000L;
 
-        SimpleRestaurant restaurant =  jdbcTemplate.queryForObject( "SELECT * FROM restaurants WHERE restaurant_id= " + restaurantId, (rs, rowNum) ->
-                new SimpleRestaurant(
-                        rs.getLong("restaurant_id"),
-                        rs.getString("name"),
-                        rs.getString("address"),
-                        rs.getString("phone_number"),
-                        rs.getFloat("rating"),
-                        rs.getLong("user_id"),
-                        rs.getString("facebook"),
-                        rs.getString("instagram"),
-                        rs.getString("twitter")
-                )
-        );
+        // Check Restaurant existed before
+        final String sql = String.format("SELECT * FROM restaurants WHERE restaurant_id=%d", restaurantId);
+        RestaurantRow restaurantRow = jdbcTemplate.queryForObject(sql, RestaurantRow.rowMapper);
 
-        restaurantDao.deleteRestaurantById(restaurant.id);
+        assertEquals(restaurantId, restaurantRow.getId().longValue());
+        assertEquals("MODIFY_TEST_REST", restaurantRow.getName());
+        assertEquals("ADDRESS", restaurantRow.getAddress());
+        assertEquals("12341234", restaurantRow.getPhoneNumber());
+        assertEquals("f", restaurantRow.getFacebook());
+        assertEquals("t", restaurantRow.getTwitter());
+        assertEquals("i", restaurantRow.getInstagram());
+
+        // Delete Restaurant
+        restaurantDao.deleteRestaurantById(restaurantId);
         em.flush();
 
-        List <SimpleRestaurant> retrievedRestaurant =  jdbcTemplate.query( "SELECT * FROM restaurants WHERE restaurant_id= " + restaurantId, (rs, rowNum) ->
-                new SimpleRestaurant(
-                        rs.getLong("restaurant_id"),
-                        rs.getString("name"),
-                        rs.getString("address"),
-                        rs.getString("phone_number"),
-                        rs.getFloat("rating"),
-                        rs.getLong("user_id"),
-                        rs.getString("facebook"),
-                        rs.getString("instagram"),
-                        rs.getString("twitter")
-                )
-        );
-
-        assertTrue(retrievedRestaurant.isEmpty());
+        // Check doesn't exist anymore
+        List<RestaurantRow> restaurantRowList = jdbcTemplate.query(sql, RestaurantRow.rowMapper);
+        assertTrue(restaurantRowList.isEmpty());
     }
 
-    private class SimpleRestaurant {
-        Long id;
-        String name;
-        String address;
-        String phoneNumber;
-        Long ownerId;
-        Float rating;
-        String facebook;
-        String instagram;
-        String twitter;
-
-        public SimpleRestaurant(Long id, String name, String address, String phoneNumber,  Float rating,Long ownerId, String facebook, String instagram, String twitter) {
-            this.id = id;
-            this.name = name;
-            this.address = address;
-            this.phoneNumber = phoneNumber;
-            this.ownerId = ownerId;
-            this.rating = rating;
-            this.facebook = facebook;
-            this.instagram = instagram;
-            this.twitter = twitter;
-        }
-    }
-    private static class SimpleUser {
-        Long user_id;
-        String username;
-        String password;
-        String first_name;
-        String last_name;
-        String email;
-        String phone;
-        boolean is_active;
-
-        public SimpleUser(Long user_id,  String username, String password, String first_name, String last_name, String email, String phone, boolean is_active) {
-            this.user_id = user_id;
-            this.username = username;
-            this.password = password;
-            this.first_name = first_name;
-            this.last_name = last_name;
-            this.email = email;
-            this.phone = phone;
-            this.is_active = is_active;
-        }
-    }
 }

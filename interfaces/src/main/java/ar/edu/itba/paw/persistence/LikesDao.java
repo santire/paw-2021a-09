@@ -10,7 +10,7 @@ import ar.edu.itba.paw.model.User;
 
 public interface LikesDao {
     Like like(User user, Restaurant restaurant);
-    boolean dislike(long userId, long restaurantId);
+    void dislike(long userId, long restaurantId);
     boolean userLikesRestaurant(long userId, long restaurantId);
      List<Like> userLikesRestaurants(long userId, List<Long> restaurantId);
     List<Like> getLikesByUserId(int page, int amountOnPage, Long userId);

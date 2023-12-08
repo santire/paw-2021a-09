@@ -5,13 +5,15 @@ import ar.edu.itba.paw.model.Like;
 import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.persistence.config.TestConfig;
-import org.junit.Assert;
+import ar.edu.itba.paw.persistence.models.LikeRow;
+import ar.edu.itba.paw.persistence.models.RestaurantRow;
+import ar.edu.itba.paw.persistence.models.UserRow;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -20,11 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 
 @Transactional
@@ -33,209 +34,122 @@ import static org.junit.Assert.assertFalse;
 @ContextConfiguration(classes = TestConfig.class)
 public class LikeJpaDaoTest {
 
-    @Autowired
-    private DataSource ds;
-
-    @Autowired
-    private LikeJpaDao likeJpaDao;
-
     @PersistenceContext
     EntityManager em;
-
+    @Autowired
+    private DataSource ds;
+    @Autowired
+    private LikeJpaDao likeJpaDao;
     private JdbcTemplate jdbcTemplate;
-    private SimpleJdbcInsert jdbcInsert;
 
     @Before
     public void setUp() {
         jdbcTemplate = new JdbcTemplate(ds);
-        jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("likes")
-                .usingGeneratedKeyColumns("like_id");
+
+        // Make sure like 15 is always inserted before each method
+        jdbcTemplate.update("INSERT INTO likes (like_id, user_id, restaurant_id) VALUES (14, 21, 997)");
+    }
+
+    @After
+    public void tearDown() {
+        // Delete like from likeTest
+        jdbcTemplate.update("DELETE FROM likes WHERE user_id=21 AND restaurant_id=998");
     }
 
     @Test
-    public void testGetLikesByUserId(){
-        List<Like> likesList = likeJpaDao.getLikesByUserId(1, 5,20L);
+    public void testGetLikesByUserId() {
+        final List<Like> likesList = likeJpaDao.getLikesByUserId(1, 5, 20L);
 
-        Assert.assertEquals(3, likesList.size());
-        Assert.assertEquals(997, likesList.get(2).getRestaurant().getId().longValue());
-        Assert.assertEquals(998, likesList.get(1).getRestaurant().getId().longValue());
-        Assert.assertEquals(999, likesList.get(0).getRestaurant().getId().longValue());
+        assertEquals(3, likesList.size());
+        assertEquals(997, likesList.get(2).getRestaurant().getId().longValue());
+        assertEquals(998, likesList.get(1).getRestaurant().getId().longValue());
+        assertEquals(999, likesList.get(0).getRestaurant().getId().longValue());
     }
 
     @Test
-    public void testUserLikesRestaurant(){
-        Assert.assertTrue(likeJpaDao.userLikesRestaurant(20,999));
+    public void testGetLikesByUserIdCount() {
+        final int likesCount = likeJpaDao.getLikesByUserIdCount(20L);
+        assertEquals(3, likesCount);
     }
 
     @Test
-    public void testUserDontLikesRestaurant(){
-        Assert.assertFalse(likeJpaDao.userLikesRestaurant(21,999));
+    public void testUserLikesRestaurant() {
+        final long userId = 20L;
+        final long restaurantId = 999L;
+        assertTrue(likeJpaDao.userLikesRestaurant(userId, restaurantId));
     }
 
     @Test
-    public void testDislike(){
-        long userId = 20;
-        long restaurantId = 997;
+    public void testUserDontLikesRestaurant() {
+        final long userId = 21L;
+        final long restaurantId = 999L;
+        assertFalse(likeJpaDao.userLikesRestaurant(userId, restaurantId));
+    }
 
-        SimpleUser user = jdbcTemplate.queryForObject("SELECT * FROM users WHERE user_id = " + userId  , (rs, rowNum) ->
-                new SimpleUser(
-                        rs.getLong("user_id"),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("first_name"),
-                        rs.getString("last_name"),
-                        rs.getString("email"),
-                        rs.getString("phone"),
-                        rs.getBoolean("is_active")
-                ));
+    @Test
+    public void testGetUserLikesByRestaurantIds() {
+        final long userId = 20L;
+        final List<Long> likedRestaurantIds = Arrays.asList(997L, 998L, 999L);
+        final Long unlikedRestaurantId = 996L;
+        final List<Long> restaurantIds = new ArrayList<>(likedRestaurantIds);
+        restaurantIds.add(unlikedRestaurantId);
 
-        SimpleRestaurant restaurant =  jdbcTemplate.queryForObject( "SELECT * FROM restaurants WHERE restaurant_id= " + restaurantId, (rs, rowNum) ->
-                new SimpleRestaurant(
-                        rs.getLong("restaurant_id"),
-                        rs.getString("name"),
-                        rs.getString("address"),
-                        rs.getString("phone_number"),
-                        rs.getFloat("rating"),
-                        rs.getLong("user_id"),
-                        rs.getString("facebook"),
-                        rs.getString("instagram"),
-                        rs.getString("twitter")
-                )
-        );
+        final List<Like> userLikes = likeJpaDao.userLikesRestaurants(userId, restaurantIds);
 
-        List <SimpleLike> retrievedLikes = jdbcTemplate.query("SELECT * FROM likes WHERE user_id = " + user.user_id + " AND restaurant_id = " + restaurant.id, (rs, rowNum) ->
-                new SimpleLike(
-                        rs.getLong("like_id"),
-                        rs.getLong("user_id"),
-                        rs.getLong("restaurant_id")
-                ));
-
-        assertFalse(retrievedLikes.isEmpty());
-
-        boolean result = likeJpaDao.dislike(user.user_id, restaurant.id);
-        em.flush();
-
-        retrievedLikes = jdbcTemplate.query("SELECT * FROM likes WHERE user_id = " + user.user_id + " AND restaurant_id = " + restaurant.id, (rs, rowNum) ->
-                new SimpleLike(
-                        rs.getLong("like_id"),
-                        rs.getLong("user_id"),
-                        rs.getLong("restaurant_id")
-                ));
-
-        assertTrue(retrievedLikes.isEmpty());
-
-
+        assertEquals(3, userLikes.size());
+        final Set<Long> actualRestaurantIds = userLikes.stream().map(l -> l.getRestaurant().getId()).collect(Collectors.toSet());
+        final Set<Long> expectedRestaurantIds = new HashSet<>(likedRestaurantIds);
+        assertEquals(actualRestaurantIds, expectedRestaurantIds);
 
     }
 
     @Test
-    public void testLike(){
-        long userId = 21;
-        long restaurantId = 997;
+    public void testLike() {
+        final long userId = 21L;
+        final long unlikedRestaurantId = 998L;
 
-        SimpleUser simpleUser = jdbcTemplate.queryForObject("SELECT * FROM users WHERE user_id = " + userId  , (rs, rowNum) ->
-                new SimpleUser(
-                        rs.getLong("user_id"),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("first_name"),
-                        rs.getString("last_name"),
-                        rs.getString("email"),
-                        rs.getString("phone"),
-                        rs.getBoolean("is_active")
-                ));
+        // Check like did not exist before
+        List<LikeRow> likeQueryRows = jdbcTemplate.query("SELECT * FROM likes WHERE user_id=" + userId + " AND restaurant_id=" + unlikedRestaurantId, LikeRow.rowMapper);
+        assertTrue(likeQueryRows.isEmpty());
 
-        User user = new User(simpleUser.user_id, simpleUser.username, simpleUser.password, simpleUser.first_name, simpleUser.last_name, simpleUser.email, simpleUser.phone, simpleUser.is_active);
+        // Prepare for like
+        UserRow userRow = jdbcTemplate.queryForObject("SELECT * FROM users WHERE user_id = " + userId, UserRow.rowMapper);
+        RestaurantRow restaurantRow = jdbcTemplate.queryForObject("SELECT * FROM restaurants WHERE restaurant_id= " + unlikedRestaurantId, RestaurantRow.rowMapper);
 
-        SimpleRestaurant simpleRestaurant =  jdbcTemplate.queryForObject( "SELECT * FROM restaurants WHERE restaurant_id= " + restaurantId, (rs, rowNum) ->
-                new SimpleRestaurant(
-                        rs.getLong("restaurant_id"),
-                        rs.getString("name"),
-                        rs.getString("address"),
-                        rs.getString("phone_number"),
-                        rs.getFloat("rating"),
-                        rs.getLong("user_id"),
-                        rs.getString("facebook"),
-                        rs.getString("instagram"),
-                        rs.getString("twitter")
-                )
-        );
-
-        Restaurant restaurant = new Restaurant(simpleRestaurant.id, simpleRestaurant.name, simpleRestaurant.address, simpleRestaurant.phoneNumber, null, user, simpleRestaurant.facebook, simpleRestaurant.twitter, simpleRestaurant.instagram);
+        User user = userRow.toUser();
+        Restaurant restaurant = restaurantRow.toRestaurant(user);
 
         Like like = likeJpaDao.like(user, restaurant);
         em.flush();
+        assertNotNull(like);
 
-        SimpleLike retrievedLike = jdbcTemplate.queryForObject("SELECT * FROM likes WHERE like_id = " + like.getId() , (rs, rowNum) ->
-                new SimpleLike(
-                        rs.getLong("like_id"),
-                        rs.getLong("user_id"),
-                        rs.getLong("restaurant_id")
-                ));
-
-        assertEquals(like.getId(), retrievedLike.like_id);
-        assertEquals(like.getRestaurant().getId(), retrievedLike.restaurant_id);
-        assertEquals(like.getUser().getId(), retrievedLike.user_id);
-
+        // Check like was inserted
+        LikeRow likeRow = jdbcTemplate.queryForObject("SELECT * FROM likes WHERE like_id=" + like.getId(), LikeRow.rowMapper);
+        assertEquals(userId, likeRow.getUserId().longValue());
+        assertEquals(unlikedRestaurantId, likeRow.getRestaurantId().longValue());
     }
 
-    private class SimpleRestaurant {
-        Long id;
-        String name;
-        String address;
-        String phoneNumber;
-        Long ownerId;
-        Float rating;
-        String facebook;
-        String instagram;
-        String twitter;
+    @Test
+    public void testDislike() {
+        final long likeId = 14L;
+        final long userId = 21L;
+        final long likedRestaurantId = 997L;
 
-        public SimpleRestaurant(Long id, String name, String address, String phoneNumber,  Float rating,Long ownerId, String facebook, String instagram, String twitter) {
-            this.id = id;
-            this.name = name;
-            this.address = address;
-            this.phoneNumber = phoneNumber;
-            this.ownerId = ownerId;
-            this.rating = rating;
-            this.facebook = facebook;
-            this.instagram = instagram;
-            this.twitter = twitter;
-        }
-    }
-    private static class SimpleUser {
-        Long user_id;
-        String username;
-        String password;
-        String first_name;
-        String last_name;
-        String email;
-        String phone;
-        boolean is_active;
+        // Check like existed before
+        LikeRow likeRow = jdbcTemplate.queryForObject("SELECT * FROM likes WHERE user_id=" + userId + " AND restaurant_id=" + likedRestaurantId, LikeRow.rowMapper);
 
-        public SimpleUser(Long user_id,  String username, String password, String first_name, String last_name, String email, String phone, boolean is_active) {
-            this.user_id = user_id;
-            this.username = username;
-            this.password = password;
-            this.first_name = first_name;
-            this.last_name = last_name;
-            this.email = email;
-            this.phone = phone;
-            this.is_active = is_active;
-        }
+        assertEquals(likeId, likeRow.getId().longValue());
+        assertEquals(userId, likeRow.getUserId().longValue());
+        assertEquals(likedRestaurantId, likeRow.getRestaurantId().longValue());
+
+        // Dislike
+        likeJpaDao.dislike(userId, likedRestaurantId);
+        em.flush();
+
+        // Check like no longer exists
+        List<LikeRow> likeQueryRows = jdbcTemplate.query("SELECT * FROM likes WHERE user_id=" + userId + " AND restaurant_id=" + likedRestaurantId, LikeRow.rowMapper);
+        assertTrue(likeQueryRows.isEmpty());
     }
 
-    private static class SimpleLike {
-        Long like_id;
-        Long user_id;
-        Long restaurant_id;
-
-
-        public SimpleLike(Long like_id,  Long user_id, Long restaurant_id) {
-            this.like_id = like_id;
-            this.user_id = user_id;
-            this.restaurant_id = restaurant_id;
-        }
-    }
 
 }

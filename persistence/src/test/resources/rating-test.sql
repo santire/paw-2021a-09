@@ -19,5 +19,5 @@ INSERT INTO ratings(rating_id, user_id, restaurant_id, rating)
 VALUES(98, 1, 1, 5);
 INSERT INTO ratings(rating_id, user_id, restaurant_id, rating)
 VALUES(99, 1, 2, 3);
-INSERT INTO ratings(rating_id, user_id, restaurant_id, rating)
-VALUES(100, 2, 1, 3);
+-- INSERT INTO ratings(rating_id, user_id, restaurant_id, rating)
+-- VALUES(100, 2, 1, 3);

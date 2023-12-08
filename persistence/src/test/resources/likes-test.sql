@@ -28,5 +28,5 @@ INSERT INTO likes(like_id, user_id, restaurant_id)
 VALUES(13, 20, 999);
 -- INSERT INTO likes(like_id, user_id, restaurant_id)
 -- VALUES(14, 21, 997);
-INSERT INTO likes(like_id, user_id, restaurant_id)
-VALUES(15, 21, 998);
+-- INSERT INTO likes(like_id, user_id, restaurant_id)
+-- VALUES(15, 21, 998);

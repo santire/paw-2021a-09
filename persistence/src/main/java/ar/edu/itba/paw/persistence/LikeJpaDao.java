@@ -31,12 +31,11 @@ public class LikeJpaDao implements LikesDao {
     }
 
     @Override
-    public boolean dislike(long userId, long restaurantId) {
+    public void dislike(long userId, long restaurantId) {
         Query query = em.createNativeQuery("DELETE FROM likes WHERE user_id = ?1 AND restaurant_id= ?2");
         query.setParameter(1, userId);
         query.setParameter(2, restaurantId);
         query.executeUpdate();
-        return true;
     }
 
     @Override

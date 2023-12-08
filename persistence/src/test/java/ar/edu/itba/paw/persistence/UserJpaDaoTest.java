@@ -1,13 +1,11 @@
 package ar.edu.itba.paw.persistence;
 
-import ar.edu.itba.paw.model.PasswordToken;
-import ar.edu.itba.paw.model.Restaurant;
 import ar.edu.itba.paw.model.User;
-import ar.edu.itba.paw.model.VerificationToken;
 import ar.edu.itba.paw.persistence.config.TestConfig;
-import junit.framework.TestCase;
+import ar.edu.itba.paw.persistence.models.TokenRow;
+import ar.edu.itba.paw.persistence.models.UserRow;
 
-import org.junit.Assert;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,32 +22,63 @@ import javax.sql.DataSource;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
 
 @Transactional
-@Sql(scripts = "classpath:restaurant-test.sql")
+@Sql(scripts = "classpath:user-test.sql")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestConfig.class)
 public class UserJpaDaoTest {
 
-    private static final Long OWNER_ID = 999L;
+    private static final long OWNER_ID = 999L;
     private static final String OWNER_EMAIL = "mluque@itba.edu.ar";
+    private static final String USERNAME = "mluque";
+    private static final String FIRST_NAME = "manuel";
+    private static final String LAST_NAME = "luque";
+    private static final String PHONE = "1135679821";
+
+    private static final String TOKEN = "TOK";
+    private static final String TOKEN_DATE = "2021-06-02 16:55:38";
+    private static final long TOKEN_USER = 997L;
+    private static final DateTimeFormatter TOKEN_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    @PersistenceContext
+    EntityManager em;
     @Autowired
     private DataSource ds;
     @Autowired
     private UserJpaDao userDao;
     private JdbcTemplate jdbcTemplate;
 
-    @PersistenceContext
-    EntityManager em;
-
     @Before
     public void setUp() {
         jdbcTemplate = new JdbcTemplate(ds);
 
+        Object[] token = new Object[]{999L, TOKEN, TOKEN_DATE, TOKEN_USER};
+
+        String verificationSql = "INSERT INTO verification_tokens(token_id, token, created_at, user_id) VALUES (?, ?, ?, ?)";
+        String passwordSql = "INSERT INTO password_tokens(token_id, token, created_at, user_id) VALUES (?, ?, ?, ?)";
+
+        // Insert test verification token for delete
+        jdbcTemplate.update(verificationSql, token);
+        // Insert test password token for delete
+        jdbcTemplate.update(passwordSql, token);
+    }
+
+    @After
+    public void tearDown() {
+        Object[] tokenId = new Object[]{999L};
+
+        String verificationSql = "DELETE FROM verification_tokens WHERE token_id=?";
+        String passwordSql = "DELETE FROM password_tokens WHERE token_id=?";
+
+        // Insert test verification token for delete
+        jdbcTemplate.update(verificationSql, tokenId);
+        // Insert test password token for delete
+        jdbcTemplate.update(passwordSql, tokenId);
     }
 
     @Test
@@ -59,25 +88,12 @@ public class UserJpaDaoTest {
         assertTrue(maybeUser.isPresent());
         final User user = maybeUser.get();
 
-        SimpleUser retrievedUser = jdbcTemplate.queryForObject("SELECT * FROM users WHERE user_id = " + OWNER_ID , (rs, rowNum) ->
-                new SimpleUser(
-                        rs.getLong("user_id"),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("first_name"),
-                        rs.getString("last_name"),
-                        rs.getString("email"),
-                        rs.getString("phone"),
-                        rs.getBoolean("is_active")
-                ));
-
-        assertEquals(retrievedUser.user_id.longValue(), user.getId().longValue());
-        assertEquals(retrievedUser.username, user.getUsername());
-        assertEquals(retrievedUser.password, user.getPassword());
-        assertEquals(retrievedUser.first_name, user.getFirstName());
-        assertEquals(retrievedUser.last_name, user.getLastName());
-        assertEquals(retrievedUser.phone, user.getPhone());
-        assertEquals(retrievedUser.is_active, user.isActive());
+        assertEquals(OWNER_ID, user.getId().longValue());
+        assertEquals(USERNAME, user.getUsername());
+        assertEquals(FIRST_NAME, user.getFirstName());
+        assertEquals(LAST_NAME, user.getLastName());
+        assertEquals(PHONE, user.getPhone());
+        assertFalse(user.isActive());
     }
 
     @Test
@@ -90,29 +106,15 @@ public class UserJpaDaoTest {
     public void testFindByEmail() {
 
         final Optional<User> maybeUser = userDao.findByEmail(OWNER_EMAIL);
-
         assertTrue(maybeUser.isPresent());
         final User user = maybeUser.get();
 
-        SimpleUser retrievedUser = jdbcTemplate.queryForObject("SELECT * FROM users WHERE email = '" + OWNER_EMAIL + "'" , (rs, rowNum) ->
-                new SimpleUser(
-                        rs.getLong("user_id"),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("first_name"),
-                        rs.getString("last_name"),
-                        rs.getString("email"),
-                        rs.getString("phone"),
-                        rs.getBoolean("is_active")
-                ));
-
-        assertEquals(retrievedUser.user_id.longValue(), user.getId().longValue());
-        assertEquals(retrievedUser.username, user.getUsername());
-        assertEquals(retrievedUser.password, user.getPassword());
-        assertEquals(retrievedUser.first_name, user.getFirstName());
-        assertEquals(retrievedUser.last_name, user.getLastName());
-        assertEquals(retrievedUser.phone, user.getPhone());
-        assertEquals(retrievedUser.is_active, user.isActive());
+        assertEquals(OWNER_ID, user.getId().longValue());
+        assertEquals(USERNAME, user.getUsername());
+        assertEquals(FIRST_NAME, user.getFirstName());
+        assertEquals(LAST_NAME, user.getLastName());
+        assertEquals(PHONE, user.getPhone());
+        assertFalse(user.isActive());
     }
 
     @Test
@@ -128,216 +130,109 @@ public class UserJpaDaoTest {
 
     @Test
     public void testCreateUser() {
-        String username = "TEST_NAME";
-        String EMAIL = "myemail@email.com";
+        final String firstName = "first";
+        final String lastName = "last";
+        final String email = "myemail@email.com";
+        final String username = "testuser";
+        final String password = "secret";
+        final String phone = "123456789";
 
-        User user = userDao.register(username, "password", "firstname", "lastname", EMAIL, "123456789");
+        User user = userDao.register(username, password, firstName, lastName, email, phone);
         em.flush();
 
-        SimpleUser retrievedUser = jdbcTemplate.queryForObject("SELECT * FROM users WHERE user_id =" + user.getId().toString(), (rs, rowNum) ->
-                new SimpleUser(
-                        rs.getLong("user_id"),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("first_name"),
-                        rs.getString("last_name"),
-                        rs.getString("email"),
-                        rs.getString("phone"),
-                        rs.getBoolean("is_active")
-                        ));
+        final String sql = String.format("SELECT * FROM users WHERE user_id=%d", user.getId());
+        UserRow userRow = jdbcTemplate.queryForObject(sql, UserRow.rowMapper);
 
-
-        assertEquals(username, retrievedUser.username);
-        assertEquals("password", retrievedUser.password);
-        assertEquals("firstname", retrievedUser.first_name);
-        assertEquals("lastname", retrievedUser.last_name);
-        assertEquals(EMAIL, retrievedUser.email);
-        assertEquals("123456789", retrievedUser.phone);
-        assertFalse(retrievedUser.is_active);
+        assertEquals(username, userRow.getUsername());
+        assertEquals(password, userRow.getPassword());
+        assertEquals(firstName, userRow.getFirstName());
+        assertEquals(lastName, userRow.getLastName());
+        assertEquals(email, userRow.getEmail());
+        assertEquals(phone, userRow.getPhone());
+        assertFalse(userRow.isActive());
     }
 
     @Test
     public void testAssignToken() {
-        LocalDateTime time = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.systemDefault());
-        String TOKEN = "TOKEN00";
+        final LocalDateTime time = LocalDateTime.parse("2021-06-02T16:55:38");
+        final String token = "TOKEN00";
+        final long userId = 999L;
 
-        SimpleUser user = jdbcTemplate.queryForObject("SELECT * FROM users WHERE email = '" + OWNER_EMAIL + "'" , (rs, rowNum) ->
-                new SimpleUser(
-                        rs.getLong("user_id"),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("first_name"),
-                        rs.getString("last_name"),
-                        rs.getString("email"),
-                        rs.getString("phone"),
-                        rs.getBoolean("is_active")
-                ));
 
-        userDao.assignTokenToUser(TOKEN, time, user.user_id);
+        userDao.assignTokenToUser(token, time, userId);
         em.flush();
 
-        SimpleToken retrievedToken = jdbcTemplate.queryForObject("SELECT * FROM verification_tokens WHERE token = '" + TOKEN + "'" , (rs, rowNum) ->
-                new SimpleToken(
-                        rs.getLong("token_id"),
-                        rs.getString("token"),
-                        rs.getString("created_at"),
-                        rs.getLong("user_id")
-                ));
+        final String sql = String.format("SELECT * FROM verification_tokens WHERE token='%s'", token);
+        TokenRow tokenRow = jdbcTemplate.queryForObject(sql, TokenRow.rowMapper);
 
-        assertEquals(user.user_id, retrievedToken.user_id);
-        assertEquals(TOKEN, retrievedToken.token);
+        assertEquals(userId, tokenRow.getUserId().longValue());
+        assertEquals(time.format(TOKEN_DATE_FORMATTER), tokenRow.getCreatedAt().substring(0, 19));
+        assertEquals(token, tokenRow.getToken());
     }
 
     @Test
     public void testAssignPasswordToken() {
-        LocalDateTime time = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.systemDefault());
-        String PTOKEN = "PTOKEN00";
+        final LocalDateTime time = LocalDateTime.parse("2021-06-02T16:55:38");
+        final String token = "TOKEN00";
+        final long userId = 999L;
 
-        SimpleUser user = jdbcTemplate.queryForObject("SELECT * FROM users WHERE email = '" + OWNER_EMAIL + "'" , (rs, rowNum) ->
-                new SimpleUser(
-                        rs.getLong("user_id"),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("first_name"),
-                        rs.getString("last_name"),
-                        rs.getString("email"),
-                        rs.getString("phone"),
-                        rs.getBoolean("is_active")
-                ));
-
-        userDao.assignPasswordTokenToUser(PTOKEN, time, user.user_id);
+        userDao.assignPasswordTokenToUser(token, time, userId);
         em.flush();
 
-        SimpleToken retrievedToken = jdbcTemplate.queryForObject("SELECT * FROM password_tokens WHERE token = '" + PTOKEN + "'" , (rs, rowNum) ->
-                new SimpleToken(
-                        rs.getLong("token_id"),
-                        rs.getString("token"),
-                        rs.getString("created_at"),
-                        rs.getLong("user_id")
-                ));
+        final String sql = String.format("SELECT * FROM password_tokens WHERE token='%s'", token);
+        TokenRow tokenRow = jdbcTemplate.queryForObject(sql, TokenRow.rowMapper);
 
-        assertEquals(user.user_id, retrievedToken.user_id);
-        assertEquals(PTOKEN, retrievedToken.token);
+        assertEquals(userId, tokenRow.getUserId().longValue());
+        assertEquals(time.format(TOKEN_DATE_FORMATTER), tokenRow.getCreatedAt().substring(0, 19));
+        assertEquals(token, tokenRow.getToken());
     }
 
     @Test
     public void testDeleteToken() {
-        LocalDateTime time = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.systemDefault());
-        String TOKEN = "0TOKEN0";
+        // Check token exists
+        final long tokenId = 999L;
+        final String sql = String.format("SELECT * FROM verification_tokens WHERE token_id=%d", tokenId);
+        TokenRow tokenRow = jdbcTemplate.queryForObject(sql, TokenRow.rowMapper);
 
-        SimpleUser user = jdbcTemplate.queryForObject("SELECT * FROM users WHERE email = '" + OWNER_EMAIL + "'" , (rs, rowNum) ->
-                new SimpleUser(
-                        rs.getLong("user_id"),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("first_name"),
-                        rs.getString("last_name"),
-                        rs.getString("email"),
-                        rs.getString("phone"),
-                        rs.getBoolean("is_active")
-                ));
+        assertEquals(tokenId, tokenRow.getId().longValue());
+        assertEquals(TOKEN, tokenRow.getToken());
+        assertEquals(TOKEN_USER, tokenRow.getUserId().longValue());
+        assertEquals(TOKEN_DATE, tokenRow.getCreatedAt().substring(0, 19));
 
-        List <SimpleToken> retrievedTokens = jdbcTemplate.query("SELECT * FROM verification_tokens WHERE token = '" + TOKEN + "'" , (rs, rowNum) ->
-                new SimpleToken(
-                        rs.getLong("token_id"),
-                        rs.getString("token"),
-                        rs.getString("created_at"),
-                        rs.getLong("user_id")
-                ));
-
-        assertFalse(retrievedTokens.isEmpty());
-
+        // Delete token
         userDao.deleteToken(TOKEN);
         em.flush();
 
-        retrievedTokens = jdbcTemplate.query("SELECT * FROM verification_tokens WHERE token = '" + TOKEN + "'" , (rs, rowNum) ->
-                new SimpleToken(
-                        rs.getLong("token_id"),
-                        rs.getString("token"),
-                        rs.getString("created_at"),
-                        rs.getLong("user_id")
-                ));
-
-        assertTrue(retrievedTokens.isEmpty());
-
+        // Check token was deleted
+       List<TokenRow> tokenRowList = jdbcTemplate.query(sql, TokenRow.rowMapper);
+       assertTrue(tokenRowList.isEmpty());
     }
 
     @Test
-    public void testDeletePasswordToken() {
-        LocalDateTime time = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.systemDefault());
-        String PTOKEN = "0PTOKEN0";
+    public void testDeletePasswordTokens() {
+        // Check token exists
+        final long tokenId = 999L;
+        final String sql = String.format("SELECT * FROM password_tokens WHERE token_id=%d", tokenId);
+        TokenRow tokenRow = jdbcTemplate.queryForObject(sql, TokenRow.rowMapper);
 
-        SimpleUser simpleUser = jdbcTemplate.queryForObject("SELECT * FROM users WHERE email = '" + OWNER_EMAIL + "'" , (rs, rowNum) ->
-                new SimpleUser(
-                        rs.getLong("user_id"),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("first_name"),
-                        rs.getString("last_name"),
-                        rs.getString("email"),
-                        rs.getString("phone"),
-                        rs.getBoolean("is_active")
-                ));
+        assertEquals(tokenId, tokenRow.getId().longValue());
+        assertEquals(TOKEN, tokenRow.getToken());
+        assertEquals(TOKEN_USER, tokenRow.getUserId().longValue());
+        assertEquals(TOKEN_DATE, tokenRow.getCreatedAt().substring(0, 19));
 
-        User user = new User(simpleUser.user_id, simpleUser.username, simpleUser.password, simpleUser.first_name, simpleUser.last_name, simpleUser.email, simpleUser.phone, simpleUser.is_active);
+        // Obtain token user
+        final String userSql = String.format("SELECT * FROM users WHERE user_id=%d", TOKEN_USER);
+        UserRow userRow = jdbcTemplate.queryForObject(userSql, UserRow.rowMapper);
 
-        List <SimpleToken> retrievedTokens = jdbcTemplate.query("SELECT * FROM password_tokens WHERE token = '" + PTOKEN + "'" , (rs, rowNum) ->
-                new SimpleToken(
-                        rs.getLong("token_id"),
-                        rs.getString("token"),
-                        rs.getString("created_at"),
-                        rs.getLong("user_id")
-                ));
+        User user = userRow.toUser();
 
-        assertFalse(retrievedTokens.isEmpty());
-
+        // Delete tokens
         userDao.deleteAssociatedPasswordTokens(user);
+        em.flush();
 
-        retrievedTokens = jdbcTemplate.query("SELECT * FROM password_tokens WHERE token = '" + PTOKEN + "'" , (rs, rowNum) ->
-                new SimpleToken(
-                        rs.getLong("token_id"),
-                        rs.getString("token"),
-                        rs.getString("created_at"),
-                        rs.getLong("user_id")
-                ));
+        // Check token was deleted
+        List<TokenRow> tokenRowList = jdbcTemplate.query(sql, TokenRow.rowMapper);
+        assertTrue(tokenRowList.isEmpty());
 
-        assertTrue(retrievedTokens.isEmpty());
-
-    }
-
-    private static class SimpleUser {
-        Long user_id;
-        String username;
-        String password;
-        String first_name;
-        String last_name;
-        String email;
-        String phone;
-        boolean is_active;
-
-        public SimpleUser(Long user_id,  String username, String password, String first_name, String last_name, String email, String phone, boolean is_active) {
-            this.user_id = user_id;
-            this.username = username;
-            this.password = password;
-            this.first_name = first_name;
-            this.last_name = last_name;
-            this.email = email;
-            this.phone = phone;
-            this.is_active = is_active;
-        }
-    }
-
-    private static class SimpleToken {
-        Long token_id;
-        String token;
-        String created_at;
-        Long user_id;
-
-        public SimpleToken(Long token_id,  String token, String created_at, Long user_id) {
-            this.token_id = token_id;
-            this.token = token;
-            this.created_at = created_at;
-            this.user_id = user_id;
-        }
     }
 }

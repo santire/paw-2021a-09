@@ -3,6 +3,8 @@ package ar.edu.itba.paw.persistence;
 import ar.edu.itba.paw.model.Reservation;
 import ar.edu.itba.paw.model.ReservationStatus;
 import ar.edu.itba.paw.persistence.config.TestConfig;
+import ar.edu.itba.paw.persistence.models.ReservationRow;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,10 +20,12 @@ import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @Transactional
 @Sql(scripts = "classpath:reservation-test.sql")
@@ -29,28 +33,41 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = TestConfig.class)
 public class ReservationJpaDaoTest {
 
-    @Autowired
-    private DataSource ds;
-
-    @Autowired
-    private ReservationJpaDao reservationJpaDao;
-
     @PersistenceContext
     EntityManager em;
-
+    @Autowired
+    private DataSource ds;
+    @Autowired
+    private ReservationJpaDao reservationJpaDao;
     private JdbcTemplate jdbcTemplate;
 
     @Before
     public void setUp() {
         jdbcTemplate = new JdbcTemplate(ds);
+        Object[] reservation = new Object[]{100L, 999L, 999L, "2023-08-08 21:00:00", 1, "PENDING"};
+
+        String sql = "INSERT INTO reservations (reservation_id, user_id, restaurant_id, date, quantity, status) VALUES (?, ?, ?, ?, ? ,?)";
+
+        // Insert test reservation for cancel
+        jdbcTemplate.update(sql, reservation);
+    }
+    @After
+    public void tearDown() {
+        // Delete test reservation
+        Object[] reservationId = new Object[]{100L};
+
+        String sql = "DELETE FROM reservations WHERE reservation_id=?";
+
+        // Delete test reservation for cancel
+        jdbcTemplate.update(sql, reservationId);
     }
 
 
     @Test
     public void testFindById() {
-        String d = "2023-08-08 19:00:00";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime date = LocalDateTime.parse(d, formatter);
+        final String d = "2023-08-08 19:00:00";
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        final LocalDateTime date = LocalDateTime.parse(d, formatter);
 
         final Optional<Reservation> maybeReservation = reservationJpaDao.findById(1);
         assertTrue(maybeReservation.isPresent());
@@ -58,103 +75,111 @@ public class ReservationJpaDaoTest {
 
         assertEquals(ReservationStatus.PENDING, reservation.getStatus());
         assertEquals(date, reservation.getDate());
-        assertEquals(999L,  reservation.getUser().getId().longValue());
+        assertEquals(999L, reservation.getUser().getId().longValue());
         assertEquals(997L, reservation.getRestaurant().getId().longValue());
     }
 
     @Test
     public void testFindConfirmedByRestaurant() {
+        final String d = "2023-08-07 15:00:00";
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        final LocalDateTime date = LocalDateTime.parse(d, formatter);
+        final long restaurantId = 997L;
+
+
+        List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 2, null, restaurantId, date, null, ReservationStatus.CONFIRMED, false);
+        assertEquals(2, reservationList.size());
+        assertEquals(3L, reservationList.get(0).getId().longValue());
+        assertEquals(4L, reservationList.get(1).getId().longValue());
+    }
+    @Test
+    public void testFindConfirmedByRestaurantCount() {
         String d = "2023-08-07 15:00:00";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime date = LocalDateTime.parse(d, formatter);
+        final long restaurantId = 997L;
 
-
-        List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 2, null,997l, date, null, ReservationStatus.CONFIRMED, false );
-        assertEquals(2, reservationList.size());
-        assertEquals(3, reservationList.get(0).getId().longValue());
-        assertEquals(4, reservationList.get(1).getId().longValue());
+        final int reservationCount = reservationJpaDao.findFilteredReservationsCount(null, restaurantId, date, null, ReservationStatus.CONFIRMED);
+        assertEquals(2, reservationCount);
     }
 
     @Test
     public void testFindPendingByRestaurant() {
-        String d = "2023-08-07 15:00:00";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime date = LocalDateTime.parse(d, formatter);
+        final String d = "2023-08-07 15:00:00";
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        final LocalDateTime date = LocalDateTime.parse(d, formatter);
 
-        List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 2, null,997l, date, null, ReservationStatus.PENDING, false );
+        final List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 2, null, 997l, date, null, ReservationStatus.PENDING, false);
         assertEquals(1, reservationList.size());
-        assertEquals(1, reservationList.get(0).getId().longValue());
+        assertEquals(1L, reservationList.get(0).getId().longValue());
+    }
+    @Test
+    public void testFindPendingByRestaurantCount() {
+        final String d = "2023-08-07 15:00:00";
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        final LocalDateTime date = LocalDateTime.parse(d, formatter);
+        final long restaurantId = 997L;
+
+        final int reservationCount = reservationJpaDao.findFilteredReservationsCount( null, restaurantId, date, null, ReservationStatus.PENDING);
+        assertEquals(1,reservationCount);
     }
 
     @Test
     public void testFindByRestaurant() {
-        List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 4, null,997l, null, null, null, false );
+        final List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 4, null, 997l, null, null, null, false);
         assertEquals(3, reservationList.size());
-        assertEquals(1, reservationList.get(0).getId().longValue());
-        assertEquals(3, reservationList.get(1).getId().longValue());
-        assertEquals(4, reservationList.get(2).getId().longValue());
+        assertEquals(1L, reservationList.get(0).getId().longValue());
+        assertEquals(3L, reservationList.get(1).getId().longValue());
+        assertEquals(4L, reservationList.get(2).getId().longValue());
+    }
+    @Test
+    public void testFindByRestaurantCount() {
+        final long restaurantId = 997L;
+        final int reservationsCount = reservationJpaDao.findFilteredReservationsCount(null, restaurantId, null, null, null);
+        assertEquals(3, reservationsCount);
     }
 
     @Test
     public void testFindByUser() {
-        String d = "2023-08-07 15:00:00";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime date = LocalDateTime.parse(d, formatter);
+        final String d = "2023-08-07 15:00:00";
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        final LocalDateTime date = LocalDateTime.parse(d, formatter);
+        final long userId = 998L;
 
-        List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 6, 999l,null, date, null, null, false );
+        final List<Reservation> reservationList = reservationJpaDao.findFilteredReservations(1, 6, userId, null, date, null, null, false);
 
-        assertEquals(3, reservationList.size());
-        assertEquals(2, reservationList.get(0).getId().longValue());
-        assertEquals(1, reservationList.get(1).getId().longValue());
-        assertEquals(4, reservationList.get(2).getId().longValue());
+        assertEquals(2, reservationList.size());
+        assertEquals(3L, reservationList.get(0).getId().longValue());
+        assertEquals(5L, reservationList.get(1).getId().longValue());
     }
 
     @Test
     public void testCancelReservation() {
-        long reservationId = 5;
+        final long userId = 999L;
+        final long restaurantId = 999L;
+        final long reservationId = 100L;
+        final String date = "2023-08-08 21:00:00";
+        final int quantity = 1;
+        final String status = "PENDING";
 
-        SimpleReservation reservation = jdbcTemplate.queryForObject("SELECT * FROM reservations WHERE reservation_id = " + reservationId , (rs, rowNum) ->
-                new SimpleReservation(
-                        rs.getLong("reservation_id"),
-                        rs.getLong("user_id"),
-                        rs.getLong("restaurant_id"),
-                        rs.getString("date"),
-                        rs.getInt("quantity"),
-                        rs.getString("status")
-                ));
+        final String sql = String.format("SELECT * FROM reservations WHERE reservation_id=%d", reservationId);
 
-        reservationJpaDao.cancelReservation(reservation.reservation_id);
+        // Check reservation Exists
+        ReservationRow reservationRow = jdbcTemplate.queryForObject(sql, ReservationRow.rowMapper);
+        assertEquals(userId, reservationRow.getUserId().longValue());
+        assertEquals(restaurantId, reservationRow.getRestaurantId().longValue());
+        // Only care up to seconds in date
+        assertEquals(date, reservationRow.getDate().substring(0, 19));
+        assertEquals(quantity, reservationRow.getQuantity());
+        assertEquals(status, reservationRow.getStatus());
+
+        // Cancel Reservation (DELETE)
+        reservationJpaDao.cancelReservation(reservationId);
         em.flush();
 
-        List <SimpleReservation> reservations = jdbcTemplate.query("SELECT * FROM reservations WHERE reservation_id = " + reservationId , (rs, rowNum) ->
-                new SimpleReservation(
-                        rs.getLong("reservation_id"),
-                        rs.getLong("user_id"),
-                        rs.getLong("restaurant_id"),
-                        rs.getString("date"),
-                        rs.getInt("quantity"),
-                        rs.getString("status")
-                ));
-
-        assertTrue(reservations.isEmpty());
+        // Check reservation Doesn't exist
+        List<ReservationRow> reservationQueryResultList = jdbcTemplate.query(sql, ReservationRow.rowMapper);
+        assertTrue(reservationQueryResultList.isEmpty());
     }
 
-    private static class SimpleReservation {
-        Long reservation_id;
-        Long user_id;
-        Long restaurant_id;
-        String date;
-        int quantity;
-        String status;
-
-        public SimpleReservation(Long reservation_id,  Long user_id, Long restaurant_id, String date, int quantity, String status) {
-            this.reservation_id = reservation_id;
-            this.user_id = user_id;
-            this.restaurant_id = restaurant_id;
-            this.date = date;
-            this.quantity = quantity;
-            this.quantity = quantity;
-            this.status = status;
-        }
-    }
 }
