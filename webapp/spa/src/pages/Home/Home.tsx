@@ -1,15 +1,7 @@
-import {
-  createStyles,
-  Flex,
-  Text,
-  Image,
-  TextInput,
-  Button,
-} from "@mantine/core";
+import { createStyles, Flex, Text, Image } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import homeImageSrc from "@/assets/images/home_image.png";
-import { UserService } from "@/api/services/UserService";
-import { useState } from "react";
+import { useUser } from "@/hooks/queries/users";
 
 const useStyles = createStyles((theme) => ({
   heading: {
@@ -42,21 +34,7 @@ const useStyles = createStyles((theme) => ({
 export function HomePage() {
   const { classes } = useStyles();
   const { t } = useTranslation();
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const [result, setResult] = useState("");
-
-  const getUser = async () => {
-    const user = await UserService.getByEmail(email, { username: email, password: password });
-    setResult(JSON.stringify(user))
-  }
-
-  const getUserWithJwt = async () => {
-    const user = await UserService.getByEmail(email);
-    setResult(JSON.stringify(user))
-  }
+  const user = useUser();
 
   return (
     <>
@@ -70,15 +48,7 @@ export function HomePage() {
           <Image src={homeImageSrc} height={"35vh"} width={"auto"} />
         </Flex>
       </div>
-      <TextInput label="email" value={email} onChange={e => setEmail(e.currentTarget.value)} />
-      <TextInput label="password" value={password} onChange={e => setPassword(e.currentTarget.value)} />
-      <Button onClick={getUser}>GET WITH BASIC</Button>
-      <Button onClick={getUserWithJwt}>GET WITH JWT</Button>
-      <Button onClick={() => setResult("")}>CLEAR</Button>
-
-      <p>
-        {result}
-      </p>
+      <p>{user.isSuccess && JSON.stringify(user.data)}</p>
     </>
   );
 }

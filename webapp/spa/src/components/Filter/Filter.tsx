@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import {
   useFilterSearchParams,
   usePageSearchParams,
-} from "../../hooks/searchParams.hooks";
+} from "@/hooks/searchParams.hooks";
 import { PriceInput } from "./PriceInput/PriceInput";
 
 export function Filter() {

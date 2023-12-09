@@ -1,15 +1,15 @@
-import { IUser } from "@/types/user/user.models";
-import { apiClient } from "../client";
+import { IUser, IUserLogin } from "@/types/user/user.models";
+import { apiClient, apiErrorHandler } from "../client";
 
 const PATH = "/users";
 
-interface AuthParams {
+export interface AuthParams {
   username: string;
   password: string;
 }
 
 interface IUserService {
-  getByEmail(email: string, auth?: AuthParams): Promise<IUser>;
+  getByEmail(email: string, auth?: IUserLogin): Promise<IUser>;
 
   // create(user: IUserRegister): Promise<IUser>;
 
@@ -21,11 +21,13 @@ interface IUserService {
 }
 
 module UserServiceImpl {
-  export async function getByEmail(email: string, auth?: AuthParams) {
+  export async function getByEmail(email: string, auth?: IUserLogin) {
     const response = await apiClient.get<IUser>(PATH, {
-      auth: auth ? { ...auth } : undefined,
-      params: { email }
-    })
+      auth: auth
+        ? { username: auth.email, password: auth.password }
+        : undefined,
+      params: { email },
+    });
     return response.data;
   }
 }

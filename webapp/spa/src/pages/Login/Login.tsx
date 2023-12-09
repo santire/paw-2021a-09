@@ -18,8 +18,9 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { IUserLogin } from "@/types/user/user.models";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserLoginSchema } from "@/types/user/user.schemas";
-import { useLoginUser } from "../hooks/user.hooks";
+import { useLoginUser } from "@/hooks/queries/users";
 import { useEffect, useState } from "react";
+import { isServerError } from "@/api/client";
 
 export function LoginPage() {
   const { t } = useTranslation();
@@ -37,30 +38,30 @@ export function LoginPage() {
     resolver: zodResolver(UserLoginSchema),
   });
 
-  const { mutate, isLoading } = useLoginUser({
-    onError: handleError,
-  });
+  const { mutate, isPending } = useLoginUser();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/");
-    }
     const alert = searchParams.get("alert") ?? "";
     if (["", "confirmed", "updated"].includes(alert)) {
       setShowAlert(alert);
     }
-  }, [isAuthenticated, setShowAlert, searchParams]);
+  }, [setShowAlert, searchParams]);
 
-  function handleError(error: ServerError) {
-    if (error.code === "invalid_credentials") {
-      resetField("password");
-      setError("email", {
-        type: "custom",
-        message: t("errors.invalidCredentials") || "",
-      });
-    } else {
-      // Unknown error notification
-    }
+  function handleMutation(data: IUserLogin) {
+    mutate(data, {
+      onSuccess: () => {
+        navigate("/");
+      },
+      onError: ({ cause }) => {
+        if (isServerError(cause) && cause.code === "invalid_credentials") {
+          resetField("password");
+          setError("email", {
+            type: "custom",
+            message: t("errors.invalidCredentials") || "",
+          });
+        }
+      },
+    });
   }
 
   return (
@@ -97,7 +98,7 @@ export function LoginPage() {
           : t("pages.login.updatedAlert")}
       </Alert>
       <Paper withBorder shadow="md" p={30} mt={showAlert ? 10 : 30} radius="md">
-        <form onSubmit={handleSubmit((data) => mutate(data))}>
+        <form onSubmit={handleSubmit((data) => handleMutation(data))}>
           <TextInput
             aria-label="email-input"
             label={t("pages.login.email.label")}
@@ -130,9 +131,9 @@ export function LoginPage() {
             color="orange"
             type="submit"
             aria-label="login-button"
-            disabled={isLoading}
+            disabled={isPending}
           >
-            {isLoading ? (
+            {isPending ? (
               <Loader variant="dots" color="orange" />
             ) : (
               t("pages.login.signIn")

@@ -7,13 +7,14 @@ interface Props {
   children: JSX.Element;
 }
 export function RouteGuard({ protection, children }: Props) {
+  const isAuthenticated = isAuthed();
   if (protection?.type === "authed") {
-    if (!isAuthed()) {
+    if (!isAuthenticated) {
       return <Navigate to={protection.redirectPath ?? "/login"} replace />;
     }
   }
   if (protection?.type === "public") {
-    if (isAuthed()) {
+    if (isAuthenticated) {
       return <Navigate to={protection.redirectPath ?? "/"} replace />;
     }
   }

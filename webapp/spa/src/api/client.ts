@@ -1,5 +1,12 @@
 import axios from "axios";
-import { clearItems, getAuthToken, getRefreshToken, setAuthToken, setRefreshToken } from "@/utils/AuthStorage";
+import {
+  clearItems,
+  getAuthToken,
+  getRefreshToken,
+  setAuthToken,
+  setRefreshToken,
+} from "@/utils/AuthStorage";
+import { apiErrorMap } from "./mappers/errors";
 
 const BASE_CONFIG = {
   baseURL: import.meta.env.VITE_HOST_API || "http://localhost:8080/app/api",
@@ -23,22 +30,21 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 apiClient.interceptors.response.use(
-
   (response) => {
     // If a response contains Auth headers, update Auth Storage
-    const authTokenHeader: string = response.headers['x-auth-token'];
-    const refreshTokenHeader: string = response.headers['x-refresh-token'];
+    const authTokenHeader: string = response.headers["x-auth-token"];
+    const refreshTokenHeader: string = response.headers["x-refresh-token"];
 
     if (authTokenHeader && authTokenHeader.startsWith("Bearer ")) {
-      setAuthToken(authTokenHeader.replace(/^Bearer\s+/i, ""))
+      setAuthToken(authTokenHeader.replace(/^Bearer\s+/i, ""));
     }
 
     if (refreshTokenHeader && refreshTokenHeader.startsWith("Bearer ")) {
-      setRefreshToken(refreshTokenHeader.replace(/^Bearer\s+/i, ""))
+      setRefreshToken(refreshTokenHeader.replace(/^Bearer\s+/i, ""));
     }
 
     return response;
@@ -49,7 +55,6 @@ apiClient.interceptors.response.use(
     // If the error status is 401 and there is no originalRequest._retry flag,
     // it means the token has expired and we need to refresh it
     if (error.response.status === 401) {
-
       if (!originalRequest._retry) {
         originalRequest._retry = true;
         const refreshToken = getRefreshToken();
@@ -57,18 +62,18 @@ apiClient.interceptors.response.use(
         // If refresh token is not found, error falls through for the app to handle
         if (refreshToken) {
           // Retry the original request with the new token
-          originalRequest.headers['X-Refresh-Token'] = `Bearer ${refreshToken}`;
+          originalRequest.headers["X-Refresh-Token"] = `Bearer ${refreshToken}`;
           const resp = await axios(originalRequest);
 
-          const authTokenHeader: string = resp.headers['x-auth-token'];
-          const refreshTokenHeader: string = resp.headers['x-refresh-token'];
+          const authTokenHeader: string = resp.headers["x-auth-token"];
+          const refreshTokenHeader: string = resp.headers["x-refresh-token"];
 
           if (authTokenHeader && authTokenHeader.startsWith("Bearer ")) {
-            setAuthToken(authTokenHeader.replace(/^Bearer\s+/i, ""))
+            setAuthToken(authTokenHeader.replace(/^Bearer\s+/i, ""));
           }
 
           if (refreshTokenHeader && refreshTokenHeader.startsWith("Bearer ")) {
-            setRefreshToken(refreshTokenHeader.replace(/^Bearer\s+/i, ""))
+            setRefreshToken(refreshTokenHeader.replace(/^Bearer\s+/i, ""));
           }
           return resp;
         }
@@ -78,8 +83,14 @@ apiClient.interceptors.response.use(
       }
     }
 
-    return Promise.reject(error);
-  }
+    return Promise.reject(
+      new Error("API Error", {
+        cause: apiErrorHandler(error, {
+          ...apiErrorMap,
+        }),
+      }),
+    );
+  },
 );
 
 function isServerErrorResponse(object: any): object is ServerErrorResponse {
@@ -90,16 +101,14 @@ export function isServerError(object: any): object is ServerError {
   return "status" in object && "code" in object;
 }
 
-export function apiErrorHandler(
-  error: any,
-  mappers?: {
-    [key: string]: {
-      code?: string;
-      status?: string;
-      errors?: ValidationError[];
-    };
-  }
-): ServerError {
+export interface ErrorMap {
+  [key: string]: {
+    code?: string;
+    status?: string;
+    errors?: ValidationError[];
+  };
+}
+export function apiErrorHandler(error: any, mappers?: ErrorMap): ServerError {
   if (
     axios.isAxiosError(error) &&
     error.response &&
@@ -148,6 +157,5 @@ export interface ServerError {
   code: string;
   errors?: ValidationError[];
 }
-
 
 export { apiClient };

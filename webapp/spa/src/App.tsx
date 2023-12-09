@@ -6,6 +6,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { RouterProvider } from "react-router-dom";
 import Layout from "@/components/Layout/Layout";
 import { Helmet, HelmetProvider } from "react-helmet-async";
@@ -25,6 +26,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       // staleTime: 2 * 60 * 1000,  // 2min
+      retry: false,
       staleTime: Infinity,
     },
   },
@@ -33,6 +35,7 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <ReactQueryDevtools initialIsOpen={false} />
       <Suspense fallback={<Layout />}>
         <ThemeProvider>
           <HelmetProvider>
