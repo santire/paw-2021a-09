@@ -15,14 +15,16 @@ public class CorsFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        logger.info("CORS Filter being executed!");
         if ("OPTIONS".equals(request.getMethod())) {
-            logger.info("CORS Filter being executed!");
-            // Do not deploy!
-            response.setHeader("Access-Control-Allow-Origin", "*");
             response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
-            response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+            response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Refresh-Token");
+        } else {
             response.addHeader("Access-Control-Expose-Headers", "Authorization, Link, Location, X-Total-Count, X-Auth-Token, X-Refresh-Token");
         }
+
+        // Do not deploy!
+        response.setHeader("Access-Control-Allow-Origin", "*");
         filterChain.doFilter(request, response);
     }
 }
