@@ -1,53 +1,36 @@
-import { Suspense, useEffect, useState } from "react";
+import { Suspense } from "react";
 import { ThemeProvider } from "./context/ThemeContext";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import {
+  MutationCache,
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+import { RouterProvider } from "react-router-dom";
 import Layout from "@/components/Layout/Layout";
-import { NotFoundPage } from "@/pages/NotFound/NotFound";
-import { Helmet, HelmetProvider } from 'react-helmet-async';
-import { HomePage } from "@/pages/Home/Home";
+import { Helmet, HelmetProvider } from "react-helmet-async";
+import { GourmetableRouter } from "./router/GourmetableRouter";
 
 const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: () => {
+      console.log("GLOBAL QUERY ERROR HANDLING WOULD GO HERE");
+    },
+  }),
+  mutationCache: new MutationCache({
+    onError: () => {
+      console.log("GLOBAL MUTATION ERROR HANDLING WOULD GO HERE");
+    },
+  }),
   defaultOptions: {
     queries: {
-      // retry: false,
-      // refetchOnWindowFocus: false, // default: true
-      // staleTime: Infinity,
+      // staleTime: 2 * 60 * 1000,  // 2min
+      staleTime: Infinity,
     },
   },
 });
 
-// const basename = import.meta.env.VITE_CONTEXT || "";
-const router = createBrowserRouter(
-  [
-    {
-      element: <Layout />,
-      children: [
-        {
-          path: "/",
-          element:
-            <>
-              <Helmet>
-                <title>Home: Gourmetable</title>
-              </Helmet>
-              <HomePage />
-            </>
-        },
-        {
-          path: "*",
-          element: <NotFoundPage />,
-        },
-      ],
-    },
-  ],
-  { basename: import.meta.env.BASE_URL }
-);
-
 function App() {
-  const [, rerenderer] = useState(0);
-  useEffect(() => {
-    rerenderer(Math.random());
-  }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <Suspense fallback={<Layout />}>
@@ -56,7 +39,7 @@ function App() {
             <Helmet>
               <title>Gourmetable</title>
             </Helmet>
-            <RouterProvider router={router} />
+            <RouterProvider router={GourmetableRouter} />
           </HelmetProvider>
         </ThemeProvider>
       </Suspense>
