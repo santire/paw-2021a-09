@@ -1,5 +1,5 @@
 import { UserService } from "@/api/services/UserService";
-import { IUserLogin } from "@/types/user/user.models";
+import { IUserLogin, IUserResetPassword } from "@/types/user/user.models";
 import { clearItems, getUserEmail } from "@/utils/AuthStorage";
 import { createQueryKeys } from "@lukemorales/query-key-factory";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -25,11 +25,35 @@ export function useCreateUser() {
   });
 }
 
+export function useRequestPasswordReset() {
+  return useMutation({
+    mutationFn: UserService.requestPasswordReset,
+  });
+}
+
 export function useActivateUser() {
   const navigate = useNavigate();
   return useMutation({
     mutationFn: ({ url, token }: { url: string; token: string }) =>
       UserService.activate(url, token),
+    onSuccess: () => {
+      // Successfully activated, log in user
+      navigate("/");
+    },
+  });
+}
+export function useResetUser() {
+  const navigate = useNavigate();
+  return useMutation({
+    mutationFn: ({
+      url,
+      token,
+      data,
+    }: {
+      url: string;
+      token: string;
+      data: IUserResetPassword;
+    }) => UserService.resetPassword(url, token, data),
     onSuccess: () => {
       // Successfully activated, log in user
       navigate("/");

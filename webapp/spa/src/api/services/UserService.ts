@@ -1,4 +1,10 @@
-import { IUser, IUserLogin, IUserRegister } from "@/types/user/user.models";
+import {
+  IUser,
+  IUserForgot,
+  IUserLogin,
+  IUserRegister,
+  IUserResetPassword,
+} from "@/types/user/user.models";
 import { apiClient } from "../client";
 
 const PATH = "/users";
@@ -14,8 +20,12 @@ interface IUserService {
   create(user: IUserRegister): Promise<IUser>;
 
   activate(url: string, token: string): Promise<void>;
-  // requestPasswordReset(email: string): Promise<void>;
-  // resetPassword(url: string, token: string, params: IUserResetPassword): Promise<void>;
+  requestPasswordReset({ email }: IUserForgot): Promise<void>;
+  resetPassword(
+    url: string,
+    token: string,
+    params: IUserResetPassword,
+  ): Promise<void>;
 
   // update(url: string, user: IUserUpdate): Promise<void>;
 }
@@ -40,6 +50,33 @@ module UserServiceImpl {
       action: "activate",
       token: token,
     });
+    return response.data;
+  }
+
+  export async function requestPasswordReset({
+    email,
+  }: IUserForgot): Promise<void> {
+    const response = await apiClient.post(PATH, null, {
+      params: { email },
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    return response.data;
+  }
+
+  export async function resetPassword(
+    url: string,
+    token: string,
+    params: IUserResetPassword,
+  ) {
+    const response = await apiClient.patch(url, {
+      action: "reset",
+      token: token,
+      ...params,
+    });
+
     return response.data;
   }
 }

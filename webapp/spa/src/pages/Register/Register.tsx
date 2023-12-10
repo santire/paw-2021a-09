@@ -1,8 +1,6 @@
 import { Flex, Title, Text, Alert } from "@mantine/core";
 import { useTranslation } from "react-i18next";
-import {
-  useSearchParams,
-} from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { IconAlertCircle } from "@tabler/icons-react";
 import { RegisterForm } from "@/components/RegisterForm/RegisterForm";
@@ -15,6 +13,7 @@ export function RegisterPage() {
   const [pending, setPending] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const { mutate } = useActivateUser();
+  const navigate = useNavigate();
 
   function handleMutation(url: string, token: string) {
     mutate(
@@ -24,10 +23,12 @@ export function RegisterPage() {
           if (isServerError(cause) && cause.code === "token_expired") {
             setError("errors.tokenExpired");
             setSearchParams("");
+            navigate("/register", { replace: true });
           }
           if (isServerError(cause) && cause.code === "token_does_not_exist") {
             setError("errors.tokenDoesNotExist");
             setSearchParams("");
+            navigate("/register", { replace: true });
           }
         },
       },

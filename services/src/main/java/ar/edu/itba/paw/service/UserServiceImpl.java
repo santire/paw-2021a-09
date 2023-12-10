@@ -77,20 +77,24 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void requestPasswordReset(String email, String baseUsersUrl, URI baseUri) throws TokenCreationException {
+    public void requestPasswordReset(String email, String baseRequestUrl, URI baseUri) throws TokenCreationException {
         User user = userDao.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        if(!user.isActive()) {
+            throw new UserNotFoundException();
+        }
         LOGGER.debug("Requesting reset for {}", user.getEmail());
-        final URI patchUri = makePatchUri(user, baseUsersUrl);
+        final URI patchUri = makePatchUri(user, baseUri.toString());
 
         String token = UUID.randomUUID().toString();
         LocalDateTime createdAt = LocalDateTime.now();
-        String url = UriBuilder.fromUri(baseUri)
+        String url = UriBuilder.fromUri(baseRequestUrl)
                 .path("user")
                 .path("reset")
                 .queryParam("token", token)
                 .queryParam("patchUrl", patchUri)
                 .build()
                 .toString();
+
         userDao.assignPasswordTokenToUser(token, createdAt, user.getId());
         LOGGER.debug("Setting reset email url to: {}", url);
         emailService.sendPasswordResetEmail(user.getEmail(), user.getFirstName(), url);

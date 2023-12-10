@@ -68,10 +68,10 @@ public class UserController {
     public Response registerUser(@QueryParam("email") final String forgotEmail,
                                  @Valid final RegisterUserForm userForm,
                                  @Context HttpServletRequest request) throws EmailInUseException, TokenCreationException {
-        final URI baseUri =  uriInfo.getBaseUriBuilder()
+        final URI baseUri = uriInfo.getBaseUriBuilder()
                 .path(PATH)
                 .build();
-      
+
         String baseUrl = request.getHeader("Origin");
         LOGGER.debug("Base url: {}", baseUrl);
         if (baseUrl == null) {
@@ -138,8 +138,16 @@ public class UserController {
             if (userForm.getPassword() == null) {
                 throw new InvalidParameterException("password", "Password can't be blank");
             }
-            userService.updatePasswordByToken(userForm.getToken(), userForm.getPassword());
-            return Response.ok().build();
+            User user = userService.updatePasswordByToken(userForm.getToken(), userForm.getPassword());
+            Map<String, String> tokens = tokenService.generateTokens(userDetailsService.loadUserByUsername(user.getEmail()));
+            return Response.ok()
+                    .header(
+                            "X-Refresh-Token", "Bearer " + tokens.get("refresh_token")
+                    )
+                    .header(
+                            "X-Auth-Token", "Bearer " + tokens.get("access_token")
+                    )
+                    .build();
         }
 
         return Response.noContent().build();
