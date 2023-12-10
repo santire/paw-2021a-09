@@ -19,6 +19,24 @@ export function useUser() {
   });
 }
 
+export function useCreateUser() {
+  return useMutation({
+    mutationFn: UserService.create,
+  });
+}
+
+export function useActivateUser() {
+  const navigate = useNavigate();
+  return useMutation({
+    mutationFn: ({ url, token }: { url: string; token: string }) =>
+      UserService.activate(url, token),
+    onSuccess: () => {
+      // Successfully activated, log in user
+      navigate("/");
+    },
+  });
+}
+
 export function useLoginUser() {
   const queryClient = useQueryClient();
   return useMutation({

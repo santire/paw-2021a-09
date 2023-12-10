@@ -14,9 +14,10 @@ import useStyles from "./RegisterForm.styles";
 import { useForm } from "react-hook-form";
 import { IUserRegister } from "../../types/user/user.models";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserRegisterSchema } from "../../types/user/user.schemas";
-import { useCreateUser } from "../../hooks/user.hooks";
+import { UserRegisterSchema } from "@/types/user/user.schemas";
+import { useCreateUser } from "@/hooks/queries/users";
 import { Dispatch, SetStateAction } from "react";
+import { isServerError } from "@/api/client";
 interface RegisterFormProps {
   setPending: Dispatch<SetStateAction<boolean>>;
 }
@@ -35,46 +36,56 @@ export function RegisterForm({ setPending }: RegisterFormProps) {
     resolver: zodResolver(UserRegisterSchema),
   });
 
-  const { mutate, isLoading } = useCreateUser({
-    onSuccess: () => {
-      reset();
-      setPending(true);
-    },
-    onError: (error) => {
-      if (error.code === "validation_error" && error.errors) {
-        for (const e of error.errors) {
-          switch (e.subject) {
-            case "email":
-              setError("email", {
-                type: "custom",
-                message: t("pages.register.email.taken") || "",
-              });
-              break;
+  const { mutate, isPending } = useCreateUser();
 
-            case "username":
-              setError("username", {
-                type: "custom",
-                message: t("pages.register.username.taken") || "",
-              });
-              break;
+  function handleMutation(data: IUserRegister) {
+    mutate(data, {
+      onSuccess: () => {
+        reset();
+        setPending(true);
+      },
+      onError: ({ cause }) => {
+        if (
+          isServerError(cause) &&
+          cause.code === "validation_error" &&
+          cause.errors
+        ) {
+          for (const e of cause.errors) {
+            switch (e.subject) {
+              case "email":
+                setError("email", {
+                  type: "custom",
+                  message: t("pages.register.email.taken") || "",
+                });
+                break;
 
-            default:
-              // TODO: Show default alert?
-              console.error("Unexpected error subject: ", e.subject, e.message);
+              case "username":
+                setError("username", {
+                  type: "custom",
+                  message: t("pages.register.username.taken") || "",
+                });
+                break;
+
+              default:
+                // todo: show default alert?
+                console.error(
+                  "unexpected error subject: ",
+                  e.subject,
+                  e.message,
+                );
+            }
           }
         }
-      } else {
-        console.error("Unknown error code: ", error.code);
-      }
-    },
-  });
+      },
+    });
+  }
 
   return (
     <Paper shadow="md" radius="lg">
       <div className={classes.wrapper}>
         <form
           className={classes.form}
-          onSubmit={handleSubmit((data) => mutate(data))}
+          onSubmit={handleSubmit((data) => handleMutation(data))}
         >
           <Text className={classes.title} px="sm" mt="sm" mb="xl">
             {t("pages.register.title")}
@@ -164,9 +175,9 @@ export function RegisterForm({ setPending }: RegisterFormProps) {
                 color="orange"
                 fullWidth
                 px="xl"
-                disabled={isLoading}
+                disabled={isPending}
               >
-                {isLoading ? (
+                {isPending ? (
                   <Loader variant="dots" color="orange" />
                 ) : (
                   t("pages.register.submit")

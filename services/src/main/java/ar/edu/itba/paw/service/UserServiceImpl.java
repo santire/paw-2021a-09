@@ -51,17 +51,17 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackFor = {UsernameInUseException.class, EmailInUseException.class, TokenCreationException.class})
     public User register(String username, String password, String firstName, String lastName, String email,
                          String phone,
-                         String baseUsersUrl,
+                         String baseRequestUrl,
                          URI baseUri)
             throws UsernameInUseException, EmailInUseException, TokenCreationException {
 
         User user = userDao.register(username, encoder.encode(password), firstName, lastName, email, phone);
 
-        final URI patchUri = makePatchUri(user, baseUsersUrl);
+        final URI patchUri = makePatchUri(user, baseUri.toString());
 
         String token = UUID.randomUUID().toString();
         LocalDateTime createdAt = LocalDateTime.now();
-        String url = UriBuilder.fromUri(baseUri)
+        String url = UriBuilder.fromUri(baseRequestUrl)
                 .path("user")
                 .path("activate")
                 .queryParam("token", token)
@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void activateUserByToken(String token) throws TokenExpiredException {
+    public User activateUserByToken(String token) throws TokenExpiredException {
 
 
         Optional<VerificationToken> maybeToken = userDao.getToken(token);
@@ -124,11 +124,13 @@ public class UserServiceImpl implements UserService {
         LOGGER.debug("Activating user {}", user.getId());
         user.setActive(true);
         userDao.deleteToken(token);
+
+        return user;
     }
 
     @Override
     @Transactional
-    public void updatePasswordByToken(String token, String password) throws TokenExpiredException, TokenDoesNotExistException {
+    public User updatePasswordByToken(String token, String password) throws TokenExpiredException, TokenDoesNotExistException {
 
         Optional<PasswordToken> maybeToken = userDao.getPasswordToken(token);
         PasswordToken passwordToken = maybeToken.orElseThrow(TokenDoesNotExistException::new);
@@ -145,6 +147,8 @@ public class UserServiceImpl implements UserService {
         User user = passwordToken.getUser();
         if (password != null && !password.isEmpty()) user.setPassword(encoder.encode(password));
         userDao.deleteAssociatedPasswordTokens(user);
+
+        return user;
     }
 
 

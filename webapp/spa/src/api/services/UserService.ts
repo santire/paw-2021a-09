@@ -1,5 +1,5 @@
-import { IUser, IUserLogin } from "@/types/user/user.models";
-import { apiClient, apiErrorHandler } from "../client";
+import { IUser, IUserLogin, IUserRegister } from "@/types/user/user.models";
+import { apiClient } from "../client";
 
 const PATH = "/users";
 
@@ -11,9 +11,9 @@ export interface AuthParams {
 interface IUserService {
   getByEmail(email: string, auth?: IUserLogin): Promise<IUser>;
 
-  // create(user: IUserRegister): Promise<IUser>;
+  create(user: IUserRegister): Promise<IUser>;
 
-  // activate(url: string, token: string): Promise<void>;
+  activate(url: string, token: string): Promise<void>;
   // requestPasswordReset(email: string): Promise<void>;
   // resetPassword(url: string, token: string, params: IUserResetPassword): Promise<void>;
 
@@ -27,6 +27,18 @@ module UserServiceImpl {
         ? { username: auth.email, password: auth.password }
         : undefined,
       params: { email },
+    });
+    return response.data;
+  }
+  export async function create(user: IUserRegister): Promise<IUser> {
+    const response = await apiClient.post(PATH, { ...user });
+    return response.data;
+  }
+
+  export async function activate(url: string, token: string): Promise<void> {
+    const response = await apiClient.patch(url, {
+      action: "activate",
+      token: token,
     });
     return response.data;
   }

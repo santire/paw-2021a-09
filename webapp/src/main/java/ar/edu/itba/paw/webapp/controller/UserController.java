@@ -3,6 +3,7 @@ package ar.edu.itba.paw.webapp.controller;
 
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.exceptions.*;
+import ar.edu.itba.paw.service.JwtService;
 import ar.edu.itba.paw.service.UserService;
 import ar.edu.itba.paw.webapp.dto.UserDto;
 import ar.edu.itba.paw.webapp.forms.RegisterUserForm;
@@ -12,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +25,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.util.Map;
 
 
 @Path(UserController.PATH)
@@ -31,6 +34,10 @@ public class UserController {
     public static final String PATH = "users";
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
+    @Autowired
+    private JwtService tokenService;
+    @Autowired
+    private UserDetailsService userDetailsService;
     @Autowired
     private UserService userService;
     @Context
@@ -61,14 +68,18 @@ public class UserController {
     public Response registerUser(@QueryParam("email") final String forgotEmail,
                                  @Valid final RegisterUserForm userForm,
                                  @Context HttpServletRequest request) throws EmailInUseException, TokenCreationException {
-        final URI baseUri = URI.create(request.getRequestURL().toString()).resolve(request.getContextPath());
-
-        final String baseUsersUrl = uriInfo.getBaseUriBuilder()
+        final URI baseUri =  uriInfo.getBaseUriBuilder()
                 .path(PATH)
-                .build().toString();
+                .build();
+      
+        String baseUrl = request.getHeader("Origin");
+        LOGGER.debug("Base url: {}", baseUrl);
+        if (baseUrl == null) {
+            baseUrl = URI.create(request.getRequestURL().toString()).resolve(request.getContextPath()).toString();
+        }
 
         if (forgotEmail != null && !forgotEmail.isEmpty()) {
-            userService.requestPasswordReset(forgotEmail, baseUsersUrl, baseUri);
+            userService.requestPasswordReset(forgotEmail, baseUrl, baseUri);
             return Response.status(Response.Status.ACCEPTED).build();
         }
 
@@ -81,7 +92,7 @@ public class UserController {
                 userForm.getFirstName(),
                 userForm.getLastName(),
                 userForm.getEmail(),
-                userForm.getPhone(), baseUsersUrl, baseUri);
+                userForm.getPhone(), baseUrl, baseUri);
 
         final URI uri = uriInfo.getAbsolutePathBuilder()
                 .path(String.valueOf(user.getId()))
@@ -111,8 +122,16 @@ public class UserController {
 
 
         if ("ACTIVATE".equalsIgnoreCase(userForm.getAction())) {
-            userService.activateUserByToken(userForm.getToken());
-            return Response.ok().build();
+            User user = userService.activateUserByToken(userForm.getToken());
+            Map<String, String> tokens = tokenService.generateTokens(userDetailsService.loadUserByUsername(user.getEmail()));
+            return Response.ok()
+                    .header(
+                            "X-Refresh-Token", "Bearer " + tokens.get("refresh_token")
+                    )
+                    .header(
+                            "X-Auth-Token", "Bearer " + tokens.get("access_token")
+                    )
+                    .build();
         }
 
         if ("RESET".equalsIgnoreCase(userForm.getAction())) {
