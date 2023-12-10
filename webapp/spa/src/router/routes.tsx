@@ -2,6 +2,8 @@ import { ForgotPage } from "@/pages/Forgot/Forgot";
 import { HomePage } from "@/pages/Home/Home";
 import { LoginPage } from "@/pages/Login/Login";
 import { NotFoundPage } from "@/pages/NotFound/NotFound";
+import { ProfilePage } from "@/pages/Profile/Profile";
+import { userProfileLoader } from "@/pages/Profile/Profile.loader";
 import { RegisterPage } from "@/pages/Register/Register";
 import { ResetPage } from "@/pages/Reset/Reset";
 import { IRoute } from "@/types/route";
@@ -29,6 +31,13 @@ export const routes: IRoute[] = [
     protection: { type: "public", redirectPath: "/" },
     element: <ForgotPage />,
     title: "Forgot User | Gourmetable",
+  },
+  {
+    path: "/user/edit",
+    protection: { type: "authed", redirectPath: "/" },
+    element: <ProfilePage />,
+    title: "User Profile | Gourmetable",
+    loader: userProfileLoader
   },
   {
     path: "/user/activate",

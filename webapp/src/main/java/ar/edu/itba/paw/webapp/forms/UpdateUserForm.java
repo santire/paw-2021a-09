@@ -20,10 +20,12 @@ public class UpdateUserForm {
     private String password;
     @Size(min = 8, max = 100)
     private String repeatPassword;
-    @Pattern(regexp = "[a-zA-ZñÑáéíóúÁÉÍÓÚ]+[a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]*")
+//    @Pattern(regexp = "[a-zA-ZñÑáéíóúÁÉÍÓÚ]+[a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]*")
+    @Pattern(regexp = "^\\p{L}+$", message = "Invalid input: Only letters (including accented characters) are allowed.")
     @Size(min = 2, max = 100)
     private String firstName;
-    @Pattern(regexp = "[a-zA-ZñÑáéíóúÁÉÍÓÚ]+[a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]*")
+//    @Pattern(regexp = "[a-zA-ZñÑáéíóúÁÉÍÓÚ]+[a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]*")
+    @Pattern(regexp = "^\\p{L}+$", message = "Invalid input: Only letters (including accented characters) are allowed.")
     @Size(min = 2, max = 100)
     private String lastName;
     @Size(min = 6, max = 100)

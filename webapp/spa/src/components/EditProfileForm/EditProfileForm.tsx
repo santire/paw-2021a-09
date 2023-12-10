@@ -13,12 +13,12 @@ import {
   Button,
   Loader,
   Alert,
-  PasswordInput,
 } from "@mantine/core";
 import useStyles from "./EditProfileForm.styles";
-import { useUpdateUser } from "../../hooks/user.hooks";
 import { useState } from "react";
 import { IconCheck } from "@tabler/icons-react";
+import { useUpdateUser } from "@/hooks/user.hooks";
+import { isServerError } from "@/api/client";
 
 interface EditProfileFormProps {
   user: IUser;
@@ -28,14 +28,8 @@ export function EditProfileForm({ user }: EditProfileFormProps) {
   const { classes } = useStyles();
   const { t } = useTranslation();
   const [alert, setAlert] = useState(false);
-  const { mutate, isLoading } = useUpdateUser({
-    onSuccess: () => {
-      setAlert(true);
-      resetField("password");
-      resetField("repeatPassword");
-    },
-  });
-  const { email, username, phone, firstName, lastName } = user;
+  const { mutate, isPending } = useUpdateUser();
+  const { self: url, email, username, phone, firstName, lastName } = user;
 
   const {
     register,
@@ -47,13 +41,32 @@ export function EditProfileForm({ user }: EditProfileFormProps) {
     resolver: zodResolver(UserUpdateSchema),
   });
 
+  function handleMutation(data: IUserUpdate) {
+    mutate(
+      { url, data },
+      {
+        onSuccess: () => {
+          setAlert(true);
+          resetField("password");
+          resetField("repeatPassword");
+        },
+
+        onError: ({cause}) => {
+          if(isServerError(cause) && cause.code === "validation_error" && cause.errors) {
+
+          }
+        }
+      },
+    );
+  }
+
   return (
     <Paper shadow="md" radius="lg" w={"70%"} p="sm">
       <div className={classes.wrapper}>
         <form
           className={classes.form}
           encType="multipart/form-data"
-          onSubmit={handleSubmit((data) => mutate(data))}
+          onSubmit={handleSubmit((data) => handleMutation(data))}
         >
           <Alert
             icon={<IconCheck size={16} />}
@@ -105,7 +118,11 @@ export function EditProfileForm({ user }: EditProfileFormProps) {
                 defaultValue={firstName}
                 placeholder={t("pages.profile.firstName.placeholder") || ""}
                 required
-                error={errors.firstName?.message}
+                error={
+                  errors.firstName?.message === "errors.invalidName"
+                    ? t(errors.firstName?.message)
+                    : errors.firstName?.message
+                }
                 {...register("firstName")}
               />
               <TextInput
@@ -114,7 +131,11 @@ export function EditProfileForm({ user }: EditProfileFormProps) {
                 defaultValue={lastName}
                 placeholder={t("pages.profile.lastName.placeholder") || ""}
                 required
-                error={errors.lastName?.message}
+                error={
+                  errors.lastName?.message === "errors.invalidName"
+                    ? t(errors.lastName?.message)
+                    : errors.lastName?.message
+                }
                 {...register("lastName")}
               />
             </SimpleGrid>
@@ -165,9 +186,9 @@ export function EditProfileForm({ user }: EditProfileFormProps) {
               color="orange"
               fullWidth
               px="xl"
-              disabled={isLoading}
+              disabled={isPending}
             >
-              {isLoading ? (
+              {isPending ? (
                 <Loader variant="dots" color="orange" />
               ) : (
                 t("pages.profile.submit")

@@ -10,7 +10,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import useStyles from "./Header.styles";
 import { IUser } from "@/types/user/user.models";
-import { useLogoutUser } from "@/hooks/queries/users";
+import { useLogoutUser } from "@/hooks/user.hooks";
 import { useNavigate } from "react-router-dom";
 
 interface Props {

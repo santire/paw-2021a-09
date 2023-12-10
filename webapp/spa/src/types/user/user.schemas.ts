@@ -1,17 +1,18 @@
 import { z } from "zod";
 
+// const REG = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ]+/;
+const REG = /^[\p{L}]+$/u;
+const isValidName = (s: string) => REG.test(s);
+
 const UserSchemaBase = z.object({
   email: z.string().email().min(2).max(100),
-  firstName: z
-    .string()
-    .min(1)
-    .max(100)
-    .regex(/[a-zA-ZñÑáéíóúÁÉÍÓÚ]+[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*/),
-  lastName: z
-    .string()
-    .min(1)
-    .max(100)
-    .regex(/[a-zA-ZñÑáéíóúÁÉÍÓÚ]+[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*/),
+  firstName: z.string().min(1).max(100).refine(isValidName, {
+    message: "errors.invalidName",
+  }),
+  lastName: z.string().min(1).max(100).refine(isValidName, {
+    message: "errors.invalidName",
+  }),
+
   phone: z
     .string()
     .regex(/[0-9]+/, "errors.invalidPhone")
@@ -31,6 +32,7 @@ const HasURLs = z.object({
   self: z.string().url(),
   reservations: z.string().url(),
   restaurants: z.string().url(),
+  comments: z.string().url(),
   ratings: z.string().url(),
   likes: z.string().url(),
 });

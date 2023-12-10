@@ -1,27 +1,33 @@
 import { UserService } from "@/api/services/UserService";
-import { IUserLogin, IUserResetPassword } from "@/types/user/user.models";
-import { clearItems, getUserEmail } from "@/utils/AuthStorage";
-import { createQueryKeys } from "@lukemorales/query-key-factory";
+import { queries } from "@/queries";
+import {
+  IUserLogin,
+  IUserResetPassword,
+  IUserUpdate,
+} from "@/types/user/user.models";
+import { clearItems } from "@/utils/AuthStorage";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-export const users = createQueryKeys("users", {
-  all: null,
-  detail: () => ({
-    queryKey: ["email"],
-  }),
-});
 
 export function useUser() {
-  const email = getUserEmail() ?? "";
-  return useQuery({
-    queryKey: users.detail().queryKey,
-    queryFn: () => UserService.getByEmail(email),
-  });
+  return useQuery(queries.users.detail());
 }
 
 export function useCreateUser() {
   return useMutation({
     mutationFn: UserService.create,
+  });
+}
+
+export function useUpdateUser() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ url, data }: { url: string; data: IUserUpdate }) =>
+      UserService.update(url, data),
+    onSuccess: (data) => {
+      // Update query cache
+      return queryClient.setQueryData(queries.users.detail().queryKey, data);
+    },
   });
 }
 
@@ -65,8 +71,10 @@ export function useLoginUser() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: IUserLogin) => UserService.getByEmail(data.email, data),
-    onSuccess: (data) => {
-      return queryClient.setQueryData(users.detail().queryKey, data);
+    onSuccess: async (data) => {
+      // TODO: instead if invalidating, update queries with likes
+      await queryClient.invalidateQueries();
+      return queryClient.setQueryData(queries.users.detail().queryKey, data);
     },
   });
 }

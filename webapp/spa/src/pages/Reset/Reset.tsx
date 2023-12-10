@@ -18,7 +18,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { IUserResetPassword } from "@/types/user/user.models";
 import { UserResetPasswordSchema } from "@/types/user/user.schemas";
 import { IconAlertCircle } from "@tabler/icons-react";
-import { useResetUser } from "@/hooks/queries/users";
+import { useResetUser } from "@/hooks/user.hooks";
 import { isServerError } from "@/api/client";
 
 export function ResetPage() {

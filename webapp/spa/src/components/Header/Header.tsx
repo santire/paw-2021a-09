@@ -2,12 +2,10 @@ import { Flex, Grid, Group } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { GourmetableLogo } from "../GourmetableLogo/GourmetableLogo";
 import useStyles from "./Header.styles";
-import { useUser } from "@/hooks/queries/users";
+import { useUser } from "@/hooks/user.hooks";
 import { NavItem } from "./NavItem";
 import { SearchBar } from "./SearchBar";
 import { UserMenu } from "./UserMenu";
-import { useState } from "react";
-import { isAuthed } from "@/utils/AuthStorage";
 export function Header() {
   const { classes } = useStyles();
   const { t } = useTranslation();

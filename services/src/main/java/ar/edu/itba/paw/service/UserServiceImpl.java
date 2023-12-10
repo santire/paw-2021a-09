@@ -158,12 +158,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateUser(long id, String password, String firstName, String lastName, String phone) {
+    public User updateUser(long id, String password, String firstName, String lastName, String phone) {
         User user = userDao.findById(id).orElseThrow(UserNotFoundException::new);
         if (password != null && !password.isEmpty()) user.setPassword(encoder.encode(password));
         if (firstName != null && !firstName.isEmpty()) user.setFirstName(firstName);
         if (lastName != null && !lastName.isEmpty()) user.setLastName(lastName);
         if (phone != null && !phone.isEmpty()) user.setPhone(phone);
+
+        return user;
     }
 
 }

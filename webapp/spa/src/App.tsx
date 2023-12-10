@@ -7,10 +7,10 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { RouterProvider } from "react-router-dom";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Layout from "@/components/Layout/Layout";
 import { Helmet, HelmetProvider } from "react-helmet-async";
-import { GourmetableRouter } from "./router/GourmetableRouter";
+import { elementRouter } from "./router/elementRoutes";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -31,6 +31,16 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+const GourmetableRouter = createBrowserRouter(
+  [
+    {
+      element: <Layout />,
+      children: elementRouter(queryClient),
+    },
+  ],
+  { basename: import.meta.env.BASE_URL },
+);
 
 function App() {
   return (

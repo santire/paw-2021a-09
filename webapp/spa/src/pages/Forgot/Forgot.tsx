@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { IUserForgot } from "@/types/user/user.models";
 import { UserForgotSchema } from "@/types/user/user.schemas";
 import { isServerError } from "@/api/client";
-import { useRequestPasswordReset } from "@/hooks/queries/users";
+import { useRequestPasswordReset } from "@/hooks/user.hooks";
 
 export function ForgotPage() {
   const { t } = useTranslation();

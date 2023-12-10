@@ -64,8 +64,9 @@
     "tokenDoesNotExist": "Hubo un problema con el link, por favor intente nuevamente.",
     "userNotFound": "Este email no está asociado a un usuario válido",
     "invalidPhone": "Número de teléfono inválido",
+    "invalidName": "Solo puede contener letras",
     "instagramRegex": "Url de instagram inválido",
-    "facebookRegex": "Url de faceboo inválido",
+    "facebookRegex": "Url de facebook inválido",
     "twitterRegex": "Url de twitter inválido"
   },
   "tags": {

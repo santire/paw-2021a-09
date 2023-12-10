@@ -4,6 +4,7 @@ import {
   IUserLogin,
   IUserRegister,
   IUserResetPassword,
+  IUserUpdate,
 } from "@/types/user/user.models";
 import { apiClient } from "../client";
 
@@ -27,7 +28,7 @@ interface IUserService {
     params: IUserResetPassword,
   ): Promise<void>;
 
-  // update(url: string, user: IUserUpdate): Promise<void>;
+  update(url: string, user: IUserUpdate): Promise<IUser>;
 }
 
 module UserServiceImpl {
@@ -42,6 +43,13 @@ module UserServiceImpl {
   }
   export async function create(user: IUserRegister): Promise<IUser> {
     const response = await apiClient.post(PATH, { ...user });
+    return response.data;
+  }
+
+  export async function update(url: string, user: IUserUpdate): Promise<IUser> {
+    const response = await apiClient.patch(url, {
+      ...user,
+    });
     return response.data;
   }
 

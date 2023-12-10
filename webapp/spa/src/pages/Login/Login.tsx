@@ -18,7 +18,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { IUserLogin } from "@/types/user/user.models";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserLoginSchema } from "@/types/user/user.schemas";
-import { useLoginUser } from "@/hooks/queries/users";
+import { useLoginUser } from "@/hooks/user.hooks";
 import { useEffect, useState } from "react";
 import { isServerError } from "@/api/client";
 

@@ -20,10 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 import java.net.URI;
 import java.util.Map;
 
@@ -99,7 +96,10 @@ public class UserController {
                 .build();
 
         LOGGER.info("user created: {}", uri);
-        return Response.created(uri).build();
+        UserDto userDto = UserDto.fromUser(user, uriInfo);
+        return Response.created(uri).entity(
+                new GenericEntity<UserDto>(userDto){}
+        ).build();
     }
 
     @PATCH
@@ -111,13 +111,14 @@ public class UserController {
                                @Valid @NotNull final UpdateUserForm userForm) {
         String action = userForm.getAction();
         // This is a standard PATCH operation to update a user
-        if (action == null) {
-            userService.updateUser(userId,
+        if (action == null || ("PATCH".equalsIgnoreCase(userForm.getAction()))) {
+            User user = userService.updateUser(userId,
                     userForm.getPassword(),
                     userForm.getFirstName(),
                     userForm.getLastName(),
                     userForm.getPhone());
-            return Response.noContent().build();
+            UserDto userDto = UserDto.fromUser(user, uriInfo);
+            return Response.ok(new GenericEntity<UserDto>(userDto){}).build();
         }
 
 
@@ -150,7 +151,7 @@ public class UserController {
                     .build();
         }
 
-        return Response.noContent().build();
+        throw new InvalidParameterException("action", "Invalid PATCH Operation");
     }
 
 

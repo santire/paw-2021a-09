@@ -27,7 +27,7 @@ public interface UserService {
 
   User activateUserByToken(String token) throws TokenExpiredException;
   User updatePasswordByToken(String token, String password) throws TokenExpiredException;
-  void updateUser(long id, String password, String firstName, String lastName, String phone);
+  User updateUser(long id, String password, String firstName, String lastName, String phone);
   void requestPasswordReset(String email, final String baseUsersUrl, URI baseUri) throws TokenCreationException;
 
 }

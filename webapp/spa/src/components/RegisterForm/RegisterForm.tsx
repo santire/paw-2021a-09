@@ -15,7 +15,7 @@ import { useForm } from "react-hook-form";
 import { IUserRegister } from "../../types/user/user.models";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserRegisterSchema } from "@/types/user/user.schemas";
-import { useCreateUser } from "@/hooks/queries/users";
+import { useCreateUser } from "@/hooks/user.hooks";
 import { Dispatch, SetStateAction } from "react";
 import { isServerError } from "@/api/client";
 interface RegisterFormProps {
@@ -142,7 +142,11 @@ export function RegisterForm({ setPending }: RegisterFormProps) {
                 aria-label="first-name-input"
                 placeholder={t("pages.register.firstName.placeholder") || ""}
                 required
-                error={errors.firstName?.message}
+                error={
+                  errors.firstName?.message === "errors.invalidName"
+                    ? t(errors.firstName?.message)
+                    : errors.firstName?.message
+                }
                 {...register("firstName")}
               />
               <TextInput
@@ -150,7 +154,11 @@ export function RegisterForm({ setPending }: RegisterFormProps) {
                 aria-label="last-name-input"
                 placeholder={t("pages.register.lastName.placeholder") || ""}
                 required
-                error={errors.lastName?.message}
+                error={
+                  errors.lastName?.message === "errors.invalidName"
+                    ? t(errors.lastName?.message)
+                    : errors.lastName?.message
+                }
                 {...register("lastName")}
               />
               <TextInput

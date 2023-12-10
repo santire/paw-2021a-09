@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { IconAlertCircle } from "@tabler/icons-react";
 import { RegisterForm } from "@/components/RegisterForm/RegisterForm";
 import { isServerError } from "@/api/client";
-import { useActivateUser } from "@/hooks/queries/users";
+import { useActivateUser } from "@/hooks/user.hooks";
 
 export function RegisterPage() {
   const { t } = useTranslation();

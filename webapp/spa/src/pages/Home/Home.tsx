@@ -1,7 +1,7 @@
 import { createStyles, Flex, Text, Image } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import homeImageSrc from "@/assets/images/home_image.png";
-import { useUser } from "@/hooks/queries/users";
+import { useUser } from "@/hooks/user.hooks";
 
 const useStyles = createStyles((theme) => ({
   heading: {
