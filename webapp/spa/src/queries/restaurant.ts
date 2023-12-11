@@ -8,8 +8,8 @@ export const restaurants = createQueryKeys("restaurants", {
     queryKey: [{ filters }],
     queryFn: () => RestaurantService.getFilteredBy(filters),
   }),
-  detail: (url: string) => ({
-    queryKey: [url],
-    queryFn: () => RestaurantService.get,
+  detail: (id: number) => ({
+    queryKey: [id],
+    queryFn: () => RestaurantService.get(id),
   }),
 });

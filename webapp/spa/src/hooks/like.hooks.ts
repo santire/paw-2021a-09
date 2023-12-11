@@ -38,8 +38,8 @@ export function useLikeRestaurant({ self }: IRestaurant) {
       url: string;
       restaurantId: number;
     }) => LikeService.like(url, restaurantId),
-    onSuccess: (like) => {
-      // TODO: update Restaurant likes in queryCache
+    onSuccess: (like, { restaurantId }) => {
+      queryClient.invalidateQueries(queries.restaurants.detail(restaurantId));
       return queryClient.setQueryData(queries.likes.detail(self).queryKey, {
         liked: true,
         like,
@@ -48,12 +48,12 @@ export function useLikeRestaurant({ self }: IRestaurant) {
   });
 }
 
-export function useDislikeRestaurant({ self }: IRestaurant) {
+export function useDislikeRestaurant({ self, id }: IRestaurant) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ url }: { url: string }) => LikeService.dislike(url),
     onSuccess: () => {
-      // TODO: update Restaurant likes in queryCache
+      queryClient.invalidateQueries(queries.restaurants.detail(id));
       return queryClient.setQueryData(queries.likes.detail(self).queryKey, {
         liked: false,
       });

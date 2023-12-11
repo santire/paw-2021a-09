@@ -7,7 +7,7 @@ import { pagedResponse } from "../utils";
 const PATH = "/restaurants";
 
 interface IRestaurantService {
-  get(url: string): Promise<IRestaurant>;
+  get(id: number): Promise<IRestaurant>;
 
   getFilteredBy(
     params: RestaurantFilterParams & PageParams,
@@ -15,8 +15,8 @@ interface IRestaurantService {
 }
 
 module RestaurantServiceImpl {
-  export async function get(url: string) {
-    const response = await apiClient.get<IRestaurant>(url);
+  export async function get(id: number) {
+    const response = await apiClient.get<IRestaurant>(`${PATH}/${id}`);
     return response.data;
   }
   export async function getFilteredBy(

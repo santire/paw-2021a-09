@@ -1,8 +1,6 @@
 import { LikeService } from "@/api/services/LikeService";
 import { RestaurantService } from "@/api/services/RestaurantService";
 import { queries } from "@/queries";
-import { RestaurantFilterParams } from "@/types/filters";
-import { PageParams } from "@/types/page";
 import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUser } from "./user.hooks";
 import { IRestaurant } from "@/types/restaurant/restaurant.models";
@@ -10,6 +8,9 @@ import { IClientLike } from "@/types/like/like.models";
 import { isAuthed } from "@/utils/AuthStorage";
 import { useRestaurantFilterAndPage } from "@/context/RestaurantFilterAndPageContext";
 
+export function useGetRestaurant(id: number) {
+  return useQuery(queries.restaurants.detail(id));
+}
 export function useGetRestaurants() {
   const { filterParams, pageParams } = useRestaurantFilterAndPage();
   const page = pageParams?.page ?? 1;
@@ -22,6 +23,10 @@ export function useGetRestaurants() {
       const resp = await RestaurantService.getFilteredBy({
         ...params,
         pageAmount: 6,
+      });
+      // push Restaurant detail state
+      resp.data.forEach((r) => {
+        queryClient.setQueriesData(queries.restaurants.detail(r.id), r);
       });
 
       if (!user.isPaused && user.isSuccess && user.data) {

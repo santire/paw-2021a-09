@@ -18,12 +18,18 @@ import { LikeButton } from "../LikeButton/LikeButton";
 import { useIsOwner } from "@/hooks/user.hooks";
 import { ManageButton } from "../ManageButton/ManageButton";
 import { TagButton } from "../TagButton/TagButton";
+import { queries } from "@/queries";
+import { useQuery } from "@tanstack/react-query";
 
 interface RestaurantCardProps {
   restaurant: IRestaurant;
 }
 export function RestaurantCard({ restaurant }: RestaurantCardProps) {
-  const { id, image, tags, name, rating, likes } = restaurant;
+  const rest = useQuery({
+    ...queries.restaurants.detail(restaurant.id),
+    initialData: restaurant,
+  });
+  const { id, image, tags, name, rating, likes } = rest.data;
   const { classes, theme } = useStyles();
   const { t } = useTranslation();
   const navigate = useNavigate();

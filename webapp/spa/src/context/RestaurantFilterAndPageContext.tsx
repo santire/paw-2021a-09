@@ -29,7 +29,7 @@ export const RestaurantFilterAndPageParamsProvider = ({
   );
 
   const contextValue: ParamsContextValue = {
-    pageParams: pageParams ?? {page: 1},
+    pageParams: pageParams ?? { page: 1 },
     filterParams,
     setFilterParams,
     setPageParams,
@@ -83,18 +83,18 @@ export const useRestaurantFilterAndPage = () => {
 };
 
 function parsePageSearchParams(searchParams: URLSearchParams, pageP: string) {
-  const pageParams: PageParams = { page: 1 };
+  const auxPageParams: { page?: number } = {};
   searchParams.forEach((value, key) => {
     switch (key) {
       case pageP: {
         const p = parseInt(value);
         const page = p <= 0 ? 1 : p;
-        pageParams.page = page;
+        auxPageParams.page = page;
         break;
       }
     }
   });
-  return pageParams;
+  return auxPageParams.page ? { page: auxPageParams.page } : undefined;
 }
 
 function parseFilterParams(searchParams: URLSearchParams) {

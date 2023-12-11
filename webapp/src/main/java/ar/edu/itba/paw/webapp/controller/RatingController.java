@@ -91,8 +91,8 @@ public class RatingController {
     public Response updateRating(@PathParam("userId") final Long userId,
                                  @PathParam("restaurantId") Long restaurantId,
                                  @Valid UpdateRatingForm ratingForm) {
-        ratingService.updateRating(userId, restaurantId, ratingForm.getRating());
-        return Response.noContent().build();
+        final Rating rating = ratingService.updateRating(userId, restaurantId, ratingForm.getRating());
+        return Response.ok(RatingDto.fromRating(rating, uriInfo)).build();
     }
 
     @DELETE
