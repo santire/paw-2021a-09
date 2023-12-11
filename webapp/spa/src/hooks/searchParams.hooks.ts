@@ -1,8 +1,8 @@
-import { useSearchParams } from "react-router-dom";
-import { RestaurantFilterParams } from "../types/filters";
-import { PageParams } from "../types/page";
+import { RestaurantFilterParams } from "@/types/filters";
+import { PageParams } from "@/types/page";
 import qs from "qs";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 function parseFilterParams(searchParams: URLSearchParams) {
   const auxFilterParams: RestaurantFilterParams = {};
@@ -50,7 +50,6 @@ function parseFilterParams(searchParams: URLSearchParams) {
 
   return auxFilterParams;
 }
-
 export function useFilterSearchParams(): [
   RestaurantFilterParams,
   (p: RestaurantFilterParams) => void,
@@ -59,77 +58,58 @@ export function useFilterSearchParams(): [
   const [filterParams, setFilterParams] = useState(
     parseFilterParams(searchParams),
   );
+  const [updateParams, setUpdateParams] = useState(false);
 
+  //
   useEffect(() => {
+    console.log("updating filter params....");
     setFilterParams(parseFilterParams(searchParams));
-
-    return () => setFilterParams({});
-  }, [searchParams]);
-
-  // If internal state changes, update Search params
-  const setter = (params: RestaurantFilterParams) => {
-    // By updating search params, internal state changes with useEffect
-    const oldParams = qs.parse("" + searchParams);
-    type IOldParams = typeof oldParams;
-    const filteredFilterParams: IOldParams = {};
-    for (const key in oldParams) {
-      if (
-        key !== "min" &&
-        key !== "max" &&
-        key !== "order" &&
-        key !== "sort" &&
-        key !== "tags" &&
-        key !== "search"
-      ) {
-        filteredFilterParams[key] = oldParams[key];
-      }
+    if (setUpdateParams) {
+      setUpdateParams(false);
     }
+    return () => setFilterParams({});
+  }, [searchParams, updateParams]);
+
+  const setParams = (p: RestaurantFilterParams) => {
+    // console.log("filterSearch: ", { ...searchParams, ...p });
     setSearchParams(
-      qs.stringify(
-        { ...filteredFilterParams, ...params },
-        { arrayFormat: "repeat" },
-      ) || [],
+      (prev) => {
+        console.log("prev searchParams (en filter): ", prev);
+        const oldParams = qs.parse("" + prev);
+        type IOldParams = typeof oldParams;
+        const filteredFilterParams: IOldParams = {};
+        for (const key in oldParams) {
+          if (
+            key !== "min" &&
+            key !== "max" &&
+            key !== "order" &&
+            key !== "sort" &&
+            key !== "tags" &&
+            key !== "search"
+          ) {
+            filteredFilterParams[key] = oldParams[key];
+          }
+        }
+
+        console.log("filterfilterparams (en filter): ", filteredFilterParams);
+        console.log("newparams (en filter): ", p);
+        return (
+          qs.stringify(
+            { ...filteredFilterParams, ...p },
+            { arrayFormat: "repeat" },
+          ) || []
+        );
+      },
       { replace: true },
     );
   };
 
-  return [filterParams, setter];
-}
-
-export function useTabSearchParam(
-  initialValue?: string,
-): [string | undefined, (tab: string) => void] {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [tab, setTab] = useState<string>();
-
-  // If search param changes, update internal state
-  useEffect(() => {
-    searchParams.forEach((value, key) => {
-      switch (key) {
-        case "tab": {
-          setTab(value);
-          break;
-        }
-      }
-    });
-    return () => setTab(initialValue);
-  }, [searchParams]);
-
-  const setter = (tab: string) => {
-    // By updating search params, internal state changes with useEffect
-    const oldParams = qs.parse("" + searchParams);
-    setSearchParams(
-      qs.stringify(
-        {
-          ...oldParams,
-          tab: tab,
-        },
-        { arrayFormat: "repeat" },
-      ),
-    );
+  const setter = (p: RestaurantFilterParams) => {
+    setFilterParams(p);
+    setUpdateParams(true);
   };
 
-  return [tab, setter];
+  return [filterParams, setter];
 }
 
 function parsePageSearchParams(searchParams: URLSearchParams, pageP: string) {
@@ -139,7 +119,6 @@ function parsePageSearchParams(searchParams: URLSearchParams, pageP: string) {
       case pageP: {
         const p = parseInt(value);
         const page = p <= 0 ? 1 : p;
-        // setPageParams((prev) => ({ ...prev, page }));
         pageParams.page = page;
         break;
       }
@@ -150,49 +129,54 @@ function parsePageSearchParams(searchParams: URLSearchParams, pageP: string) {
 
 export function usePageSearchParams(
   pageName?: string,
-): [PageParams, (p?: PageParams) => void] {
+): [PageParams | undefined, (p?: PageParams) => void] {
   const pageP = pageName ?? "page";
   const [searchParams, setSearchParams] = useSearchParams();
-  const [pageParams, setPageParams] = useState(
+  const [pageParams, setPageParams] = useState<PageParams | undefined>(
     parsePageSearchParams(searchParams, pageP),
   );
 
-  // If search param changes, update internal state
-  useEffect(() => {
-    searchParams.forEach((value, key) => {
-      switch (key) {
-        case pageP: {
-          const p = parseInt(value);
-          const page = p <= 0 ? 1 : p;
-          setPageParams((prev) => ({ ...prev, page }));
-          break;
-        }
-      }
-    });
-    return () => setPageParams({ page: 1 });
-  }, [searchParams, setPageParams]);
+  const [updateParams, setUpdateParams] = useState(false);
 
-  const setter = (params?: PageParams) => {
-    // By updating search params, internal state changes with useEffect
-    const oldParams = qs.parse("" + searchParams);
-    type IOldParams = typeof oldParams;
-    const filteredFilterParams: IOldParams = {};
-    for (const key in oldParams) {
-      if (key !== pageP && key !== "pageAmount") {
-        filteredFilterParams[key] = oldParams[key];
-      }
+  useEffect(() => {
+    console.log("updating page params....");
+    setPageParams(parsePageSearchParams(searchParams, pageP));
+    if (updateParams) {
+      setUpdateParams(false);
     }
+    return () => setPageParams({ page: 1 });
+  }, [searchParams, updateParams]);
+
+  const setParams = (p?: PageParams) => {
+    // console.log("pageSearch: ", { ...searchParams, ...p });
     setSearchParams(
-      qs.stringify(
-        {
-          ...filteredFilterParams,
-          [pageP]: params?.page,
-          pageAmount: params?.pageAmount,
-        },
-        { arrayFormat: "repeat" },
-      ) || [],
+      (prev) => {
+        console.log("prev searchParams (en page): ", prev);
+        const oldParams = qs.parse("" + prev);
+        type IOldParams = typeof oldParams;
+        const filteredFilterParams: IOldParams = {};
+        for (const key in oldParams) {
+          if (key !== pageP && key !== "pageAmount") {
+            filteredFilterParams[key] = oldParams[key];
+          }
+        }
+
+        console.log("filterfilterparams (en page): ", filteredFilterParams);
+        console.log("newparams (en page): ", p);
+        return (
+          qs.stringify(
+            { ...filteredFilterParams, ...p },
+            { arrayFormat: "repeat" },
+          ) || []
+        );
+      },
       { replace: true },
     );
+  };
+
+  const setter = (p?: PageParams) => {
+    setParams(p);
+    setUpdateParams(true);
   };
 
   return [pageParams, setter];

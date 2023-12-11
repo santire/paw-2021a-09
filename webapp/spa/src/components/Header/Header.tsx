@@ -11,7 +11,8 @@ export function Header() {
   const { t } = useTranslation();
   const user = useUser();
 
-  if (user.isSuccess && user.data) {
+
+  if (user.isSuccess && !user.isPending && user.data) {
     return (
       <div className={classes.header}>
         <Grid justify="center" px="sm" m={0} align="center">

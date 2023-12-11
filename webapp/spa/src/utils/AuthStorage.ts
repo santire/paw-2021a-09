@@ -25,7 +25,6 @@ export function getUserEmail() {
 function getSubFromToken(token: string) {
   try {
     const jwtToken = decodeJwt(token);
-    console.log("jwt sub: ", jwtToken.sub);
     return jwtToken.sub;
   } catch (error) {
     console.error("Token is malformed");

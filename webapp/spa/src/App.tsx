@@ -11,6 +11,7 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Layout from "@/components/Layout/Layout";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { elementRouter } from "./router/elementRoutes";
+import { RestaurantFilterAndPageParamsProvider } from "./context/RestaurantFilterAndPageContext";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -35,7 +36,11 @@ const queryClient = new QueryClient({
 const GourmetableRouter = createBrowserRouter(
   [
     {
-      element: <Layout />,
+      element: (
+        <RestaurantFilterAndPageParamsProvider>
+          <Layout />
+        </RestaurantFilterAndPageParamsProvider>
+      ),
       children: elementRouter(queryClient),
     },
   ],

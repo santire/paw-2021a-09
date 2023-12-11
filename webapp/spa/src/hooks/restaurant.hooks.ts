@@ -3,17 +3,17 @@ import { RestaurantService } from "@/api/services/RestaurantService";
 import { queries } from "@/queries";
 import { RestaurantFilterParams } from "@/types/filters";
 import { PageParams } from "@/types/page";
-import {
-  QueryClient,
-  keepPreviousData,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUser } from "./user.hooks";
 import { IRestaurant } from "@/types/restaurant/restaurant.models";
 import { IClientLike } from "@/types/like/like.models";
+import { isAuthed } from "@/utils/AuthStorage";
+import { useRestaurantFilterAndPage } from "@/context/RestaurantFilterAndPageContext";
 
-export function useGetRestaurants(params: PageParams & RestaurantFilterParams) {
+export function useGetRestaurants() {
+  const { filterParams, pageParams } = useRestaurantFilterAndPage();
+  const page = pageParams?.page ?? 1;
+  const params = { ...filterParams, ...pageParams, page };
   const queryClient = useQueryClient();
   const user = useUser();
   const query = useQuery({
@@ -24,7 +24,7 @@ export function useGetRestaurants(params: PageParams & RestaurantFilterParams) {
         pageAmount: 6,
       });
 
-      if (!user.isPaused && user.data) {
+      if (!user.isPaused && user.isSuccess && user.data) {
         await updateLikesCache(queryClient, user.data.likes, resp.data);
       }
       return resp;
@@ -38,6 +38,9 @@ async function updateLikesCache(
   url: string,
   restaurants: IRestaurant[],
 ) {
+  if (!isAuthed()) {
+    return;
+  }
   const restaurantIds = restaurants.map((r) => r.id);
   const likes = await LikeService.getByRestaurants(url, restaurantIds);
   const restaurantSelfs = restaurants.map((r) => r.self);

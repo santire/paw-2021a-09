@@ -13,15 +13,18 @@ export function useGetLike({ self, id }: IRestaurant) {
     queryKey: queries.likes.detail(self).queryKey,
     queryFn: async () => {
       const clientLike: IClientLike = { liked: false };
-      try {
-        const resp = await LikeService.get(`${likeUrl}/${id}`);
-        clientLike.liked = true;
-        clientLike.like = resp;
-      } finally {
+      if (!likeUrl) {
         return clientLike;
       }
+      // const resp = await LikeService.get(`${likeUrl}/${id}`);
+      const [resp] = await LikeService.getByRestaurants(likeUrl, [id]);
+      if (resp) {
+        clientLike.liked = true;
+        clientLike.like = resp;
+      }
+      return clientLike;
     },
-    enabled: !!likeUrl,
+    enabled: user.isSuccess && !user.isStale && !!likeUrl,
   });
 }
 
@@ -36,7 +39,8 @@ export function useLikeRestaurant({ self }: IRestaurant) {
       restaurantId: number;
     }) => LikeService.like(url, restaurantId),
     onSuccess: (like) => {
-      queryClient.setQueriesData(queries.likes.detail(self), {
+      // TODO: update Restaurant likes in queryCache
+      return queryClient.setQueryData(queries.likes.detail(self).queryKey, {
         liked: true,
         like,
       });
@@ -49,7 +53,10 @@ export function useDislikeRestaurant({ self }: IRestaurant) {
   return useMutation({
     mutationFn: ({ url }: { url: string }) => LikeService.dislike(url),
     onSuccess: () => {
-      queryClient.invalidateQueries(queries.likes.detail(self));
+      // TODO: update Restaurant likes in queryCache
+      return queryClient.setQueryData(queries.likes.detail(self).queryKey, {
+        liked: false,
+      });
     },
   });
 }

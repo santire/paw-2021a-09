@@ -8,12 +8,15 @@ import {
   usePageSearchParams,
 } from "@/hooks/searchParams.hooks";
 import { PriceInput } from "./PriceInput/PriceInput";
+import { useRestaurantFilterAndPage } from "@/context/RestaurantFilterAndPageContext";
 
 export function Filter() {
   const { classes } = useStyles();
   const { t } = useTranslation();
-  const [filterParams, setFilterParams] = useFilterSearchParams();
-  const [_, setPageParams] = usePageSearchParams();
+  // const [filterParams, setFilterParams] = useFilterSearchParams();
+  // const [_, setPageParams] = usePageSearchParams();
+  const { filterParams, setFilterParams, setPageParams } =
+    useRestaurantFilterAndPage();
 
   const [errors, setErrors] = useState<string[]>([]);
 
@@ -34,8 +37,6 @@ export function Filter() {
   }, [filterParams]);
 
   const setParams = () => {
-    setPageParams();
-    for(let i =0; i< 100000; i++);
     setFilterParams({
       tags,
       min,
@@ -43,6 +44,7 @@ export function Filter() {
       sort,
       order,
     });
+    setPageParams();
   };
   const clearAll = () => {
     setTags(undefined);
@@ -51,7 +53,6 @@ export function Filter() {
     setSort(undefined);
     setOrder(undefined);
     setPageParams();
-    for(let i =0; i< 100000; i++);
     setFilterParams({});
   };
 

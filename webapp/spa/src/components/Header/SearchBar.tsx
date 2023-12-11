@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { createSearchParams, useNavigate } from "react-router-dom";
 import useStyles from "./Header.styles";
-import { useFilterSearchParams } from "../../hooks/searchParams.hooks";
+import { useRestaurantFilterAndPage } from "@/context/RestaurantFilterAndPageContext";
 
 export function SearchBar() {
   const { classes } = useStyles();
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
-  const [filterParams, setFilterParams] = useFilterSearchParams();
+  const {filterParams, setFilterParams, setPageParams} = useRestaurantFilterAndPage();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,6 +28,7 @@ export function SearchBar() {
       data={[]}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
+          setPageParams();
           setFilterParams({ search: search });
           navigate({
             pathname: "restaurants",

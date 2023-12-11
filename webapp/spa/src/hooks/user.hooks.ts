@@ -7,12 +7,17 @@ import {
   IUserResetPassword,
   IUserUpdate,
 } from "@/types/user/user.models";
-import { clearItems, isAuthed } from "@/utils/AuthStorage";
+import { clearItems, getUserEmail, isAuthed } from "@/utils/AuthStorage";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 
 export function useUser() {
-  return useQuery({...queries.users.detail(), enabled: !!isAuthed()});
+  const email = getUserEmail();
+  return useQuery({
+    queryKey: queries.users.detail().queryKey,
+    queryFn: () => UserService.getByEmail(email!),
+    enabled: !!isAuthed() && !!email,
+  });
 }
 
 export function useCreateUser() {
@@ -74,9 +79,10 @@ export function useLoginUser() {
   return useMutation({
     mutationFn: (data: IUserLogin) => UserService.getByEmail(data.email, data),
     onSuccess: async (data) => {
-      // TODO: instead if invalidating, update queries with likes
-      queryClient.setQueryData(queries.users.detail().queryKey, data);
-      await queryClient.invalidateQueries();
+      // // TODO: instead if invalidating, update queries with likes
+      // await queryClient.invalidateQueries();
+      await queryClient.cancelQueries();
+      return queryClient.setQueryData(queries.users.detail().queryKey, data);
     },
   });
 }
@@ -86,8 +92,11 @@ export function useLogoutUser() {
   const navigate = useNavigate();
   return async () => {
     clearItems();
-    await queryClient.invalidateQueries();
-    queryClient.clear();
+    await queryClient.invalidateQueries({ refetchType: "none" });
+    await queryClient.invalidateQueries({
+      queryKey: queries.users.detail().queryKey,
+    });
+    await queryClient.cancelQueries();
     navigate("/", { replace: true });
   };
 }

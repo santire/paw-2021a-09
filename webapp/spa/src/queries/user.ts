@@ -5,6 +5,6 @@ export const users = createQueryKeys("users", {
   all: null,
   detail: () => ({
     queryKey: ["email"],
-    queryFn: () => UserService.getByEmail(getUserEmail() ?? ""),
+    // queryFn: () => UserService.getByEmail(getUserEmail() ?? ""),
   }),
 });

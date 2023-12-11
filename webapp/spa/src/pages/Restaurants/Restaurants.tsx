@@ -9,13 +9,10 @@ import {
 } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { RestaurantCard } from "@/components/RestaurantCard/RestaurantCard";
-import {
-  useFilterSearchParams,
-  usePageSearchParams,
-} from "@/hooks/searchParams.hooks";
 import { Filter } from "@/components/Filter/Filter";
 import { RestaurantCardSkeleton } from "@/components/RestaurantCard/RestaurantCardSkeleton";
 import { useGetRestaurants } from "@/hooks/restaurant.hooks";
+import { useRestaurantFilterAndPage } from "@/context/RestaurantFilterAndPageContext";
 
 const useStyles = createStyles((theme) => ({
   title: {
@@ -25,9 +22,8 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export function RestaurantsPage() {
-  const [pageParams, setPageParams] = usePageSearchParams();
-  const [filterParams] = useFilterSearchParams();
-  const { error, data } = useGetRestaurants({...filterParams, ...pageParams});
+  const { error, data } = useGetRestaurants();
+  const { pageParams, setPageParams } = useRestaurantFilterAndPage();
 
   const { t } = useTranslation();
 
