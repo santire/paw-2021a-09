@@ -14,13 +14,13 @@ import { elementRouter } from "./router/elementRoutes";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
-    onError: () => {
-      console.log("GLOBAL QUERY ERROR HANDLING WOULD GO HERE");
+    onError: ({ cause }) => {
+      // console.log(cause);
     },
   }),
   mutationCache: new MutationCache({
     onError: () => {
-      console.log("GLOBAL MUTATION ERROR HANDLING WOULD GO HERE");
+      // console.log("GLOBAL MUTATION ERROR HANDLING WOULD GO HERE");
     },
   }),
   defaultOptions: {

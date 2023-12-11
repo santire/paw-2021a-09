@@ -29,7 +29,7 @@ const HasImageObj = z.object({
 const HasURLs = z.object({
   self: z.string().url(),
   image: z.string().url(),
-  reviews: z.string().url(),
+  comments: z.string().url(),
   menu: z.string().url(),
   owner: z.string().url(),
 });
@@ -39,18 +39,10 @@ const HasComputedProps = z.object({
   likes: z.number().gte(0),
   rating: z.number().gte(0).lte(5),
 });
-const HasClientProps = z.object({
-  likedByUser: z.boolean(),
-});
-
-export const RestaurantResponseSchema = RestaurantSchemaBase.merge(HasID)
-  .merge(HasComputedProps)
-  .merge(HasURLs);
 
 export const RestaurantSchema = RestaurantSchemaBase.merge(HasID)
   .merge(HasComputedProps)
-  .merge(HasURLs)
-  .merge(HasClientProps);
+  .merge(HasURLs);
 
 export const RestaurantRegisterSchema = RestaurantSchemaBase.merge(HasImageObj)
   .refine(({ facebook }) => !facebook || facebookRegex.test(facebook), {

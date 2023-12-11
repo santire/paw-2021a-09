@@ -15,7 +15,7 @@ import useStyles from "./RestaurantCard.styles";
 import { useNavigate } from "react-router-dom";
 import { IconStar } from "@tabler/icons-react";
 import { LikeButton } from "../LikeButton/LikeButton";
-import { useIsOwner } from "../../hooks/user.hooks";
+import { useIsOwner } from "@/hooks/user.hooks";
 import { ManageButton } from "../ManageButton/ManageButton";
 import { TagButton } from "../TagButton/TagButton";
 

@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.webapp.controller;
 
 import ar.edu.itba.paw.model.Like;
+import ar.edu.itba.paw.model.exceptions.LikeNotFoundException;
 import ar.edu.itba.paw.service.LikesService;
 import ar.edu.itba.paw.webapp.dto.LikeDto;
 import ar.edu.itba.paw.webapp.forms.LikeForm;
@@ -29,12 +30,25 @@ public class LikeController {
     private UriInfo uriInfo;
 
     @GET
+    @Path("{restaurantId}")
+    @Produces(value = {MediaType.APPLICATION_JSON})
+    @PreAuthorize("@authComponent.isUser(#userId)")
+    public Response getUserLike(@PathParam("userId") final Long userId,
+                                @PathParam("restaurantId") final Long restaurantId
+                                ) {
+
+        Like like = likesService.getByUserAndRestaurant(userId, restaurantId).orElseThrow(LikeNotFoundException::new);
+        return Response.ok(new GenericEntity<LikeDto>(LikeDto.fromLike(like, uriInfo)) {
+        }).build();
+    }
+
+    @GET
     @Produces(value = {MediaType.APPLICATION_JSON})
     @PreAuthorize("@authComponent.isUser(#userId)")
     public Response getUserLikes(@PathParam("userId") final Long userId,
-                                         @QueryParam("page") @DefaultValue("1") Integer page,
-                                         @QueryParam("pageAmount") @DefaultValue("10") Integer pageAmount,
-                                         @QueryParam("restaurantId") final List<Long> restaurantIds) {
+                                 @QueryParam("page") @DefaultValue("1") Integer page,
+                                 @QueryParam("pageAmount") @DefaultValue("10") Integer pageAmount,
+                                 @QueryParam("restaurantId") final List<Long> restaurantIds) {
 
         if (restaurantIds != null && !restaurantIds.isEmpty()) {
             return Response.ok(getUserLikesByRestaurantIds(userId, restaurantIds)).build();

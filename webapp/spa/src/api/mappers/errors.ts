@@ -17,4 +17,7 @@ export const apiErrorMap: ErrorMap = {
     code: "validation_error",
     errors: [{ subject: "username", message: "username in use" }],
   },
+  AccessDeniedException: { code: "access_denied" },
+  AlreadyLikedException: { code: "already_liked" },
+  LikeNotFound: { code: "like_not_found" },
 };

@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { MultiSelect } from "@mantine/core";
-import { useGetTags } from "../../../hooks/tags.hooks";
+import { useGetTags } from "@/hooks/tags.hooks";
 import { Dispatch, SetStateAction } from "react";
 
 interface TagsSelectorProps {

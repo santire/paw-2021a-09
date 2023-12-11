@@ -8,10 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -28,6 +25,19 @@ public class LikeJpaDao implements LikesDao {
         Like like = new Like(user, restaurant);
         em.persist(like);
         return like;
+    }
+
+    @Override
+    public Like getByUserAndRestaurant(User user, Restaurant restaurant) {
+        TypedQuery<Like> query = em.createQuery("from Like where user.id = :userId and restaurant.id = :restaurantId", Like.class);
+        query.setParameter("userId", user.getId());
+        query.setParameter("restaurantId", restaurant.getId());
+        try {
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+
     }
 
     @Override

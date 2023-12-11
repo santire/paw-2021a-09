@@ -1,4 +1,4 @@
-import { Button, Group, Paper, Select, Text, filterProps } from "@mantine/core";
+import { Button, Group, Paper, Select, Text } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import useStyles from "./Filter.styles";
 import { TagsSelector } from "./TagsSelector/TagsSelector";
@@ -17,12 +17,12 @@ export function Filter() {
 
   const [errors, setErrors] = useState<string[]>([]);
 
-  const [tags, setTags] = useState(filterParams?.tags);
-  const [min, setMin] = useState(filterParams?.min);
-  const [max, setMax] = useState(filterParams?.max);
+  const [tags, setTags] = useState(filterParams.tags);
+  const [min, setMin] = useState(filterParams.min);
+  const [max, setMax] = useState(filterParams.max);
 
-  const [sort, setSort] = useState(filterParams?.sort);
-  const [order, setOrder] = useState(filterParams?.order);
+  const [sort, setSort] = useState(filterParams.sort);
+  const [order, setOrder] = useState(filterParams.order);
 
   // I need to sync filter state with urlState
   useEffect(() => {
@@ -35,6 +35,7 @@ export function Filter() {
 
   const setParams = () => {
     setPageParams();
+    for(let i =0; i< 100000; i++);
     setFilterParams({
       tags,
       min,
@@ -50,6 +51,7 @@ export function Filter() {
     setSort(undefined);
     setOrder(undefined);
     setPageParams();
+    for(let i =0; i< 100000; i++);
     setFilterParams({});
   };
 

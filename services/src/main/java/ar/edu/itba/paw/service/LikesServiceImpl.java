@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class LikesServiceImpl implements LikesService {
@@ -26,6 +27,14 @@ public class LikesServiceImpl implements LikesService {
 
     @Autowired
     private UserDao userDao;
+
+    @Override
+    public Optional<Like> getByUserAndRestaurant(long userId, long restaurantId) {
+        User user = userDao.findById(userId).orElseThrow(UserNotFoundException::new);
+        Restaurant restaurant = restaurantDao.findById(restaurantId).orElseThrow(RestaurantNotFoundException::new);
+
+        return Optional.ofNullable(likesDao.getByUserAndRestaurant(user, restaurant));
+    }
 
     @Override
     @Transactional

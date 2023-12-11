@@ -6,6 +6,7 @@ import { ProfilePage } from "@/pages/Profile/Profile";
 import { userProfileLoader } from "@/pages/Profile/Profile.loader";
 import { RegisterPage } from "@/pages/Register/Register";
 import { ResetPage } from "@/pages/Reset/Reset";
+import { RestaurantsPage } from "@/pages/Restaurants/Restaurants";
 import { IRoute } from "@/types/route";
 
 export const routes: IRoute[] = [
@@ -13,6 +14,11 @@ export const routes: IRoute[] = [
     path: "/",
     element: <HomePage />,
     title: "Home | Gourmetable",
+  },
+  {
+    path: "/restaurants",
+    element: <RestaurantsPage />,
+    title: "Browse Restaurants | Gourmetable",
   },
   {
     path: "/login",
@@ -37,7 +43,7 @@ export const routes: IRoute[] = [
     protection: { type: "authed", redirectPath: "/" },
     element: <ProfilePage />,
     title: "User Profile | Gourmetable",
-    loader: userProfileLoader
+    loader: userProfileLoader,
   },
   {
     path: "/user/activate",
