@@ -6,10 +6,12 @@ import { NotFoundPage } from "@/pages/NotFound/NotFound";
 import { Helmet } from "react-helmet-async";
 import { RestaurantSkeleton } from "./Skeleton";
 import { RestaurantHeader } from "./Header";
+import { useTabSearchParam } from "@/hooks/searchParams.hooks";
+import { Comments } from "@/components/Comments/Comments";
 
 export function RestaurantPage({ restaurantId }: { restaurantId: number }) {
   const { t } = useTranslation();
-  // const [tabParam, setTabParam] = useTabSearchParam("menu");
+  const [tabParam, setTabParam] = useTabSearchParam("menu");
   const { data, isLoading, isError } = useGetRestaurant(restaurantId);
 
   if (isLoading) {
@@ -57,35 +59,36 @@ export function RestaurantPage({ restaurantId }: { restaurantId: number }) {
           <RestaurantHeader restaurant={data} />
           <Divider m="xl" orientation="horizontal" />
           <Flex justify={"center"}>
-            {/* <Tabs */}
-            {/*   value={tabParam ?? "menu"} */}
-            {/*   onTabChange={setTabParam} */}
-            {/*   style={{ width: "80%", justifyContent: "center" }} */}
-            {/* > */}
-            {/*   <Tabs.List> */}
-            {/*     <Tabs.Tab value="menu" icon={<IconMenu size={14} />}> */}
-            {/*       {t("pages.restaurant.menu.title")} */}
-            {/*     </Tabs.Tab> */}
-            {/*     <Tabs.Tab */}
-            {/*       value="reviews" */}
-            {/*       icon={<IconMessageCircle size={14} />} */}
-            {/*     > */}
-            {/*       {t("pages.restaurant.reviews.title")} */}
-            {/*     </Tabs.Tab> */}
-            {/*   </Tabs.List> */}
+            <Tabs
+              value={tabParam ?? "menu"}
+              onTabChange={setTabParam}
+              style={{ width: "80%", justifyContent: "center" }}
+            >
+              <Tabs.List>
+                <Tabs.Tab value="menu" icon={<IconMenu size={14} />}>
+                  {t("pages.restaurant.menu.title")}
+                </Tabs.Tab>
+                <Tabs.Tab
+                  value="reviews"
+                  icon={<IconMessageCircle size={14} />}
+                >
+                  {t("pages.restaurant.reviews.title")}
+                </Tabs.Tab>
+              </Tabs.List>
 
-            {/*   <Tabs.Panel value="menu" pt="xs"> */}
-            {/*     <Center mt={50}> */}
-            {/*       <MenuItems restaurant={data} /> */}
-            {/*     </Center> */}
-            {/*   </Tabs.Panel> */}
+              <Tabs.Panel value="menu" pt="xs">
+                <Center mt={50}>
+                  {/* <MenuItems restaurant={data} /> */}
+                  menu placeholder
+                </Center>
+              </Tabs.Panel>
 
-            {/*   <Tabs.Panel value="reviews" pt="xs"> */}
-            {/*     <Center mt={50}> */}
-            {/*       <Reviews restaurant={data} /> */}
-            {/*     </Center> */}
-            {/*   </Tabs.Panel> */}
-            {/* </Tabs> */}
+              <Tabs.Panel value="reviews" pt="xs">
+                <Center mt={50}>
+                  <Comments restaurant={data} />
+                </Center>
+              </Tabs.Panel>
+            </Tabs>
           </Flex>
         </Flex>
       </>

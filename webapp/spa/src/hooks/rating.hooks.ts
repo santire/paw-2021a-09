@@ -1,5 +1,4 @@
 import { IRestaurant } from "@/types/restaurant/restaurant.models";
-import { Page } from "@/types/page";
 import { useUser } from "./user.hooks";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queries } from "@/queries";

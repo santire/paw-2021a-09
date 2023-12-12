@@ -65,7 +65,7 @@ public class CommentJpaDao implements CommentDao {
 
         // WHERE true is necessary so that query still works regardless of user_id/restaurant_id
         // as those parts start with " AND..."
-        Query nativeQuery = em.createNativeQuery("SELECT comment_id FROM comments WHERE true" + userPart + restaurantPart + " ORDER BY date " + orderPart);
+        Query nativeQuery = em.createNativeQuery("SELECT comment_id FROM comments WHERE true" + userPart + restaurantPart + " ORDER BY date " + orderPart + ", comment_id " + orderPart);
 
         if (userId != null) {
             nativeQuery.setParameter("userId", userId);

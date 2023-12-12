@@ -22,6 +22,8 @@ import {
 import { useAuth } from "../../hooks/useAuth";
 import { useIsOwner } from "../../hooks/user.hooks";
 import { ReviewItem } from "./ReviewItem";
+import { ICommentRegister } from "@/types/comment/comment.models";
+import { CommentRegisterSchema } from "@/types/comment/comment.schemas";
 
 interface ReviewsProps {
   restaurant: IRestaurant;
@@ -48,9 +50,9 @@ export function Reviews({ restaurant }: ReviewsProps) {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<IReviewRegister>({
+  } = useForm<ICommentRegister>({
     mode: "onTouched",
-    resolver: zodResolver(ReviewRegisterSchema),
+    resolver: zodResolver(CommentRegisterSchema),
   });
 
   if (isLoading) {
@@ -95,8 +97,8 @@ export function Reviews({ restaurant }: ReviewsProps) {
                   <Textarea
                     mb={10}
                     w={"100%"}
-                    error={errors.review?.message}
-                    {...register("review")}
+                    error={errors.message?.message}
+                    {...register("message")}
                   />
                 </Flex>
                 <Button

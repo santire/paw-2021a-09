@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-const ReviewSchemaBase = z.object({
-  review: z.string().min(1).max(144),
+const CommentSchemaBase = z.object({
+  message: z.string().min(1).max(144),
 });
 
 const HasID = z.object({
@@ -16,5 +16,5 @@ const HasURLs = z.object({
   restaurant: z.string().url(),
 });
 
-export const ReviewSchema = ReviewSchemaBase.merge(HasID).merge(HasURLs);
-export const ReviewRegisterSchema = ReviewSchemaBase;
+export const CommentSchema = CommentSchemaBase.merge(HasID).merge(HasURLs);
+export const CommentRegisterSchema = CommentSchemaBase;

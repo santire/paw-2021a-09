@@ -1,7 +1,7 @@
 import { UserService } from "@/api/services/UserService";
 import { queries } from "@/queries";
+import { IComment } from "@/types/comment/comment.models";
 import { IRestaurant } from "@/types/restaurant/restaurant.models";
-import { IReview } from "@/types/review/review.models";
 import {
   IUserLogin,
   IUserResetPassword,
@@ -103,16 +103,16 @@ export function useLogoutUser() {
 
 type isOwnerProps = {
   restaurant?: IRestaurant;
-  review?: IReview;
+  comment?: IComment;
 };
-export function useIsOwner({ restaurant, review }: isOwnerProps) {
+export function useIsOwner({ restaurant, comment }: isOwnerProps) {
   const { data } = useUser();
   if (restaurant) {
     const { owner } = restaurant;
     return data?.self === owner;
   }
-  if (review) {
-    const { user } = review;
+  if (comment) {
+    const { user } = comment;
     return data?.self === user;
   }
 }

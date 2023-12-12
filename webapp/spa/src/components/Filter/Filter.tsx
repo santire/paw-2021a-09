@@ -3,18 +3,12 @@ import { useTranslation } from "react-i18next";
 import useStyles from "./Filter.styles";
 import { TagsSelector } from "./TagsSelector/TagsSelector";
 import { useEffect, useState } from "react";
-import {
-  useFilterSearchParams,
-  usePageSearchParams,
-} from "@/hooks/searchParams.hooks";
 import { PriceInput } from "./PriceInput/PriceInput";
 import { useRestaurantFilterAndPage } from "@/context/RestaurantFilterAndPageContext";
 
 export function Filter() {
   const { classes } = useStyles();
   const { t } = useTranslation();
-  // const [filterParams, setFilterParams] = useFilterSearchParams();
-  // const [_, setPageParams] = usePageSearchParams();
   const { filterParams, setFilterParams, setPageParams } =
     useRestaurantFilterAndPage();
 
