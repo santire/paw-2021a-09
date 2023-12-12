@@ -29,11 +29,12 @@ export function ReservationButton({ restaurant }: Props) {
         >
           {t("pages.restaurant.reservationButton")}
         </Button>
-        {/* <ReservationModal */}
-        {/*   restaurant={restaurant} */}
-        {/*   show={showModal} */}
-        {/*   setShow={setShowModal} */}
-        {/* /> */}
+        <ReservationModal
+          restaurant={restaurant}
+          user={user.data}
+          show={showModal}
+          setShow={setShowModal}
+        />
       </Box>
     );
   }

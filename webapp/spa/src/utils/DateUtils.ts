@@ -74,6 +74,7 @@ export class DateUtils {
     const [hours, minutes] = time.split(":");
     date.setHours(Number(hours));
     date.setMinutes(Number(minutes));
+    date.setSeconds(0);
     return date;
   }
 }

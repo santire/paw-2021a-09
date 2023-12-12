@@ -12,6 +12,7 @@ import Layout from "@/components/Layout/Layout";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { elementRouter } from "./router/elementRoutes";
 import { RestaurantFilterAndPageParamsProvider } from "./context/RestaurantFilterAndPageContext";
+import { NotificationsProvider } from "@mantine/notifications";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -53,12 +54,14 @@ function App() {
       <ReactQueryDevtools initialIsOpen={false} />
       <Suspense fallback={<Layout />}>
         <ThemeProvider>
-          <HelmetProvider>
-            <Helmet>
-              <title>Gourmetable</title>
-            </Helmet>
-            <RouterProvider router={GourmetableRouter} />
-          </HelmetProvider>
+          <NotificationsProvider>
+            <HelmetProvider>
+              <Helmet>
+                <title>Gourmetable</title>
+              </Helmet>
+              <RouterProvider router={GourmetableRouter} />
+            </HelmetProvider>
+          </NotificationsProvider>
         </ThemeProvider>
       </Suspense>
     </QueryClientProvider>

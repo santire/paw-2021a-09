@@ -1,4 +1,4 @@
-import { Text, Modal, NumberInput, Select, Alert, Button } from "@mantine/core";
+import { Text, Modal, NumberInput, Select, Button } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { IRestaurant } from "../../types/restaurant/restaurant.models";
 import { Dispatch, SetStateAction, useState } from "react";
@@ -11,17 +11,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ReservationRegisterSchema } from "../../types/reservation/reservation.schemas";
 import { showNotification } from "@mantine/notifications";
 import { IconCheck } from "@tabler/icons-react";
+import { IUser } from "@/types/user/user.models";
 
 interface Props {
+  user: IUser;
   restaurant: IRestaurant;
   show: boolean;
   setShow: Dispatch<SetStateAction<boolean>>;
 }
-export function ReservationModal({ restaurant, show, setShow }: Props) {
+export function ReservationModal({ restaurant, user, show, setShow }: Props) {
   const { t } = useTranslation();
   const [quantity, setQuantity] = useState(1);
-  const [date, setDate] = useState(new Date());
-  const [time, setTime] = useState(new Date());
+  const [time, setTime] = useState(DateUtils.getTimeOptions(new Date())[0]);
+  const [date, setDate] = useState(DateUtils.addTimeToDate(new Date(), time));
 
   const {
     handleSubmit,
@@ -34,86 +36,55 @@ export function ReservationModal({ restaurant, show, setShow }: Props) {
     resolver: zodResolver(ReservationRegisterSchema),
   });
 
-  const makeReservation = useCreateReservation({
-    onSuccess: () => {
-      setShow(false);
-      showNotification({
-        color: "green",
-        icon: <IconCheck />,
-        autoClose: 5000,
-        title: t("pages.restaurant.notifTitle"),
-        message: t("pages.restaurant.pendingReservation"),
-      });
-    },
-    onError: (error) => {
-      if (error.code === "validation_error" && error.errors) {
-        for (const e of error.errors) {
-          switch (e.subject) {
-            case "date":
-              setError("date", {
-                type: "custom",
-                message: t("reservationModal.errors.date") || "",
-              });
-              break;
-
-            case "time":
-              setError("time", {
-                type: "custom",
-                message: t("reservationModal.errors.time") || "",
-              });
-              break;
-
-            default:
-              // TODO: Show default alert?
-              console.error("Unexpected error subject: ", e.subject, e.message);
-          }
-        }
-      } else {
-        console.error("Unknown error code: ", error.code);
-      }
-    },
-  });
-
-  const getTimeOptions = () => {
-    if (!date) return [];
-    return DateUtils.getTimeOptions(date);
-  };
+  const makeReservation = useCreateReservation();
+  function handleMutation(data: IReservationRegister) {
+    makeReservation.mutate(
+      { userId: user.userId, restaurantId: restaurant.id, params: data },
+      {
+        onSuccess: () => {
+          setShow(false);
+          showNotification({
+            color: "green",
+            icon: <IconCheck />,
+            autoClose: 5000,
+            title: t("pages.restaurant.notifTitle"),
+            message: t("pages.restaurant.pendingReservation"),
+          });
+        },
+      },
+    );
+  }
 
   const handleTimeChange = (value: string) => {
-    clearErrors("time");
+    clearErrors("date");
     const [hours, minutes] = value.split(":");
-    const selectedTime = new Date();
-    selectedTime.setHours(Number(hours));
-    selectedTime.setMinutes(Number(minutes));
-    setTime(selectedTime);
+    setDate((prev) => {
+      prev.setHours(Number(hours));
+      prev.setMinutes(Number(minutes));
+      return prev;
+    });
+    setTime(value);
   };
 
   const handleDateChange = (value: Date) => {
     clearErrors("date");
-    setDate(new Date(value));
-    const timeOptions = DateUtils.getTimeOptions(date);
-    setTime(DateUtils.addTimeToDate(date, timeOptions[0])); // Set the first option as the default time
+    setDate((prev) => {
+      value.setMinutes(prev.getMinutes());
+      value.setHours(prev.getHours());
+      return value;
+    });
   };
 
   const handleReservation = () => {
-    const day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
-    const realMonth = date.getMonth() + 1;
-    const month = realMonth < 10 ? `0${realMonth}` : realMonth;
-    const hours = time.toLocaleTimeString("es");
-
     const form: IReservationRegister = {
-      date: `${day}/${month}/${date.getFullYear()}`,
-      time: hours.slice(0, 5),
+      date: date,
       quantity: quantity,
     };
 
     setValue("date", form.date);
-    setValue("time", form.time);
     setValue("quantity", form.quantity);
 
-    handleSubmit((data) =>
-      makeReservation.mutate({ restaurantId: restaurant.id, reservation: data })
-    )();
+    handleSubmit((data) => handleMutation(data))();
   };
 
   return (
@@ -141,7 +112,7 @@ export function ReservationModal({ restaurant, show, setShow }: Props) {
                 : value > 15
                 ? 15
                 : value
-              : value
+              : value,
           )
         }
         error={errors?.quantity?.message}
@@ -163,18 +134,12 @@ export function ReservationModal({ restaurant, show, setShow }: Props) {
       <Select
         label={t("pages.userReservations.pickTime")}
         withAsterisk
-        value={
-          time
-            ? `${time.getHours()}:${time
-                .getMinutes()
-                .toString()
-                .padStart(2, "0")}`
-            : ""
-        }
+        required
+        value={time}
         onChange={handleTimeChange}
-        data={getTimeOptions()}
+        data={DateUtils.getTimeOptions(date)}
         mb={5}
-        error={errors.time?.message}
+        error={errors.date?.message}
       />
 
       <Button

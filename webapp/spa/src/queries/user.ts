@@ -9,4 +9,7 @@ export const users = createQueryKeys("users", {
   restaurants: (params: PageParams) => ({
     queryKey: [{ ...params }],
   }),
+  reservations: (params: PageParams) => ({
+    queryKey: [{ ...params }],
+  }),
 });

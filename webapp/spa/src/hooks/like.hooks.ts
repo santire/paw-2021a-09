@@ -39,6 +39,9 @@ export function useLikeRestaurant({ self }: IRestaurant) {
       restaurantId: number;
     }) => LikeService.like(url, restaurantId),
     onSuccess: (like, { restaurantId }) => {
+      queryClient.invalidateQueries({
+        queryKey: [...queries.restaurants.list._def, "popular"],
+      });
       queryClient.invalidateQueries(queries.restaurants.detail(restaurantId));
       return queryClient.setQueryData(queries.likes.detail(self).queryKey, {
         liked: true,
@@ -53,6 +56,9 @@ export function useDislikeRestaurant({ self, id }: IRestaurant) {
   return useMutation({
     mutationFn: ({ url }: { url: string }) => LikeService.dislike(url),
     onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [...queries.restaurants.list._def, "popular"],
+      });
       queryClient.invalidateQueries(queries.restaurants.detail(id));
       return queryClient.setQueryData(queries.likes.detail(self).queryKey, {
         liked: false,

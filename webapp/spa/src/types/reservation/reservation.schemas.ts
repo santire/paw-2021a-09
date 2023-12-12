@@ -6,7 +6,7 @@ const ReservationSchemaBase = z.object({
 });
 
 const HasID = z.object({
-  reservationId: z.number().int().gt(0),
+  id: z.number().int().gt(0),
 });
 
 const HasURLs = z.object({
@@ -15,14 +15,7 @@ const HasURLs = z.object({
   restaurant: z.string().url(),
 });
 
-const HasDateTimeString = z.object({
-  date: z.string(),
-  time: z.string(),
-});
-
-export const ReservationRegisterSchema = ReservationSchemaBase.omit({
-  date: true,
-}).merge(HasDateTimeString);
+export const ReservationRegisterSchema = ReservationSchemaBase;
 export const ReservationSchema = ReservationSchemaBase.merge(HasID)
   .merge(HasURLs)
-  .merge(z.object({ confirmed: z.boolean() }));
+  .merge(z.object({ status: z.enum(["PENDING", "CONFIRMED", "DENIED"]) }));

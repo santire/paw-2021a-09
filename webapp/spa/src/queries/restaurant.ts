@@ -7,13 +7,7 @@ export const restaurants = createQueryKeys("restaurants", {
   list: (filters: RestaurantFilterParams & PageParams) => ({
     queryKey: [{ filters }],
     queryFn: () => RestaurantService.getFilteredBy(filters),
-
-    hot: () => ({
-      queryKey: null,
-    }),
-    popular: () => ({
-      queryKey: null,
-    }),
+    hot: () => {},
   }),
   detail: (id: number) => ({
     queryKey: [id],

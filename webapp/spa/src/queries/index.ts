@@ -5,5 +5,6 @@ import { likes } from "./like";
 import { ratings } from "./rating";
 import { comments } from "./comments";
 import { menuItems } from "./menuItem";
+import { reservations } from "./reservations";
 
-export const queries = mergeQueryKeys(users, restaurants, likes, ratings, comments, menuItems);
+export const queries = mergeQueryKeys(users, restaurants, likes, ratings, comments, menuItems, reservations);
