@@ -422,7 +422,13 @@
       "tagsDivider": "Categoría",
       "profileImage": "Imagen de perfil",
       "dropImage": "Arrastre las imagenes aquí o haga click para seleccionar un archivo",
+      "dropImageSize": "La imagen no debe superar los 400kb",
       "tagsSelection": "Al menos 1 categoría es requerida",
+      "errors": {
+        "imageTooLarge": "La imagen es muy grande",
+        "imageMissing": "La imagen es obligatoria",
+        "imageInvalidType": "No es un tipo de imagen válido"
+      },
       "name": {
         "label": "Nombre del restaurante",
         "placeholder": "Mi restaurante",

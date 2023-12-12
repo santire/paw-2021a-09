@@ -16,6 +16,7 @@ public class JpaUtils {
     public static List<Long> getFilteredIds(int page, int amountOnPage, Query query) {
         query.setFirstResult((page - 1) * amountOnPage);
         query.setMaxResults(amountOnPage);
+        System.out.println(String.format("page: %d, amount: %d", page, amountOnPage));
         @SuppressWarnings("unchecked")
         List<Long> filteredIds = (List<Long>) query.getResultList().stream().map(e -> Long.valueOf(e.toString()))
                 .collect(Collectors.toList());

@@ -1,6 +1,7 @@
 import {
   IRestaurant,
   IRestaurantRegister,
+  IRestaurantUpdate,
 } from "@/types/restaurant/restaurant.models";
 import { apiClient } from "../client";
 import { MAX_PAGE_AMOUNT, Page, PageParams } from "@/types/page";
@@ -15,8 +16,13 @@ interface IRestaurantService {
   getFilteredBy(
     params: RestaurantFilterParams & PageParams,
   ): Promise<Page<IRestaurant[]>>;
+  getOwnedRestaurants(
+    userId: number,
+    params: PageParams,
+  ): Promise<Page<IRestaurant[]>>;
 
   create(userId: number, params: IRestaurantRegister): Promise<IRestaurant>;
+  update(url: string, params: IRestaurantUpdate): Promise<IRestaurant>;
   remove(url: string): Promise<void>;
 }
 
@@ -31,6 +37,19 @@ module RestaurantServiceImpl {
     return _getAll(params);
   }
 
+  export async function getOwnedRestaurants(
+    userId: number,
+    params: PageParams,
+  ) {
+    const response = await apiClient.get<IRestaurant[]>(PATH, {
+      params: {
+        ownedBy: userId,
+        ...params,
+      },
+    });
+    return pagedResponse(response);
+  }
+
   export async function create(
     userId: number,
     restaurant: IRestaurantRegister,
@@ -40,7 +59,7 @@ module RestaurantServiceImpl {
       throw new Error("Restaurant Creation Error", {
         cause: {
           status: "400",
-          code: "validation_error",
+          code: "missing_image",
           errors: [
             {
               subject: "image",
@@ -64,6 +83,34 @@ module RestaurantServiceImpl {
         await apiClient.delete(newRestLocation);
         throw error;
       }
+    }
+    return response.data;
+  }
+
+  export async function update(url: string, params: IRestaurantUpdate) {
+    const { image, ...data } = params;
+    if (!image) {
+      console.log("uppps")
+      throw new Error("Restaurant Creation Error", {
+        cause: {
+          status: "400",
+          code: "missing_image",
+          errors: [
+            {
+              subject: "image",
+              message: "missing image",
+            },
+          ],
+        },
+      });
+    }
+    const response = await apiClient.patch<IRestaurant>(url, {
+      ...data,
+    });
+    if (response.status === 200 && image) {
+      const formData = new FormData();
+      formData.append("image", image);
+      await setImage(url, image);
     }
     return response.data;
   }

@@ -9,6 +9,7 @@ import ar.edu.itba.paw.service.RestaurantService;
 import ar.edu.itba.paw.webapp.dto.RestaurantDto;
 import ar.edu.itba.paw.webapp.forms.RegisterRestaurantForm;
 import ar.edu.itba.paw.webapp.forms.UpdateRestaurantForm;
+import ar.edu.itba.paw.webapp.methods.PATCH;
 import ar.edu.itba.paw.webapp.utils.CachingUtils;
 import ar.edu.itba.paw.webapp.utils.PageUtils;
 import ar.edu.itba.paw.webapp.validators.ImageFileValidator;
@@ -195,7 +196,7 @@ public class RestaurantController {
                 .entity(bytes).build();
     }
 
-    @PUT
+    @PATCH
     @Path("/{restaurantId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = {MediaType.APPLICATION_JSON})
@@ -208,7 +209,7 @@ public class RestaurantController {
             tagList = Arrays.stream(restaurantForm.getTags()).map(Tags::valueOf).collect(Collectors.toList());
             LOGGER.debug("tags: {}", tagList);
         }
-        restaurantService.updateRestaurant(
+        Restaurant restaurant = restaurantService.updateRestaurant(
                 restaurantId,
                 restaurantForm.getName(),
                 restaurantForm.getAddress(),
@@ -218,7 +219,8 @@ public class RestaurantController {
                 restaurantForm.getTwitter(),
                 restaurantForm.getInstagram()
         );
-        return Response.noContent().build();
+        RestaurantDto restaurantDto = RestaurantDto.fromRestaurant(restaurant, uriInfo);
+        return Response.ok(new GenericEntity<RestaurantDto>(restaurantDto){}).build();
     }
 
     @DELETE

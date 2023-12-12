@@ -442,7 +442,13 @@
       "tagsDivider": "Categories",
       "profileImage": "Profile Image",
       "dropImage": "Change profile image",
+      "dropImageSize": "The image file shouldn't exceed 400kb",
       "tagsSelection": "At least 1 tag is required",
+      "errors": {
+        "imageTooLarge": "The image is too large",
+        "imageMissing": "An image is required",
+        "imageInvalidType": "Not a valid image type"
+      },
       "name": {
         "label": "Restaurant name",
         "placeholder": "My resturant",

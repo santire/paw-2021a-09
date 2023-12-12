@@ -11,10 +11,12 @@ import { useUser } from "./user.hooks";
 import {
   IRestaurant,
   IRestaurantRegister,
+  IRestaurantUpdate,
 } from "@/types/restaurant/restaurant.models";
 import { IClientLike } from "@/types/like/like.models";
 import { isAuthed } from "@/utils/AuthStorage";
 import { useRestaurantFilterAndPage } from "@/context/RestaurantFilterAndPageContext";
+import { PageParams } from "@/types/page";
 
 export function useGetRestaurant(id: number) {
   return useQuery(queries.restaurants.detail(id));
@@ -34,12 +36,34 @@ export function useGetRestaurants() {
       });
       // push Restaurant detail state
       resp.data.forEach((r) => {
-        queryClient.setQueriesData(queries.restaurants.detail(r.id), r);
+        queryClient.setQueryData(queries.restaurants.detail(r.id).queryKey, r);
       });
 
       if (!user.isPaused && user.isSuccess && user.data) {
         await updateLikesCache(queryClient, user.data.likes, resp.data);
       }
+      return resp;
+    },
+  });
+  return query;
+}
+
+export function useGetOwnedRestaurants(pageParams: PageParams) {
+  const page = pageParams?.page ?? 1;
+  const pageAmount = pageParams?.pageAmount ?? 6;
+  const params = { ...pageParams, page, pageAmount };
+  const queryClient = useQueryClient();
+  const user = useUser();
+  const userId = user.data?.userId;
+  const query = useQuery({
+    queryKey: queries.users.restaurants(params).queryKey,
+    enabled: user.isSuccess && !user.isStale && !!userId,
+    queryFn: async () => {
+      const resp = await RestaurantService.getOwnedRestaurants(userId!, params);
+      // push Restaurant detail state
+      resp.data.forEach((r) => {
+        queryClient.setQueryData(queries.restaurants.detail(r.id).queryKey, r);
+      });
       return resp;
     },
   });
@@ -61,6 +85,36 @@ export function useCreateRestaurant() {
       queryClient.invalidateQueries({
         queryKey: queries.restaurants.list._def,
       });
+      queryClient.invalidateQueries({
+        queryKey: queries.users.restaurants._def,
+      });
+      // Set restaurant data
+      return queryClient.setQueryData(
+        queries.restaurants.detail(data.id).queryKey,
+        data,
+      );
+    },
+  });
+}
+
+export function useUpdateRestaurant() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      restaurantUrl,
+      params,
+    }: {
+      restaurantUrl: string;
+      params: IRestaurantUpdate;
+    }) => RestaurantService.update(restaurantUrl, params),
+    onSuccess: (data) => {
+      // Might change browsing lists, invalidate all
+      queryClient.invalidateQueries({
+        queryKey: queries.restaurants.list._def,
+      });
+      queryClient.invalidateQueries({
+        queryKey: queries.users.restaurants._def,
+      });
       // Set restaurant data
       return queryClient.setQueryData(
         queries.restaurants.detail(data.id).queryKey,
@@ -78,6 +132,9 @@ export function useDeleteRestaurant({ id }: IRestaurant) {
       // Might change browsing lists, invalidate all
       queryClient.invalidateQueries({
         queryKey: queries.restaurants.list._def,
+      });
+      queryClient.invalidateQueries({
+        queryKey: queries.users.restaurants._def,
       });
       // Clear restaurant data
       return queryClient.invalidateQueries(queries.restaurants.detail(id));

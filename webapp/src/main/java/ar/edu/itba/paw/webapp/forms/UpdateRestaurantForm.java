@@ -8,17 +8,14 @@ import javax.validation.constraints.Size;
 public class UpdateRestaurantForm {
     @Size(min = 2, max = 100)
     @Pattern(regexp = "[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ()'°´¨!&.\\s]+")
-    @NotNull
     private String name;
 
     @Pattern(regexp = "[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ&()'°´¨!.\\s]+")
     @Size(min = 6, max = 100)
-    @NotNull
     private String address;
 
     @Size(min = 8, max = 30)
     @Pattern(regexp = "[0-9]+")
-    @NotNull
     private String phoneNumber;
 
 

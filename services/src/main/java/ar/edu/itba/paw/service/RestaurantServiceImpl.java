@@ -63,17 +63,16 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Override
     @Transactional
-    public Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber, List<Tags> tags, String facebook, String twitter, String instagram) {
+    public Restaurant updateRestaurant(long id, String name, String address, String phoneNumber, List<Tags> tags, String facebook, String twitter, String instagram) {
         Restaurant restaurant = restaurantDao.findById(id).orElseThrow(RestaurantNotFoundException::new);
-        restaurant.setName(name);
-        restaurant.setAddress(address);
-        restaurant.setPhoneNumber(phoneNumber);
-        restaurant.setTags(tags);
-        restaurant.setFacebook(facebook);
-        restaurant.setTwitter(twitter);
-        restaurant.setInstagram(instagram);
-
-        return Optional.of(restaurant);
+        if (name != null) restaurant.setName(name);
+        if (address != null) restaurant.setAddress(address);
+        if (phoneNumber != null) restaurant.setPhoneNumber(phoneNumber);
+        if (tags != null) restaurant.setTags(tags);
+        if (facebook != null) restaurant.setFacebook(facebook);
+        if (twitter != null) restaurant.setTwitter(twitter);
+        if (instagram != null) restaurant.setInstagram(instagram);
+        return restaurant;
     }
 
     @Override

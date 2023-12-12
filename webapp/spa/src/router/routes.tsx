@@ -10,6 +10,8 @@ import { ResetPage } from "@/pages/Reset/Reset";
 import { RestaurantPage } from "@/pages/Restaurant/Restaurant";
 import { ValidateRestaurant } from "@/pages/Restaurant/ValidateRestaurant";
 import { RestaurantsPage } from "@/pages/Restaurants/Restaurants";
+import { ValidateRestaurantUpdate } from "@/pages/UpdateRestaurant/ValidateUpdateRestaurant";
+import { UserRestaurantsPage } from "@/pages/UserRestaurants/UserRestaurants";
 import { IRoute } from "@/types/route";
 
 export const routes: IRoute[] = [
@@ -32,6 +34,11 @@ export const routes: IRoute[] = [
   {
     path: "/restaurants/:restaurantId",
     element: <ValidateRestaurant />,
+  },
+  {
+    path: "/restaurants/:restaurantId/edit",
+    protection: {type: "authed", redirectPath: "/"},
+    element: <ValidateRestaurantUpdate />,
   },
   {
     path: "/login",
@@ -69,6 +76,12 @@ export const routes: IRoute[] = [
     protection: { type: "public", redirectPath: "/" },
     element: <ResetPage />,
     title: "Reset Password | Gourmetable",
+  },
+  {
+    path: "/user/restaurants",
+    protection: { type: "authed", redirectPath: "/" },
+    element: <UserRestaurantsPage />,
+    title: "Owned Restaurants | Gourmetable",
   },
   {
     path: "*",

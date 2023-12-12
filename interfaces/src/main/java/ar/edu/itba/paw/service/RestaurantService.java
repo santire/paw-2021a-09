@@ -18,7 +18,7 @@ public interface RestaurantService {
     List<Restaurant> getHotRestaurants(int limit, int lastDays);
 
     // UPDATE
-    Optional<Restaurant> updateRestaurant(long id, String name, String address, String phoneNumber, List<Tags> tags, String facebook, String twitter, String instagram);
+    Restaurant updateRestaurant(long id, String name, String address, String phoneNumber, List<Tags> tags, String facebook, String twitter, String instagram);
 
     // DESTROY
     void deleteRestaurantById(long id);

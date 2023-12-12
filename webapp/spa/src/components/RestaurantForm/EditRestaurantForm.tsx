@@ -23,11 +23,12 @@ import { useEffect, useState } from "react";
 import {
   IRestaurant,
   IRestaurantUpdate,
-} from "../../types/restaurant/restaurant.models";
-import { RestaurantUdpdateSchema } from "../../types/restaurant/restaurant.schemas";
-import { useUpdateRestaurant } from "../../hooks/restaurant.hooks";
-import { useGetTags } from "../../hooks/tags.hooks";
-import { useIsOwner } from "../../hooks/user.hooks";
+} from "@/types/restaurant/restaurant.models";
+import { RestaurantUdpdateSchema } from "@/types/restaurant/restaurant.schemas";
+import { useUpdateRestaurant } from "@/hooks/restaurant.hooks";
+import { useGetTags } from "@/hooks/tags.hooks";
+import { useIsOwner } from "@/hooks/user.hooks";
+import { isServerError } from "@/api/client";
 
 interface EditRestaurantFormProps {
   restaurant: IRestaurant;
@@ -59,23 +60,38 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
     resolver: zodResolver(RestaurantUdpdateSchema),
   });
 
-  const { mutate, isLoading } = useUpdateRestaurant({
-    onSuccess: () => {
-      navigate(`/restaurants/${restaurant.id}`);
-    },
-    onError: (error) => {
-      if (error.code === "invalid_image") {
-        setError("image", {
-          type: "custom",
-          message:
-            t("pages.registerRestaurant.errors.imageInvalid") ||
-            "Invalid image",
-        });
-      } else {
-        console.error("Unknown error code: ", error.code);
-      }
-    },
-  });
+  const { mutate, isPending } = useUpdateRestaurant();
+
+  function handleMutation(data: IRestaurantUpdate) {
+    if (!data.image) {
+      setError("image", {
+        type: "custom",
+        message:
+          t("pages.registerRestaurant.errors.imageMissing") ||
+          "Image is required",
+      });
+      setShowMessage(true);
+    }
+    mutate(
+      { restaurantUrl: restaurant.self, params: data },
+      {
+        onSuccess: () => {
+          navigate(`/restaurants/${restaurant.id}`);
+        },
+
+        onError: ({ cause }) => {
+          if (isServerError(cause) && cause.code === "invalid_image") {
+            setError("image", {
+              type: "custom",
+              message:
+                t("pages.editRestaurant.errors.imageInvalid") ||
+                "Invalid image",
+            });
+          }
+        },
+      },
+    );
+  }
 
   useEffect(() => {
     if (!isOwner) {
@@ -95,7 +111,7 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
       setChips(restaurant.tags.map((t) => tagsList.data.indexOf(t) + ""));
       setValue(
         "tags",
-        restaurant.tags.map((t) => tagsList.data.indexOf(t) + "")
+        restaurant.tags.map((t) => tagsList.data.indexOf(t) + ""),
       );
     }
   }, [tagsList.data]);
@@ -131,9 +147,7 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
       <div className={classes.wrapper}>
         <form
           className={classes.form}
-          onSubmit={handleSubmit((data) => {
-            mutate({ restaurantId: restaurant.id, restaurant: data });
-          })}
+          onSubmit={handleSubmit((data) => handleMutation(data))}
         >
           <Text
             className={classes.title}
@@ -142,13 +156,10 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
             mb="xl"
             align="center"
           >
-            {t("pages.registerRestaurant.title")}
+            {t("pages.editRestaurant.title")}
           </Text>
           <div className={classes.fields}>
-            <Divider
-              my="xs"
-              label={t("pages.registerRestaurant.loginDivider")}
-            />
+            <Divider my="xs" label={t("pages.editRestaurant.loginDivider")} />
             <SimpleGrid
               cols={1}
               mt="md"
@@ -156,10 +167,8 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
             >
               <TextInput
                 mb="md"
-                label={t("pages.registerRestaurant.name.label")}
-                placeholder={
-                  t("pages.registerRestaurant.name.placeholder") || ""
-                }
+                label={t("pages.editRestaurant.name.label")}
+                placeholder={t("pages.editRestaurant.name.placeholder") || ""}
                 required
                 error={errors.name?.message}
                 {...register("name")}
@@ -172,9 +181,9 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
               breakpoints={[{ maxWidth: "sm", cols: 1 }]}
             >
               <TextInput
-                label={t("pages.registerRestaurant.address.label")}
+                label={t("pages.editRestaurant.address.label")}
                 placeholder={
-                  t("pages.registerRestaurant.address.placeholder") || ""
+                  t("pages.editRestaurant.address.placeholder") || ""
                 }
                 required
                 error={errors.address?.message}
@@ -188,10 +197,8 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
             >
               <TextInput
                 mb="md"
-                label={t("pages.registerRestaurant.phone.label")}
-                placeholder={
-                  t("pages.registerRestaurant.phone.placeholder") || ""
-                }
+                label={t("pages.editRestaurant.phone.label")}
+                placeholder={t("pages.editRestaurant.phone.placeholder") || ""}
                 type="number"
                 required
                 error={
@@ -204,7 +211,7 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
             </SimpleGrid>
             <Divider
               my="xs"
-              label={t("pages.registerRestaurant.socialMediaDivider")}
+              label={t("pages.editRestaurant.socialMediaDivider")}
             />
             <SimpleGrid
               cols={1}
@@ -212,9 +219,9 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
               breakpoints={[{ maxWidth: "sm", cols: 1 }]}
             >
               <TextInput
-                label={t("pages.registerRestaurant.facebook.label")}
+                label={t("pages.editRestaurant.facebook.label")}
                 placeholder={
-                  t("pages.registerRestaurant.facebook.placeholder") || ""
+                  t("pages.editRestaurant.facebook.placeholder") || ""
                 }
                 error={
                   errors.facebook?.message === "errors.facebookRegex"
@@ -224,9 +231,9 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
                 {...register("facebook")}
               />
               <TextInput
-                label={t("pages.registerRestaurant.instagram.label")}
+                label={t("pages.editRestaurant.instagram.label")}
                 placeholder={
-                  t("pages.registerRestaurant.instagram.placeholder") || ""
+                  t("pages.editRestaurant.instagram.placeholder") || ""
                 }
                 error={
                   errors.instagram?.message === "errors.instagramRegex"
@@ -237,9 +244,9 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
               />
               <TextInput
                 mb="md"
-                label={t("pages.registerRestaurant.twitter.label")}
+                label={t("pages.editRestaurant.twitter.label")}
                 placeholder={
-                  t("pages.registerRestaurant.twitter.placeholder") || ""
+                  t("pages.editRestaurant.twitter.placeholder") || ""
                 }
                 error={
                   errors.twitter?.message === "errors.twitterRegex"
@@ -249,10 +256,7 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
                 {...register("twitter")}
               />
             </SimpleGrid>
-            <Divider
-              my="xs"
-              label={t("pages.registerRestaurant.profileImage")}
-            />
+            <Divider my="xs" label={t("pages.editRestaurant.profileImage")} />
 
             <Grid align="center">
               <Grid.Col span={9}>
@@ -262,28 +266,28 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
                     setFiles(files);
                     setShowMessage(false);
                     clearErrors("image");
+                    setShowPrevious(false);
                   }}
                   onReject={(files) => {
                     setFiles([]);
                     setValue("image", null);
                     setShowMessage(true);
+                    setShowPrevious(true);
                     for (const err of files[0].errors) {
                       if (err.code === "file-too-large") {
                         setError("image", {
                           type: "custom",
                           message:
-                            t(
-                              "pages.registerRestaurant.errors.imageTooLarge"
-                            ) || "Image too large",
+                            t("pages.editRestaurant.errors.imageTooLarge") ||
+                            "Image too large",
                         });
                       }
                       if (err.code === "file-invalid-type") {
                         setError("image", {
                           type: "custom",
                           message:
-                            t(
-                              "pages.registerRestaurant.errors.imageInvalidType"
-                            ) || "Image type invalid",
+                            t("pages.editRestaurant.errors.imageInvalidType") ||
+                            "Image type invalid",
                         });
                       }
                     }
@@ -319,10 +323,10 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
                     <div className={classes.imageContainer}>
                       <IconPhoto size={70} stroke={1.5} />
                       <Text size="lg" inline align="start">
-                        {t("pages.registerRestaurant.dropImage")}
+                        {t("pages.editRestaurant.dropImage")}
 
                         <Text size="sm" color="dimmed" inline mt={7}>
-                          {t("pages.registerRestaurant.dropImageSize")}
+                          {t("pages.editRestaurant.dropImageSize")}
                         </Text>
                       </Text>
                     </div>
@@ -357,12 +361,9 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
               </Grid.Col>
             </Grid>
 
-            <Divider
-              my="xs"
-              label={t("pages.registerRestaurant.tagsDivider")}
-            />
+            <Divider my="xs" label={t("pages.editRestaurant.tagsDivider")} />
             <Text size="xl" inline className={classes.tagsText}>
-              {t("pages.registerRestaurant.tagsSelection")}
+              {t("pages.editRestaurant.tagsSelection")}
             </Text>
             {errors.tags && (
               <Text color="red" mt={5}>
@@ -390,9 +391,9 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
               color="orange"
               fullWidth
               px="xl"
-              disabled={isLoading}
+              disabled={isPending}
             >
-              {isLoading ? (
+              {isPending ? (
                 <Loader variant="dots" color="orange" />
               ) : (
                 t("pages.editRestaurant.submit")

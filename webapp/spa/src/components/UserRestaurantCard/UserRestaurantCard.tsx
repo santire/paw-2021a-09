@@ -29,7 +29,11 @@ export function UserRestaurantCard({ restaurant }: RestaurantCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const { mutate, isLoading } = useDeleteRestaurant();
+  const { mutate, isPending } = useDeleteRestaurant(restaurant);
+
+  function handleMutation() {
+    mutate(restaurant.self);
+  }
 
   return (
     <Card withBorder p="lg" radius="md" className={classes.card}>
@@ -130,8 +134,8 @@ export function UserRestaurantCard({ restaurant }: RestaurantCardProps) {
           variant="outline"
           size="sm"
           fullWidth
-          onClick={() => mutate(id)}
-          disabled={isLoading}
+          onClick={() => handleMutation()}
+          disabled={isPending}
         >
           {t("userRestaurantCard.deleteModal.confirm")}
         </Button>
