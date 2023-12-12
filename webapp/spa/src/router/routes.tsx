@@ -11,6 +11,8 @@ import { RestaurantPage } from "@/pages/Restaurant/Restaurant";
 import { ValidateRestaurant } from "@/pages/Restaurant/ValidateRestaurant";
 import { RestaurantsPage } from "@/pages/Restaurants/Restaurants";
 import { ValidateRestaurantUpdate } from "@/pages/UpdateRestaurant/ValidateUpdateRestaurant";
+import { UserReservationsPage } from "@/pages/UserReservations/UserReservations";
+import { UserReservationsHistoryPage } from "@/pages/UserReservations/UserReservationsHistory";
 import { UserRestaurantsPage } from "@/pages/UserRestaurants/UserRestaurants";
 import { IRoute } from "@/types/route";
 
@@ -37,7 +39,7 @@ export const routes: IRoute[] = [
   },
   {
     path: "/restaurants/:restaurantId/edit",
-    protection: {type: "authed", redirectPath: "/"},
+    protection: { type: "authed", redirectPath: "/" },
     element: <ValidateRestaurantUpdate />,
   },
   {
@@ -82,6 +84,18 @@ export const routes: IRoute[] = [
     protection: { type: "authed", redirectPath: "/" },
     element: <UserRestaurantsPage />,
     title: "Owned Restaurants | Gourmetable",
+  },
+  {
+    path: "/user/reservations",
+    protection: { type: "authed", redirectPath: "/" },
+    element: <UserReservationsPage />,
+    title: "My Reservations | Gourmetable",
+  },
+  {
+    path: "/user/reservations/history",
+    protection: { type: "authed", redirectPath: "/" },
+    element: <UserReservationsHistoryPage />,
+    title: "My Reservations | Gourmetable",
   },
   {
     path: "*",

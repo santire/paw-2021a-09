@@ -1,4 +1,4 @@
-import { Button, Loader, Skeleton, Text, useMantineTheme } from "@mantine/core";
+import { Button, Skeleton, Text, useMantineTheme } from "@mantine/core";
 import { useGetRestaurant } from "../../hooks/restaurant.hooks";
 import { IReservation } from "../../types/reservation/reservation.models";
 import { DateUtils } from "../../utils/DateUtils";
@@ -28,7 +28,7 @@ export function UserReservation({
 
   if (restaurantData) {
     return (
-      <tr key={reservation.reservationId}>
+      <tr key={reservation.id}>
         <td>{reservation.quantity}</td>
         <td>{formattedDate}</td>
         <td>
@@ -41,7 +41,7 @@ export function UserReservation({
                   ? theme.colors.gray[5]
                   : theme.colors.gray[8],
             }}
-            to={`/restaurants/${restaurantData.id}`}
+            to={restaurantData.self}
           >
             {restaurantData.name}
           </Link>
@@ -51,14 +51,14 @@ export function UserReservation({
             style={{
               color: isHistory
                 ? theme.colors.gray[7]
-                : reservation.confirmed
+                : reservation.status === "CONFIRMED"
                 ? theme.colors.green[8]
                 : theme.colors.yellow[8],
             }}
           >
             {isHistory
               ? t("pages.userReservations.finished")
-              : reservation.confirmed
+              : reservation.status === "CONFIRMED"
               ? t("pages.userReservations.confirmed")
               : t("pages.userReservations.pending")}
           </Text>
@@ -84,7 +84,7 @@ export function UserReservation({
   }
 
   return (
-    <tr key={reservation.reservationId}>
+    <tr key={reservation.id}>
       <td>{reservation.quantity}</td>
       <td>{formattedDate}</td>
       <td>
@@ -93,12 +93,13 @@ export function UserReservation({
       <td>
         <Text
           style={{
-            color: reservation.confirmed
-              ? theme.colors.green[6]
-              : theme.colors.red[6],
+            color:
+              reservation.status === "CONFIRMED"
+                ? theme.colors.green[6]
+                : theme.colors.red[6],
           }}
         >
-          {reservation.confirmed
+          {reservation.status === "CONFIRMED"
             ? t("userReservation.confirmed")
             : t("userReservation.pending")}
         </Text>
@@ -110,7 +111,6 @@ export function UserReservation({
             variant="light"
             disabled={true}
             onClick={() => alert("test")}
-            // onClick={() => openDenyModal(userId!, reservation.id!)}
           >{t`pages.restaurantReservations.cancelButton`}</Button>
         </td>
       )}

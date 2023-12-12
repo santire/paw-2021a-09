@@ -28,7 +28,6 @@ export function ReservationModal({ restaurant, user, show, setShow }: Props) {
   const {
     handleSubmit,
     formState: { errors },
-    setError,
     setValue,
     clearErrors,
   } = useForm<IReservationRegister>({

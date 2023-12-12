@@ -1,10 +1,10 @@
 import { Text, Modal, Container, Button, Loader } from "@mantine/core";
 import { Dispatch, SetStateAction } from "react";
-import { IReservation } from "../../types/reservation/reservation.models";
+import { IReservation } from "@/types/reservation/reservation.models";
 import { useTranslation } from "react-i18next";
 import { useCancelReservation } from "../../hooks/reservation.hooks";
 import { IconCheck } from "@tabler/icons-react";
-import { IRestaurant } from "../../types/restaurant/restaurant.models";
+import { IRestaurant } from "@/types/restaurant/restaurant.models";
 import { showNotification } from "@mantine/notifications";
 
 interface CancelModalProps {
@@ -15,22 +15,25 @@ interface CancelModalProps {
 }
 export function CancelModal({
   reservation,
-  restaurant,
   show,
   setShow,
 }: CancelModalProps) {
   const { t } = useTranslation();
-  const { mutate, isLoading } = useCancelReservation({
-    onSuccess: () => {
-      setShow(false);
-      showNotification({
-        color: "green",
-        icon: <IconCheck />,
-        autoClose: 5000,
-        message: t("pages.userReservations.denyModal.success"),
-      });
-    },
-  });
+  const { mutate, isPending } = useCancelReservation();
+
+  function handleMutation() {
+    mutate(reservation.self, {
+      onSuccess: () => {
+        setShow(false);
+        showNotification({
+          color: "green",
+          icon: <IconCheck />,
+          autoClose: 5000,
+          message: t("pages.userReservations.denyModal.success"),
+        });
+      },
+    });
+  }
   return (
     <Modal
       opened={show}
@@ -43,12 +46,7 @@ export function CancelModal({
         <Button
           type="submit"
           color="red"
-          onClick={() =>
-            mutate({
-              reservationId: reservation.reservationId,
-              restaurantId: restaurant.id,
-            })
-          }
+          onClick={handleMutation}
         >
           {t`pages.userReservations.denyModal.cancelButton`}
         </Button>
@@ -57,9 +55,9 @@ export function CancelModal({
           variant="default"
           color="gray"
           style={{ marginLeft: "0.5rem" }}
-          disabled={isLoading}
+          disabled={isPending}
         >
-          {isLoading ? (
+          {isPending ? (
             <Loader color="orange" variant="dots" />
           ) : (
             t`pages.userReservations.denyModal.goBackButton`
