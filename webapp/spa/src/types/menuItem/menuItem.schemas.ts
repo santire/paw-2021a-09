@@ -9,6 +9,7 @@ const MenuItemSchemaBase = z.object({
 const HasID = z.object({
   id: z.number().int().gt(0),
   self: z.string().url(),
+  restaurant: z.string().url(),
 });
 
 export const MenuItemSchema = MenuItemSchemaBase.merge(HasID);

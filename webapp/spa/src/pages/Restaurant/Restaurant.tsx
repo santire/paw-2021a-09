@@ -8,6 +8,7 @@ import { RestaurantSkeleton } from "./Skeleton";
 import { RestaurantHeader } from "./Header";
 import { useTabSearchParam } from "@/hooks/searchParams.hooks";
 import { Comments } from "@/components/Comments/Comments";
+import { MenuItems } from "@/components/MenuItems/MenuItems";
 
 export function RestaurantPage({ restaurantId }: { restaurantId: number }) {
   const { t } = useTranslation();
@@ -78,8 +79,7 @@ export function RestaurantPage({ restaurantId }: { restaurantId: number }) {
 
               <Tabs.Panel value="menu" pt="xs">
                 <Center mt={50}>
-                  {/* <MenuItems restaurant={data} /> */}
-                  menu placeholder
+                  <MenuItems restaurant={data} />
                 </Center>
               </Tabs.Panel>
 

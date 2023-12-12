@@ -1,14 +1,13 @@
 import { CloseButton, Group } from "@mantine/core";
-import { useDeleteMenuItem } from "../../hooks/menuItems.hooks";
-import { IMenuItem } from "../../types/menuItem/menuItem.models";
+import { useDeleteMenuItem } from "@/hooks/menuItem.hooks";
+import { IMenuItem } from "@/types/menuItem/menuItem.models";
 
 interface MenuItemProps {
   item: IMenuItem;
-  restaurantId: number;
   isOwner?: boolean;
 }
-export function MenuItem({ item, restaurantId, isOwner }: MenuItemProps) {
-  const deleteItem = useDeleteMenuItem();
+export function MenuItem({ item, isOwner }: MenuItemProps) {
+  const deleteItem = useDeleteMenuItem(item.restaurant);
 
   return (
     <tr key={item.id}>
@@ -21,9 +20,9 @@ export function MenuItem({ item, restaurantId, isOwner }: MenuItemProps) {
             <CloseButton
               aria-label="Close modal"
               onClick={() => {
-                deleteItem.mutate({ restaurantId, menuItemId: item.id });
+                deleteItem.mutate({ url: item.self });
               }}
-              disabled={deleteItem.isLoading}
+              disabled={deleteItem.isPending}
             />
           </Group>
         ) : null}

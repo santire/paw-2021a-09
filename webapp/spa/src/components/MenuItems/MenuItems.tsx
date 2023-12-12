@@ -14,18 +14,18 @@ import {
 } from "@mantine/core";
 import {
   useCreateMenuItem,
-  useGetMenuItems,
-} from "../../hooks/menuItems.hooks";
+  useGetRestaurantMenu,
+} from "@/hooks/menuItem.hooks";
 import { IconAlertCircle } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 import { MenuItem } from "./MenuItem";
-import { useIsOwner } from "../../hooks/user.hooks";
-import { usePageSearchParams } from "../../hooks/searchParams.hooks";
+import { useIsOwner } from "@/hooks/user.hooks";
+import { usePageSearchParams } from "@/hooks/searchParams.hooks";
 import { useForm } from "react-hook-form";
-import { IMenuItemRegister } from "../../types/menuItem/menuItem.models";
-import { MenuItemRegisterSchema } from "../../types/menuItem/menuItem.schemas";
+import { IMenuItemRegister } from "@/types/menuItem/menuItem.models";
+import { MenuItemRegisterSchema } from "@/types/menuItem/menuItem.schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IRestaurant } from "../../types/restaurant/restaurant.models";
+import { IRestaurant } from "@/types/restaurant/restaurant.models";
 
 interface MenuItemsProps {
   restaurant: IRestaurant;
@@ -34,16 +34,12 @@ export function MenuItems({ restaurant }: MenuItemsProps) {
   const { t } = useTranslation();
   const [pageParams, setPageParams] = usePageSearchParams(
     undefined,
-    "menuPage"
+    "menuPage",
   );
-  const { data, isLoading } = useGetMenuItems(restaurant.id, pageParams);
+  const { data, isLoading } = useGetRestaurantMenu(restaurant, pageParams);
   const isOwner = useIsOwner({ restaurant });
 
-  const createItem = useCreateMenuItem({
-    onSuccess: () => {
-      reset();
-    },
-  });
+  const createItem = useCreateMenuItem();
 
   const {
     register,
@@ -57,6 +53,22 @@ export function MenuItems({ restaurant }: MenuItemsProps) {
     mode: "onTouched",
     resolver: zodResolver(MenuItemRegisterSchema),
   });
+
+  function handleMutation(data: IMenuItemRegister) {
+    if (isOwner) {
+      createItem.mutate(
+        {
+          url: restaurant.menu,
+          item: data,
+        },
+        {
+          onSuccess: () => {
+            reset();
+          },
+        },
+      );
+    }
+  }
 
   if (isLoading) {
     return (
@@ -84,11 +96,7 @@ export function MenuItems({ restaurant }: MenuItemsProps) {
           ) : null}
         </Flex>
         <Box w="30%" hidden={!isOwner}>
-          <form
-            onSubmit={handleSubmit((e) => {
-              createItem.mutate({ restaurantId: restaurant.id, menuItem: e });
-            })}
-          >
+          <form onSubmit={handleSubmit((e) => handleMutation(e))}>
             <SimpleGrid cols={1} breakpoints={[{ maxWidth: "sm", cols: 1 }]}>
               <TextInput
                 label={t("pages.restaurant.menu.name.label")}
@@ -126,9 +134,9 @@ export function MenuItems({ restaurant }: MenuItemsProps) {
                   color="orange"
                   fullWidth
                   px="xl"
-                  disabled={createItem.isLoading}
+                  disabled={createItem.isPending}
                 >
-                  {createItem.isLoading ? (
+                  {createItem.isPending ? (
                     <Loader variant="dots" color="orange" />
                   ) : (
                     t("pages.restaurant.menu.submit")
@@ -175,17 +183,12 @@ export function MenuItems({ restaurant }: MenuItemsProps) {
                   key={i.id}
                   item={i}
                   isOwner={isOwner}
-                  restaurantId={restaurant.id}
                 />
               ))}
             </tbody>
           </Table>
           <Box w="30%" hidden={!isOwner}>
-            <form
-              onSubmit={handleSubmit((e) => {
-                createItem.mutate({ restaurantId: restaurant.id, menuItem: e });
-              })}
-            >
+            <form onSubmit={handleSubmit((e) => handleMutation(e))}>
               <SimpleGrid cols={1} breakpoints={[{ maxWidth: "sm", cols: 1 }]}>
                 <TextInput
                   label={t("pages.restaurant.menu.name.label")}
@@ -227,9 +230,9 @@ export function MenuItems({ restaurant }: MenuItemsProps) {
                     color="orange"
                     fullWidth
                     px="xl"
-                    disabled={createItem.isLoading}
+                    disabled={createItem.isPending}
                   >
-                    {createItem.isLoading ? (
+                    {createItem.isPending ? (
                       <Loader variant="dots" color="orange" />
                     ) : (
                       t("pages.restaurant.menu.submit")
