@@ -7,12 +7,12 @@ import javax.validation.constraints.*;
 public class MenuItemForm {
 
     @Size(min = 1, max = 100)
-    @Pattern(regexp = "[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ ()'´¨!.,]+")
+//    @Pattern(regexp = "[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ ()'´¨!.,]+")
     @NotEmpty
     private String name;
 
     @Size(min = 0, max = 100)
-    @Pattern(regexp = "[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ ()'´¨!.,]+|^$")
+//    @Pattern(regexp = "[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ ()'´¨!.,]+|^$")
     @NotEmpty
     private String description;
 

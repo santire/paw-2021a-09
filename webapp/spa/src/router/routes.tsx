@@ -5,6 +5,7 @@ import { NotFoundPage } from "@/pages/NotFound/NotFound";
 import { ProfilePage } from "@/pages/Profile/Profile";
 import { userProfileLoader } from "@/pages/Profile/Profile.loader";
 import { RegisterPage } from "@/pages/Register/Register";
+import { RegisterRestaurantPage } from "@/pages/RegisterRestaurant/RegisterRestaurant";
 import { ResetPage } from "@/pages/Reset/Reset";
 import { RestaurantPage } from "@/pages/Restaurant/Restaurant";
 import { ValidateRestaurant } from "@/pages/Restaurant/ValidateRestaurant";
@@ -20,6 +21,12 @@ export const routes: IRoute[] = [
   {
     path: "/restaurants",
     element: <RestaurantsPage />,
+    title: "Browse Restaurants | Gourmetable",
+  },
+  {
+    path: "/restaurants/register",
+    protection: { type: "authed", redirectPath: "/" },
+    element: <RegisterRestaurantPage />,
     title: "Browse Restaurants | Gourmetable",
   },
   {

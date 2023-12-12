@@ -20,15 +20,18 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import useStyles from "./RestaurantForm.styles";
 import { useState } from "react";
-import { IRestaurantRegister } from "../../types/restaurant/restaurant.models";
-import { RestaurantRegisterSchema } from "../../types/restaurant/restaurant.schemas";
-import { useCreateRestaurant } from "../../hooks/restaurant.hooks";
-import { useGetTags } from "../../hooks/tags.hooks";
+import { IRestaurantRegister } from "@/types/restaurant/restaurant.models";
+import { RestaurantRegisterSchema } from "@/types/restaurant/restaurant.schemas";
+import { useCreateRestaurant } from "@/hooks/restaurant.hooks";
+import { useGetTags } from "@/hooks/tags.hooks";
+import { isServerError } from "@/api/client";
+import { useUser } from "@/hooks/user.hooks";
 
 export function RestaurantForm() {
   const { classes } = useStyles();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const user = useUser();
 
   const [chips, setChips] = useState<string[]>([]);
 
@@ -49,23 +52,41 @@ export function RestaurantForm() {
     resolver: zodResolver(RestaurantRegisterSchema),
   });
 
-  const { mutate, isLoading } = useCreateRestaurant({
-    onSuccess: () => {
-      navigate("/user/restaurants");
-    },
-    onError: (error) => {
-      if (error.code === "invalid_image") {
-        setError("image", {
-          type: "custom",
-          message:
-            t("pages.registerRestaurant.errors.imageInvalid") ||
-            "Invalid image",
-        });
-      } else {
-        console.error("Unknown error code: ", error.code);
+  const { mutate, isPending } = useCreateRestaurant();
+  function handleMutation(data: IRestaurantRegister) {
+    if (user.isSuccess && user.data.userId) {
+      {
+        if (!data.image) {
+          setError("image", {
+            type: "custom",
+            message:
+              t("pages.registerRestaurant.errors.imageMissing") ||
+              "Image is required",
+          });
+          setShowMessage(true);
+        } else {
+          mutate(
+            { userId: user.data.userId, params: data },
+            {
+              onSuccess: () => {
+                navigate("/user/restaurants");
+              },
+              onError: ({ cause }) => {
+                if (isServerError(cause) && cause.code === "invalid_image") {
+                  setError("image", {
+                    type: "custom",
+                    message:
+                      t("pages.registerRestaurant.errors.imageInvalid") ||
+                      "Invalid image",
+                  });
+                }
+              },
+            },
+          );
+        }
       }
-    },
-  });
+    }
+  }
 
   const previews = files.map((file, index) => {
     setValue("image", file);
@@ -93,19 +114,7 @@ export function RestaurantForm() {
       <div className={classes.wrapper}>
         <form
           className={classes.form}
-          onSubmit={handleSubmit((data) => {
-            if (!data.image) {
-              setError("image", {
-                type: "custom",
-                message:
-                  t("pages.registerRestaurant.errors.imageMissing") ||
-                  "Image is required",
-              });
-              setShowMessage(true);
-            } else {
-              mutate(data);
-            }
-          })}
+          onSubmit={handleSubmit((data) => handleMutation(data))}
         >
           <Text
             className={classes.title}
@@ -245,7 +254,7 @@ export function RestaurantForm() {
                           type: "custom",
                           message:
                             t(
-                              "pages.registerRestaurant.errors.imageTooLarge"
+                              "pages.registerRestaurant.errors.imageTooLarge",
                             ) || "Image too large",
                         });
                       }
@@ -254,7 +263,7 @@ export function RestaurantForm() {
                           type: "custom",
                           message:
                             t(
-                              "pages.registerRestaurant.errors.imageInvalidType"
+                              "pages.registerRestaurant.errors.imageInvalidType",
                             ) || "Image type invalid",
                         });
                       }
@@ -360,9 +369,9 @@ export function RestaurantForm() {
               color="orange"
               fullWidth
               px="xl"
-              disabled={isLoading}
+              disabled={isPending || !user.isSuccess}
             >
-              {isLoading ? (
+              {isPending ? (
                 <Loader variant="dots" color="orange" />
               ) : (
                 t("pages.register.submit")

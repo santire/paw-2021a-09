@@ -20,4 +20,5 @@ export const apiErrorMap: ErrorMap = {
   AccessDeniedException: { code: "access_denied" },
   AlreadyLikedException: { code: "already_liked" },
   LikeNotFound: { code: "like_not_found" },
+  InvalidImageException: { code: "invalid_image" },
 };

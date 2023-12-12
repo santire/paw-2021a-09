@@ -208,7 +208,7 @@ public class RestaurantJpaDao implements RestaurantDao {
                         +
                         " r.rating, r.user_id, "
                         +
-                        " AVG(price) as price, COALESCE(q,0) as hot, COALESCE(l, 0) as likes"
+                        " COALESCE(p, 0) as price, COALESCE(q,0) as hot, COALESCE(l, 0) as likes"
                         +
                         " FROM ("
                         +
@@ -248,14 +248,24 @@ public class RestaurantJpaDao implements RestaurantDao {
                         +
                         " ON r.restaurant_id=lik.rid"
                         +
-                        " LEFT JOIN menu_items m ON r.restaurant_id = m.restaurant_id"
+                        " LEFT JOIN ("
+                        +
+                        " SELECT restaurant_id, AVG(price)"
+                        +
+                        " FROM menu_items"
+                        +
+                        " GROUP BY restaurant_id"
+                        +
+                        ") AS pr(rid, p)"
+                        +
+                        " ON r.restaurant_id=pr.rid"
                         +
                         " WHERE r.name ILIKE :searchTerm"
                         +
-                        " AND price BETWEEN :low AND :high"
+                        " AND COALESCE(p, 0) BETWEEN :low AND :high"
                         +
                         " GROUP BY r.restaurant_id, r.name, r.phone_number, r.rating,"
-                        + " r.address, r.user_id,  hot, likes"
+                        + " r.address, r.user_id, hot, likes, price"
                         +
                         " ORDER BY " + orderBy + " " + order
                         +

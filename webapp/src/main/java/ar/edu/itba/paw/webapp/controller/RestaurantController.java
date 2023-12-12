@@ -55,7 +55,7 @@ public class RestaurantController {
                                    @QueryParam("ownedBy") final Long ownedBy,
                                    @QueryParam("search") @DefaultValue("") String search,
                                    @QueryParam("tags") List<Integer> tags,
-                                   @QueryParam("min") @DefaultValue("1") Integer min,
+                                   @QueryParam("min") @DefaultValue("0") Integer min,
                                    @QueryParam("max") @DefaultValue("10000") Integer max,
                                    @QueryParam("sort") @DefaultValue("name") String sortBy,
                                    @QueryParam("order") @DefaultValue("asc") String order,

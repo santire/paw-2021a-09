@@ -45,7 +45,7 @@ export function RestaurantsPage() {
           <Flex direction="column" align="center">
             <SimpleGrid cols={3} spacing="xl" mb="xl">
               {restaurants.data.map((rest) => (
-                <RestaurantCard restaurant={rest} key={rest.name} />
+                <RestaurantCard restaurant={rest} key={rest.self} />
               ))}
             </SimpleGrid>
             <Pagination

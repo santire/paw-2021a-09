@@ -1,9 +1,17 @@
 import { LikeService } from "@/api/services/LikeService";
 import { RestaurantService } from "@/api/services/RestaurantService";
 import { queries } from "@/queries";
-import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useUser } from "./user.hooks";
-import { IRestaurant } from "@/types/restaurant/restaurant.models";
+import {
+  IRestaurant,
+  IRestaurantRegister,
+} from "@/types/restaurant/restaurant.models";
 import { IClientLike } from "@/types/like/like.models";
 import { isAuthed } from "@/utils/AuthStorage";
 import { useRestaurantFilterAndPage } from "@/context/RestaurantFilterAndPageContext";
@@ -36,6 +44,45 @@ export function useGetRestaurants() {
     },
   });
   return query;
+}
+
+export function useCreateRestaurant() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      userId,
+      params,
+    }: {
+      userId: number;
+      params: IRestaurantRegister;
+    }) => RestaurantService.create(userId, params),
+    onSuccess: (data) => {
+      // Might change browsing lists, invalidate all
+      queryClient.invalidateQueries({
+        queryKey: queries.restaurants.list._def,
+      });
+      // Set restaurant data
+      return queryClient.setQueryData(
+        queries.restaurants.detail(data.id).queryKey,
+        data,
+      );
+    },
+  });
+}
+
+export function useDeleteRestaurant({ id }: IRestaurant) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: RestaurantService.remove,
+    onSuccess: () => {
+      // Might change browsing lists, invalidate all
+      queryClient.invalidateQueries({
+        queryKey: queries.restaurants.list._def,
+      });
+      // Clear restaurant data
+      return queryClient.invalidateQueries(queries.restaurants.detail(id));
+    },
+  });
 }
 
 async function updateLikesCache(

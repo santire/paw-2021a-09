@@ -89,11 +89,11 @@ export function MenuItems({ restaurant }: MenuItemsProps) {
           <Text size={30} mb={5} align="left">
             {t("pages.restaurant.menu.notFound")}
           </Text>
-          {isOwner ? (
-            <Text size={19} italic mb={50} align="left">
-              {t("pages.restaurant.menu.ownerHint")}
-            </Text>
-          ) : null}
+          {/* {isOwner ? ( */}
+          {/*   <Text size={19} italic mb={50} align="left"> */}
+          {/*     {t("pages.restaurant.menu.ownerHint")} */}
+          {/*   </Text> */}
+          {/* ) : null} */}
         </Flex>
         <Box w="30%" hidden={!isOwner}>
           <form onSubmit={handleSubmit((e) => handleMutation(e))}>
