@@ -90,7 +90,7 @@ export function Comments({ restaurant }: Props) {
           <form onSubmit={handleSubmit((e) => handleMutation(e))}>
             <Group position="center">
               <Flex direction="column" w={"100%"}>
-                <Title mb="xs">{t("pages.restaurant.reviews.title")}</Title>
+                <Title mb="xs">{t("pages.restaurant.comments.title")}</Title>
                 <Textarea
                   mb={10}
                   w={"100%"}
@@ -105,7 +105,7 @@ export function Comments({ restaurant }: Props) {
                 px="xl"
                 disabled={mutation.isPending}
               >
-                {t("pages.restaurant.reviews.submit")}
+                {t("pages.restaurant.comments.submit")}
               </Button>
             </Group>
           </form>

@@ -159,11 +159,11 @@
         "submit": "Submit",
         "error": "Couldn't add menu item"
       },
-      "reviews": {
-        "title": "Leave a review",
+      "comments": {
+        "title": "Leave a comment",
         "submit": "Submit",
-        "notFound": "This restaurant doesn't have any reviews yet",
-        "hint": "Be the first to make a review!"
+        "notFound": "This restaurant doesn't have any comments yet",
+        "hint": "Be the first to make a comment!"
       }
     },
     "restaurants": {

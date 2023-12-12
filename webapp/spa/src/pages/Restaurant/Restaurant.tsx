@@ -28,8 +28,8 @@ export function RestaurantPage({ restaurantId }: { restaurantId: number }) {
               <Tabs.Tab value="Menu" icon={<IconMenu size={14} />}>
                 {t("pages.restaurant.menu.title")}
               </Tabs.Tab>
-              <Tabs.Tab value="Reviews" icon={<IconMessageCircle size={14} />}>
-                {t("pages.restaurant.reviews.title")}
+              <Tabs.Tab value="Comments" icon={<IconMessageCircle size={14} />}>
+                {t("pages.restaurant.comments.title")}
               </Tabs.Tab>
             </Tabs.List>
 
@@ -39,7 +39,7 @@ export function RestaurantPage({ restaurantId }: { restaurantId: number }) {
               </Center>
             </Tabs.Panel>
 
-            <Tabs.Panel value="Reviews" pt="xs">
+            <Tabs.Panel value="Comments" pt="xs">
               <Center mt={50}>
                 <Loader color="gray" variant="dots" size="xl" />
               </Center>
@@ -69,10 +69,10 @@ export function RestaurantPage({ restaurantId }: { restaurantId: number }) {
                   {t("pages.restaurant.menu.title")}
                 </Tabs.Tab>
                 <Tabs.Tab
-                  value="reviews"
+                  value="comments"
                   icon={<IconMessageCircle size={14} />}
                 >
-                  {t("pages.restaurant.reviews.title")}
+                  {t("pages.restaurant.comments.title")}
                 </Tabs.Tab>
               </Tabs.List>
 
@@ -83,7 +83,7 @@ export function RestaurantPage({ restaurantId }: { restaurantId: number }) {
                 </Center>
               </Tabs.Panel>
 
-              <Tabs.Panel value="reviews" pt="xs">
+              <Tabs.Panel value="comments" pt="xs">
                 <Center mt={50}>
                   <Comments restaurant={data} />
                 </Center>

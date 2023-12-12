@@ -1,3 +1,4 @@
+import { PageParams } from "@/types/page";
 import qs from "qs";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
