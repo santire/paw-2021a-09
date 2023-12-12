@@ -1,7 +1,9 @@
-import { createStyles, Flex, Text, Image } from "@mantine/core";
+import { createStyles, Flex, Text, Image, Container, Center, Loader } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import homeImageSrc from "@/assets/images/home_image.png";
 import { useUser } from "@/hooks/user.hooks";
+import { useGetFilteredRestaurants } from "@/hooks/restaurant.hooks";
+import { CarouselWrapper, RestaurantCarousel } from "@/components/RestaurantCarousel/RestaurantCarousel";
 
 const useStyles = createStyles((theme) => ({
   heading: {
@@ -36,6 +38,9 @@ export function HomePage() {
   const { t } = useTranslation();
   const user = useUser();
 
+  const { data: popularRestaurants } = useGetFilteredRestaurants("popular");
+  const { data: hotRestaurants } = useGetFilteredRestaurants("hot");
+
   return (
     <>
       <div className={classes.heading}>
@@ -48,7 +53,43 @@ export function HomePage() {
           <Image src={homeImageSrc} height={"35vh"} width={"auto"} />
         </Flex>
       </div>
-      <p>{user.isSuccess && JSON.stringify(user.data)}</p>
+
+      <Container size="xl" my="xl">
+        {popularRestaurants ? (
+          <RestaurantCarousel
+            restaurants={popularRestaurants.data}
+            title={t("pages.home.popular")}
+            tooltip={t("pages.home.popularTooltip")}
+          />
+        ) : (
+          <CarouselWrapper
+            title={t("pages.home.popular")}
+            tooltip={t("pages.home.popularTooltip")}
+          >
+            <Center w={"100%"} mih={200}>
+              <Loader variant="dots" color="orange" size={65} />
+            </Center>
+          </CarouselWrapper>
+        )}
+      </Container>
+      <Container size="xl" my="xl">
+        {hotRestaurants ? (
+          <RestaurantCarousel
+            restaurants={hotRestaurants.data}
+            title={t("pages.home.hot")}
+            tooltip={t("pages.home.hotTooltip")}
+          />
+        ) : (
+          <CarouselWrapper
+            title={t("pages.home.hot")}
+            tooltip={t("pages.home.hotTooltip")}
+          >
+            <Center w={"100%"} mih={200}>
+              <Loader variant="dots" color="orange" size={65} />
+            </Center>
+          </CarouselWrapper>
+        )}
+      </Container>
     </>
   );
 }

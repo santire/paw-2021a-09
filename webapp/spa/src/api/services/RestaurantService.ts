@@ -4,7 +4,7 @@ import {
   IRestaurantUpdate,
 } from "@/types/restaurant/restaurant.models";
 import { apiClient } from "../client";
-import { MAX_PAGE_AMOUNT, Page, PageParams } from "@/types/page";
+import { DEFAULT_PAGE, MAX_PAGE_AMOUNT, Page, PageParams } from "@/types/page";
 import { RestaurantFilterParams } from "@/types/filters";
 import { pagedResponse } from "../utils";
 
@@ -21,6 +21,9 @@ interface IRestaurantService {
     params: PageParams,
   ): Promise<Page<IRestaurant[]>>;
 
+  getPopular(): Promise<Page<IRestaurant[]>>;
+  getHot(): Promise<Page<IRestaurant[]>>;
+
   create(userId: number, params: IRestaurantRegister): Promise<IRestaurant>;
   update(url: string, params: IRestaurantUpdate): Promise<IRestaurant>;
   remove(url: string): Promise<void>;
@@ -35,6 +38,14 @@ module RestaurantServiceImpl {
     params: RestaurantFilterParams & PageParams,
   ) {
     return _getAll(params);
+  }
+
+  export async function getPopular() {
+    return _getAll(DEFAULT_PAGE, "popular");
+  }
+
+  export async function getHot() {
+    return _getAll(DEFAULT_PAGE, "hot");
   }
 
   export async function getOwnedRestaurants(

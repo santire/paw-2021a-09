@@ -48,6 +48,29 @@ export function useGetRestaurants() {
   return query;
 }
 
+export function useGetFilteredRestaurants(type: "hot" | "popular") {
+  const queryClient = useQueryClient();
+  const user = useUser();
+  const query = useQuery({
+    queryKey: [...queries.restaurants.list._def, type],
+    queryFn: async () => {
+      const resp =
+        type === "hot"
+          ? await RestaurantService.getHot()
+          : await RestaurantService.getPopular();
+      resp.data.forEach((r) => {
+        queryClient.setQueryData(queries.restaurants.detail(r.id).queryKey, r);
+      });
+
+      if (!user.isPaused && user.isSuccess && user.data) {
+        await updateLikesCache(queryClient, user.data.likes, resp.data);
+      }
+      return resp;
+    },
+  });
+  return query;
+}
+
 export function useGetOwnedRestaurants(pageParams: PageParams) {
   const page = pageParams?.page ?? 1;
   const pageAmount = pageParams?.pageAmount ?? 6;
