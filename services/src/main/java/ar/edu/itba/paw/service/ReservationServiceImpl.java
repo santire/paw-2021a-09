@@ -5,13 +5,13 @@ import ar.edu.itba.paw.model.exceptions.ReservationNotFoundException;
 import ar.edu.itba.paw.model.exceptions.RestaurantNotFoundException;
 import ar.edu.itba.paw.model.exceptions.UserNotFoundException;
 import ar.edu.itba.paw.persistence.ReservationDao;
+import ar.edu.itba.paw.service.utils.UriBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,13 +39,13 @@ public class ReservationServiceImpl implements ReservationService {
         User owner = restaurant.getOwner();
         Reservation reservation = reservationDao.addReservation(user, restaurant, date, quantity);
 
-        final String ownerUrl = UriBuilder.fromUri(baseUri).path("restaurants")
+        final String ownerUrl = UriBuilder.fromUri(baseUri.toString()).path("restaurants")
                 .path(reservation.getRestaurant().getId().toString())
                 .path("reservations")
                 .queryParam("tab", "pending")
                 .build().toString();
 
-        final String userUrl = UriBuilder.fromUri(baseUri)
+        final String userUrl = UriBuilder.fromUri(baseUri.toString())
                 .path("user")
                 .path("reservations")
                 .build().toString();

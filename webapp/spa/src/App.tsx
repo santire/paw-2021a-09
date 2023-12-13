@@ -11,20 +11,11 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Layout from "@/components/Layout/Layout";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { elementRouter } from "./router/elementRoutes";
-import { RestaurantFilterAndPageParamsProvider } from "./context/RestaurantFilterAndPageContext";
 import { NotificationsProvider } from "@mantine/notifications";
 
 const queryClient = new QueryClient({
-  queryCache: new QueryCache({
-    onError: ({ cause }) => {
-      // console.log(cause);
-    },
-  }),
-  mutationCache: new MutationCache({
-    onError: () => {
-      // console.log("GLOBAL MUTATION ERROR HANDLING WOULD GO HERE");
-    },
-  }),
+  queryCache: new QueryCache(),
+  mutationCache: new MutationCache(),
   defaultOptions: {
     queries: {
       // staleTime: 2 * 60 * 1000,  // 2min
@@ -37,9 +28,7 @@ const queryClient = new QueryClient({
 const GourmetableRouter = createBrowserRouter(
   [
     {
-      element: (
-          <Layout />
-      ),
+      element: <Layout />,
       children: elementRouter(queryClient),
     },
   ],

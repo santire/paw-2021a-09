@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.ws.rs.core.UriBuilder;
+import ar.edu.itba.paw.service.utils.UriBuilder;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -58,14 +58,14 @@ public class UserServiceImpl implements UserService {
         User user = userDao.register(username, encoder.encode(password), firstName, lastName, email, phone);
 
         final URI patchUri = makePatchUri(user, baseUri.toString());
-
+        
         String token = UUID.randomUUID().toString();
         LocalDateTime createdAt = LocalDateTime.now();
         String url = UriBuilder.fromUri(baseRequestUrl)
                 .path("user")
                 .path("activate")
                 .queryParam("token", token)
-                .queryParam("patchUrl", patchUri)
+                .queryParam("patchUrl", patchUri.toString())
                 .build()
                 .toString();
 
@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
                 .path("user")
                 .path("reset")
                 .queryParam("token", token)
-                .queryParam("patchUrl", patchUri)
+                .queryParam("patchUrl", patchUri.toString())
                 .build()
                 .toString();
 
