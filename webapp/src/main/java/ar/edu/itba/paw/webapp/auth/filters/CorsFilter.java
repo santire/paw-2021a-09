@@ -24,7 +24,7 @@ public class CorsFilter extends OncePerRequestFilter {
         }
 
         // Do not deploy!
-        response.setHeader("Access-Control-Allow-Origin", "*");
+        //response.setHeader("Access-Control-Allow-Origin", "*");
         filterChain.doFilter(request, response);
     }
 }

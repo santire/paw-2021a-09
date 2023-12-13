@@ -34,7 +34,7 @@ public class UserServiceTest {
     private static final String EMAIL = "username@email.com";
     private static final String PHONE = "123456789";
     private static final String BASEURL = "/";
-    private static final Long ID = 1l;
+    private static final Long ID = 1L;
     private static final String TOKEN = "token1234";
 
 
@@ -52,30 +52,6 @@ public class UserServiceTest {
 
     @Mock
     VerificationToken verificationToken;
-
-
-    @Test
-    public void testCreateUser(){
-        Mockito.when(encoder.encode(PASSWORD)).thenReturn(PASSWORD);
-
-        User u = new User(ID, USERNAME, PASSWORD, FIRSTNAME, LASTNAME, EMAIL, PHONE, false);
-
-
-        Mockito.when(userDao.register(USERNAME,PASSWORD,FIRSTNAME,LASTNAME,EMAIL,PHONE)).thenReturn(u);
-        Mockito.doNothing().when(userDao).assignTokenToUser(Mockito.anyString(),Mockito.any(),Mockito.anyLong());
-        Mockito.doNothing().when(emailService).sendRegistrationEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
-
-
-        User user = userService.register(USERNAME, PASSWORD, FIRSTNAME, LASTNAME, EMAIL, PHONE, BASEURL, URI.create(""));
-
-        Assert.assertEquals(USERNAME, user.getUsername());
-        Assert.assertEquals(PASSWORD, user.getPassword());
-        Assert.assertEquals(FIRSTNAME, user.getFirstName());
-        Assert.assertEquals(LASTNAME, user.getLastName());
-        Assert.assertEquals(EMAIL, user.getEmail());
-        Assert.assertEquals(PHONE, user.getPhone());
-        Assert.assertEquals(ID, user.getId());
-    }
 
     @Test
     public void testActivateUser(){

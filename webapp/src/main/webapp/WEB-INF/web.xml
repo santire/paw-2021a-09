@@ -85,23 +85,23 @@
     </filter-mapping>
 
 <!--    TODO: Add filters as POM dependency?-->
-<!--    <filter>-->
-<!--        <filter-name>ExpiresFilter</filter-name>-->
-<!--        <filter-class>org.apache.catalina.filters.ExpiresFilter</filter-class>-->
-<!--        <init-param>-->
-<!--            <param-name>ExpiresByType image</param-name>-->
-<!--            <param-value>access plus 10 minutes</param-value>-->
-<!--        </init-param>-->
-<!--        <init-param>-->
-<!--            <param-name>ExpiresByType application/javascript</param-name>-->
-<!--            <param-value>access plus 10 minutes</param-value>-->
-<!--        </init-param>-->
-<!--    </filter>-->
+    <filter>
+        <filter-name>ExpiresFilter</filter-name>
+        <filter-class>org.apache.catalina.filters.ExpiresFilter</filter-class>
+        <init-param>
+            <param-name>ExpiresByType image</param-name>
+            <param-value>access plus 10 minutes</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ExpiresByType application/javascript</param-name>
+            <param-value>access plus 10 minutes</param-value>
+        </init-param>
+    </filter>
 
-<!--    &lt;!&ndash; Map the ExpiresFilter to a URL pattern &ndash;&gt;-->
-<!--    <filter-mapping>-->
-<!--        <filter-name>ExpiresFilter</filter-name>-->
-<!--        <url-pattern>/paw-2021a-09/src/assets/*</url-pattern>-->
-<!--    </filter-mapping>-->
+    <!-- Map the ExpiresFilter to a URL pattern -->
+    <filter-mapping>
+        <filter-name>ExpiresFilter</filter-name>
+        <url-pattern>/assets/*</url-pattern>
+    </filter-mapping>
 
 </web-app>
