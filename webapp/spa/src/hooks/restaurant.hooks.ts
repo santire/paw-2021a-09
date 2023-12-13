@@ -138,11 +138,12 @@ export function useUpdateRestaurant() {
       queryClient.invalidateQueries({
         queryKey: queries.users.restaurants._def,
       });
+      return queryClient.invalidateQueries(queries.restaurants.detail(data.id));
       // Set restaurant data
-      return queryClient.setQueryData(
-        queries.restaurants.detail(data.id).queryKey,
-        data,
-      );
+      // return queryClient.setQueryData(
+      //   queries.restaurants.detail(data.id).queryKey,
+      //   data,
+      // );
     },
   });
 }
