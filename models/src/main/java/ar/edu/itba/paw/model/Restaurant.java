@@ -61,6 +61,8 @@ public class Restaurant {
 
     @OneToMany(orphanRemoval = true, mappedBy = "restaurant")
     private List<MenuItem> menu;
+    @OneToMany(orphanRemoval = true, mappedBy = "restaurant")
+    private List<Reservation> reservations;
 
     @OneToOne(mappedBy = "restaurant", cascade = CascadeType.ALL)
     private Image profileImage;

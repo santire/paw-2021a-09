@@ -42,7 +42,6 @@ export function useGetReservations(
 ) {
   const user = useUser();
   const userId = user.data?.userId;
-  console.log("Getting reservations");
 
   return useQuery({
     queryKey: queries.reservations.user(filter, status, params).queryKey,
