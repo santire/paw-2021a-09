@@ -63,15 +63,6 @@ export function EditRestaurantForm({ restaurant }: EditRestaurantFormProps) {
   const { mutate, isPending } = useUpdateRestaurant();
 
   function handleMutation(data: IRestaurantUpdate) {
-    if (!data.image) {
-      setError("image", {
-        type: "custom",
-        message:
-          t("pages.registerRestaurant.errors.imageMissing") ||
-          "Image is required",
-      });
-      setShowMessage(true);
-    }
     mutate(
       { restaurantUrl: restaurant.self, params: data },
       {

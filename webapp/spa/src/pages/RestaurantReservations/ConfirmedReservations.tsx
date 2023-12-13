@@ -14,14 +14,14 @@ export function ConfirmedReservations({
     undefined,
     "confirmedPage",
   );
-  const { data } = useGetRestaurantReservations(
+  const { data, isSuccess } = useGetRestaurantReservations(
     restaurantId,
     "current",
     "confirmed",
     pendingPageParams,
   );
 
-  if (data && data.meta.total <= 0) {
+  if (isSuccess && data && data.meta.total <= 0) {
     return (
       <Flex align="flex-start" justify={"center"} w="100%">
         <Flex direction="column" justify="center">
@@ -32,7 +32,7 @@ export function ConfirmedReservations({
       </Flex>
     );
   }
-  if (data) {
+  if (isSuccess && data) {
     return (
       <Center mt={50}>
         <Flex direction="column" align="center">

@@ -7,7 +7,6 @@ import {
 } from "@/types/reservation/reservation.models";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUser } from "./user.hooks";
-import { IRestaurant } from "@/types/restaurant/restaurant.models";
 
 export function useCreateReservation() {
   const queryClient = useQueryClient();
@@ -56,11 +55,11 @@ export function useConfirmReservation(id: number) {
   return useMutation({
     mutationFn: (url: string) => ReservationService.confirm(url),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [...queries.reservations.restaurant._def, id, "current"],
-      });
       // For pending reservations
       queryClient.invalidateQueries(queries.restaurants.detail(id));
+      return queryClient.invalidateQueries({
+        queryKey: [...queries.reservations.restaurant._def, id, "current"],
+      });
     },
   });
 }
@@ -99,7 +98,10 @@ export function useDenyReservation(id: number) {
       message: IReservationCancelMessage;
     }) => ReservationService.deny(url, message),
     onSuccess: () => {
-      queryClient.invalidateQueries({
+      // For pending reservations
+      queryClient.invalidateQueries(queries.restaurants.detail(id));
+
+      return queryClient.invalidateQueries({
         queryKey: [...queries.reservations.restaurant._def, id, "current"],
       });
     },

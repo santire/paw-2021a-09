@@ -100,21 +100,6 @@ module RestaurantServiceImpl {
 
   export async function update(url: string, params: IRestaurantUpdate) {
     const { image, ...data } = params;
-    if (!image) {
-      console.log("uppps")
-      throw new Error("Restaurant Creation Error", {
-        cause: {
-          status: "400",
-          code: "missing_image",
-          errors: [
-            {
-              subject: "image",
-              message: "missing image",
-            },
-          ],
-        },
-      });
-    }
     const response = await apiClient.patch<IRestaurant>(url, {
       ...data,
     });

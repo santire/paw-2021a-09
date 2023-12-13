@@ -18,13 +18,13 @@ export function RestaurantReservation({
 }: RestaurantReservationProps) {
   const theme = useMantineTheme();
   const { t } = useTranslation();
-  const { user } = reservation;
+  const { restaurant } = reservation;
   const [showConfirm, setShowConfirm] = useState(false);
   const [showDeny, setShowDeny] = useState(false);
 
   const date = new Date(reservation.date);
   const formattedDate = DateUtils.formatDate(date);
-  const rid = parseInt(user.substring(user.lastIndexOf("/") + 1));
+  const rid = parseInt(restaurant.substring(restaurant.lastIndexOf("/") + 1));
   const { data: userData, isLoading } = useUser()
 
   if (!isLoading && userData) {
