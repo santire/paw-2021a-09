@@ -79,7 +79,7 @@ public class CommentJpaDaoTest {
 
     @Test
     public void testFindByRestaurant() {
-        final List<Comment> commentList = commentJpaDao.findFilteredComments(1, 5, null, 2L, true);
+        final List<Comment> commentList = commentJpaDao.findFilteredComments(1, 5, null, 2L, false);
 
         assertEquals(2L, commentList.size());
         assertEquals(2L, commentList.get(1).getUser().getId().longValue());

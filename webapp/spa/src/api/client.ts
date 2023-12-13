@@ -9,7 +9,7 @@ import {
 import { apiErrorMap } from "./mappers/errors";
 
 const BASE_CONFIG = {
-  baseURL: import.meta.env.VITE_HOST_API || "http://localhost:8080/app/api",
+  baseURL: import.meta.env.VITE_HOST_API,
   paramsSerializer: {
     indexes: null,
   },

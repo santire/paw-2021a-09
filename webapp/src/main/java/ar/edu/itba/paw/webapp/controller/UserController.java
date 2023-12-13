@@ -69,11 +69,7 @@ public class UserController {
                 .path(PATH)
                 .build();
 
-        String baseUrl = request.getHeader("Origin");
-        LOGGER.debug("Base url: {}", baseUrl);
-        if (baseUrl == null) {
-            baseUrl = URI.create(request.getRequestURL().toString()).resolve(request.getContextPath()).toString();
-        }
+        String baseUrl = URI.create(request.getRequestURL().toString()).resolve(request.getContextPath()).toString();
 
         if (forgotEmail != null && !forgotEmail.isEmpty()) {
             userService.requestPasswordReset(forgotEmail, baseUrl, baseUri);
