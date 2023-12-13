@@ -9,9 +9,9 @@ import java.util.Map;
 
 public class UriBuilder {
 
-    private String baseUri;
-    private StringBuilder pathBuilder;
-    private Map<String, String> queryParams;
+    private final String baseUri;
+    private final StringBuilder pathBuilder;
+    private final Map<String, String> queryParams;
 
     private UriBuilder(String baseUri) {
         this.baseUri = baseUri;
@@ -22,17 +22,7 @@ public class UriBuilder {
     public static UriBuilder fromUri(String baseUri) {
         return new UriBuilder(baseUri);
     }
-
-    public static void main(String[] args) throws URISyntaxException {
-        // Example usage:
-        URI uri = UriBuilder.fromUri("https://example.com")
-                .path("path")
-                .queryParam("param1", "value1")
-                .queryParam("param2", "value2")
-                .build();
-
-        System.out.println(uri.toString());
-    }
+    
 
     public UriBuilder path(String pathSegment) {
         pathBuilder.append("/").append(pathSegment);

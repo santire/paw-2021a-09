@@ -34,17 +34,29 @@ interface IReservationService {
   ): Promise<Page<IReservation[]>>;
 }
 
+const formatDate = (currentDate: Date) => {
+  // Get components
+  const day = currentDate.getDate().toString().padStart(2, "0");
+  const month = (currentDate.getMonth() + 1).toString().padStart(2, "0"); // Note: Month is zero-based
+  const year = currentDate.getFullYear();
+  const hours = currentDate.getHours().toString().padStart(2, "0");
+  const minutes = currentDate.getMinutes().toString().padStart(2, "0");
+  const seconds = currentDate.getSeconds().toString().padStart(2, "0");
+
+  // Create the formatted string
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+};
+
 module ReservationServiceImpl {
   export async function create(
     userId: number,
     restaurantId: number,
     params: IReservationRegister,
   ) {
-    const formattedDate = params.date.toISOString().slice(0, 19);
     const response = await apiClient.post<IReservation>(PATH, {
       userId,
       restaurantId,
-      date: formattedDate,
+      date: formatDate(params.date),
       quantity: params.quantity,
     });
 

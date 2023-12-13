@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
         User user = userDao.register(username, encoder.encode(password), firstName, lastName, email, phone);
 
         final URI patchUri = makePatchUri(user, baseUri.toString());
-        
+
         String token = UUID.randomUUID().toString();
         LocalDateTime createdAt = LocalDateTime.now();
         String url = UriBuilder.fromUri(baseRequestUrl)
