@@ -3,9 +3,9 @@ import { IReservation } from "../../types/reservation/reservation.models";
 import { DateUtils } from "../../utils/DateUtils";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { useGetUserById } from "../../hooks/user.hooks";
 import { ConfirmModal } from "../ReservationModal/ConfirmModal";
 import { DenyModal } from "../ReservationModal/DenyModal";
+import { useUser } from "@/hooks/user.hooks";
 
 interface RestaurantReservationProps {
   reservation: IReservation;
@@ -25,7 +25,7 @@ export function RestaurantReservation({
   const date = new Date(reservation.date);
   const formattedDate = DateUtils.formatDate(date);
   const rid = parseInt(user.substring(user.lastIndexOf("/") + 1));
-  const { data: userData, isLoading } = useGetUserById(rid);
+  const { data: userData, isLoading } = useUser()
 
   if (!isLoading && userData) {
     return (
@@ -39,14 +39,14 @@ export function RestaurantReservation({
             style={{
               color: isHistory
                 ? theme.colors.gray[7]
-                : reservation.confirmed
+                : reservation.status === "CONFIRMED"
                 ? theme.colors.green[8]
                 : theme.colors.yellow[8],
             }}
           >
             {isHistory
               ? t("pages.userReservations.finished")
-              : reservation.confirmed
+              : reservation.status === "CONFIRMED"
               ? t("pages.userReservations.confirmed")
               : t("pages.userReservations.pending")}
           </Text>
@@ -55,7 +55,7 @@ export function RestaurantReservation({
           <Button
             color={"green"}
             variant="outline"
-            disabled={isHistory || reservation.confirmed}
+            disabled={isHistory || reservation.status !== "PENDING"}
             onClick={() => setShowConfirm(true)}
           >{t`pages.restaurantReservations.confirmButton`}</Button>
         </td>
@@ -63,19 +63,19 @@ export function RestaurantReservation({
           <Button
             color={"red"}
             variant="outline"
-            disabled={isHistory || reservation.confirmed}
+            disabled={isHistory || reservation.status !== "PENDING"}
             onClick={() => setShowDeny(true)}
           >{t`pages.restaurantReservations.denyButton`}</Button>
         </td>
         <ConfirmModal
           restaurantId={rid}
-          reservationId={reservation.reservationId}
+          reservation={reservation}
           show={showConfirm}
           setShow={setShowConfirm}
         />
         <DenyModal
           restaurantId={rid}
-          reservationId={reservation.reservationId}
+          reservation={reservation}
           show={showDeny}
           setShow={setShowDeny}
         />
@@ -84,7 +84,7 @@ export function RestaurantReservation({
   }
 
   return (
-    <tr key={reservation.reservationId}>
+    <tr key={reservation.id}>
       <td>
         <Skeleton height={18} mt={4} radius="xl" width={60} />
       </td>
@@ -98,14 +98,14 @@ export function RestaurantReservation({
           style={{
             color: isHistory
               ? theme.colors.gray[7]
-              : reservation.confirmed
+              : reservation.status === "CONFIRMED"
               ? theme.colors.green[8]
               : theme.colors.yellow[8],
           }}
         >
           {isHistory
             ? t("pages.userReservations.finished")
-            : reservation.confirmed
+            : reservation.status
             ? t("pages.userReservations.confirmed")
             : t("pages.userReservations.pending")}
         </Text>
@@ -126,18 +126,6 @@ export function RestaurantReservation({
           onClick={() => setShowDeny(true)}
         >{t`pages.restaurantReservations.denyButton`}</Button>
       </td>
-      {/* <CancelModal */}
-      {/*   restaurant={restaurantData} */}
-      {/*   reservation={reservation} */}
-      {/*   show={show} */}
-      {/*   setShow={setShow} */}
-      {/* /> */}
-      {/* <CancelModal */}
-      {/*   restaurant={restaurantData} */}
-      {/*   reservation={reservation} */}
-      {/*   show={show} */}
-      {/*   setShow={setShow} */}
-      {/* /> */}
     </tr>
   );
 }

@@ -4,31 +4,36 @@ import { useTranslation } from "react-i18next";
 import { useConfirmReservation } from "../../hooks/reservation.hooks";
 import { IconCheck } from "@tabler/icons-react";
 import { showNotification } from "@mantine/notifications";
+import { IReservation } from "@/types/reservation/reservation.models";
 
 interface ConfirmModalProps {
-  reservationId: number;
+  reservation: IReservation;
   restaurantId: number;
   show: boolean;
   setShow: Dispatch<SetStateAction<boolean>>;
 }
 export function ConfirmModal({
-  reservationId,
+  reservation,
   restaurantId,
   show,
   setShow,
 }: ConfirmModalProps) {
   const { t } = useTranslation();
-  const { mutate, isLoading } = useConfirmReservation({
-    onSuccess: () => {
-      setShow(false);
-      showNotification({
-        color: "green",
-        icon: <IconCheck />,
-        autoClose: 5000,
-        message: t("pages.restaurantReservations.confirmModal.success"),
-      });
-    },
-  });
+  const { mutate, isPending } = useConfirmReservation(restaurantId);
+
+  function handleMutation() {
+    mutate(reservation.self, {
+      onSuccess: () => {
+        setShow(false);
+        showNotification({
+          color: "green",
+          icon: <IconCheck />,
+          autoClose: 5000,
+          message: t("pages.restaurantReservations.confirmModal.success"),
+        });
+      },
+    });
+  }
   return (
     <Modal
       opened={show}
@@ -38,16 +43,7 @@ export function ConfirmModal({
     >
       <Text mb={"xl"}>{t`pages.restaurantReservations.confirmModal.text`}</Text>
       <Container>
-        <Button
-          type="submit"
-          color="green"
-          onClick={() =>
-            mutate({
-              reservationId,
-              restaurantId,
-            })
-          }
-        >
+        <Button type="submit" color="green" onClick={handleMutation}>
           {t`pages.restaurantReservations.confirmModal.confirmButton`}
         </Button>
         <Button
@@ -55,9 +51,9 @@ export function ConfirmModal({
           variant="default"
           color="gray"
           style={{ marginLeft: "0.5rem" }}
-          disabled={isLoading}
+          disabled={isPending}
         >
-          {isLoading ? (
+          {isPending ? (
             <Loader color="orange" variant="dots" />
           ) : (
             t`pages.userReservations.denyModal.goBackButton`

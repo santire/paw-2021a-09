@@ -15,6 +15,10 @@ const HasURLs = z.object({
   restaurant: z.string().url(),
 });
 
+export const CancelMessageSchema = z.object({
+  message: z.string().min(10),
+});
+
 export const ReservationRegisterSchema = ReservationSchemaBase;
 export const ReservationSchema = ReservationSchemaBase.merge(HasID)
   .merge(HasURLs)

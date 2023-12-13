@@ -19,6 +19,20 @@ export class DateUtils {
   static getNextWeek(date: Date): Date {
     return new Date(date.getTime() + 7 * 24 * 60 * 60 * 1000);
   }
+  static getFirstDate(): Date {
+    const currentDate = new Date();
+
+    // Min hour is 12pm
+    if (currentDate.getHours() < 12) {
+      currentDate.setHours(12, 0, 0);
+    } else {
+      const minutes = Math.ceil(currentDate.getMinutes() / 30) * 30;
+      currentDate.setMinutes(minutes);
+      currentDate.setSeconds(0);
+    }
+
+    return currentDate;
+  }
 
   static getTimeOptions = (selectedDate: Date) => {
     const currentTime = new Date();

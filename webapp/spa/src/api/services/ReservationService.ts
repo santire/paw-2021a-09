@@ -1,5 +1,6 @@
 import {
   IReservation,
+  IReservationCancelMessage,
   IReservationRegister,
 } from "@/types/reservation/reservation.models";
 import { apiClient } from "../client";
@@ -14,19 +15,21 @@ interface IReservationService {
     params: IReservationRegister,
   ): Promise<IReservation>;
 
-  // confirm(params: ActionReservationParams): Promise<void>;
-  // deny(params: DenyReservationParams): Promise<void>;
   cancel(url: string): Promise<void>;
+  confirm(url: string): Promise<IReservation>;
+  deny(url: string, message: IReservationCancelMessage): Promise<IReservation>;
 
   getUserReservations(
     userId: number,
     filterType: string,
+    status: string,
     params: PageParams,
   ): Promise<Page<IReservation[]>>;
 
   getRestaurantReservations(
     restaurantId: number,
     filterType: string,
+    status: string,
     params: PageParams,
   ): Promise<Page<IReservation[]>>;
 }
@@ -51,12 +54,14 @@ module ReservationServiceImpl {
   export async function getUserReservations(
     userId: number,
     filterType: string,
+    status: string,
     params: PageParams,
   ) {
     const response = await apiClient.get<IReservation[]>(PATH, {
       params: {
         madeBy: userId,
         type: filterType,
+        status: status !== "any" ? status.toLowerCase() : undefined,
         ...params,
       },
     });
@@ -66,12 +71,14 @@ module ReservationServiceImpl {
   export async function getRestaurantReservations(
     restaurantId: number,
     filterType: string,
+    status: string,
     params: PageParams,
   ) {
     const response = await apiClient.get<IReservation[]>(PATH, {
       params: {
         madeTo: restaurantId,
         type: filterType.toLowerCase(),
+        status: status !== "any" ? status.toLowerCase() : undefined,
         ...params,
       },
     });
@@ -80,6 +87,22 @@ module ReservationServiceImpl {
 
   export async function cancel(url: string) {
     const response = await apiClient.delete(url);
+    return response.data;
+  }
+  export async function confirm(url: string) {
+    const response = await apiClient.patch<IReservation>(url, {
+      status: "confirmed",
+    });
+    return response.data;
+  }
+  export async function deny(
+    url: string,
+    { message }: IReservationCancelMessage,
+  ) {
+    const response = await apiClient.patch(url, {
+      status: "denied",
+      message: message,
+    });
     return response.data;
   }
 }

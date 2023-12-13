@@ -1,19 +1,10 @@
-
-import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import {
-  Text,
-  Container,
-  Flex,
-  Loader,
-  createStyles,
-  Table,
-  Pagination,
-} from "@mantine/core";
+import { Link } from "react-router-dom";
+import { Text, Container, Flex, createStyles, Tabs } from "@mantine/core";
 import { useTranslation } from "react-i18next";
-import { useGetReservations } from "@/hooks/reservation.hooks";
-import { usePageSearchParams } from "@/hooks/searchParams.hooks";
-import { UserReservation } from "@/components/UserReservation/UserReservation";
+import { useTabSearchParam } from "@/hooks/searchParams.hooks";
+import { IconAlertCircle, IconCircleCheck } from "@tabler/icons-react";
+import { UserPendingReservations } from "./UserPendingReservations";
+import { UserConfirmedReservations } from "./UserConfirmedReservations";
 
 const useStyles = createStyles((theme) => ({
   heading: {
@@ -55,62 +46,34 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 export function UserReservationsPage() {
-  const { classes } = useStyles();
+  const [tabParam, setTabParam] = useTabSearchParam("pending");
   const { t } = useTranslation();
-  const [pageParams, setPageParams] = usePageSearchParams();
-  const { data } = useGetReservations("current", pageParams);
-
-
-  if (data && data.meta.total <= 0) {
-    return (
-      <Wrapper>
-        <Flex justify="center" align="center" h={"100%"}>
-          <div className={classes.empty}>
-            <Text mb={50}>{t("pages.userReservations.notFound")}</Text>
-          </div>
-        </Flex>
-      </Wrapper>
-    );
-  }
-
-  if (data) {
-    return (
-      <Wrapper>
-        <Flex direction="column" align="center">
-          <Table>
-            <thead>
-              <tr>
-                <th>{t("pages.userReservations.table.customers")}</th>
-                <th>{t("pages.userReservations.table.date")}</th>
-                <th>{t("pages.userReservations.table.restaurant")}</th>
-                <th>{t("pages.userReservations.table.state")}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.data.map((r) => (
-                <UserReservation key={r.self} reservation={r} isHistory={false} />
-              ))}
-            </tbody>
-          </Table>
-          <div style={{ marginTop: "2rem", textAlign: "center" }}></div>
-          <Pagination
-            total={data.meta.maxPages ?? 1}
-            siblings={3}
-            page={pageParams?.page}
-            onChange={(e) => setPageParams({ page: e })}
-            align="center"
-            color="orange"
-          />
-        </Flex>
-      </Wrapper>
-    );
-  }
   return (
     <Wrapper>
       <Container size="xl" my="xl">
         <Flex justify="center" align="center" h={"100%"}>
-          <Loader color="orange" size="lg" />
+          <Tabs
+            value={tabParam ?? "pending"}
+            onTabChange={setTabParam}
+            style={{ width: "80%", justifyContent: "center" }}
+          >
+            <Tabs.List>
+              <Tabs.Tab value="pending" icon={<IconAlertCircle size={16} />}>
+                {t`pages.restaurantReservations.tabs.pending.title`}
+              </Tabs.Tab>
+              <Tabs.Tab value="confirmed" icon={<IconCircleCheck size={16} />}>
+                {t`pages.restaurantReservations.tabs.confirmed.title`}
+              </Tabs.Tab>
+            </Tabs.List>
+
+            <Tabs.Panel value="pending" pt="xs">
+              <UserPendingReservations />
+            </Tabs.Panel>
+
+            <Tabs.Panel value="confirmed" pt="xs">
+              <UserConfirmedReservations />
+            </Tabs.Panel>
+          </Tabs>
         </Flex>
       </Container>
     </Wrapper>

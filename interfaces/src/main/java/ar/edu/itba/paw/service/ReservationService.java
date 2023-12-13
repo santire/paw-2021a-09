@@ -21,10 +21,10 @@ public interface ReservationService {
     Optional<Reservation> findById(long reservationId);
 
     // UPDATE
-    void confirmReservation(long reservationId);
+    Reservation confirmReservation(long reservationId);
 
     //DESTROY
-    void ownerCancelReservation(long reservationId, String message);
+    Reservation ownerCancelReservation(long reservationId, String message);
     void userCancelReservation(long reservationId);
 
 

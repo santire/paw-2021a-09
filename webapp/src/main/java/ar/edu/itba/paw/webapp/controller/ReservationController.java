@@ -100,25 +100,26 @@ public class ReservationController {
     @Path("/{reservationId}")
     @Produces(value = {MediaType.APPLICATION_JSON})
     @Consumes(value = {MediaType.APPLICATION_JSON})
-    @PreAuthorize("!@authComponent.isReservationOwner(#reservationId)")
+    @PreAuthorize("@authComponent.isReservationOwner(#reservationId)")
     public Response updateReservationStatus(@PathParam("reservationId") final Long reservationId,
-                                       @Valid @NotNull final ReservationStatusForm statusForm) {
+                                            @Valid @NotNull final ReservationStatusForm statusForm) {
+        Reservation reservation;
         switch (statusForm.getStatus()) {
             case DENIED:
                 String message = statusForm.getMessage();
                 if (message == null || message.length() < 10) {
                     throw new InvalidParameterException("message", "message should have at least 10 characters");
                 }
-                reservationService.ownerCancelReservation(reservationId, message);
+                reservation = reservationService.ownerCancelReservation(reservationId, message);
                 break;
             case CONFIRMED:
-                reservationService.confirmReservation(reservationId);
+                reservation = reservationService.confirmReservation(reservationId);
                 break;
             default:
                 throw new InvalidParameterException("status", "Can only be 'confirmed' or 'denied' ");
         }
 
-        return Response.ok().build();
+        return Response.ok().entity(ReservationDto.fromReservation(reservation, uriInfo)).build();
     }
 
     @DELETE

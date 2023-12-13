@@ -56,7 +56,7 @@ export function UserReservationsHistoryPage() {
   const { classes } = useStyles();
   const { t } = useTranslation();
   const [pageParams, setPageParams] = usePageSearchParams();
-  const { data } = useGetReservations("history", pageParams);
+  const { data } = useGetReservations("history", "any", pageParams);
 
   if (data && data.meta.total <= 0) {
     return (

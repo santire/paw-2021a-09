@@ -15,47 +15,54 @@ import { useDenyReservation } from "../../hooks/reservation.hooks";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  IReservation,
+  IReservationCancelMessage,
+} from "@/types/reservation/reservation.models";
+import { CancelMessageSchema } from "@/types/reservation/reservation.schemas";
 
 interface DenyModalProps {
-  reservationId: number;
+  reservation: IReservation;
   restaurantId: number;
   show: boolean;
   setShow: Dispatch<SetStateAction<boolean>>;
 }
 
-const DenySchema = z.object({
-  message: z.string().min(1).max(144),
-});
-type IDeny = z.infer<typeof DenySchema>;
-
 export function DenyModal({
-  reservationId,
+  reservation,
   restaurantId,
   show,
   setShow,
 }: DenyModalProps) {
   const { t } = useTranslation();
-  const { mutate, isLoading } = useDenyReservation({
-    onSuccess: () => {
-      setShow(false);
-      reset();
-      showNotification({
-        color: "green",
-        icon: <IconCheck />,
-        autoClose: 5000,
-        message: t("pages.restaurantReservations.denyModal.success"),
-      });
-    },
-  });
+  const { mutate, isPending } = useDenyReservation(restaurantId);
+
+  function handleMutation(data: IReservationCancelMessage) {
+    mutate(
+      { url: reservation.self, message: data },
+      {
+        onSuccess: () => {
+          setShow(false);
+          reset();
+          showNotification({
+            color: "green",
+            icon: <IconCheck />,
+            autoClose: 5000,
+            message: t("pages.restaurantReservations.denyModal.success"),
+          });
+        },
+      },
+    );
+  }
 
   const {
     handleSubmit,
     register,
     formState: { errors },
     reset,
-  } = useForm<IDeny>({
+  } = useForm<IReservationCancelMessage>({
     mode: "onTouched",
-    resolver: zodResolver(DenySchema),
+    resolver: zodResolver(CancelMessageSchema),
   });
 
   return (
@@ -65,18 +72,14 @@ export function DenyModal({
       title={t("pages.restaurantReservations.denyModal.denyTitle")}
       centered
     >
-      <form
-        onSubmit={handleSubmit((data) =>
-          mutate({ reservationId, restaurantId, message: data.message })
-        )}
-      >
+      <form onSubmit={handleSubmit((data) => handleMutation(data))}>
         {/* <Text mb={"xl"}>{t`pages.restaurantReservations.denyModal.text`}</Text> */}
 
         <Textarea
           withAsterisk
           label={t`pages.restaurantReservations.denyModal.message`}
           placeholder={String(
-            t`pages.restaurantReservations.denyModal.placeholder`
+            t`pages.restaurantReservations.denyModal.placeholder`,
           )}
           {...register("message")}
           error={errors.message?.message}
@@ -93,9 +96,9 @@ export function DenyModal({
             variant="default"
             color="gray"
             style={{ marginLeft: "0.5rem" }}
-            disabled={isLoading}
+            disabled={isPending}
           >
-            {isLoading ? (
+            {isPending ? (
               <Loader color="orange" variant="dots" />
             ) : (
               t`pages.userReservations.denyModal.goBackButton`

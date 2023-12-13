@@ -214,6 +214,8 @@
       "title": "Your reservations",
       "adminTitle": "Reservations made to your restaurant",
       "notFound": "Looks like you do not have any reservations",
+      "notFoundPending": "Looks like you do not have any pending reservations",
+      "notFoundConfirmed": "Looks like you do not have any confirmed reservations",
       "pending": "Pending confirmation",
       "confirmed": "Confirmed",
       "finished": "Finished",

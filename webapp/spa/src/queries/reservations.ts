@@ -5,14 +5,19 @@ export const reservations = createQueryKeys("reservations", {
   detail: (url: string) => ({
     queryKey: [url],
   }),
-  user: (str: "current" | "history", params: PageParams) => ({
-    queryKey: [str, { ...params }],
+  user: (
+    str: "current" | "history",
+    status: "pending" | "confirmed" | "denied" | "any",
+    params: PageParams,
+  ) => ({
+    queryKey: [str, status, { ...params }],
   }),
   restaurant: (
     restaurantId: number,
-    str: "current | history",
+    str: "current" | "history",
+    status: "pending" | "confirmed" | "denied" | "any",
     params: PageParams,
   ) => ({
-    queryKey: [restaurantId, str, { ...params }],
+    queryKey: [restaurantId, str, status, { ...params }],
   }),
 });

@@ -38,9 +38,7 @@ const GourmetableRouter = createBrowserRouter(
   [
     {
       element: (
-        <RestaurantFilterAndPageParamsProvider>
           <Layout />
-        </RestaurantFilterAndPageParamsProvider>
       ),
       children: elementRouter(queryClient),
     },

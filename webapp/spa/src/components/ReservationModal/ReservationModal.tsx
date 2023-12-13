@@ -22,8 +22,13 @@ interface Props {
 export function ReservationModal({ restaurant, user, show, setShow }: Props) {
   const { t } = useTranslation();
   const [quantity, setQuantity] = useState(1);
-  const [time, setTime] = useState(DateUtils.getTimeOptions(new Date())[0]);
-  const [date, setDate] = useState(DateUtils.addTimeToDate(new Date(), time));
+  const [time, setTime] = useState(
+    `${DateUtils.getFirstDate().getHours()}:${DateUtils.getFirstDate()
+      .getMinutes()
+      .toString()
+      .padStart(2, "0")}`,
+  );
+  const [date, setDate] = useState(DateUtils.getFirstDate());
 
   const {
     handleSubmit,
@@ -38,7 +43,11 @@ export function ReservationModal({ restaurant, user, show, setShow }: Props) {
   const makeReservation = useCreateReservation();
   function handleMutation(data: IReservationRegister) {
     makeReservation.mutate(
-      { userId: user.userId, restaurantId: restaurant.id, params: data },
+      {
+        userId: user.userId,
+        restaurantId: restaurant.id,
+        params: { ...data },
+      },
       {
         onSuccess: () => {
           setShow(false);

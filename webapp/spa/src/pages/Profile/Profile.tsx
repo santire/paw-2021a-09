@@ -1,11 +1,11 @@
 import { EditProfileForm } from "@/components/EditProfileForm/EditProfileForm";
-import { useProfileLoaderData } from "./Profile.loader";
 import { Flex, Loader, Text } from "@mantine/core";
 import { useTranslation } from "react-i18next";
+import { useUser } from "@/hooks/user.hooks";
 
 export function ProfilePage() {
   const { t } = useTranslation();
-  const { isLoading, data: user } = useProfileLoaderData();
+  const { isLoading, data: user } = useUser();
 
   if (isLoading) {
     return (

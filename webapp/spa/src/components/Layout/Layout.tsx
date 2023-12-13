@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Outlet } from "react-router-dom";
 import { Footer, FooterProps } from "../Footer/Footer";
 import { Header } from "../Header/Header";
+import { RestaurantFilterAndPageParamsProvider } from "@/context/RestaurantFilterAndPageContext";
 
 const useStyles = createStyles(() => ({
   app: {
@@ -45,13 +46,17 @@ export default function Layout() {
 
   return (
     <div className={classes.app}>
-      <Header />
+      <RestaurantFilterAndPageParamsProvider>
+        <>
+          <Header />
 
-      <main className={classes.main}>
-        {/* <Navigation /> */}
-        <Outlet />
-      </main>
-      <Footer data={data} />
+          <main className={classes.main}>
+            {/* <Navigation /> */}
+            <Outlet />
+          </main>
+          <Footer data={data} />
+        </>
+      </RestaurantFilterAndPageParamsProvider>
     </div>
   );
 }

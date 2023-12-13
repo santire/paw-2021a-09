@@ -105,27 +105,26 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     @Transactional
-    public void confirmReservation(long reservationId) {
+    public Reservation confirmReservation(long reservationId) {
         Reservation reservation = reservationDao.findById(reservationId).orElseThrow(ReservationNotFoundException::new);
         Restaurant restaurant = reservation.getRestaurant();
         User user = reservation.getUser();
 
-        // TODO: Check if date has already passed
-        // TODO: Check if pending, shouldn't be able to confirm/deny otherwise
-
         emailService.sendReservationConfirmationEmail(user.getEmail(), restaurant.getName(), reservation.getDate(), reservation.getQuantity());
         reservation.setStatus(ReservationStatus.CONFIRMED);
+        return reservation;
     }
 
     @Override
     @Transactional
-    public void ownerCancelReservation(long reservationId, String message) {
+    public Reservation ownerCancelReservation(long reservationId, String message) {
         Reservation reservation = reservationDao.findById(reservationId).orElseThrow(ReservationNotFoundException::new);
         Restaurant restaurant = reservation.getRestaurant();
         User user = reservation.getUser();
 
         emailService.sendOwnerReservationCancelEmail(user.getEmail(), user.getName(), restaurant.getName(), reservation.getDate(), reservation.getQuantity(), message);
         reservation.setStatus(ReservationStatus.DENIED);
+        return reservation;
     }
 
     // DESTROY
@@ -138,6 +137,7 @@ public class ReservationServiceImpl implements ReservationService {
         User user = reservation.getUser();
         reservationDao.cancelReservation(reservationId);
         emailService.sendUserReservationCancelEmail(user.getEmail(), owner.getEmail(), user.getName(), owner.getName(), restaurant.getName(), reservation.getDate(), reservation.getQuantity());
+
     }
 
 

@@ -3,12 +3,12 @@ import { HomePage } from "@/pages/Home/Home";
 import { LoginPage } from "@/pages/Login/Login";
 import { NotFoundPage } from "@/pages/NotFound/NotFound";
 import { ProfilePage } from "@/pages/Profile/Profile";
-import { userProfileLoader } from "@/pages/Profile/Profile.loader";
 import { RegisterPage } from "@/pages/Register/Register";
 import { RegisterRestaurantPage } from "@/pages/RegisterRestaurant/RegisterRestaurant";
 import { ResetPage } from "@/pages/Reset/Reset";
-import { RestaurantPage } from "@/pages/Restaurant/Restaurant";
 import { ValidateRestaurant } from "@/pages/Restaurant/ValidateRestaurant";
+import { ValidateRestaurantReservationHistory } from "@/pages/RestaurantReservations/RestaurantReservationHistory";
+import { ValidateRestaurantReservation } from "@/pages/RestaurantReservations/ValidateRestaurantReservations";
 import { RestaurantsPage } from "@/pages/Restaurants/Restaurants";
 import { ValidateRestaurantUpdate } from "@/pages/UpdateRestaurant/ValidateUpdateRestaurant";
 import { UserReservationsPage } from "@/pages/UserReservations/UserReservations";
@@ -43,6 +43,16 @@ export const routes: IRoute[] = [
     element: <ValidateRestaurantUpdate />,
   },
   {
+    path: "/restaurants/:restaurantId/reservations",
+    protection: { type: "authed", redirectPath: "/" },
+    element: <ValidateRestaurantReservation />,
+  },
+  {
+    path: "/restaurants/:restaurantId/reservations/history",
+    protection: { type: "authed", redirectPath: "/" },
+    element: <ValidateRestaurantReservationHistory />,
+  },
+  {
     path: "/login",
     protection: { type: "public", redirectPath: "/" },
     element: <LoginPage />,
@@ -65,7 +75,6 @@ export const routes: IRoute[] = [
     protection: { type: "authed", redirectPath: "/" },
     element: <ProfilePage />,
     title: "User Profile | Gourmetable",
-    loader: userProfileLoader,
   },
   {
     path: "/user/activate",
