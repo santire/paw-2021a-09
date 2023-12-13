@@ -13,6 +13,7 @@ import { Filter } from "@/components/Filter/Filter";
 import { RestaurantCardSkeleton } from "@/components/RestaurantCard/RestaurantCardSkeleton";
 import { useGetRestaurants } from "@/hooks/restaurant.hooks";
 import { useRestaurantFilterAndPage } from "@/context/RestaurantFilterAndPageContext";
+import { useEffect } from "react";
 
 const useStyles = createStyles((theme) => ({
   title: {
@@ -23,8 +24,15 @@ const useStyles = createStyles((theme) => ({
 
 export function RestaurantsPage() {
   const { error, data } = useGetRestaurants();
-  const { pageParams, setPageParams } = useRestaurantFilterAndPage();
+  const { pageParams, setPageParams, setFilterParams } =
+    useRestaurantFilterAndPage();
 
+  useEffect(() => {
+    return () => {
+      setPageParams();
+      setFilterParams({});
+    };
+  }, []);
   const { t } = useTranslation();
 
   if (error) {
